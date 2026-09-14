@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Assistant', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  .font-hebrew {
+    font-family: 'Frank Ruhl Libre', 'Alef', 'SBL Hebrew', 'Ezra SIL', serif;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Content typography overrides */
+.wp-content-rendered h1, 
+.wp-content-rendered h2, 
+.wp-content-rendered h3, 
+.wp-content-rendered h4 {
+  color: #334155;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.wp-content-rendered h2 { font-size: 1.5rem; border-bottom: 2px solid #8CB65F22; padding-bottom: 0.5rem; }
+.wp-content-rendered h3 { font-size: 1.25rem; color: #44505B; }
+.wp-content-rendered h4 { font-size: 1.1rem; }
+.wp-content-rendered p { margin-bottom: 1rem; line-height: 1.8; color: #475569; font-size: 1.05rem; }
+.wp-content-rendered a { color: #8CB65F; font-weight: 600; text-decoration: none; transition: color 0.15s; }
+.wp-content-rendered a:hover { color: #6e9447; text-decoration: underline; }
+
+/* Beautiful Nested Hierarchical Lists */
+.wp-content-rendered ul {
+  list-style-type: disc;
+  padding-right: 1.5rem;
+  margin: 0.75rem 0;
+}
+.wp-content-rendered ul ul {
+  list-style-type: circle;
+  padding-right: 1.75rem;
+  margin: 0.4rem 0;
+  border-right: 2px solid #8CB65F25;
+}
+.wp-content-rendered ul ul ul {
+  list-style-type: square;
+  padding-right: 1.75rem;
+  margin: 0.3rem 0;
+  border-right: 2px solid #8CB65F40;
+}
+.wp-content-rendered li {
+  margin-bottom: 0.4rem;
+  line-height: 1.7;
+  color: #334155;
+  font-size: 1.05rem;
+}
+.wp-content-rendered li > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.375rem;
+  transition: all 0.15s;
+}
+.wp-content-rendered li > a:hover {
+  background-color: #8CB65F15;
+  color: #6e9447;
+}
+
+/* Table styling matching Kahuna clean table */
+.wp-content-rendered table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.wp-content-rendered th {
+  background: #44505B;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 12px 16px;
+  text-align: center;
+  border: 1px solid #334155;
+}
+.wp-content-rendered td {
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  color: #334155;
+}
+.wp-content-rendered tr:nth-child(even) td {
+  background: #f8fafc;
+}
+.wp-content-rendered tr:hover td {
+  background: #f1f5f9;
+}
