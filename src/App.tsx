@@ -8,7 +8,14 @@ import { CourseView } from './components/CourseView';
 import { SearchView } from './components/SearchView';
 
 export const App: React.FC = () => {
-  const [currentRoute, setCurrentRoute] = useState<string>('');
+  const [currentRoute, setCurrentRoute] = useState<string>(() => {
+    if (typeof window === 'undefined') return '';
+    let hash = window.location.hash.replace(/^#\/?/, '');
+    try {
+      hash = decodeURIComponent(hash);
+    } catch {}
+    return hash;
+  });
   const [searchOpen, setSearchOpen] = useState(false);
 
   // Sync route with window hash
@@ -22,7 +29,6 @@ export const App: React.FC = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    handleHashChange();
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);

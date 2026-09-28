@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase, CommentItem } from '../lib/supabase';
+import { fetchComments, postComment, CommentItem } from '../lib/api';
 import { MessageSquare, Send, CheckCircle2, User, ShieldCheck } from 'lucide-react';
 
 interface CommentsProps {
@@ -23,36 +23,39 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
   const candidateSlugs = Array.from(
     new Set([
       pageSlug,
-      pageSlug.toLowerCase(),
+      pageSlug?.toLowerCase(),
       rawSlug,
       rawSlug?.toLowerCase(),
       pageId ? String(pageId) : null,
+      pageSlug === 'about' || rawSlug === 'about' ? 'about' : null,
     ].filter(Boolean) as string[])
   );
 
-  const fetchComments = async () => {
+  const loadData = async (isCurrent: () => boolean) => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('comments')
-        .select('*')
-        .in('page_slug', candidateSlugs)
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching comments:', error);
-      } else {
-        setComments(data || []);
+      const data = await fetchComments(candidateSlugs);
+      if (isCurrent()) {
+        setComments(data);
       }
     } catch (err) {
-      console.error('Failed to load comments:', err);
+      if (isCurrent()) {
+        console.error('[Comments] Failed to load comments from D1:', err);
+      }
     } finally {
-      setLoading(false);
+      if (isCurrent()) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
-    fetchComments();
+    let mounted = true;
+    loadData(() => mounted);
+
+    return () => {
+      mounted = false;
+    };
   }, [pageSlug, rawSlug, pageId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,28 +66,15 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
     setErrorMessage('');
 
     try {
-      const newComment = {
+      const saved = await postComment({
         page_slug: pageSlug,
         author_name: authorName.trim(),
-        author_email: authorEmail.trim() || null,
+        author_email: authorEmail.trim() || undefined,
         content: content.trim(),
-        is_admin_reply: false,
-        approved: true,
-      };
+      });
 
-      const { data, error } = await supabase
-        .from('comments')
-        .insert([newComment])
-        .select();
-
-      if (error) {
-        throw error;
-      }
-
-      if (data && data.length > 0) {
-        setComments(prev => [...prev, data[0] as CommentItem]);
-      } else {
-        fetchComments();
+      if (saved && saved.id) {
+        setComments(prev => [...prev, saved]);
       }
 
       setContent('');
