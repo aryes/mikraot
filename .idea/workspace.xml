@@ -7,6 +7,9 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="3J0ndKUr2lTMjg3nCrJCr7qAfR7" />
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
@@ -30,5 +33,11 @@
       <updated>1788806939347</updated>
     </task>
     <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="655" y="340" key="com.intellij.ide.util.TipDialog" timestamp="1790705705592">
+      <screen x="0" y="0" width="1920" height="1032" />
+    </state>
+    <state x="655" y="340" key="com.intellij.ide.util.TipDialog/1920.0.1536.826/0.0.1920.1032@0.0.1920.1032" timestamp="1790705705592" />
   </component>
 </project>

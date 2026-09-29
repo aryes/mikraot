@@ -19,6 +19,14 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  const currentHashRoute = typeof window !== 'undefined'
+    ? window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '')
+    : '';
+  let decodedHash = '';
+  try {
+    decodedHash = decodeURIComponent(currentHashRoute);
+  } catch {}
+
   // Collect candidate slug identifiers to query for comments
   const candidateSlugs = Array.from(
     new Set([
@@ -27,6 +35,9 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
       rawSlug,
       rawSlug?.toLowerCase(),
       pageId ? String(pageId) : null,
+      currentHashRoute,
+      decodedHash,
+      pageSlug ? `טעמים/${pageSlug}` : null,
       pageSlug === 'about' || rawSlug === 'about' ? 'about' : null,
     ].filter(Boolean) as string[])
   );
