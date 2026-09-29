@@ -1,0 +1,2 @@
+# Normalize line endings to LF in the repo and working tree (shell hooks break with CRLF).
+* text=auto eol=lf
