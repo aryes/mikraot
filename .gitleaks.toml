@@ -1,0 +1,13 @@
+# Project gitleaks config: default rules plus a catch-all for password-like assignments.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "password-assignment"
+description = "Password or secret assigned to a variable"
+regex = '''(?i)[\w.-]*(?:password|passwd|pwd|secret)[\w.-]*\s*[:=]\s*['"]?([^\s'"]{6,})['"]?'''
+secretGroup = 1
+entropy = 3.0
+[[rules.allowlists]]
+description = "Placeholders that point to .env"
+regexes = ['''^<[A-Z_]+ in \.env>$''']

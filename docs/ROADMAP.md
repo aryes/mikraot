@@ -4,7 +4,7 @@
 - [x] Move credentials out of docs into `.env`
 - [x] Remove Supabase client and unused deps
 - [x] Scrub credentials, `node_modules` and `dist` from git history
-- [ ] Add secret scanning (gitleaks) as a pre-commit hook
+- [x] Add secret scanning (gitleaks) as a pre-commit hook
 - [ ] Delete the pre-rewrite backup bundle once the new history is confirmed
 - [ ] Stop tracking `.idea/`
 

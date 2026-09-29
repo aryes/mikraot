@@ -18,6 +18,7 @@ The plan and known issues are in `docs/ROADMAP.md`.
 ## Secrets policy
 - Never write credentials into tracked files (including docs, CLAUDE.md, code fallbacks).
 - Local: `.env` / `.dev.vars` (gitignored). Worker: `wrangler secret`. Cloudflare auth: `wrangler login` (OAuth), not pasted tokens.
+- Secret scanning: gitleaks pre-commit hook in `.githooks/`, rules in `.gitleaks.toml`. `npm install` enables it (`prepare` script); gitleaks itself: `winget install Gitleaks.Gitleaks`.
 
 ## Architecture
 - Frontend: all content bundled from `src/data/siteData.json` (340 items, exported from WP by `export_data.php` on the server). `utils/contentParser.tsx` converts WP HTML/shortcodes.
