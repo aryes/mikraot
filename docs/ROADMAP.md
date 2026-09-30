@@ -5,7 +5,7 @@
 - [x] Remove Supabase client and unused deps
 - [x] Scrub credentials, `node_modules` and `dist` from git history
 - [x] Add secret scanning (gitleaks) as a pre-commit hook
-- [ ] Delete the pre-rewrite backup bundle once the new history is confirmed
+- [x] Delete the pre-rewrite backup bundle once the new history is confirmed
 - [x] Stop tracking `.idea/`
 
 ## 2. Foundations

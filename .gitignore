@@ -7,3 +7,4 @@ dist-ssr
 .DS_Store
 .dev.vars
 .idea/
+.claude/settings.local.json
