@@ -7,6 +7,8 @@
 const YOUTUBE_ID =
   /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/;
 const SITE_URL = /href="https?:\/\/(?:www\.)?mikraot\.net(?:\/staging\/4160)?\/([^"]*)"/g;
+/** Media lives in public/wp-content/uploads, at the same paths as on WordPress. */
+const MEDIA_URL = /https?:\/\/(?:www\.)?mikraot\.net(?:\/staging\/4160)?\/wp-content\//g;
 
 export function getYouTubeId(url: string): string | null {
   return url.match(YOUTUBE_ID)?.[1] ?? null;
@@ -26,8 +28,7 @@ function youTubeEmbed(id: string): string {
 }
 
 function audioButton(url: string): string {
-  const src = url.replace('https://mikraot.net/staging/4160/', 'https://mikraot.net/');
-  return `<button type="button" class="inline-audio-btn inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#8CB65F] hover:bg-[#7aa252] text-white shadow-xs mx-1 align-middle transition-transform active:scale-95 cursor-pointer" data-audio-src="${src}" title="השמע צליל">
+  return `<button type="button" class="inline-audio-btn inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#8CB65F] hover:bg-[#7aa252] text-white shadow-xs mx-1 align-middle transition-transform active:scale-95 cursor-pointer" data-audio-src="${url}" title="השמע צליל">
     <svg class="play-icon w-4 h-4 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
     <svg class="pause-icon w-4 h-4 hidden pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
   </button>`;
@@ -45,16 +46,25 @@ function collapsible(id: string, label: string, inner: string): string {
   </div>`;
 }
 
-/** Rewrites a link to mikraot.net into a site-relative path; media stays on the absolute URL. */
-function siteLink(path: string): string {
-  const [pathPart = '', rest = ''] = path.split(/(?=[?#])/, 2);
+/** Finds the site URL of a WordPress post ID (for `?page_id=`/`?p=` links). */
+export type UrlForId = (id: number) => string | undefined;
+
+/** Rewrites a link to a mikraot.net page into a site-relative path with a trailing slash. */
+function siteLink(path: string, urlForId: UrlForId): string {
+  const [, pathPart = '', rest = ''] = /^([^?#]*)(.*)$/.exec(path) ?? [];
   const clean = pathPart.replace(/^\/+|\/+$/g, '');
-  if (clean.startsWith('wp-content')) return `href="https://mikraot.net/${clean}${rest}"`;
+
+  // WordPress resolves ID links (/?page_id=48) itself; a static site links to the page directly.
+  const id = clean ? undefined : /^\?(?:page_id|p)=(\d+)(#.*)?$/.exec(rest);
+  const target = id ? urlForId(Number(id[1])) : undefined;
+  if (id && target) return `href="${target}${id[2] ?? ''}"`;
+
   return `href="/${clean ? `${clean}/` : ''}${rest}"`;
 }
 
-export function wpHtmlToSiteHtml(raw: string): string {
-  let html = raw;
+export function wpHtmlToSiteHtml(raw: string, urlForId: UrlForId = () => undefined): string {
+  // Media first, so every later step (shortcodes, links, srcset) sees site-relative paths.
+  let html = raw.replace(MEDIA_URL, '/wp-content/');
 
   // Standalone Gutenberg embed figures and bare YouTube URLs in their own paragraph become players.
   html = html.replace(
@@ -88,5 +98,8 @@ export function wpHtmlToSiteHtml(raw: string): string {
     },
   );
 
-  return html.replace(SITE_URL, (_m, path: string) => siteLink(path));
+  // Tooltips that merely repeat a site URL (often the staging address) are dropped.
+  html = html.replace(/\s+title="https?:\/\/(?:www\.)?mikraot\.net[^"]*"/g, '');
+
+  return html.replace(SITE_URL, (_m, path: string) => siteLink(path, urlForId));
 }

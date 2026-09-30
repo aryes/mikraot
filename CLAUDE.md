@@ -28,7 +28,7 @@ The plan and known issues are in `docs/ROADMAP.md`.
 - `wrangler.jsonc` configures the new single Worker `mikraot` (static assets + D1 binding `DB`); not deployed yet.
 - Comments API: `src/pages/api/comments.ts` (on-demand route in the site Worker) using `src/server/comments.ts`; D1 schema in `migrations/`. Local dev/tests use a local D1 (`npm run db:local:reset` loads fictional fixtures).
 - The old separate Worker `worker/` → `mikraot-api` on `mikraot.net/api/*` is still deployed and serves only the old staging app; remove it at cutover. Production D1 has no migration history yet: apply `migrations/` remotely (0001 is a no-op there) before the new Worker goes live.
-- Media (MP3s, images) is still served from WordPress `wp-content/uploads` on Bluehost.
+- Media (76 MP3s, 52 images) is in `public/wp-content/uploads/`, at the same paths as on WordPress; content URLs are rewritten to site-relative `/wp-content/...`. Plugin folders and user avatars from WordPress uploads were deliberately not copied.
 - Live site is still WordPress. Staging app: https://mikraot.net/staging/app/
 
 ## Procedures

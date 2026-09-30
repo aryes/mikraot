@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { getYouTubeId, wpHtmlToSiteHtml } from './wp-html';
 
+const urlForId = (id: number) => (id === 48 ? '/תנועות/' : undefined);
+
 describe('getYouTubeId', () => {
   it.each([
     ['https://youtu.be/abcdefghijk', 'abcdefghijk'],
@@ -34,12 +36,12 @@ describe('wpHtmlToSiteHtml', () => {
     );
   });
 
-  it('turns audio shortcodes into buttons, moving staging media to the live site', () => {
+  it('turns audio shortcodes into buttons that play the local media file', () => {
     const html = wpHtmlToSiteHtml(
       '[sc_embed_player fileurl="https://mikraot.net/staging/4160/wp-content/uploads/a.mp3"]',
     );
     expect(html).toContain('class="inline-audio-btn');
-    expect(html).toContain('data-audio-src="https://mikraot.net/wp-content/uploads/a.mp3"');
+    expect(html).toContain('data-audio-src="/wp-content/uploads/a.mp3"');
   });
 
   it('turns collapse shortcodes into numbered, accessible toggles', () => {
@@ -72,9 +74,35 @@ describe('wpHtmlToSiteHtml', () => {
     );
   });
 
-  it('keeps media links absolute on the live site', () => {
+  it('resolves WordPress ID links to the page URL', () => {
+    expect(
+      wpHtmlToSiteHtml('<a href="https://mikraot.net/staging/4160/?page_id=48">x</a>', urlForId),
+    ).toBe('<a href="/תנועות/">x</a>');
+    expect(wpHtmlToSiteHtml('<a href="https://mikraot.net/?p=48#top">x</a>', urlForId)).toBe(
+      '<a href="/תנועות/#top">x</a>',
+    );
+    // Unknown IDs keep a valid (if unresolved) root query link rather than a broken path.
+    expect(wpHtmlToSiteHtml('<a href="https://mikraot.net/?page_id=9">x</a>', urlForId)).toBe(
+      '<a href="/?page_id=9">x</a>',
+    );
+  });
+
+  it('drops tooltips that only repeat a site URL', () => {
+    expect(
+      wpHtmlToSiteHtml(
+        '<a title="https://mikraot.net/staging/4160/x/" href="https://mikraot.net/x/">x</a>',
+      ),
+    ).toBe('<a href="/x/">x</a>');
+  });
+
+  it('serves media from the site itself, keeping WordPress paths', () => {
     expect(
       wpHtmlToSiteHtml('<a href="https://mikraot.net/staging/4160/wp-content/uploads/a.pdf">x</a>'),
-    ).toBe('<a href="https://mikraot.net/wp-content/uploads/a.pdf">x</a>');
+    ).toBe('<a href="/wp-content/uploads/a.pdf">x</a>');
+    expect(
+      wpHtmlToSiteHtml(
+        '<img src="https://mikraot.net/wp-content/uploads/b.jpg" srcset="https://www.mikraot.net/wp-content/uploads/b-300x200.jpg 300w">',
+      ),
+    ).toBe('<img src="/wp-content/uploads/b.jpg" srcset="/wp-content/uploads/b-300x200.jpg 300w">');
   });
 });

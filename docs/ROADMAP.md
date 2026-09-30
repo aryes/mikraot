@@ -37,7 +37,7 @@
   - All 174 generated page URLs match WordPress permalinks exactly — but LearnPress serves lessons and quizzes only inside their course (`/courses/<course>/lessons/<lesson>/`, `/courses/<course>/quizzes/<quiz>/`); standalone `/lessons/…/` and `/quizzes/…/` return 404 on the live site. Our 131 standalone lesson/quiz URLs must move under their course.
   - "Sample course" (published) is LearnPress demo content: 127 of the 131 lessons/quizzes, Latin filler text. Real course material: "טעמי המקרא" (1 test lesson with placeholder text + 1 real quiz) and the draft "ניקוד" (1 lesson + 1 quiz). **Decision needed (Arye):** drop the demo course?
 - [ ] Convert WordPress HTML/shortcodes to content files with custom blocks (audio, collapsible, YouTube, tables)
-- [ ] Media into the repo; rewrite media URLs
+- [x] Media into the repo (`public/wp-content/uploads/`, 12 MB, same paths as WordPress; plugin data and user avatars excluded); all 33 media files referenced by published pages verified present; content media URLs made site-relative. Also fixed: `?page_id=` links now resolve to the page URL; staging URLs removed from link tooltips
 - [ ] Keep every WordPress URL; 301 redirects where they must differ; sitemap
 - [ ] Keystatic editor with the custom blocks (local first; browser editing after GitHub)
 - [ ] Pagefind search, self-hosted fonts

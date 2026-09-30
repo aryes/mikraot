@@ -71,3 +71,22 @@ test('menu links point to real WordPress URLs', async ({ page, isMobile }) => {
   await expect(page).toHaveURL(/\/%D7%9E%D7%91%D7%98%D7%90\/$/);
   await expect(page.locator('h1')).toHaveText('מבטא');
 });
+
+test('media is served by the site at the WordPress paths', async ({ page, request }) => {
+  const mp3 = await request.get('/wp-content/uploads/2023/07/ארגב.mp3');
+  expect(mp3.status()).toBe(200);
+  expect(mp3.headers()['content-type']).toContain('audio/mpeg');
+
+  await page.goto('/דגש-קל/');
+  const sources = await page
+    .locator('.inline-audio-btn')
+    .evaluateAll((buttons) => buttons.map((b) => b.getAttribute('data-audio-src') ?? ''));
+  expect(sources.length).toBeGreaterThan(0);
+  const statuses = await Promise.all(
+    sources.map(async (src) => (await request.head(src)).status()),
+  );
+  sources.forEach((src, i) => {
+    expect(src).toMatch(/^\/wp-content\/uploads\//);
+    expect(statuses[i], src).toBe(200);
+  });
+});

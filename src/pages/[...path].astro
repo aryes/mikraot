@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import { Comments } from '../components/Comments';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { sitePages, type SitePage } from '../lib/site';
+import { sitePages, urlForId, type SitePage } from '../lib/site';
 import { wpHtmlToSiteHtml } from '../lib/wp-html';
 
 export const getStaticPaths = (() =>
@@ -44,7 +44,7 @@ const isFrontPage = path === '';
 
       <div
         class="wp-content-rendered prose prose-slate max-w-none text-right"
-        set:html={wpHtmlToSiteHtml(item.content)}
+        set:html={wpHtmlToSiteHtml(item.content, urlForId)}
       />
 
       <Comments client:visible pageKey={path || String(item.id)} lookupKeys={commentKeys} />

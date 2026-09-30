@@ -22,3 +22,8 @@ export const sitePages: SitePage[] = siteData.content.filter(isPublicPage).map((
 });
 
 export const menuTree = buildMenuTree(siteData.menu);
+
+const urlsById = new Map(sitePages.map((page) => [page.item.id, page.url]));
+
+/** Site URL of a published page or post by its WordPress ID. */
+export const urlForId = (id: number): string | undefined => urlsById.get(id);
