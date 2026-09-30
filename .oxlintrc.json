@@ -42,5 +42,14 @@
     ".astro",
     "test-results",
     "playwright-report"
+  ],
+  "overrides": [
+    {
+      "files": ["scripts/**"],
+      "rules": {
+        "no-console": "off",
+        "no-await-in-loop": "off"
+      }
+    }
   ]
 }

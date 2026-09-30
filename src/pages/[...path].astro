@@ -15,12 +15,12 @@ interface Props {
   page: SitePage;
 }
 
-const { item, path } = Astro.props.page;
+const { item, path, seo } = Astro.props.page;
 const commentKeys = [...new Set([path, item.slug, item.rawSlug, String(item.id)].filter(Boolean))];
 const isFrontPage = path === '';
 ---
 
-<BaseLayout title={item.title} description={item.excerpt || undefined}>
+<BaseLayout title={seo.title} description={seo.description} ogImage={seo.ogImage}>
   <article class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
     {!isFrontPage && (
       <nav

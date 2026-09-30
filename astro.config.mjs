@@ -1,6 +1,7 @@
 // @ts-check
 import cloudflare from '@astrojs/cloudflare';
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 
@@ -12,6 +13,6 @@ export default defineConfig({
   // Optimize images at build time (no Cloudflare Images binding); the site uses no sessions.
   adapter: cloudflare({ imageService: 'compile' }),
   session: false,
-  integrations: [react()],
+  integrations: [react(), sitemap()],
   vite: { plugins: [tailwindcss()] },
 });

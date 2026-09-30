@@ -90,3 +90,32 @@ test('media is served by the site at the WordPress paths', async ({ page, reques
     expect(statuses[i], src).toBe(200);
   });
 });
+
+test('pages keep the live site titles, descriptions and social tags', async ({ page }) => {
+  await page.goto('/שווא-נע/');
+  await expect(page).toHaveTitle('שווא נע - מקראות');
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /\S{10}/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://mikraot.net/%D7%A9%D7%95%D7%95%D7%90-%D7%A0%D7%A2/',
+  );
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+    'content',
+    'שווא נע - מקראות',
+  );
+});
+
+test('sitemap lists every page; the WordPress sitemap URL redirects to it', async ({ request }) => {
+  const index = await request.get('/sitemap-index.xml');
+  expect(index.status()).toBe(200);
+  const sitemap = await (await request.get('/sitemap-0.xml')).text();
+  expect(sitemap.match(/<loc>/g)).toHaveLength(34);
+
+  const old = await request.get('/sitemap.xml', { maxRedirects: 0 });
+  expect(old.status()).toBe(301);
+  expect(old.headers()['location']).toMatch(/\/sitemap-index\.xml$/);
+
+  expect(await (await request.get('/robots.txt')).text()).toContain(
+    'Sitemap: https://mikraot.net/sitemap-index.xml',
+  );
+});

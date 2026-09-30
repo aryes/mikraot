@@ -5,14 +5,17 @@ import SiteHeader from '../components/SiteHeader.astro';
 import { siteData } from '../lib/site';
 
 interface Props {
+  /** Full document title, as the live site renders it (see src/data/seo.json). */
   title: string;
   description?: string | undefined;
+  /** Site-relative image path for social previews. */
+  ogImage?: string | undefined;
 }
 
-const { title, description } = Astro.props;
-const { site } = siteData;
-const fullTitle =
-  Astro.url.pathname === '/' ? `${site.title} - ${site.tagline}` : `${title} | ${site.title}`;
+const { title, description, ogImage } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const icon = (size: number) =>
+  `/wp-content/uploads/2021/08/cropped-pexels-cottonbro-5986498-scaled-1-${size}x${size}.jpg`;
 ---
 
 <!doctype html>
@@ -20,14 +23,21 @@ const fullTitle =
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{fullTitle}</title>
+    <title>{title}</title>
     {description && <meta name="description" content={description} />}
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238CB65F'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>"
-    />
+    <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="icon" href={icon(32)} sizes="32x32" />
+    <link rel="icon" href={icon(192)} sizes="192x192" />
+    <link rel="apple-touch-icon" href={icon(180)} />
+    <meta property="og:locale" content="he_IL" />
+    <meta property="og:site_name" content={`${siteData.site.title} - ${siteData.site.tagline}`} />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:url" content={canonical} />
+    {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
+    <meta name="twitter:card" content="summary" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
