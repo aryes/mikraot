@@ -25,10 +25,13 @@
     "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
+    "@astrojs/markdoc": "^2.0.9",
     "@astrojs/react": "^7.0.0",
     "@fontsource-variable/assistant": "^5.3.0",
     "@fontsource-variable/frank-ruhl-libre": "^5.3.0",
     "@fontsource/alef": "^5.3.0",
+    "@keystatic/astro": "^6.0.0",
+    "@keystatic/core": "^0.6.9",
     "astro": "^7.3.5",
     "lucide-react": "^1.49.0",
     "react": "^19.3.0",
@@ -38,6 +41,7 @@
     "@astrojs/check": "^0.9.10",
     "@astrojs/cloudflare": "^14.3.3",
     "@astrojs/sitemap": "^3.7.4",
+    "@markdoc/markdoc": "^0.5.10",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.6.3",
@@ -54,7 +58,8 @@
     "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "vitest": "^5.0.3",
-    "wrangler": "^4.145.0"
+    "wrangler": "^4.145.0",
+    "yaml": "^2.9.1"
   },
   "allowScripts": {
     "esbuild@0.28.2": true,
