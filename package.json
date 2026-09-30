@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro check && npm run build:site",
+    "build:site": "astro build && pagefind --site dist/client",
     "preview": "astro preview",
     "typecheck": "astro check",
     "lint": "oxlint --type-aware",
@@ -45,6 +46,7 @@
     "linkedom": "^0.18.13",
     "oxlint": "^1.86.0",
     "oxlint-tsgolint": "^7.0.2003",
+    "pagefind": "^1.5.2",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.0",
     "prettier-plugin-tailwindcss": "^0.8.1",

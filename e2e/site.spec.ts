@@ -146,3 +146,35 @@ test('fonts are self-hosted and load (no third-party font requests)', async ({ p
   expect(loaded).toEqual({ body: true, heading: true });
   expect(external).toEqual([]);
 });
+
+test('search finds pages by keyword (Ctrl+K), ignoring niqqud', async ({ page }) => {
+  await page.goto('/about/');
+  await page.keyboard.press('Control+k');
+  const dialog = page.getByRole('dialog', { name: 'חיפוש באתר' });
+  await expect(dialog).toBeVisible();
+
+  await dialog.getByRole('searchbox').fill('בראשית');
+  // Match by URL: niqqud marks can be stored in different orders, so text patterns are fragile.
+  await expect(dialog.locator('a[href="/בראשית/"]')).toBeVisible();
+
+  await dialog.getByRole('searchbox').fill('דגש קל');
+  const first = dialog.getByRole('listitem').first().getByRole('link');
+  await expect(first).toContainText('דגש קל');
+  await first.click();
+  await expect(page.locator('h1')).toHaveText('דגש קל');
+});
+
+test('search opens from the header button and reports no results', async ({ page }) => {
+  // Stub the index: real Pagefind still returns weak single-letter matches for most queries.
+  await page.route('**/pagefind/pagefind.js', (route) =>
+    route.fulfill({
+      contentType: 'text/javascript',
+      body: 'export const search = async () => ({ results: [] });',
+    }),
+  );
+  await page.goto('/');
+  await page.getByRole('button', { name: 'חיפוש באתר' }).click();
+  const dialog = page.getByRole('dialog', { name: 'חיפוש באתר' });
+  await dialog.getByRole('searchbox').fill('מילה');
+  await expect(dialog.getByText('לא נמצאו תוצאות עבור "מילה"')).toBeVisible();
+});

@@ -35,6 +35,7 @@ The plan and known issues are in `docs/ROADMAP.md`.
 
 ## Procedures
 
+- Build: `npm run build` = type check + `build:site` (Astro build, then the Pagefind search index into `dist/client/pagefind/`; search only works in built output, not in `npm run dev`).
 - Dev server: `npm run dev` (http://localhost:4321, runs in Cloudflare's workerd). Checks: `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm run build`.
 - `.dev.vars` must exist (it may be empty): it stops wrangler from loading `.env`, whose operations credentials must never reach the Worker.
 - SSH to Bluehost goes directly to the origin IP (`SSH_HOST` / `SSH_USER` in `.env`), because Cloudflare doesn't proxy port 22. The old staging app at /staging/app/ is no longer updated.

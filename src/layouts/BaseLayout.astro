@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import SearchDialog from '../components/SearchDialog.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import { siteData } from '../lib/site';
@@ -48,5 +49,6 @@ const icon = (size: number) =>
       <slot />
     </main>
     <SiteFooter />
+    <SearchDialog />
   </body>
 </html>

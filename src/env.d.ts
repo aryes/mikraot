@@ -10,3 +10,8 @@ declare module 'cloudflare:workers' {
     DB: import('./server/comments').CommentsDb;
   };
 }
+
+interface Window {
+  /** Loads Pagefind's search module; defined by an inline script in SearchDialog.astro. */
+  loadPagefind?: () => Promise<unknown>;
+}

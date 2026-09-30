@@ -21,7 +21,7 @@ export default defineConfig({
   // Tests run against the production build in Cloudflare's workerd runtime, with the local D1
   // database reset to e2e/fixtures/comments.sql (fictional data).
   webServer: {
-    command: `npm run db:local:reset && npx astro build && npx astro preview --port ${port}`,
+    command: `npm run db:local:reset && npm run build:site && npx astro preview --port ${port}`,
     url: `http://localhost:${port}/`,
     reuseExistingServer: !process.env['CI'],
     timeout: 180_000,

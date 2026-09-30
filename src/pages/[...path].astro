@@ -21,7 +21,8 @@ const isFrontPage = path === '';
 ---
 
 <BaseLayout title={seo.title} description={seo.description} ogImage={seo.ogImage}>
-  <article class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+  <!-- data-pagefind-body: only page content is indexed for search (not header, footer, comments). -->
+  <article data-pagefind-body class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
     {!isFrontPage && (
       <nav
         class="mb-6 flex items-center gap-2 text-xs font-medium text-slate-500"
@@ -37,7 +38,10 @@ const isFrontPage = path === '';
 
     <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs sm:p-10">
       <header class="mb-8 border-b border-slate-100 pb-6">
-        <h1 class="font-hebrew mb-2 text-3xl leading-tight font-extrabold tracking-tight text-[#334155] sm:text-4xl">
+        <h1
+          data-pagefind-meta="title"
+          class="font-hebrew mb-2 text-3xl leading-tight font-extrabold tracking-tight text-[#334155] sm:text-4xl"
+        >
           {item.title}
         </h1>
       </header>
@@ -47,7 +51,9 @@ const isFrontPage = path === '';
         set:html={wpHtmlToSiteHtml(item.content, urlForId)}
       />
 
-      <Comments client:visible pageKey={path || String(item.id)} lookupKeys={commentKeys} />
+      <div data-pagefind-ignore>
+        <Comments client:visible pageKey={path || String(item.id)} lookupKeys={commentKeys} />
+      </div>
     </div>
   </article>
 </BaseLayout>
