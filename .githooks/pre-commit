@@ -1,5 +1,17 @@
 #!/bin/sh
-# Block commits that contain secrets. Requires gitleaks (winget install Gitleaks.Gitleaks).
+# Pre-commit checks: staged files must be formatted, and must not contain secrets.
+# Requires gitleaks (winget install Gitleaks.Gitleaks).
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+if [ -n "$staged" ]; then
+  # Prettier skips files it can't format and those in .prettierignore.
+  if ! echo "$staged" | tr '\n' '\0' | xargs -0 npx --no-install prettier --check --ignore-unknown >/dev/null 2>&1; then
+    echo "pre-commit: staged files are not formatted. Run: npm run format" >&2
+    echo "$staged" | tr '\n' '\0' | xargs -0 npx --no-install prettier --check --ignore-unknown >&2
+    exit 1
+  fi
+fi
+
 if ! command -v gitleaks >/dev/null 2>&1 && [ -n "$LOCALAPPDATA" ]; then
   PATH="$PATH:$(cygpath -u "$LOCALAPPDATA")/Microsoft/WinGet/Links"
 fi

@@ -43,7 +43,9 @@ for (const page of sitePages) {
 
   const description = meta(html, 'description');
   // Jetpack serves images through its CDN (i0.wp.com); the new site serves them itself.
-  const ogImage = meta(html, 'og:image')?.replace(/^https:\/\/i\d\.wp\.com\/mikraot\.net/, '').replace(/\?.*$/, '');
+  const ogImage = meta(html, 'og:image')
+    ?.replace(/^https:\/\/i\d\.wp\.com\/mikraot\.net/, '')
+    .replace(/\?.*$/, '');
   result[page.path] = {
     title: decodeEntities(title).trim(),
     ...(description && { description }),
