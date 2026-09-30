@@ -47,7 +47,7 @@
 ## 4. Parity with original
 
 - [ ] Full inventory of mikraot.net pages and features (crawl and compare)
-- [ ] Courses, lessons and quizzes (LearnPress); quizzes are not shown anywhere yet
+- [ ] Courses, lessons and quizzes (LearnPress): **deferred** (decided 2026-09-30); the new site has no course pages or links until then. Also deferred: the 7 LearnPress system pages (All Courses, Profile, Checkout, Instructor(s), Become A Teacher, Term Conditions). When migrating: lessons/quizzes are course-scoped URLs, and most published course content is the LearnPress demo "Sample course"
 - [ ] Comments: moderation, Turnstile, rate limit
 - [ ] Analytics (Cloudflare Web Analytics)
 - [ ] Decide per plugin: Email Subscribers (newsletter + subscriber list), GamiPress (points/badges), BuddyPress (profiles), OptinMonster (popups), Nextend (Facebook login), Google sign-in
@@ -63,7 +63,6 @@
 ## Known issues (current app)
 
 - Search (Ctrl+K) was removed with the old single-page app; comes back with Pagefind.
-- Lesson and quiz URLs are standalone (`/lessons/x/`) instead of course-scoped; fix with the content migration.
 - Comments: POST auto-approves, no rate limit or captcha, CORS `*`. (Raw DB errors no longer returned: fixed in `worker/`, not yet deployed.)
 - `wp-html.ts` doesn't handle `[learn_press_*]` and `[elementor]` shortcodes or the 7 raw `<table>`s.
 - The comments e2e test depends on the live API until the API moves into this Worker.

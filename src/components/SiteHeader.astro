@@ -1,5 +1,5 @@
 ---
-import { BookOpen, ChevronDown, GraduationCap, Home, Menu } from 'lucide-react';
+import { BookOpen, ChevronDown, Home, Menu } from 'lucide-react';
 import { menuTree, siteData } from '../lib/site';
 import { menuItemUrl } from '../lib/urls';
 
@@ -27,14 +27,6 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
     </a>
 
     <div class="flex items-center gap-2">
-      <a
-        href="/courses/"
-        class="hidden items-center gap-1.5 rounded-xl bg-[#8CB65F] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-[#7aa252] md:flex"
-      >
-        <GraduationCap size={16} />
-        קורסים
-      </a>
-
       <!-- Mobile menu: a native disclosure, so it works without JavaScript. -->
       <details class="md:hidden">
         <summary
@@ -89,12 +81,6 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
               )}
             </div>
           ))}
-          <a
-            href="/courses/"
-            class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold text-[#8CB65F] hover:bg-emerald-50"
-          >
-            <GraduationCap size={16} /> קורסים ומבחנים
-          </a>
         </nav>
       </details>
     </div>
@@ -161,11 +147,6 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
             </li>
           );
         })}
-        <li>
-          <a href="/courses/" class:list={[navLink, isActive('/courses/') ? activeLink : idleLink]}>
-            קורסים
-          </a>
-        </li>
       </ul>
     </div>
   </nav>

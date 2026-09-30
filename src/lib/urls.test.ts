@@ -31,12 +31,6 @@ describe('pathSegmentsFor', () => {
     expect(pathSegmentsFor(child, byId, '4')).toBe('טעמים/נוסח-אשכנז');
   });
 
-  it('prefixes LearnPress types', () => {
-    expect(pathSegmentsFor(item({ type: 'lp_course', slug: 'c' }), byId, '4')).toBe('courses/c');
-    expect(pathSegmentsFor(item({ type: 'lp_lesson', slug: 'l' }), byId, '4')).toBe('lessons/l');
-    expect(pathSegmentsFor(item({ type: 'lp_quiz', slug: 'q' }), byId, '4')).toBe('quizzes/q');
-  });
-
   it('does not nest posts', () => {
     expect(pathSegmentsFor(item({ type: 'post', slug: 'p', parentId: 213 }), byId, '4')).toBe('p');
   });
@@ -50,10 +44,18 @@ describe('pathSegmentsFor', () => {
 });
 
 describe('isPublicPage', () => {
-  it('keeps published pages and excludes drafts and quiz questions', () => {
+  it('keeps published pages and posts and excludes drafts', () => {
     expect(isPublicPage(item({}))).toBe(true);
+    expect(isPublicPage(item({ type: 'post' }))).toBe(true);
     expect(isPublicPage(item({ status: 'draft' }))).toBe(false);
-    expect(isPublicPage(item({ type: 'lp_question' }))).toBe(false);
+  });
+
+  it('leaves out LearnPress content and its system pages until courses are migrated', () => {
+    for (const type of ['lp_course', 'lp_lesson', 'lp_quiz', 'lp_question']) {
+      expect(isPublicPage(item({ type }))).toBe(false);
+    }
+    expect(isPublicPage(item({ slug: 'lp-profile' }))).toBe(false);
+    expect(isPublicPage(item({ slug: 'courses' }))).toBe(false);
   });
 });
 

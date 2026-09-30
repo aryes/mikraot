@@ -1,17 +1,25 @@
 import type { ContentItem, MenuItem } from '../types';
 
-/** URL prefixes WordPress/LearnPress use per content type (pages and posts have none). */
-const TYPE_PREFIX: Record<string, string> = {
-  lp_course: 'courses',
-  lp_lesson: 'lessons',
-  lp_quiz: 'quizzes',
-};
+/** Content types that have their own public URL. LearnPress courses are deferred to the migration. */
+const ROUTABLE_TYPES = new Set(['page', 'post']);
 
-/** Content types that have their own public URL. */
-const ROUTABLE_TYPES = new Set(['page', 'post', 'lp_course', 'lp_lesson', 'lp_quiz']);
+/** WordPress pages that only exist to serve LearnPress (deferred together with the courses). */
+const LEARNPRESS_PAGE_SLUGS = new Set([
+  'courses',
+  'lp-profile',
+  'lp-checkout',
+  'lp-become-a-teacher',
+  'lp-term-conditions',
+  'instructor',
+  'instructors',
+]);
 
 export function isPublicPage(item: ContentItem): boolean {
-  return item.status === 'publish' && ROUTABLE_TYPES.has(item.type);
+  return (
+    item.status === 'publish' &&
+    ROUTABLE_TYPES.has(item.type) &&
+    !LEARNPRESS_PAGE_SLUGS.has(item.slug)
+  );
 }
 
 /**
@@ -24,8 +32,6 @@ export function pathSegmentsFor(
   frontPageId: string,
 ): string {
   if (String(item.id) === frontPageId) return '';
-  const prefix = TYPE_PREFIX[item.type];
-  if (prefix) return `${prefix}/${item.slug}`;
   if (item.type !== 'page') return item.slug;
 
   const segments = [item.slug];

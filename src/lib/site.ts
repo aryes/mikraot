@@ -22,6 +22,3 @@ export const sitePages: SitePage[] = siteData.content.filter(isPublicPage).map((
 });
 
 export const menuTree = buildMenuTree(siteData.menu);
-
-export const contentOfType = (type: string): ContentItem[] =>
-  sitePages.filter((page) => page.item.type === type).map((page) => page.item);
