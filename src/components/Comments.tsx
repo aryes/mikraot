@@ -3,32 +3,10 @@ import { fetchComments, postComment, type CommentItem } from '../lib/api';
 import { MessageSquare, Send, CheckCircle2, User, ShieldCheck } from 'lucide-react';
 
 interface CommentsProps {
-  pageSlug: string;
-  pageTitle?: string;
-  rawSlug?: string;
-  pageId?: number;
-}
-
-/** Every identifier a page's comments may have been stored under (WordPress slugs vary). */
-function candidateSlugsFor(pageSlug: string, rawSlug?: string, pageId?: number): string[] {
-  const hashRoute = window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '');
-  let decodedHash = '';
-  try {
-    decodedHash = decodeURIComponent(hashRoute);
-  } catch {
-    // Malformed percent-encoding: fall back to the raw route only.
-  }
-  const candidates = [
-    pageSlug,
-    pageSlug.toLowerCase(),
-    rawSlug,
-    rawSlug?.toLowerCase(),
-    pageId ? String(pageId) : undefined,
-    hashRoute,
-    decodedHash,
-    `טעמים/${pageSlug}`,
-  ];
-  return [...new Set(candidates.filter((slug): slug is string => Boolean(slug)))];
+  /** Key new comments are stored under: the page's decoded path, e.g. `טעמים/נוסח-אשכנז`. */
+  pageKey: string;
+  /** Every key this page's existing comments may be stored under (WordPress slugs vary). */
+  lookupKeys: string[];
 }
 
 function formatDate(dateStr: string): string {
@@ -37,7 +15,7 @@ function formatDate(dateStr: string): string {
   return date.toLocaleDateString('he-IL', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId }) => {
+export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
   // Comments are stored together with the query key they were loaded for, so a response
   // for a previous page can never be shown on the current one.
   const [loaded, setLoaded] = useState<{ key: string; comments: CommentItem[] } | null>(null);
@@ -48,7 +26,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const slugKey = candidateSlugsFor(pageSlug, rawSlug, pageId).join(',');
+  const slugKey = lookupKeys.join(',');
   const loading = loaded?.key !== slugKey;
   const comments = loaded?.key === slugKey ? loaded.comments : [];
 
@@ -62,7 +40,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
     };
   }, [slugKey]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!authorName.trim() || !content.trim()) return;
 
@@ -71,7 +49,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
 
     try {
       const saved = await postComment({
-        page_slug: pageSlug,
+        page_slug: pageKey,
         author_name: authorName.trim(),
         author_email: authorEmail.trim() || undefined,
         content: content.trim(),

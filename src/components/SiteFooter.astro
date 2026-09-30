@@ -1,0 +1,66 @@
+---
+import { ArrowUp, BookOpen } from 'lucide-react';
+import { menuTree, siteData } from '../lib/site';
+import { menuItemUrl } from '../lib/urls';
+
+const quickLinks = menuTree.slice(0, 6);
+---
+
+<footer class="mt-20 border-t border-slate-800 bg-[#1E2C35] text-[#BBBBBB]">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
+      <div class="space-y-3 md:col-span-2">
+        <div class="flex items-center gap-2 text-white">
+          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#8CB65F] font-bold text-white">
+            <BookOpen size={18} />
+          </div>
+          <span class="text-xl font-bold">{siteData.site.title}</span>
+        </div>
+        <p class="max-w-md text-sm leading-relaxed text-slate-400">
+          אתר מוקדש ללימוד, שיפור והעמקת הקריאה בתנ"ך, כולל דיוקי הגיה, כללי דקדוק, טעמי המקרא
+          וקריאות מוקלטות בנוסחים השונים.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="mb-3 border-b border-slate-700 pb-2 text-sm font-bold text-white">ניווט מהיר</h2>
+        <ul class="space-y-2 text-xs">
+          <li>
+            <a href="/" class="transition-colors hover:text-[#8CB65F]">
+              דף הבית
+            </a>
+          </li>
+          {quickLinks.map((item) => (
+            <li>
+              <a
+                href={menuItemUrl(item) ?? undefined}
+                class="transition-colors hover:text-[#8CB65F]"
+              >
+                {item.title}
+              </a>
+            </li>
+          ))}
+          <li>
+            <a href="/courses/" class="font-semibold text-[#8CB65F]">
+              קורסים ומבחנים
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="flex flex-col items-start justify-between md:items-end">
+        <a
+          href="#top"
+          class="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-slate-700"
+        >
+          <ArrowUp size={14} /> לראש העמוד
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-800/80 pt-6 text-xs text-slate-500 sm:flex-row">
+      <p>{siteData.site.copyright}</p>
+      <p>לימוד מקראות וטעמי המקרא</p>
+    </div>
+  </div>
+</footer>

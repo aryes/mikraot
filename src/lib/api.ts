@@ -6,7 +6,7 @@ export interface CommentItem {
   id: number;
   page_slug: string;
   author_name: string;
-  author_email?: string;
+  author_email?: string | undefined;
   content: string;
   is_admin_reply: number | boolean;
   approved: number | boolean;
@@ -31,7 +31,7 @@ export async function fetchComments(candidateSlugs: string[]): Promise<CommentIt
 export async function postComment(comment: {
   page_slug: string;
   author_name: string;
-  author_email?: string;
+  author_email?: string | undefined;
   content: string;
 }): Promise<CommentItem> {
   const res = await fetch(`${API_BASE}/comments`, {

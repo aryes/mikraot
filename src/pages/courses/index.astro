@@ -1,0 +1,85 @@
+---
+import { BookOpen, ChevronLeft, GraduationCap } from 'lucide-react';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { sitePages } from '../../lib/site';
+
+const courses = sitePages.filter((page) => page.item.type === 'lp_course');
+const lessons = sitePages.filter((page) => page.item.type === 'lp_lesson');
+const lessonCount = (courseId: number) =>
+  lessons.filter(({ item }) => item.parentId === courseId || item.meta?.['_lp_course'] === courseId)
+    .length;
+---
+
+<BaseLayout title="קורסים">
+  <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+    <div class="mx-auto mb-12 max-w-2xl text-center">
+      <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-[#8CB65F] shadow-xs">
+        <GraduationCap size={32} />
+      </div>
+      <h1 class="mb-3 text-3xl font-extrabold tracking-tight text-slate-800 sm:text-4xl">
+        קורסי לימוד ומבחנים
+      </h1>
+      <p class="text-sm leading-relaxed text-slate-600 sm:text-base">
+        מערכי שיעור מובנים, תרגולים מוקלטים ומבחני ידע להעמקת השליטה בקריאה בטעמים ובדיוקי הניקוד.
+      </p>
+    </div>
+
+    <div class="mb-16 grid grid-cols-1 gap-8 md:grid-cols-2">
+      {courses.map(({ item, url }) => {
+        const count = lessonCount(item.id);
+        return (
+          <a
+            href={url}
+            class="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-xs transition-all hover:border-[#8CB65F] hover:shadow-md sm:p-8"
+          >
+            <div>
+              <div class="mb-4 flex items-center justify-between">
+                <span class="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-bold text-[#8CB65F]">
+                  קורס מודרך
+                </span>
+                <span class="text-xs font-medium text-slate-400">
+                  {count > 0 ? `${count} שיעורים` : 'שיעורים ותרגולים'}
+                </span>
+              </div>
+              <h2 class="font-hebrew mb-3 text-2xl font-bold text-slate-800 transition-colors group-hover:text-[#8CB65F]">
+                {item.title}
+              </h2>
+              <p class="mb-6 line-clamp-3 text-sm leading-relaxed text-slate-600">
+                {item.excerpt || 'לימוד מקיף צעד אחר צעד עם תרגול שמע והסברים מפורטים.'}
+              </p>
+            </div>
+            <div class="flex items-center justify-between border-t border-slate-100 pt-4 text-xs font-bold text-[#8CB65F]">
+              <span>התחל לימוד</span>
+              <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+            </div>
+          </a>
+        );
+      })}
+    </div>
+
+    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8">
+      <h2 class="mb-6 flex items-center gap-2 text-xl font-bold text-slate-800">
+        <BookOpen className="text-[#8CB65F]" size={22} />
+        כל השיעורים והנושאים
+      </h2>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {lessons.slice(0, 30).map(({ item, url }, index) => (
+          <a
+            href={url}
+            class="group flex items-center justify-between rounded-xl border border-slate-100 p-3 text-right transition-all hover:border-[#8CB65F] hover:bg-slate-50"
+          >
+            <span class="flex items-center gap-2.5 truncate">
+              <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[11px] font-bold text-slate-500 transition-colors group-hover:bg-[#8CB65F] group-hover:text-white">
+                {index + 1}
+              </span>
+              <span class="truncate text-xs font-semibold text-slate-700 group-hover:text-[#8CB65F]">
+                {item.title}
+              </span>
+            </span>
+            <ChevronLeft size={14} className="shrink-0 text-slate-300 group-hover:text-[#8CB65F]" />
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+</BaseLayout>

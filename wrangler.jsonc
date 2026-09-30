@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // One Worker serves the static pages (assets) and the /api routes.
+  "name": "mikraot",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2026-09-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "directory": "./dist", "binding": "ASSETS" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mikraot-db",
+      "database_id": "2ec94a3f-c042-4c21-b1fb-e25f69941888",
+    },
+  ],
+  "observability": { "enabled": true },
+}

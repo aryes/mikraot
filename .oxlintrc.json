@@ -34,5 +34,11 @@
     "browser": true,
     "es2024": true
   },
-  "ignorePatterns": ["dist", "node_modules", "src/data/siteData.json"]
+  "ignorePatterns": [
+    "dist",
+    "node_modules",
+    "src/data/siteData.json",
+    "worker-configuration.d.ts",
+    ".astro"
+  ]
 }

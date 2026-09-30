@@ -1,7 +1,7 @@
 # Mikraot.net
 
 The website https://mikraot.net: a Hebrew site teaching Bible reading (pronunciation, grammar, cantillation), with courses, lessons, quizzes and audio.
-Stack: React + TypeScript + Vite + Tailwind, Cloudflare (Workers, D1, static hosting), git → GitHub later.
+Stack: Astro (static pages) + React islands + TypeScript + Tailwind, one Cloudflare Worker (pages + API, D1), git → GitHub later.
 The live site currently runs on WordPress (Bluehost) and is being migrated to this stack.
 The plan and known issues are in `docs/ROADMAP.md`.
 
@@ -24,14 +24,16 @@ The plan and known issues are in `docs/ROADMAP.md`.
 
 ## Architecture
 
-- Frontend: all content bundled from `src/data/siteData.json` (340 items, exported from WP by `export_data.php` on the server). `utils/contentParser.tsx` converts WP HTML/shortcodes.
-- API: `worker/` → Cloudflare Worker `mikraot-api` on `mikraot.net/api/*`, D1 database `mikraot-db`.
+- Astro builds one static page per WordPress URL (`src/pages/[...path].astro`, URLs from `src/lib/urls.ts`). Content currently comes from `src/data/siteData.json` (an older export of the WordPress staging copy), converted by `src/lib/wp-html.ts`; `src/scripts/content.ts` adds audio/collapsible/video behaviour in the browser. React only for islands (`Comments`).
+- `wrangler.jsonc` configures the new single Worker `mikraot` (static assets + D1 binding `DB`); not deployed yet.
+- API still lives in the old separate Worker: `worker/` → `mikraot-api` on `mikraot.net/api/*`, D1 database `mikraot-db`.
 - Media (MP3s, images) is still served from WordPress `wp-content/uploads` on Bluehost.
 - Live site is still WordPress. Staging app: https://mikraot.net/staging/app/
 
 ## Procedures
 
-- Dev server: `npm run dev` (http://localhost:5173).
-- Deploy frontend: `npm run build`, then scp `dist/` to Bluehost `/home4/<bluehost-user>/public_html/staging/app/`. SSH goes directly to the origin IP (`SSH_HOST` / `SSH_USER` in `.env`), because Cloudflare doesn't proxy port 22.
+- Dev server: `npm run dev` (http://localhost:4321, runs in Cloudflare's workerd). Checks: `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm run build`.
+- `.dev.vars` must exist (it may be empty): it stops wrangler from loading `.env`, whose operations credentials must never reach the Worker.
+- SSH to Bluehost goes directly to the origin IP (`SSH_HOST` / `SSH_USER` in `.env`), because Cloudflare doesn't proxy port 22. The old staging app at /staging/app/ is no longer updated.
 - Deploy Worker: `npx wrangler deploy` from `worker/` (after a one-time `npx wrangler login`).
 - Query D1: `npx wrangler d1 execute mikraot-db --remote --command "..."`.

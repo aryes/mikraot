@@ -1,0 +1,168 @@
+---
+import { BookOpen, ChevronDown, GraduationCap, Home, Menu } from 'lucide-react';
+import { menuTree, siteData } from '../lib/site';
+import { menuItemUrl } from '../lib/urls';
+
+const current = decodeURI(Astro.url.pathname);
+const isActive = (url: string | null) => url !== null && url === current;
+const navLink = 'flex items-center gap-1 rounded-lg px-3 py-2 transition-colors';
+const activeLink = 'bg-white font-bold text-[#8CB65F] shadow-xs';
+const idleLink = 'hover:bg-white/60 hover:text-[#8CB65F]';
+const hasChildren = (item: { children?: unknown[] | undefined }) =>
+  item.children !== undefined && item.children.length > 0;
+---
+
+<header class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-xs">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+    <a href="/" class="group flex items-center gap-3 select-none">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-[#6e9447] to-[#8CB65F] text-white shadow-sm transition-transform group-hover:scale-105">
+        <BookOpen size={22} />
+      </div>
+      <div>
+        <p class="text-2xl leading-none font-black tracking-tight text-slate-800 transition-colors group-hover:text-[#8CB65F]">
+          {siteData.site.title}
+        </p>
+        <p class="mt-0.5 text-xs font-medium text-slate-500">{siteData.site.tagline}</p>
+      </div>
+    </a>
+
+    <div class="flex items-center gap-2">
+      <a
+        href="/courses/"
+        class="hidden items-center gap-1.5 rounded-xl bg-[#8CB65F] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-[#7aa252] md:flex"
+      >
+        <GraduationCap size={16} />
+        קורסים
+      </a>
+
+      <!-- Mobile menu: a native disclosure, so it works without JavaScript. -->
+      <details class="md:hidden">
+        <summary
+          class="list-none rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 [&::-webkit-details-marker]:hidden"
+          aria-label="תפריט"
+        >
+          <Menu size={22} />
+        </summary>
+        <nav
+          class="absolute inset-x-0 top-full max-h-[80vh] space-y-2 overflow-y-auto border-b border-slate-200 bg-white px-4 pt-2 pb-6 shadow-md"
+          aria-label="תפריט"
+        >
+          <a
+            href="/"
+            class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50"
+          >
+            <Home size={16} /> ראשי
+          </a>
+          {menuTree.map((item) => (
+            <div class="space-y-1">
+              <a
+                href={menuItemUrl(item) ?? undefined}
+                class="block rounded-lg px-3 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50"
+              >
+                {item.title}
+              </a>
+              {hasChildren(item) && (
+                <div class="mr-4 space-y-1 border-r-2 border-slate-200 pr-3">
+                  {item.children?.map((sub) => (
+                    <div>
+                      <a
+                        href={menuItemUrl(sub) ?? undefined}
+                        class="block rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-[#8CB65F]"
+                      >
+                        {sub.title}
+                      </a>
+                      {hasChildren(sub) && (
+                        <div class="mr-3 space-y-0.5 border-r border-slate-200 pr-2">
+                          {sub.children?.map((subSub) => (
+                            <a
+                              href={menuItemUrl(subSub) ?? undefined}
+                              class="block px-2 py-1 text-[11px] text-slate-500 hover:text-[#8CB65F]"
+                            >
+                              {subSub.title}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+          <a
+            href="/courses/"
+            class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold text-[#8CB65F] hover:bg-emerald-50"
+          >
+            <GraduationCap size={16} /> קורסים ומבחנים
+          </a>
+        </nav>
+      </details>
+    </div>
+  </div>
+
+  <!-- Desktop menu: dropdowns open on hover and keyboard focus via CSS only. -->
+  <nav class="hidden border-t border-slate-200/60 bg-slate-50 md:block" aria-label="ניווט ראשי">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <ul class="flex items-center gap-1 py-1 text-sm font-semibold text-slate-700">
+        <li>
+          <a href="/" class:list={[navLink, isActive('/') ? activeLink : idleLink]}>
+            <Home size={15} /> ראשי
+          </a>
+        </li>
+        {menuTree.map((item) => {
+          const url = menuItemUrl(item);
+          return (
+            <li class="group relative">
+              <a
+                href={url ?? undefined}
+                class:list={[navLink, isActive(url) ? activeLink : idleLink]}
+              >
+                {item.title}
+                {hasChildren(item) && (
+                  <ChevronDown
+                    size={14}
+                    className="text-slate-400 transition-transform group-hover:rotate-180"
+                  />
+                )}
+              </a>
+              {hasChildren(item) && (
+                <div class="invisible absolute top-full right-0 z-50 min-w-[220px] -translate-y-1 rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-lg transition-all duration-150 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                  {item.children?.map((sub) => (
+                    <div class="group/sub relative">
+                      <a
+                        href={menuItemUrl(sub) ?? undefined}
+                        class="flex w-full items-center justify-between px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#8CB65F]"
+                      >
+                        <span>{sub.title}</span>
+                        {hasChildren(sub) && (
+                          <ChevronDown size={12} className="-rotate-90 text-slate-400" />
+                        )}
+                      </a>
+                      {hasChildren(sub) && (
+                        <div class="absolute top-0 right-full mr-1 hidden min-w-[200px] rounded-xl border border-slate-200 bg-white py-2 shadow-lg group-focus-within/sub:block group-hover/sub:block">
+                          {sub.children?.map((subSub) => (
+                            <a
+                              href={menuItemUrl(subSub) ?? undefined}
+                              class="block w-full px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#8CB65F]"
+                            >
+                              {subSub.title}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </li>
+          );
+        })}
+        <li>
+          <a href="/courses/" class:list={[navLink, isActive('/courses/') ? activeLink : idleLink]}>
+            קורסים
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
