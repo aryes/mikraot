@@ -11,3 +11,5 @@ dist-ssr
 .astro
 .wrangler
 .migration
+test-results
+playwright-report

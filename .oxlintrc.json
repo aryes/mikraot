@@ -39,6 +39,8 @@
     "node_modules",
     "src/data/siteData.json",
     "worker-configuration.d.ts",
-    ".astro"
+    ".astro",
+    "test-results",
+    "playwright-report"
   ]
 }

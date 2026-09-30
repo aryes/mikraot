@@ -5,7 +5,12 @@
   "main": "@astrojs/cloudflare/entrypoints/server",
   "compatibility_date": "2026-09-30",
   "compatibility_flags": ["nodejs_compat"],
-  "assets": { "directory": "./dist", "binding": "ASSETS" },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // Serve src/pages/404.astro (with status 404) for unknown URLs.
+    "not_found_handling": "404-page",
+  },
   "d1_databases": [
     {
       "binding": "DB",

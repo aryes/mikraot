@@ -41,6 +41,7 @@
 - [ ] Keep every WordPress URL; 301 redirects where they must differ; sitemap
 - [ ] Keystatic editor with the custom blocks (local first; browser editing after GitHub)
 - [ ] Pagefind search, self-hosted fonts
+- [x] Playwright e2e basics (`npm run test:e2e`, desktop + mobile, against the production build in workerd): URLs, 404, collapsibles, comments, menu
 - [ ] Playwright e2e: crawl the original and the new site and compare every page
 
 ## 4. Parity with original
@@ -65,4 +66,4 @@
 - Lesson and quiz URLs are standalone (`/lessons/x/`) instead of course-scoped; fix with the content migration.
 - Comments: POST auto-approves, no rate limit or captcha, CORS `*`. (Raw DB errors no longer returned: fixed in `worker/`, not yet deployed.)
 - `wp-html.ts` doesn't handle `[learn_press_*]` and `[elementor]` shortcodes or the 7 raw `<table>`s.
-- The migration docs describe Playwright tests that aren't in the repo.
+- The comments e2e test depends on the live API until the API moves into this Worker.

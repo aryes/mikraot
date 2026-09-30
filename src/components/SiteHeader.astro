@@ -111,10 +111,14 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
         </li>
         {menuTree.map((item) => {
           const url = menuItemUrl(item);
+          // Items without a URL only open a dropdown; a button keeps them keyboard-focusable.
+          const Trigger = url ? 'a' : 'button';
           return (
             <li class="group relative">
-              <a
+              <Trigger
                 href={url ?? undefined}
+                type={url ? undefined : 'button'}
+                aria-haspopup={hasChildren(item) ? 'true' : undefined}
                 class:list={[navLink, isActive(url) ? activeLink : idleLink]}
               >
                 {item.title}
@@ -124,7 +128,7 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
                     className="text-slate-400 transition-transform group-hover:rotate-180"
                   />
                 )}
-              </a>
+              </Trigger>
               {hasChildren(item) && (
                 <div class="invisible absolute top-full right-0 z-50 min-w-[220px] -translate-y-1 rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-lg transition-all duration-150 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
                   {item.children?.map((sub) => (

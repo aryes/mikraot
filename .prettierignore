@@ -4,3 +4,5 @@ package-lock.json
 src/data/siteData.json
 worker-configuration.d.ts
 .astro
+test-results
+playwright-report
