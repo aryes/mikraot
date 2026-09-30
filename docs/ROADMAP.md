@@ -7,6 +7,8 @@
 - [x] Add secret scanning (gitleaks) as a pre-commit hook
 - [x] Delete the pre-rewrite backup bundle once the new history is confirmed
 - [x] Stop tracking `.idea/`
+- [x] Delete Supabase API keys and reset its DB password
+- [ ] Decide Supabase's fate together with the Google sign-in decision (checked 2026-09-30: its only data, 4 comments, is identical in D1)
 
 ## 2. Foundations
 - ESLint + Prettier, strict tsconfig, Vitest + Playwright, update deps
