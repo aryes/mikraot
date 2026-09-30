@@ -34,11 +34,25 @@ function audioButton(url: string): string {
   </button>`;
 }
 
-function collapsible(id: string, label: string, inner: string): string {
+/** Reads an attribute from shortcode attributes, e.g. `expand_text="הראה פתרון"`. */
+function shortcodeAttr(attrs: string, name: string): string {
+  const value = new RegExp(`(?:^|\\s)${name}=["']([^"']*)["']`).exec(attrs)?.[1] ?? '';
+  return value.replace(/&nbsp;/g, ' ').trim();
+}
+
+/**
+ * An expandable explanation. Like the WordPress plugin, the toggle is an eye icon, with a text
+ * label only when the shortcode sets one (e.g. "הראה פתרון" / "החבא פתרון").
+ */
+function collapsible(id: string, expandText: string, collapseText: string, inner: string): string {
+  const label = expandText
+    ? `<span class="collapse-label" data-expand-text="${expandText}" data-collapse-text="${collapseText || expandText}">${expandText}</span>`
+    : '';
+  const ariaLabel = expandText ? '' : ' aria-label="הצג / הסתר ביאור"';
   return `<div class="bg-collapse-wrapper my-2 inline-block">
-    <button type="button" class="collapse-toggle-btn inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-[#8CB65F] border border-slate-200 rounded-lg text-xs font-semibold transition-all cursor-pointer" data-target="${id}" aria-expanded="false" aria-controls="${id}">
-      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-      <span>${label}</span>
+    <button type="button" class="collapse-toggle-btn inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-[#8CB65F] border border-slate-200 rounded-lg text-xs font-semibold transition-all cursor-pointer" data-target="${id}" aria-expanded="false" aria-controls="${id}"${ariaLabel}>
+      <svg class="w-3.5 h-3.5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      ${label}
     </button>
     <div id="${id}" class="collapse-target hidden mt-2 p-3 bg-emerald-50/60 border-r-3 border-[#8CB65F] rounded-l-lg text-slate-800 text-sm leading-relaxed">
       ${inner}
@@ -93,8 +107,12 @@ export function wpHtmlToSiteHtml(raw: string, urlForId: UrlForId = () => undefin
     /\[bg_collapse([^\]]*)\]([\s\S]*?)\[\/bg_collapse\]/g,
     (_m, attrs: string, inner: string) => {
       collapseCount += 1;
-      const label = attrs.match(/text=["']([^"']*)["']/)?.[1] || 'הצג / הסתר ביאור';
-      return collapsible(`collapse-${collapseCount}`, label, inner);
+      return collapsible(
+        `collapse-${collapseCount}`,
+        shortcodeAttr(attrs, 'expand_text'),
+        shortcodeAttr(attrs, 'collapse_text'),
+        inner,
+      );
     },
   );
 

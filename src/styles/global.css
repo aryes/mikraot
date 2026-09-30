@@ -136,3 +136,15 @@
 .wp-content-rendered tr:hover td {
   background: #f1f5f9;
 }
+
+/* WordPress block classes that carry meaning in the migrated content (values from WordPress core). */
+.wp-content-rendered .has-text-align-center {
+  text-align: center;
+}
+.wp-content-rendered .has-text-align-right {
+  text-align: right;
+}
+/* Orange marks the letter or vowel being taught; some spans get it only from this class. */
+.wp-content-rendered .has-luminous-vivid-orange-color {
+  color: #ff6900;
+}

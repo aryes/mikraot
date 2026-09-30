@@ -119,3 +119,15 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
     'Sitemap: https://mikraot.net/sitemap-index.xml',
   );
 });
+
+test('WordPress formatting classes render: centred text and class-only orange', async ({
+  page,
+}) => {
+  await page.goto('/דגש-קל/');
+  const centred = page.locator('.wp-content-rendered .has-text-align-center').first();
+  await expect(centred).toHaveCSS('text-align', 'center');
+
+  await page.goto('/שווא-נע/');
+  const orange = page.locator('.wp-content-rendered .has-luminous-vivid-orange-color').first();
+  await expect(orange).toHaveCSS('color', 'rgb(255, 105, 0)');
+});

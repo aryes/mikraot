@@ -52,6 +52,10 @@ function toggleCollapse(button: HTMLElement): void {
   button.classList.toggle('border-[#8CB65F]', open);
   button.classList.toggle('bg-slate-100', !open);
   button.classList.toggle('text-slate-700', !open);
+  const label = button.querySelector<HTMLElement>('.collapse-label');
+  if (label) {
+    label.textContent = (open ? label.dataset['collapseText'] : label.dataset['expandText']) ?? '';
+  }
 }
 
 function openVideo(id: string, title: string): void {

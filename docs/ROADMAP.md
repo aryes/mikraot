@@ -43,7 +43,8 @@
 - [ ] Keystatic editor with the custom blocks (local first; browser editing after GitHub)
 - [ ] Pagefind search, self-hosted fonts
 - [x] Playwright e2e basics (`npm run test:e2e`, desktop + mobile, against the production build in workerd): URLs, 404, collapsibles, comments, menu
-- [ ] Playwright e2e: crawl the original and the new site and compare every page
+- [x] Compare every page with the live site (`npm run compare:live`, after a build; report in `.migration/compare-report.md`): text, links, images, headings, lists, tables, collapsibles, audio and colour highlights. Result 2026-10-01: 33/34 pages identical except typography; the home page lacks the "latest posts" block (needs post dates: comes with the content migration)
+- [ ] **Decision (Arye): typography.** WordPress shows ’ ” “ – where the content has ' " -. Options: match WordPress; proper Hebrew geresh/gershayim (׳ ״) with – dashes (recommended); or keep as typed
 
 ## 4. Parity with original
 

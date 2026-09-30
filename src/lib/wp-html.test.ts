@@ -44,15 +44,26 @@ describe('wpHtmlToSiteHtml', () => {
     expect(html).toContain('data-audio-src="/wp-content/uploads/a.mp3"');
   });
 
-  it('turns collapse shortcodes into numbered, accessible toggles', () => {
+  it('turns collapse shortcodes into numbered toggles: eye icon only, like the live site', () => {
     const html = wpHtmlToSiteHtml(
-      '[bg_collapse view="link" text="ביאור"]first[/bg_collapse][bg_collapse]second[/bg_collapse]',
+      '[bg_collapse view="link-inline" icon="eye" expand_text="" collapse_text=" " ]first[/bg_collapse]' +
+        '[bg_collapse view="link-inline"]second[/bg_collapse]',
     );
     expect(html).toContain('data-target="collapse-1"');
     expect(html).toContain('aria-controls="collapse-2"');
-    expect(html).toContain('<span>ביאור</span>');
-    expect(html).toContain('<span>הצג / הסתר ביאור</span>');
+    expect(html).toContain('aria-label="הצג / הסתר ביאור"'); // icon-only needs an accessible name
+    expect(html).not.toContain('collapse-label');
     expect(html).toMatch(/id="collapse-1"[^>]*>\s*first/);
+  });
+
+  it('shows the expand/collapse text when the shortcode sets one', () => {
+    const html = wpHtmlToSiteHtml(
+      '[bg_collapse icon="eye" expand_text="&nbsp; &nbsp;הראה פתרון" collapse_text="&nbsp; &nbsp;החבא פתרון"]x[/bg_collapse]',
+    );
+    expect(html).toContain(
+      '<span class="collapse-label" data-expand-text="הראה פתרון" data-collapse-text="החבא פתרון">הראה פתרון</span>',
+    );
+    expect(html).not.toContain('aria-label=');
   });
 
   it('rewrites internal links (live and staging) to site paths with a trailing slash', () => {
