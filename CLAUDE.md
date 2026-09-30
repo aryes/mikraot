@@ -35,5 +35,5 @@ The plan and known issues are in `docs/ROADMAP.md`.
 - Dev server: `npm run dev` (http://localhost:4321, runs in Cloudflare's workerd). Checks: `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm run build`.
 - `.dev.vars` must exist (it may be empty): it stops wrangler from loading `.env`, whose operations credentials must never reach the Worker.
 - SSH to Bluehost goes directly to the origin IP (`SSH_HOST` / `SSH_USER` in `.env`), because Cloudflare doesn't proxy port 22. The old staging app at /staging/app/ is no longer updated.
-- Deploy Worker: `npx wrangler deploy` from `worker/` (after a one-time `npx wrangler login`).
+- Deploy the old API Worker: `npx wrangler deploy --config wrangler.json` from `worker/` (explicit config: the Astro build leaves a `.wrangler/deploy` redirect in the root). One-time `npx wrangler login` first.
 - Query D1: `npx wrangler d1 execute mikraot-db --remote --command "..."`.

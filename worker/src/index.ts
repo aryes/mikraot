@@ -39,7 +39,8 @@ export default {
       }
 
       const placeholders = slugs.map(() => '?').join(',');
-      const query = `SELECT * FROM comments WHERE page_slug IN (${placeholders}) AND approved = 1 ORDER BY created_at ASC`;
+      // Public fields only: author_email must never leave the database.
+      const query = `SELECT id, page_slug, author_name, content, is_admin_reply, created_at FROM comments WHERE page_slug IN (${placeholders}) AND approved = 1 ORDER BY created_at ASC`;
       const { results } = await env.DB.prepare(query)
         .bind(...slugs)
         .all();
@@ -69,7 +70,7 @@ export default {
 
         const result = await env.DB.prepare(
           `INSERT INTO comments (page_slug, author_name, author_email, content, is_admin_reply, approved)
-           VALUES (?, ?, ?, ?, 0, 1) RETURNING *`,
+           VALUES (?, ?, ?, ?, 0, 1) RETURNING id, page_slug, author_name, content, is_admin_reply, created_at`,
         )
           .bind(page_slug, author_name.trim(), author_email?.trim() || null, content.trim())
           .first();
