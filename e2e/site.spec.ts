@@ -131,3 +131,18 @@ test('WordPress formatting classes render: centred text and class-only orange', 
   const orange = page.locator('.wp-content-rendered .has-luminous-vivid-orange-color').first();
   await expect(orange).toHaveCSS('color', 'rgb(255, 105, 0)');
 });
+
+test('fonts are self-hosted and load (no third-party font requests)', async ({ page }) => {
+  const external: string[] = [];
+  page.on('request', (req) => {
+    if (/fonts\.(googleapis|gstatic)\.com/.test(req.url())) external.push(req.url());
+  });
+  await page.goto('/שווא-נע/');
+  await page.evaluate(() => document.fonts.ready);
+  const loaded = await page.evaluate(() => ({
+    body: document.fonts.check('16px "Assistant Variable"', 'שווא'),
+    heading: document.fonts.check('16px "Frank Ruhl Libre Variable"', 'שווא'),
+  }));
+  expect(loaded).toEqual({ body: true, heading: true });
+  expect(external).toEqual([]);
+});

@@ -1,17 +1,14 @@
 @import 'tailwindcss';
+/* Self-hosted fonts (Hebrew + Latin subsets; browsers fetch only what a page uses). */
+@import '@fontsource-variable/assistant';
+@import '@fontsource-variable/frank-ruhl-libre';
+@import '@fontsource/alef/400.css';
+@import '@fontsource/alef/700.css';
 
-@layer base {
-  body {
-    font-family:
-      'Assistant',
-      -apple-system,
-      BlinkMacSystemFont,
-      sans-serif;
-  }
-
-  .font-hebrew {
-    font-family: 'Frank Ruhl Libre', 'Alef', 'SBL Hebrew', 'Ezra SIL', serif;
-  }
+/* Theme fonts: `font-sans` (body text) and `font-hebrew` (headings), used as Tailwind utilities. */
+@theme {
+  --font-sans: 'Assistant Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-hebrew: 'Frank Ruhl Libre Variable', 'Alef', 'SBL Hebrew', 'Ezra SIL', serif;
 }
 
 /* Custom Scrollbar */

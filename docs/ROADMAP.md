@@ -41,7 +41,8 @@
 - [x] SEO parity: titles, descriptions and og tags captured from the live pages (`scripts/fetch-live-seo.ts` → `src/data/seo.json`, the source of truth once WordPress is gone), live favicon, sitemap (34 URLs) with `/sitemap.xml` → `/sitemap-index.xml` 301, `robots.txt`
 - [ ] Open: WordPress feeds (`/feed/`, `/sitemap.rss`) are not replicated; decide whether they are needed
 - [ ] Keystatic editor with the custom blocks (local first; browser editing after GitHub)
-- [ ] Pagefind search, self-hosted fonts
+- [x] Self-hosted fonts (@fontsource: Assistant, Frank Ruhl Libre, Alef; Hebrew + Latin subsets)
+- [ ] Pagefind search
 - [x] Playwright e2e basics (`npm run test:e2e`, desktop + mobile, against the production build in workerd): URLs, 404, collapsibles, comments, menu
 - [x] Compare every page with the live site (`npm run compare:live`, after a build; report in `.migration/compare-report.md`): text, links, images, headings, lists, tables, collapsibles, audio and colour highlights. Result 2026-10-01: 33/34 pages identical except typography; the home page lacks the "latest posts" block (needs post dates: comes with the content migration)
 - [ ] **Decision (Arye): typography.** WordPress shows ’ ” “ – where the content has ' " -. Options: match WordPress; proper Hebrew geresh/gershayim (׳ ״) with – dashes (recommended); or keep as typed
