@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchComments, postComment, CommentItem } from '../lib/api';
+import { fetchComments, postComment, type CommentItem } from '../lib/api';
 import { MessageSquare, Send, CheckCircle2, User, ShieldCheck } from 'lucide-react';
 
 interface CommentsProps {

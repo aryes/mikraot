@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { MenuItem } from '../types';
+import type { MenuItem } from '../types';
 import { buildMenuTree, cleanUrlToRoute } from '../utils/menuHelper';
-import { Search, Menu, X, ChevronDown, BookOpen, GraduationCap, Volume2, Home } from 'lucide-react';
+import { Search, Menu, X, ChevronDown, BookOpen, GraduationCap, Home } from 'lucide-react';
 
 interface HeaderProps {
   siteTitle: string;

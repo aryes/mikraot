@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Volume2, Play, Pause, ChevronDown, ChevronUp, Eye, EyeOff, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface ContentParserProps {
   content: string;
@@ -9,7 +9,7 @@ interface ContentParserProps {
 function getYouTubeId(url: string): string | null {
   if (!url) return null;
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-  return match ? match[1] : null;
+  return match?.[1] ?? null;
 }
 
 export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigate }) => {
@@ -76,7 +76,7 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
     // 4. Transform [sc_embed_player fileurl="..."] into interactive audio buttons
     processed = processed.replace(
       /\[sc_embed_player\s+fileurl=["']([^"']+)["'][^\]]*\]/g,
-      (match, url) => {
+      (_match, url: string) => {
         const cleanUrl = url.replace('https://mikraot.net/staging/4160/', 'https://mikraot.net/');
         return `<button type="button" class="inline-audio-btn inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#8CB65F] hover:bg-[#7aa252] text-white shadow-xs mx-1 align-middle transition-transform active:scale-95 cursor-pointer" data-audio-src="${cleanUrl}" title="השמע צליל">
           <svg class="play-icon w-4 h-4 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
@@ -89,7 +89,7 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
     let collapseCounter = 0;
     processed = processed.replace(
       /\[bg_collapse([^\]]*)\]([\s\S]*?)\[\/bg_collapse\]/g,
-      (match, attrs, innerContent) => {
+      (_match, attrs: string, innerContent: string) => {
         collapseCounter++;
         const id = `collapse-${collapseCounter}`;
         const textMatch = attrs.match(/text=["']([^"']*)["']/);
@@ -110,7 +110,7 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
     // 6. Replace internal links to hash routing
     processed = processed.replace(
       /href="https?:\/\/(?:www\.)?mikraot\.net(?:\/staging\/4160)?\/([^"]*)"/g,
-      (match, slug) => {
+      (_match, slug: string) => {
         const clean = slug.replace(/^\/|\/$/g, '');
         if (clean.startsWith('wp-content')) {
           return `href="https://mikraot.net/${clean}"`;
@@ -266,7 +266,7 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
                 title={activeVideoModal.title}
                 className="w-full h-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen
+                allowFullScreen
               ></iframe>
             </div>
           </div>

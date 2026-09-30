@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { ContentItem } from '../types';
-import { Search, X, BookOpen, Volume2, ArrowLeft } from 'lucide-react';
+import type { ContentItem } from '../types';
+import { Search, X, BookOpen, ArrowLeft } from 'lucide-react';
 
 interface SearchViewProps {
   items: ContentItem[];

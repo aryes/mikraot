@@ -1,11 +1,10 @@
 import React from 'react';
-import { ContentItem } from '../types';
-import { GraduationCap, BookOpen, Clock, CheckCircle2, ChevronLeft } from 'lucide-react';
+import type { ContentItem } from '../types';
+import { GraduationCap, BookOpen, ChevronLeft } from 'lucide-react';
 
 interface CourseViewProps {
   courses: ContentItem[];
   lessons: ContentItem[];
-  quizzes: ContentItem[];
   onSelectCourse: (course: ContentItem) => void;
   onSelectLesson: (lesson: ContentItem) => void;
 }
@@ -13,7 +12,6 @@ interface CourseViewProps {
 export const CourseView: React.FC<CourseViewProps> = ({
   courses,
   lessons,
-  quizzes,
   onSelectCourse,
   onSelectLesson,
 }) => {

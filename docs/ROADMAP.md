@@ -11,13 +11,18 @@
 - [ ] Decide Supabase's fate together with the Google sign-in decision (checked 2026-09-30: its only data, 4 comments, is identical in D1)
 
 ## 2. Foundations
-- ESLint + Prettier, strict tsconfig, Vitest + Playwright, update deps
+- [x] Update deps, clean package.json
+- [x] Strict tsconfig (strict, noUncheckedIndexedAccess, verbatimModuleSyntax)
+- [ ] ESLint + Prettier
+- [ ] Vitest unit tests
+- [ ] Worker: own tsconfig + Workers types
+- [ ] Playwright e2e (with URL routing)
 - Real URL routing that preserves WordPress URLs (SEO and old links; 301s where they differ)
 - Move static hosting to Cloudflare
 
 ## 3. Parity with original
 - Full inventory of mikraot.net pages and features (crawl and compare)
-- Migrate missing features: contact form, TablePress tables, LearnPress course progress/quizzes, Google sign-in, analytics, comment moderation, media/MP3 hosting (e.g. R2)
+- Migrate missing features: contact form, TablePress tables, LearnPress course progress/quizzes (quizzes are not shown anywhere yet), Google sign-in, analytics, comment moderation, media/MP3 hosting (e.g. R2)
 
 ## 4. Launch
 - GitHub + CI deploys
@@ -29,6 +34,4 @@
 - 7 unpublished items (drafts/private) ship to visitors inside the JS bundle.
 - Comments: POST auto-approves, no rate limit or captcha, CORS `*`, raw DB errors returned to the client.
 - `contentParser` doesn't handle `[learn_press_*]` and `[elementor]` shortcodes or the 7 raw `<table>`s.
-- `AudioPlayer` and `InteractiveLineReader` are unused.
 - The migration docs describe Playwright tests that aren't in the repo.
-- `tsc` reports 2 type errors; `package.json` has `"type": "commonjs"` in an ESM project.

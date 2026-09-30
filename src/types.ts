@@ -20,7 +20,7 @@ export interface ContentItem {
   excerpt: string;
   parentId: number;
   order: number;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 }
 
 export interface AudioFile {
@@ -35,7 +35,7 @@ export interface SiteData {
     title: string;
     tagline: string;
     copyright: string;
-    frontPageId: number;
+    frontPageId: string;
   };
   menu: MenuItem[];
   content: ContentItem[];

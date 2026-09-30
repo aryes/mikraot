@@ -1,4 +1,4 @@
-import { MenuItem } from '../types';
+import type { MenuItem } from '../types';
 
 export function buildMenuTree(items: MenuItem[]): MenuItem[] {
   const map = new Map<number, MenuItem>();

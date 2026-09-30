@@ -1,8 +1,7 @@
 import React from 'react';
-import { ContentItem } from '../types';
+import type { ContentItem } from '../types';
 import { ContentParser } from '../utils/contentParser';
 import { Comments } from './Comments';
-import { BookOpen, Calendar, ArrowRight, Share2 } from 'lucide-react';
 
 interface PageViewProps {
   page: ContentItem;

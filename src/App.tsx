@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import siteData from './data/siteData.json';
-import { ContentItem } from './types';
+import { contentOfType, siteData } from './data/site';
+import type { ContentItem } from './types';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { PageView } from './components/PageView';
@@ -57,9 +57,10 @@ export const App: React.FC = () => {
   const findContent = (route: string): ContentItem | null => {
     if (!route || route === '' || route === 'home') {
       return (
-        (siteData.content.find(c => c.id === siteData.site.frontPageId) as ContentItem) ||
-        (siteData.content.find(c => c.slug === 'home' || c.slug === 'מקראות') as ContentItem) ||
-        (siteData.content[0] as ContentItem)
+        siteData.content.find(c => String(c.id) === siteData.site.frontPageId) ??
+        siteData.content.find(c => c.slug === 'home' || c.slug === 'מקראות') ??
+        siteData.content[0] ??
+        null
       );
     }
 
@@ -73,7 +74,7 @@ export const App: React.FC = () => {
       c.title.toLowerCase() === clean ||
       String(c.id) === clean
     );
-    if (found) return found as ContentItem;
+    if (found) return found;
 
     // 2. Match by last path segment (handles hierarchical URLs like טעמים/נוסח-אשכנז)
     if (lastSegment) {
@@ -81,7 +82,7 @@ export const App: React.FC = () => {
         c.slug.toLowerCase() === lastSegment || 
         c.rawSlug.toLowerCase() === lastSegment
       );
-      if (found) return found as ContentItem;
+      if (found) return found;
     }
 
     return null;
@@ -89,9 +90,8 @@ export const App: React.FC = () => {
 
   const activePage = findContent(currentRoute);
 
-  const courses = siteData.content.filter(c => c.type === 'lp_course') as ContentItem[];
-  const lessons = siteData.content.filter(c => c.type === 'lp_lesson') as ContentItem[];
-  const quizzes = siteData.content.filter(c => c.type === 'lp_quiz') as ContentItem[];
+  const courses = contentOfType('lp_course');
+  const lessons = contentOfType('lp_lesson');
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F3F7F5] font-sans antialiased text-[#444444]">
@@ -99,7 +99,7 @@ export const App: React.FC = () => {
       <Header
         siteTitle={siteData.site.title}
         tagline={siteData.site.tagline}
-        menuItems={siteData.menu as any}
+        menuItems={siteData.menu}
         currentRoute={currentRoute}
         onNavigate={navigateTo}
         onOpenSearch={() => setSearchOpen(true)}
@@ -111,7 +111,6 @@ export const App: React.FC = () => {
           <CourseView
             courses={courses}
             lessons={lessons}
-            quizzes={quizzes}
             onSelectCourse={(c) => navigateTo(c.slug || String(c.id))}
             onSelectLesson={(l) => navigateTo(l.slug || String(l.id))}
           />
@@ -134,16 +133,15 @@ export const App: React.FC = () => {
       {/* Footer */}
       <Footer
         siteTitle={siteData.site.title}
-        tagline={siteData.site.tagline}
         copyright={siteData.site.copyright}
-        menuItems={siteData.menu as any}
+        menuItems={siteData.menu}
         onNavigate={navigateTo}
       />
 
       {/* Search Modal */}
       {searchOpen && (
         <SearchView
-          items={siteData.content as ContentItem[]}
+          items={siteData.content}
           onSelect={(item) => navigateTo(item.slug || String(item.id))}
           onClose={() => setSearchOpen(false)}
         />

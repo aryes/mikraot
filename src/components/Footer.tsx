@@ -1,11 +1,10 @@
 import React from 'react';
-import { MenuItem } from '../types';
+import type { MenuItem } from '../types';
 import { cleanUrlToRoute } from '../utils/menuHelper';
 import { BookOpen, ArrowUp } from 'lucide-react';
 
 interface FooterProps {
   siteTitle: string;
-  tagline: string;
   copyright: string;
   menuItems: MenuItem[];
   onNavigate: (route: string) => void;
@@ -13,7 +12,6 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({
   siteTitle,
-  tagline,
   copyright,
   menuItems,
   onNavigate,
