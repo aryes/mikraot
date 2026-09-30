@@ -4,11 +4,11 @@ export function buildMenuTree(items: MenuItem[]): MenuItem[] {
   const map = new Map<number, MenuItem>();
   const roots: MenuItem[] = [];
 
-  items.forEach(item => {
+  items.forEach((item) => {
     map.set(item.id, { ...item, children: [] });
   });
 
-  items.forEach(item => {
+  items.forEach((item) => {
     const node = map.get(item.id)!;
     if (item.parentId && map.has(item.parentId)) {
       map.get(item.parentId)!.children!.push(node);

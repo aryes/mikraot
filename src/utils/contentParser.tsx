@@ -8,14 +8,18 @@ interface ContentParserProps {
 
 function getYouTubeId(url: string): string | null {
   if (!url) return null;
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+  const match = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/,
+  );
   return match?.[1] ?? null;
 }
 
 export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigate }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentPlayingSrc, setCurrentPlayingSrc] = useState<string | null>(null);
-  const [activeVideoModal, setActiveVideoModal] = useState<{ id: string; title: string } | null>(null);
+  const [activeVideoModal, setActiveVideoModal] = useState<{ id: string; title: string } | null>(
+    null,
+  );
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -48,7 +52,7 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
             loading="lazy"
           ></iframe>
         </div>`;
-      }
+      },
     );
 
     // 2. Transform standalone YouTube URLs in isolated paragraphs (not inside lists)
@@ -67,7 +71,7 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
             loading="lazy"
           ></iframe>
         </div>`;
-      }
+      },
     );
 
     // 3. Remove remaining Gutenberg block comment wrappers
@@ -82,7 +86,7 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
           <svg class="play-icon w-4 h-4 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
           <svg class="pause-icon w-4 h-4 hidden pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
         </button>`;
-      }
+      },
     );
 
     // 5. Transform [bg_collapse ...]...[/bg_collapse] into interactive expand/collapse
@@ -104,7 +108,7 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
             ${innerContent}
           </div>
         </div>`;
-      }
+      },
     );
 
     // 6. Replace internal links to hash routing
@@ -116,7 +120,7 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
           return `href="https://mikraot.net/${clean}"`;
         }
         return `href="#/${clean}"`;
-      }
+      },
     );
 
     return processed;
@@ -134,7 +138,11 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
       const audioSrc = audioBtn.getAttribute('data-audio-src');
       if (!audioSrc) return;
 
-      if (currentAudioRef.current && currentPlayingSrc === audioSrc && !currentAudioRef.current.paused) {
+      if (
+        currentAudioRef.current &&
+        currentPlayingSrc === audioSrc &&
+        !currentAudioRef.current.paused
+      ) {
         currentAudioRef.current.pause();
         setCurrentPlayingSrc(null);
         updateButtonIcons(null);
@@ -149,13 +157,16 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
       currentAudioRef.current = audio;
       setCurrentPlayingSrc(audioSrc);
 
-      audio.play().then(() => {
-        updateButtonIcons(audioBtn);
-      }).catch(err => {
-        console.error('Audio playback failed:', err);
-        setCurrentPlayingSrc(null);
-        updateButtonIcons(null);
-      });
+      audio
+        .play()
+        .then(() => {
+          updateButtonIcons(audioBtn);
+        })
+        .catch((err) => {
+          console.error('Audio playback failed:', err);
+          setCurrentPlayingSrc(null);
+          updateButtonIcons(null);
+        });
 
       audio.onended = () => {
         setCurrentPlayingSrc(null);
@@ -249,13 +260,13 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
 
       {/* Video Lightbox Modal for list video clicks */}
       {activeVideoModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden animate-scaleUp">
-            <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-slate-800 text-sm">{activeVideoModal.title}</h3>
+        <div className="animate-fadeIn fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4 backdrop-blur-xs">
+          <div className="animate-scaleUp w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 p-4">
+              <h3 className="text-sm font-bold text-slate-800">{activeVideoModal.title}</h3>
               <button
                 onClick={() => setActiveVideoModal(null)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 cursor-pointer"
+                className="cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
               >
                 <X size={18} />
               </button>
@@ -264,7 +275,7 @@ export const ContentParser: React.FC<ContentParserProps> = ({ content, onNavigat
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${activeVideoModal.id}?autoplay=1`}
                 title={activeVideoModal.title}
-                className="w-full h-full border-0"
+                className="h-full w-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               ></iframe>

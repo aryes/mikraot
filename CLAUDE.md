@@ -6,6 +6,7 @@ The live site currently runs on WordPress (Bluehost) and is being migrated to th
 The plan and known issues are in `docs/ROADMAP.md`.
 
 ## Working agreement (owner: Arye)
+
 1. Claude operates the services directly: Cloudflare (wrangler / API / dashboard), Bluehost (SSH, WP-CLI, cPanel), WordPress.
 2. Claude installs/uninstalls packages and runs all commands. Arye supervises and approves; he does not run commands or write code.
 3. **Never commit without Arye's explicit approval.** That includes amends and history rewrites.
@@ -16,17 +17,20 @@ The plan and known issues are in `docs/ROADMAP.md`.
 8. Ask before anything irreversible or public-facing: DNS/cutover, deleting WordPress data or backups, deleting D1 data, billing. Always back up before destructive server/DB operations.
 
 ## Secrets policy
+
 - Never write credentials into tracked files (including docs, CLAUDE.md, code fallbacks).
 - Local: `.env` / `.dev.vars` (gitignored). Worker: `wrangler secret`. Cloudflare auth: `wrangler login` (OAuth), not pasted tokens.
 - Secret scanning: gitleaks pre-commit hook in `.githooks/`, rules in `.gitleaks.toml`. `npm install` enables it (`prepare` script); gitleaks itself: `winget install Gitleaks.Gitleaks`.
 
 ## Architecture
+
 - Frontend: all content bundled from `src/data/siteData.json` (340 items, exported from WP by `export_data.php` on the server). `utils/contentParser.tsx` converts WP HTML/shortcodes.
 - API: `worker/` → Cloudflare Worker `mikraot-api` on `mikraot.net/api/*`, D1 database `mikraot-db`.
 - Media (MP3s, images) is still served from WordPress `wp-content/uploads` on Bluehost.
 - Live site is still WordPress. Staging app: https://mikraot.net/staging/app/
 
 ## Procedures
+
 - Dev server: `npm run dev` (http://localhost:5173).
 - Deploy frontend: `npm run build`, then scp `dist/` to Bluehost `/home4/<bluehost-user>/public_html/staging/app/`. SSH goes directly to the origin IP (`SSH_HOST` / `SSH_USER` in `.env`), because Cloudflare doesn't proxy port 22.
 - Deploy Worker: `npx wrangler deploy` from `worker/` (after a one-time `npx wrangler login`).

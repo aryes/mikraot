@@ -10,21 +10,21 @@ interface PageViewProps {
 
 export const PageView: React.FC<PageViewProps> = ({ page, onNavigate }) => {
   return (
-    <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fadeIn">
+    <article className="animate-fadeIn mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-xs text-slate-500 mb-6 font-medium">
-        <button onClick={() => onNavigate('')} className="hover:text-[#8CB65F] cursor-pointer">
+      <nav className="mb-6 flex items-center gap-2 text-xs font-medium text-slate-500">
+        <button onClick={() => onNavigate('')} className="cursor-pointer hover:text-[#8CB65F]">
           ראשי
         </button>
         <span>/</span>
-        <span className="text-slate-800 font-semibold truncate max-w-xs">{page.title}</span>
+        <span className="max-w-xs truncate font-semibold text-slate-800">{page.title}</span>
       </nav>
 
       {/* Main Card Container matching Kahuna style */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-10 shadow-xs">
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs sm:p-10">
         {/* Title */}
-        <header className="border-b border-slate-100 pb-6 mb-8">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#334155] tracking-tight leading-tight mb-2 font-hebrew">
+        <header className="mb-8 border-b border-slate-100 pb-6">
+          <h1 className="font-hebrew mb-2 text-3xl leading-tight font-extrabold tracking-tight text-[#334155] sm:text-4xl">
             {page.title}
           </h1>
         </header>

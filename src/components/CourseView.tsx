@@ -16,53 +16,60 @@ export const CourseView: React.FC<CourseViewProps> = ({
   onSelectLesson,
 }) => {
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fadeIn">
+    <div className="animate-fadeIn mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="text-center max-w-2xl mx-auto mb-12">
-        <div className="w-14 h-14 bg-emerald-100 text-[#8CB65F] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xs">
+      <div className="mx-auto mb-12 max-w-2xl text-center">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-[#8CB65F] shadow-xs">
           <GraduationCap size={32} />
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-800 tracking-tight mb-3">
+        <h1 className="mb-3 text-3xl font-extrabold tracking-tight text-slate-800 sm:text-4xl">
           קורסי לימוד ומבחנים
         </h1>
-        <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+        <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
           מערכי שיעור מובנים, תרגולים מוקלטים ומבחני ידע להעמקת השליטה בקריאה בטעמים ובדיוקי הניקוד.
         </p>
       </div>
 
       {/* Courses Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+      <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-2">
         {courses.map((course) => {
-          const courseLessons = lessons.filter(l => l.parentId === course.id || l.meta?._lp_course === course.id);
-          
+          const courseLessons = lessons.filter(
+            (l) => l.parentId === course.id || l.meta?._lp_course === course.id,
+          );
+
           return (
             <div
               key={course.id}
               onClick={() => onSelectCourse(course)}
-              className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs hover:shadow-md hover:border-[#8CB65F] transition-all cursor-pointer flex flex-col justify-between group"
+              className="group flex cursor-pointer flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-xs transition-all hover:border-[#8CB65F] hover:shadow-md sm:p-8"
             >
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="bg-emerald-50 text-[#8CB65F] font-bold text-xs px-3 py-1 rounded-full border border-emerald-100">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-bold text-[#8CB65F]">
                     קורס מודרך
                   </span>
-                  <span className="text-xs text-slate-400 font-medium">
-                    {courseLessons.length > 0 ? `${courseLessons.length} שיעורים` : 'שיעורים ותרגולים'}
+                  <span className="text-xs font-medium text-slate-400">
+                    {courseLessons.length > 0
+                      ? `${courseLessons.length} שיעורים`
+                      : 'שיעורים ותרגולים'}
                   </span>
                 </div>
 
-                <h3 className="text-2xl font-bold text-slate-800 group-hover:text-[#8CB65F] transition-colors mb-3 font-hebrew">
+                <h3 className="font-hebrew mb-3 text-2xl font-bold text-slate-800 transition-colors group-hover:text-[#8CB65F]">
                   {course.title}
                 </h3>
 
-                <p className="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3">
+                <p className="mb-6 line-clamp-3 text-sm leading-relaxed text-slate-600">
                   {course.excerpt || 'לימוד מקיף צעד אחר צעד עם תרגול שמע והסברים מפורטים.'}
                 </p>
               </div>
 
-              <div className="border-t border-slate-100 pt-4 flex items-center justify-between text-xs font-bold text-[#8CB65F]">
+              <div className="flex items-center justify-between border-t border-slate-100 pt-4 text-xs font-bold text-[#8CB65F]">
                 <span>התחל לימוד</span>
-                <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+                <ChevronLeft
+                  size={16}
+                  className="transition-transform group-hover:-translate-x-1"
+                />
               </div>
             </div>
           );
@@ -70,28 +77,31 @@ export const CourseView: React.FC<CourseViewProps> = ({
       </div>
 
       {/* All Lessons & Topics List */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs">
-        <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8">
+        <h2 className="mb-6 flex items-center gap-2 text-xl font-bold text-slate-800">
           <BookOpen className="text-[#8CB65F]" size={22} />
           כל השיעורים והנושאים
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {lessons.slice(0, 30).map((lesson, idx) => (
             <button
               key={lesson.id}
               onClick={() => onSelectLesson(lesson)}
-              className="text-right p-3 rounded-xl border border-slate-100 hover:border-[#8CB65F] hover:bg-slate-50 transition-all flex items-center justify-between group cursor-pointer"
+              className="group flex cursor-pointer items-center justify-between rounded-xl border border-slate-100 p-3 text-right transition-all hover:border-[#8CB65F] hover:bg-slate-50"
             >
               <div className="flex items-center gap-2.5 truncate">
-                <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-500 text-[11px] font-bold flex items-center justify-center shrink-0 group-hover:bg-[#8CB65F] group-hover:text-white transition-colors">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[11px] font-bold text-slate-500 transition-colors group-hover:bg-[#8CB65F] group-hover:text-white">
                   {idx + 1}
                 </span>
-                <span className="text-xs font-semibold text-slate-700 group-hover:text-[#8CB65F] truncate">
+                <span className="truncate text-xs font-semibold text-slate-700 group-hover:text-[#8CB65F]">
                   {lesson.title}
                 </span>
               </div>
-              <ChevronLeft size={14} className="text-slate-300 group-hover:text-[#8CB65F] shrink-0" />
+              <ChevronLeft
+                size={14}
+                className="shrink-0 text-slate-300 group-hover:text-[#8CB65F]"
+              />
             </button>
           ))}
         </div>

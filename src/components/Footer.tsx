@@ -10,44 +10,42 @@ interface FooterProps {
   onNavigate: (route: string) => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({
-  siteTitle,
-  copyright,
-  menuItems,
-  onNavigate,
-}) => {
+export const Footer: React.FC<FooterProps> = ({ siteTitle, copyright, menuItems, onNavigate }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Top level menu links for footer
-  const quickLinks = menuItems.filter(m => m.parentId === 0).slice(0, 6);
+  const quickLinks = menuItems.filter((m) => m.parentId === 0).slice(0, 6);
 
   return (
-    <footer className="bg-[#1E2C35] text-[#BBBBBB] border-t border-slate-800 mt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="mt-20 border-t border-slate-800 bg-[#1E2C35] text-[#BBBBBB]">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Brand & Description */}
-          <div className="md:col-span-2 space-y-3">
+          <div className="space-y-3 md:col-span-2">
             <div className="flex items-center gap-2 text-white">
-              <div className="w-8 h-8 rounded-lg bg-[#8CB65F] text-white flex items-center justify-center font-bold">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#8CB65F] font-bold text-white">
                 <BookOpen size={18} />
               </div>
               <span className="text-xl font-bold">{siteTitle}</span>
             </div>
-            <p className="text-sm text-slate-400 max-w-md leading-relaxed">
-              אתר מוקדש ללימוד, שיפור והעמקת הקריאה בתנ"ך, כולל דיוקי הגיה, כללי דקדוק, טעמי המקרא וקריאות מוקלטות בנוסחים השונים.
+            <p className="max-w-md text-sm leading-relaxed text-slate-400">
+              אתר מוקדש ללימוד, שיפור והעמקת הקריאה בתנ"ך, כולל דיוקי הגיה, כללי דקדוק, טעמי המקרא
+              וקריאות מוקלטות בנוסחים השונים.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-bold text-sm mb-3 border-b border-slate-700 pb-2">ניווט מהיר</h4>
+            <h4 className="mb-3 border-b border-slate-700 pb-2 text-sm font-bold text-white">
+              ניווט מהיר
+            </h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <button
                   onClick={() => onNavigate('')}
-                  className="hover:text-[#8CB65F] transition-colors cursor-pointer"
+                  className="cursor-pointer transition-colors hover:text-[#8CB65F]"
                 >
                   דף הבית
                 </button>
@@ -56,7 +54,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li key={item.id}>
                   <button
                     onClick={() => onNavigate(cleanUrlToRoute(item.url))}
-                    className="hover:text-[#8CB65F] transition-colors cursor-pointer"
+                    className="cursor-pointer transition-colors hover:text-[#8CB65F]"
                   >
                     {item.title}
                   </button>
@@ -65,7 +63,7 @@ export const Footer: React.FC<FooterProps> = ({
               <li>
                 <button
                   onClick={() => onNavigate('courses')}
-                  className="hover:text-[#8CB65F] transition-colors cursor-pointer font-semibold text-[#8CB65F]"
+                  className="cursor-pointer font-semibold text-[#8CB65F] transition-colors hover:text-[#8CB65F]"
                 >
                   קורסים ומבחנים
                 </button>
@@ -74,10 +72,10 @@ export const Footer: React.FC<FooterProps> = ({
           </div>
 
           {/* Back to Top */}
-          <div className="flex flex-col justify-between items-start md:items-end">
+          <div className="flex flex-col items-start justify-between md:items-end">
             <button
               onClick={scrollToTop}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold transition-all border border-slate-700 cursor-pointer shadow-xs"
+              className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-slate-700"
             >
               <ArrowUp size={14} />
               לראש העמוד
@@ -85,11 +83,9 @@ export const Footer: React.FC<FooterProps> = ({
           </div>
         </div>
 
-        <div className="border-t border-slate-800/80 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-800/80 pt-6 text-xs text-slate-500 sm:flex-row">
           <p>{copyright}</p>
-          <p className="flex items-center gap-1">
-            לימוד מקראות וטעמי המקרא
-          </p>
+          <p className="flex items-center gap-1">לימוד מקראות וטעמי המקרא</p>
         </div>
       </div>
     </footer>

@@ -19,9 +19,10 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const currentHashRoute = typeof window !== 'undefined'
-    ? window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '')
-    : '';
+  const currentHashRoute =
+    typeof window !== 'undefined'
+      ? window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '')
+      : '';
   let decodedHash = '';
   try {
     decodedHash = decodeURIComponent(currentHashRoute);
@@ -29,17 +30,19 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
 
   // Collect candidate slug identifiers to query for comments
   const candidateSlugs = Array.from(
-    new Set([
-      pageSlug,
-      pageSlug?.toLowerCase(),
-      rawSlug,
-      rawSlug?.toLowerCase(),
-      pageId ? String(pageId) : null,
-      currentHashRoute,
-      decodedHash,
-      pageSlug ? `טעמים/${pageSlug}` : null,
-      pageSlug === 'about' || rawSlug === 'about' ? 'about' : null,
-    ].filter(Boolean) as string[])
+    new Set(
+      [
+        pageSlug,
+        pageSlug?.toLowerCase(),
+        rawSlug,
+        rawSlug?.toLowerCase(),
+        pageId ? String(pageId) : null,
+        currentHashRoute,
+        decodedHash,
+        pageSlug ? `טעמים/${pageSlug}` : null,
+        pageSlug === 'about' || rawSlug === 'about' ? 'about' : null,
+      ].filter(Boolean) as string[],
+    ),
   );
 
   const loadData = async (isCurrent: () => boolean) => {
@@ -85,7 +88,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
       });
 
       if (saved && saved.id) {
-        setComments(prev => [...prev, saved]);
+        setComments((prev) => [...prev, saved]);
       }
 
       setContent('');
@@ -113,60 +116,58 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
   };
 
   return (
-    <section className="mt-12 pt-8 border-t border-slate-200">
+    <section className="mt-12 border-t border-slate-200 pt-8">
       {/* Header */}
-      <div className="flex items-center gap-2 mb-6">
-        <MessageSquare className="w-5 h-5 text-[#8CB65F]" />
-        <h3 className="text-xl font-bold text-slate-800 font-hebrew">
+      <div className="mb-6 flex items-center gap-2">
+        <MessageSquare className="h-5 w-5 text-[#8CB65F]" />
+        <h3 className="font-hebrew text-xl font-bold text-slate-800">
           תגובות ושאלות {comments.length > 0 && `(${comments.length})`}
         </h3>
       </div>
 
       {/* Comment List */}
-      <div className="space-y-4 mb-8">
+      <div className="mb-8 space-y-4">
         {loading ? (
-          <div className="text-sm text-slate-400 py-4">טוען תגובות...</div>
+          <div className="py-4 text-sm text-slate-400">טוען תגובות...</div>
         ) : comments.length === 0 ? (
-          <div className="text-sm text-slate-500 bg-slate-50 border border-slate-200/60 rounded-xl p-5 text-center">
+          <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-sm text-slate-500">
             אין תגובות עדיין. היו הראשונים להגיב או לשאול שאלה!
           </div>
         ) : (
           comments.map((comment) => (
             <div
               key={comment.id}
-              className={`p-4 sm:p-5 rounded-xl border transition-all ${
+              className={`rounded-xl border p-4 transition-all sm:p-5 ${
                 comment.is_admin_reply
-                  ? 'bg-emerald-50/50 border-emerald-200/80 mr-4 sm:mr-8'
-                  : 'bg-slate-50/80 border-slate-200/80'
+                  ? 'mr-4 border-emerald-200/80 bg-emerald-50/50 sm:mr-8'
+                  : 'border-slate-200/80 bg-slate-50/80'
               }`}
             >
-              <div className="flex items-center justify-between mb-2">
+              <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                    comment.is_admin_reply
-                      ? 'bg-[#8CB65F] text-white'
-                      : 'bg-slate-200 text-slate-600'
-                  }`}>
+                  <div
+                    className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
+                      comment.is_admin_reply
+                        ? 'bg-[#8CB65F] text-white'
+                        : 'bg-slate-200 text-slate-600'
+                    }`}
+                  >
                     {comment.is_admin_reply ? (
-                      <ShieldCheck className="w-4 h-4" />
+                      <ShieldCheck className="h-4 w-4" />
                     ) : (
-                      <User className="w-3.5 h-3.5" />
+                      <User className="h-3.5 w-3.5" />
                     )}
                   </div>
-                  <span className="font-bold text-sm text-slate-800">
-                    {comment.author_name}
-                  </span>
+                  <span className="text-sm font-bold text-slate-800">{comment.author_name}</span>
                   {comment.is_admin_reply && (
-                    <span className="text-[11px] font-semibold bg-[#8CB65F]/15 text-[#5e8238] px-2 py-0.5 rounded-full">
+                    <span className="rounded-full bg-[#8CB65F]/15 px-2 py-0.5 text-[11px] font-semibold text-[#5e8238]">
                       מנהל האתר
                     </span>
                   )}
                 </div>
-                <time className="text-xs text-slate-400">
-                  {formatDate(comment.created_at)}
-                </time>
+                <time className="text-xs text-slate-400">{formatDate(comment.created_at)}</time>
               </div>
-              <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap pr-9">
+              <p className="pr-9 text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
                 {comment.content}
               </p>
             </div>
@@ -175,28 +176,26 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
       </div>
 
       {/* Add Comment Form */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-7 shadow-xs">
-        <h4 className="text-base font-bold text-slate-800 mb-4 font-hebrew">
-          הוספת תגובה או שאלה
-        </h4>
+      <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs sm:p-7">
+        <h4 className="font-hebrew mb-4 text-base font-bold text-slate-800">הוספת תגובה או שאלה</h4>
 
         {submitted && (
-          <div className="mb-4 flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-xl">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
             <span>התגובה נוספה בהצלחה!</span>
           </div>
         )}
 
         {errorMessage && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl">
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
             {errorMessage}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1">
+              <label className="mb-1 block text-xs font-semibold text-slate-600">
                 שם <span className="text-red-500">*</span>
               </label>
               <input
@@ -205,26 +204,26 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
                 value={authorName}
                 onChange={(e) => setAuthorName(e.target.value)}
                 placeholder="השם שלכם"
-                className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8CB65F] focus:border-transparent transition-all"
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:ring-[#8CB65F] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1">
-                אימייל <span className="text-slate-400 font-normal">(לא יוצג באתר)</span>
+              <label className="mb-1 block text-xs font-semibold text-slate-600">
+                אימייל <span className="font-normal text-slate-400">(לא יוצג באתר)</span>
               </label>
               <input
                 type="email"
                 value={authorEmail}
                 onChange={(e) => setAuthorEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8CB65F] focus:border-transparent transition-all"
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:ring-[#8CB65F] focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">
+            <label className="mb-1 block text-xs font-semibold text-slate-600">
               תוכן התגובה <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -233,7 +232,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="כתבו את תגובתכם או שאלתכם כאן..."
-              className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8CB65F] focus:border-transparent transition-all resize-y"
+              className="w-full resize-y rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:ring-[#8CB65F] focus:outline-none"
             />
           </div>
 
@@ -241,9 +240,9 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
             <button
               type="submit"
               disabled={submitting || !authorName.trim() || !content.trim()}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#8CB65F] hover:bg-[#7aa252] disabled:opacity-50 text-white text-sm font-bold rounded-xl transition-all shadow-xs cursor-pointer"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#8CB65F] px-5 py-2.5 text-sm font-bold text-white shadow-xs transition-all hover:bg-[#7aa252] disabled:opacity-50"
             >
-              <Send className="w-4 h-4" />
+              <Send className="h-4 w-4" />
               <span>{submitting ? 'שולח...' : 'פרסום תגובה'}</span>
             </button>
           </div>

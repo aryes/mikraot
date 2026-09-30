@@ -38,7 +38,7 @@ export const App: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
-        setSearchOpen(prev => !prev);
+        setSearchOpen((prev) => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -57,8 +57,8 @@ export const App: React.FC = () => {
   const findContent = (route: string): ContentItem | null => {
     if (!route || route === '' || route === 'home') {
       return (
-        siteData.content.find(c => String(c.id) === siteData.site.frontPageId) ??
-        siteData.content.find(c => c.slug === 'home' || c.slug === 'מקראות') ??
+        siteData.content.find((c) => String(c.id) === siteData.site.frontPageId) ??
+        siteData.content.find((c) => c.slug === 'home' || c.slug === 'מקראות') ??
         siteData.content[0] ??
         null
       );
@@ -68,19 +68,19 @@ export const App: React.FC = () => {
     const lastSegment = clean.split('/').pop() || '';
 
     // 1. Direct full match on slug, rawSlug, title, or ID
-    let found = siteData.content.find(c => 
-      c.slug.toLowerCase() === clean || 
-      c.rawSlug.toLowerCase() === clean ||
-      c.title.toLowerCase() === clean ||
-      String(c.id) === clean
+    let found = siteData.content.find(
+      (c) =>
+        c.slug.toLowerCase() === clean ||
+        c.rawSlug.toLowerCase() === clean ||
+        c.title.toLowerCase() === clean ||
+        String(c.id) === clean,
     );
     if (found) return found;
 
     // 2. Match by last path segment (handles hierarchical URLs like טעמים/נוסח-אשכנז)
     if (lastSegment) {
-      found = siteData.content.find(c => 
-        c.slug.toLowerCase() === lastSegment || 
-        c.rawSlug.toLowerCase() === lastSegment
+      found = siteData.content.find(
+        (c) => c.slug.toLowerCase() === lastSegment || c.rawSlug.toLowerCase() === lastSegment,
       );
       if (found) return found;
     }
@@ -94,7 +94,7 @@ export const App: React.FC = () => {
   const lessons = contentOfType('lp_lesson');
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F3F7F5] font-sans antialiased text-[#444444]">
+    <div className="flex min-h-screen flex-col bg-[#F3F7F5] font-sans text-[#444444] antialiased">
       {/* Header */}
       <Header
         siteTitle={siteData.site.title}
@@ -117,12 +117,12 @@ export const App: React.FC = () => {
         ) : activePage ? (
           <PageView page={activePage} onNavigate={navigateTo} />
         ) : (
-          <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-            <h2 className="text-3xl font-bold text-slate-800 mb-3">העמוד לא נמצא (404)</h2>
-            <p className="text-slate-600 mb-6">העמוד המבוקש אינו קיים או שהועבר.</p>
+          <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+            <h2 className="mb-3 text-3xl font-bold text-slate-800">העמוד לא נמצא (404)</h2>
+            <p className="mb-6 text-slate-600">העמוד המבוקש אינו קיים או שהועבר.</p>
             <button
               onClick={() => navigateTo('')}
-              className="px-6 py-2.5 bg-[#8CB65F] hover:bg-[#7aa252] text-white rounded-xl font-bold transition-all shadow-xs cursor-pointer"
+              className="cursor-pointer rounded-xl bg-[#8CB65F] px-6 py-2.5 font-bold text-white shadow-xs transition-all hover:bg-[#7aa252]"
             >
               חזרה לדף הבית
             </button>
