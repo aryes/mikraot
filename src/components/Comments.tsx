@@ -9,9 +9,38 @@ interface CommentsProps {
   pageId?: number;
 }
 
+/** Every identifier a page's comments may have been stored under (WordPress slugs vary). */
+function candidateSlugsFor(pageSlug: string, rawSlug?: string, pageId?: number): string[] {
+  const hashRoute = window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '');
+  let decodedHash = '';
+  try {
+    decodedHash = decodeURIComponent(hashRoute);
+  } catch {
+    // Malformed percent-encoding: fall back to the raw route only.
+  }
+  const candidates = [
+    pageSlug,
+    pageSlug.toLowerCase(),
+    rawSlug,
+    rawSlug?.toLowerCase(),
+    pageId ? String(pageId) : undefined,
+    hashRoute,
+    decodedHash,
+    `טעמים/${pageSlug}`,
+  ];
+  return [...new Set(candidates.filter((slug): slug is string => Boolean(slug)))];
+}
+
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  if (Number.isNaN(date.getTime())) return dateStr;
+  return date.toLocaleDateString('he-IL', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
 export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId }) => {
-  const [comments, setComments] = useState<CommentItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Comments are stored together with the query key they were loaded for, so a response
+  // for a previous page can never be shown on the current one.
+  const [loaded, setLoaded] = useState<{ key: string; comments: CommentItem[] } | null>(null);
   const [authorName, setAuthorName] = useState('');
   const [authorEmail, setAuthorEmail] = useState('');
   const [content, setContent] = useState('');
@@ -19,58 +48,19 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const currentHashRoute =
-    typeof window !== 'undefined'
-      ? window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '')
-      : '';
-  let decodedHash = '';
-  try {
-    decodedHash = decodeURIComponent(currentHashRoute);
-  } catch {}
-
-  // Collect candidate slug identifiers to query for comments
-  const candidateSlugs = Array.from(
-    new Set(
-      [
-        pageSlug,
-        pageSlug?.toLowerCase(),
-        rawSlug,
-        rawSlug?.toLowerCase(),
-        pageId ? String(pageId) : null,
-        currentHashRoute,
-        decodedHash,
-        pageSlug ? `טעמים/${pageSlug}` : null,
-        pageSlug === 'about' || rawSlug === 'about' ? 'about' : null,
-      ].filter(Boolean) as string[],
-    ),
-  );
-
-  const loadData = async (isCurrent: () => boolean) => {
-    try {
-      setLoading(true);
-      const data = await fetchComments(candidateSlugs);
-      if (isCurrent()) {
-        setComments(data);
-      }
-    } catch (err) {
-      if (isCurrent()) {
-        console.error('[Comments] Failed to load comments from D1:', err);
-      }
-    } finally {
-      if (isCurrent()) {
-        setLoading(false);
-      }
-    }
-  };
+  const slugKey = candidateSlugsFor(pageSlug, rawSlug, pageId).join(',');
+  const loading = loaded?.key !== slugKey;
+  const comments = loaded?.key === slugKey ? loaded.comments : [];
 
   useEffect(() => {
-    let mounted = true;
-    loadData(() => mounted);
-
+    let current = true;
+    void fetchComments(slugKey.split(',')).then((data) => {
+      if (current) setLoaded({ key: slugKey, comments: data });
+    });
     return () => {
-      mounted = false;
+      current = false;
     };
-  }, [pageSlug, rawSlug, pageId]);
+  }, [slugKey]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,31 +77,18 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
         content: content.trim(),
       });
 
-      if (saved && saved.id) {
-        setComments((prev) => [...prev, saved]);
+      if (saved.id) {
+        setLoaded((prev) => prev && { ...prev, comments: [...prev.comments, saved] });
       }
 
       setContent('');
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 5000);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Failed to submit comment:', err);
       setErrorMessage('אירעה שגיאה בשליחת התגובה. אנא נסו שוב.');
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const formatDate = (dateStr: string) => {
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('he-IL', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
-    } catch {
-      return dateStr;
     }
   };
 
@@ -192,7 +169,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageSlug, rawSlug, pageId })
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-600">

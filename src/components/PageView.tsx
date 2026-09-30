@@ -30,7 +30,7 @@ export const PageView: React.FC<PageViewProps> = ({ page, onNavigate }) => {
         </header>
 
         {/* Content */}
-        <ContentParser content={page.content} onNavigate={onNavigate} />
+        <ContentParser key={page.id} content={page.content} onNavigate={onNavigate} />
 
         {/* Comments & Discussion */}
         <Comments

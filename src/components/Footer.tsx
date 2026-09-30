@@ -10,11 +10,9 @@ interface FooterProps {
   onNavigate: (route: string) => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ siteTitle, copyright, menuItems, onNavigate }) => {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
+export const Footer: React.FC<FooterProps> = ({ siteTitle, copyright, menuItems, onNavigate }) => {
   // Top level menu links for footer
   const quickLinks = menuItems.filter((m) => m.parentId === 0).slice(0, 6);
 

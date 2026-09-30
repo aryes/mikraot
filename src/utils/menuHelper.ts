@@ -26,7 +26,7 @@ export function cleanUrlToRoute(url: string): string {
     const urlObj = new URL(url, 'https://mikraot.net');
     let pathname = urlObj.pathname;
     // Strip /staging/4160/ or /staging/app/ or trailing slash
-    pathname = pathname.replace(/^\/staging\/[^\/]+/, '').replace(/^\/wp-content\/[^\/]+/, '');
+    pathname = pathname.replace(/^\/staging\/[^/]+/, '').replace(/^\/wp-content\/[^/]+/, '');
     pathname = pathname.replace(/^\/|\/$/g, '');
     try {
       return decodeURIComponent(pathname);

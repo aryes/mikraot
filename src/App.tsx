@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { contentOfType, siteData } from './data/site';
-import type { ContentItem } from './types';
+import { findContent, navigateTo, routeFromHash } from './routing';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { PageView } from './components/PageView';
@@ -8,24 +8,13 @@ import { CourseView } from './components/CourseView';
 import { SearchView } from './components/SearchView';
 
 export const App: React.FC = () => {
-  const [currentRoute, setCurrentRoute] = useState<string>(() => {
-    if (typeof window === 'undefined') return '';
-    let hash = window.location.hash.replace(/^#\/?/, '');
-    try {
-      hash = decodeURIComponent(hash);
-    } catch {}
-    return hash;
-  });
+  const [currentRoute, setCurrentRoute] = useState(() => routeFromHash(window.location.hash));
   const [searchOpen, setSearchOpen] = useState(false);
 
   // Sync route with window hash
   useEffect(() => {
     const handleHashChange = () => {
-      let hash = window.location.hash.replace(/^#\/?/, '');
-      try {
-        hash = decodeURIComponent(hash);
-      } catch {}
-      setCurrentRoute(hash);
+      setCurrentRoute(routeFromHash(window.location.hash));
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -44,49 +33,6 @@ export const App: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
-
-  const navigateTo = (route: string) => {
-    let clean = route.replace(/^#\/?/, '');
-    try {
-      clean = decodeURIComponent(clean);
-    } catch {}
-    window.location.hash = `#/${clean}`;
-  };
-
-  // Find page by slug, title, ID, or hierarchical path segment
-  const findContent = (route: string): ContentItem | null => {
-    if (!route || route === '' || route === 'home') {
-      return (
-        siteData.content.find((c) => String(c.id) === siteData.site.frontPageId) ??
-        siteData.content.find((c) => c.slug === 'home' || c.slug === 'מקראות') ??
-        siteData.content[0] ??
-        null
-      );
-    }
-
-    const clean = route.toLowerCase().replace(/^\/|\/$/g, '');
-    const lastSegment = clean.split('/').pop() || '';
-
-    // 1. Direct full match on slug, rawSlug, title, or ID
-    let found = siteData.content.find(
-      (c) =>
-        c.slug.toLowerCase() === clean ||
-        c.rawSlug.toLowerCase() === clean ||
-        c.title.toLowerCase() === clean ||
-        String(c.id) === clean,
-    );
-    if (found) return found;
-
-    // 2. Match by last path segment (handles hierarchical URLs like טעמים/נוסח-אשכנז)
-    if (lastSegment) {
-      found = siteData.content.find(
-        (c) => c.slug.toLowerCase() === lastSegment || c.rawSlug.toLowerCase() === lastSegment,
-      );
-      if (found) return found;
-    }
-
-    return null;
-  };
 
   const activePage = findContent(currentRoute);
 

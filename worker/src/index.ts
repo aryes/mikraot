@@ -50,8 +50,15 @@ export default {
     // POST /api/comments
     if (request.method === 'POST' && url.pathname === '/api/comments') {
       try {
-        const body: any = await request.json();
-        const { page_slug, author_name, author_email, content } = body;
+        const body: unknown = await request.json();
+        const field = (name: string): string | undefined => {
+          const value = body && typeof body === 'object' ? Reflect.get(body, name) : undefined;
+          return typeof value === 'string' ? value : undefined;
+        };
+        const page_slug = field('page_slug');
+        const author_name = field('author_name');
+        const author_email = field('author_email');
+        const content = field('content');
 
         if (!page_slug || !author_name?.trim() || !content?.trim()) {
           return new Response(JSON.stringify({ error: 'Missing required fields' }), {
@@ -68,8 +75,9 @@ export default {
           .first();
 
         return new Response(JSON.stringify(result), { status: 201, headers: corsHeaders });
-      } catch (err: any) {
-        return new Response(JSON.stringify({ error: err.message }), {
+      } catch (err) {
+        console.error('POST /api/comments failed:', err);
+        return new Response(JSON.stringify({ error: 'Internal error' }), {
           status: 500,
           headers: corsHeaders,
         });

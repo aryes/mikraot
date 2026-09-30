@@ -15,7 +15,7 @@
 
 - [x] Update deps, clean package.json
 - [x] Strict tsconfig (strict, noUncheckedIndexedAccess, verbatimModuleSyntax)
-- [ ] ESLint + Prettier
+- [x] Oxlint (type-aware) + Prettier (typescript-eslint lacks TS 7 support)
 - [ ] Vitest unit tests
 - [ ] Worker: own tsconfig + Workers types
 - [ ] Playwright e2e (with URL routing)
@@ -37,6 +37,6 @@
 
 - Routing is hash-based (`#/slug`), which doesn't match WordPress URLs.
 - 7 unpublished items (drafts/private) ship to visitors inside the JS bundle.
-- Comments: POST auto-approves, no rate limit or captcha, CORS `*`, raw DB errors returned to the client.
+- Comments: POST auto-approves, no rate limit or captcha, CORS `*`. (Raw DB errors no longer returned: fixed in `worker/`, not yet deployed.)
 - `contentParser` doesn't handle `[learn_press_*]` and `[elementor]` shortcodes or the 7 raw `<table>`s.
 - The migration docs describe Playwright tests that aren't in the repo.
