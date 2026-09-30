@@ -12,6 +12,8 @@
     "preview": "astro preview",
     "typecheck": "astro check",
     "lint": "oxlint --type-aware",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "cf-typegen": "wrangler types",
@@ -37,6 +39,7 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",
+    "vitest": "^5.0.3",
     "wrangler": "^4.145.0"
   },
   "allowScripts": {

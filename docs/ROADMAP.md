@@ -27,7 +27,7 @@
 - [x] Strict tsconfig (strict, noUncheckedIndexedAccess, verbatimModuleSyntax)
 - [x] Oxlint (type-aware) + Prettier (typescript-eslint lacks TS 7 support)
 - [x] Astro project skeleton: all 174 WordPress URLs as static pages, Cloudflare adapter, `wrangler.jsonc` for one Worker (TypeScript 6: `@astrojs/check` does not support TS 7 yet)
-- [ ] Vitest unit tests (content conversion first)
+- [x] Vitest unit tests: URL generation and WordPress HTML conversion (`npm test`)
 - [ ] D1 schema as migration files; move the comments API into the Astro Worker
 
 ## 3. Content migration
