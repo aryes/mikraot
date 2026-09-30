@@ -17,6 +17,7 @@
     "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "db:local:reset": "wrangler d1 migrations apply mikraot-db --local && wrangler d1 execute mikraot-db --local --file e2e/fixtures/comments.sql",
     "cf-typegen": "wrangler types",
     "prepare": "git config core.hooksPath .githooks"
   },

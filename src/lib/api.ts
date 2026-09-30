@@ -1,29 +1,16 @@
-// Cloudflare D1 & Worker API Client for Mikraot.net
+/** Browser client for the site's comments API (served by the same Worker at /api). */
+import type { PublicComment } from '../server/comments';
 
-const API_BASE = 'https://mikraot.net/api';
+export type CommentItem = PublicComment;
 
-export interface CommentItem {
-  id: number;
-  page_slug: string;
-  author_name: string;
-  author_email?: string | undefined;
-  content: string;
-  is_admin_reply: number | boolean;
-  approved: number | boolean;
-  created_at: string;
-}
-
-export async function fetchComments(candidateSlugs: string[]): Promise<CommentItem[]> {
+export async function fetchComments(pageKeys: string[]): Promise<CommentItem[]> {
   try {
-    const slugParam = encodeURIComponent(candidateSlugs.join(','));
-    const res = await fetch(`${API_BASE}/comments?page_slug=${slugParam}`);
-    if (!res.ok) {
-      throw new Error(`Failed to fetch comments: ${res.status}`);
-    }
+    const res = await fetch(`/api/comments/?page_slug=${encodeURIComponent(pageKeys.join(','))}`);
+    if (!res.ok) throw new Error(`Failed to fetch comments: ${res.status}`);
     const data: CommentItem[] = await res.json();
-    return data || [];
+    return data;
   } catch (err) {
-    console.error('[API] Error loading comments from Cloudflare D1:', err);
+    console.error('[API] Error loading comments:', err);
     return [];
   }
 }
@@ -34,18 +21,11 @@ export async function postComment(comment: {
   author_email?: string | undefined;
   content: string;
 }): Promise<CommentItem> {
-  const res = await fetch(`${API_BASE}/comments`, {
+  const res = await fetch('/api/comments/', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(comment),
   });
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error || `Failed to submit comment: ${res.status}`);
-  }
-
+  if (!res.ok) throw new Error(`Failed to submit comment: ${res.status}`);
   return await res.json();
 }

@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+// Comments load lazily (island script on scroll) and then call a Worker endpoint that may start
+// cold, which can exceed the default 5s under parallel test load.
+const COMMENTS_LOADED = { timeout: 15_000 };
+
 test('front page renders at /', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle(/^מקראות/);
@@ -30,12 +34,29 @@ test('collapsible explanations open and close', async ({ page }) => {
   await expect(panel).toBeHidden();
 });
 
-test('existing comments load when the comments section scrolls into view', async ({ page }) => {
+test('approved comments load when the comments section scrolls into view', async ({ page }) => {
   await page.goto('/טעמים/נוסח-אשכנז/');
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
-  // Comments come from the live API until it moves into this Worker, so allow for the network.
-  await expect(page.getByText('מיכל').first()).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText('קורא לדוגמה')).toBeVisible(COMMENTS_LOADED);
+  await expect(page.getByText('מנהל האתר')).toBeVisible(); // admin reply badge
   await expect(page.getByRole('heading', { name: 'תגובות ושאלות (2)' })).toBeVisible();
+  await expect(page.getByText('ממתין לאישור')).toHaveCount(0); // unapproved stays hidden
+});
+
+test('a visitor can post a comment', async ({ page }, testInfo) => {
+  const text = `תגובת בדיקה ${testInfo.project.name} ${Date.now()}`;
+  await page.goto('/about/');
+  await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
+  await expect(page.getByText('אורח לדוגמה')).toBeVisible(COMMENTS_LOADED);
+  await expect(page.getByText('אורח לדוגמה 0')).toHaveCount(0); // no stray '0' from is_admin_reply
+  await page.getByPlaceholder('השם שלכם').fill('מבקר בדיקה');
+  await page.getByPlaceholder('כתבו את תגובתכם').fill(text);
+  await page.getByRole('button', { name: 'פרסום תגובה' }).click();
+  await expect(page.getByText('התגובה נוספה בהצלחה!')).toBeVisible(COMMENTS_LOADED);
+  await expect(page.getByText(text)).toBeVisible();
+  await page.reload();
+  await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
+  await expect(page.getByText(text)).toBeVisible(COMMENTS_LOADED); // persisted in D1
 });
 
 test('menu links point to real WordPress URLs', async ({ page, isMobile }) => {

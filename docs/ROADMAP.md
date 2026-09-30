@@ -28,7 +28,7 @@
 - [x] Oxlint (type-aware) + Prettier (typescript-eslint lacks TS 7 support)
 - [x] Astro project skeleton: all 174 WordPress URLs as static pages, Cloudflare adapter, `wrangler.jsonc` for one Worker (TypeScript 6: `@astrojs/check` does not support TS 7 yet)
 - [x] Vitest unit tests: URL generation and WordPress HTML conversion (`npm test`)
-- [ ] D1 schema as migration files; move the comments API into the Astro Worker
+- [x] D1 schema as migration files (`migrations/`); comments API in the Astro Worker (`/api/comments/`), unit + e2e tests on a local D1 with fictional fixtures. Before go-live: apply migrations to production D1 (approval needed)
 
 ## 3. Content migration
 
@@ -65,4 +65,3 @@
 - Search (Ctrl+K) was removed with the old single-page app; comes back with Pagefind.
 - Comments: POST auto-approves, no rate limit or captcha, CORS `*`. (Raw DB errors no longer returned: fixed in `worker/`, not yet deployed.)
 - `wp-html.ts` doesn't handle `[learn_press_*]` and `[elementor]` shortcodes or the 7 raw `<table>`s.
-- The comments e2e test depends on the live API until the API moves into this Worker.

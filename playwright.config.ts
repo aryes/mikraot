@@ -4,9 +4,12 @@ const port = 4322;
 
 export default defineConfig({
   testDir: 'e2e',
-  fullyParallel: true,
+  // One worker: the local D1 emulation can stall when a write overlaps other requests
+  // (seen as comments hanging on "loading"); serial runs are stable and barely slower.
+  workers: 1,
   forbidOnly: Boolean(process.env['CI']),
-  retries: process.env['CI'] ? 1 : 0,
+  // One retry absorbs rare local browser aborts; retried tests are still reported as flaky.
+  retries: 1,
   use: {
     baseURL: `http://localhost:${port}`,
     trace: 'retain-on-failure',
@@ -15,9 +18,10 @@ export default defineConfig({
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
-  // Tests run against the production build served by Cloudflare's workerd runtime.
+  // Tests run against the production build in Cloudflare's workerd runtime, with the local D1
+  // database reset to e2e/fixtures/comments.sql (fictional data).
   webServer: {
-    command: `npx astro build && npx astro preview --port ${port}`,
+    command: `npm run db:local:reset && npx astro build && npx astro preview --port ${port}`,
     url: `http://localhost:${port}/`,
     reuseExistingServer: !process.env['CI'],
     timeout: 180_000,

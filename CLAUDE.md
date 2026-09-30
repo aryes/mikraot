@@ -26,7 +26,8 @@ The plan and known issues are in `docs/ROADMAP.md`.
 
 - Astro builds one static page per WordPress URL (`src/pages/[...path].astro`, URLs from `src/lib/urls.ts`). Content currently comes from `src/data/siteData.json` (an older export of the WordPress staging copy), converted by `src/lib/wp-html.ts`; `src/scripts/content.ts` adds audio/collapsible/video behaviour in the browser. React only for islands (`Comments`).
 - `wrangler.jsonc` configures the new single Worker `mikraot` (static assets + D1 binding `DB`); not deployed yet.
-- API still lives in the old separate Worker: `worker/` → `mikraot-api` on `mikraot.net/api/*`, D1 database `mikraot-db`.
+- Comments API: `src/pages/api/comments.ts` (on-demand route in the site Worker) using `src/server/comments.ts`; D1 schema in `migrations/`. Local dev/tests use a local D1 (`npm run db:local:reset` loads fictional fixtures).
+- The old separate Worker `worker/` → `mikraot-api` on `mikraot.net/api/*` is still deployed and serves only the old staging app; remove it at cutover. Production D1 has no migration history yet: apply `migrations/` remotely (0001 is a no-op there) before the new Worker goes live.
 - Media (MP3s, images) is still served from WordPress `wp-content/uploads` on Bluehost.
 - Live site is still WordPress. Staging app: https://mikraot.net/staging/app/
 

@@ -114,11 +114,11 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                     )}
                   </div>
                   <span className="text-sm font-bold text-slate-800">{comment.author_name}</span>
-                  {comment.is_admin_reply && (
+                  {comment.is_admin_reply ? (
                     <span className="rounded-full bg-[#8CB65F]/15 px-2 py-0.5 text-[11px] font-semibold text-[#5e8238]">
                       מנהל האתר
                     </span>
-                  )}
+                  ) : null}
                 </div>
                 <time className="text-xs text-slate-400">{formatDate(comment.created_at)}</time>
               </div>
