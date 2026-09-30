@@ -32,7 +32,10 @@
 
 ## 3. Content migration
 
-- [ ] Fresh export of all WordPress content, SEO meta (All in One SEO) and URLs
+- [x] Fresh read-only export from live WordPress (`scripts/wp-export.php` → `.migration/wp-export.json`, gitignored): content, permalinks, menus, SEO, media, LearnPress structure. Findings (2026-09-30):
+  - Content of all 340 items is identical to the old staging-based `siteData.json`.
+  - All 174 generated page URLs match WordPress permalinks exactly — but LearnPress serves lessons and quizzes only inside their course (`/courses/<course>/lessons/<lesson>/`, `/courses/<course>/quizzes/<quiz>/`); standalone `/lessons/…/` and `/quizzes/…/` return 404 on the live site. Our 131 standalone lesson/quiz URLs must move under their course.
+  - "Sample course" (published) is LearnPress demo content: 127 of the 131 lessons/quizzes, Latin filler text. Real course material: "טעמי המקרא" (1 test lesson with placeholder text + 1 real quiz) and the draft "ניקוד" (1 lesson + 1 quiz). **Decision needed (Arye):** drop the demo course?
 - [ ] Convert WordPress HTML/shortcodes to content files with custom blocks (audio, collapsible, YouTube, tables)
 - [ ] Media into the repo; rewrite media URLs
 - [ ] Keep every WordPress URL; 301 redirects where they must differ; sitemap
@@ -59,6 +62,7 @@
 ## Known issues (current app)
 
 - Search (Ctrl+K) was removed with the old single-page app; comes back with Pagefind.
+- Lesson and quiz URLs are standalone (`/lessons/x/`) instead of course-scoped; fix with the content migration.
 - Comments: POST auto-approves, no rate limit or captcha, CORS `*`. (Raw DB errors no longer returned: fixed in `worker/`, not yet deployed.)
 - `wp-html.ts` doesn't handle `[learn_press_*]` and `[elementor]` shortcodes or the 7 raw `<table>`s.
 - The migration docs describe Playwright tests that aren't in the repo.

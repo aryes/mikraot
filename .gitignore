@@ -10,3 +10,4 @@ dist-ssr
 .claude/settings.local.json
 .astro
 .wrangler
+.migration
