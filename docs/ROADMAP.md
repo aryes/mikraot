@@ -42,7 +42,7 @@
 - [x] Home page "latest posts" block (was missing)
 - [ ] Open: WordPress feeds (`/feed/`, `/sitemap.rss`) are not replicated; decide whether they are needed
 - [x] Keystatic editor, local mode (`npm run cms`): pages/posts with all custom blocks and the meaningful colours, site settings; every content file verified to open in it
-- [ ] Keystatic: editing area lays out Hebrew left-to-right (bullets on the left, end punctuation misplaced); menu (`src/data/menu.json`) not editable there yet; GitHub mode for browser editing after GitHub
+- [ ] Keystatic: the Hebrew interface (needed for right-to-left editing) has poor built-in translations, e.g. Save = "להציל", Singletons = "רווקים" (could be fixed upstream); menu (`src/data/menu.json`) not editable there yet; GitHub mode for browser editing after GitHub
 - [x] Self-hosted fonts (@fontsource: Assistant, Frank Ruhl Libre, Alef; Hebrew + Latin subsets)
 - [x] Pagefind search (Ctrl+K / header button): 34 pages indexed at build; plain queries match text with niqqud. Possible refinement: leave the single-letter transliteration tables out of the index (they cause weak matches for queries with no real hit)
 - [x] Playwright e2e basics (`npm run test:e2e`, desktop + mobile, against the production build in workerd): URLs, 404, collapsibles, comments, menu

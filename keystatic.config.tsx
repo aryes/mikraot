@@ -72,6 +72,8 @@ const content = fields.markdoc({
 
 export default config({
   storage: { kind: 'local' },
+  // Hebrew interface; it also lays the editor out right-to-left.
+  locale: 'he-IL',
   ui: { brand: { name: 'מקראות' } },
   collections: {
     pages: collection({
