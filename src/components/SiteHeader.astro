@@ -5,8 +5,8 @@ import { menuTree, site } from '../lib/site';
 const current = decodeURI(Astro.url.pathname);
 const isActive = (url: string | null) => url !== null && url === current;
 const navLink = 'flex items-center gap-1 rounded-lg px-3 py-2 transition-colors';
-const activeLink = 'bg-white font-bold text-[#8CB65F] shadow-xs';
-const idleLink = 'hover:bg-white/60 hover:text-[#8CB65F]';
+const activeLink = 'bg-white font-bold text-brand-strong shadow-xs';
+const idleLink = 'hover:bg-white/60 hover:text-brand-strong';
 const hasChildren = (item: { children?: unknown[] | undefined }) =>
   item.children !== undefined && item.children.length > 0;
 ---
@@ -14,11 +14,11 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
 <header class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-xs">
   <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
     <a href="/" class="group flex items-center gap-3 select-none">
-      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-[#6e9447] to-[#8CB65F] text-white shadow-sm transition-transform group-hover:scale-105">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-brand-strong to-brand text-white shadow-sm transition-transform group-hover:scale-105">
         <BookOpen size={22} />
       </div>
       <div>
-        <p class="text-2xl leading-none font-black tracking-tight text-slate-800 transition-colors group-hover:text-[#8CB65F]">
+        <p class="text-2xl leading-none font-black tracking-tight text-slate-800 transition-colors group-hover:text-brand-strong">
           {site.title}
         </p>
         <p class="mt-0.5 text-xs font-medium text-slate-500">{site.tagline}</p>
@@ -34,7 +34,7 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
       >
         <Search size={15} />
         <span class="hidden sm:inline">חיפוש...</span>
-        <kbd class="hidden rounded border border-slate-300 bg-white px-1.5 py-0.5 text-[10px] text-slate-400 md:inline">
+        <kbd class="hidden rounded border border-slate-300 bg-white px-1.5 py-0.5 text-[10px] text-slate-600 md:inline">
           Ctrl+K
         </kbd>
       </button>
@@ -71,7 +71,7 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
                     <div>
                       <a
                         href={sub.url ?? undefined}
-                        class="block rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-[#8CB65F]"
+                        class="block rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-strong"
                       >
                         {sub.title}
                       </a>
@@ -80,7 +80,7 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
                           {sub.children?.map((subSub) => (
                             <a
                               href={subSub.url ?? undefined}
-                              class="block px-2 py-1 text-[11px] text-slate-500 hover:text-[#8CB65F]"
+                              class="block px-2 py-1 text-[11px] text-slate-500 hover:text-brand-strong"
                             >
                               {subSub.title}
                             </a>
@@ -133,7 +133,7 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
                     <div class="group/sub relative">
                       <a
                         href={sub.url ?? undefined}
-                        class="flex w-full items-center justify-between px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#8CB65F]"
+                        class="flex w-full items-center justify-between px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-strong"
                       >
                         <span>{sub.title}</span>
                         {hasChildren(sub) && (
@@ -145,7 +145,7 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
                           {sub.children?.map((subSub) => (
                             <a
                               href={subSub.url ?? undefined}
-                              class="block w-full px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#8CB65F]"
+                              class="block w-full px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-strong"
                             >
                               {subSub.title}
                             </a>

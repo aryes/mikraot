@@ -7,6 +7,11 @@
 
 /* Theme fonts: `font-sans` (body text) and `font-hebrew` (headings), used as Tailwind utilities. */
 @theme {
+  /* Brand green for accents; the darker shades meet WCAG AA contrast (4.5:1) for text and for
+     white text on buttons. */
+  --color-brand: #8cb65f;
+  --color-brand-strong: #5b763e;
+  --color-brand-deep: #4d6434;
   --font-sans: 'Assistant Variable', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-hebrew: 'Frank Ruhl Libre Variable', 'Alef', 'SBL Hebrew', 'Ezra SIL', serif;
 }
@@ -56,13 +61,13 @@
   font-size: 1.05rem;
 }
 .wp-content-rendered a {
-  color: #8cb65f;
+  color: var(--color-brand-strong);
   font-weight: 600;
   text-decoration: none;
   transition: color 0.15s;
 }
 .wp-content-rendered a:hover {
-  color: #6e9447;
+  color: var(--color-brand-deep);
   text-decoration: underline;
 }
 
@@ -100,7 +105,7 @@
 }
 .wp-content-rendered li > a:hover {
   background-color: #8cb65f15;
-  color: #6e9447;
+  color: var(--color-brand-deep);
 }
 
 /* Table styling matching Kahuna clean table */

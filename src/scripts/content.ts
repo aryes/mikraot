@@ -19,7 +19,7 @@ function showPlaying(button: HTMLElement | null): void {
     btn.querySelector('.play-icon')?.classList.toggle('hidden', playing);
     btn.querySelector('.pause-icon')?.classList.toggle('hidden', !playing);
     btn.classList.toggle('ring-4', playing);
-    btn.classList.toggle('ring-[#8CB65F]/30', playing);
+    btn.classList.toggle('ring-brand/30', playing);
     btn.classList.toggle('scale-110', playing);
   }
 }
@@ -53,9 +53,9 @@ function toggleCollapse(button: HTMLElement): void {
   if (!target) return;
   const open = !target.classList.toggle('hidden');
   button.setAttribute('aria-expanded', String(open));
-  button.classList.toggle('bg-[#8CB65F]', open);
+  button.classList.toggle('bg-brand-strong', open);
   button.classList.toggle('text-white', open);
-  button.classList.toggle('border-[#8CB65F]', open);
+  button.classList.toggle('border-brand', open);
   button.classList.toggle('bg-slate-100', !open);
   button.classList.toggle('text-slate-700', !open);
   const label = button.querySelector<HTMLElement>('.collapse-label');

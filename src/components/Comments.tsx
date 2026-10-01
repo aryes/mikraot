@@ -74,7 +74,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
     <section className="mt-12 border-t border-slate-200 pt-8">
       {/* Header */}
       <div className="mb-6 flex items-center gap-2">
-        <MessageSquare className="h-5 w-5 text-[#8CB65F]" />
+        <MessageSquare className="text-brand-strong h-5 w-5" />
         <h3 className="font-hebrew text-xl font-bold text-slate-800">
           תגובות ושאלות {comments.length > 0 && `(${comments.length})`}
         </h3>
@@ -83,9 +83,9 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
       {/* Comment List */}
       <div className="mb-8 space-y-4">
         {loading ? (
-          <div className="py-4 text-sm text-slate-400">טוען תגובות...</div>
+          <div className="py-4 text-sm text-slate-600">טוען תגובות...</div>
         ) : comments.length === 0 ? (
-          <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-sm text-slate-500">
+          <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-sm text-slate-600">
             אין תגובות עדיין. היו הראשונים להגיב או לשאול שאלה!
           </div>
         ) : (
@@ -103,7 +103,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                   <div
                     className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
                       comment.is_admin_reply
-                        ? 'bg-[#8CB65F] text-white'
+                        ? 'bg-brand-strong text-white'
                         : 'bg-slate-200 text-slate-600'
                     }`}
                   >
@@ -115,12 +115,12 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                   </div>
                   <span className="text-sm font-bold text-slate-800">{comment.author_name}</span>
                   {comment.is_admin_reply ? (
-                    <span className="rounded-full bg-[#8CB65F]/15 px-2 py-0.5 text-[11px] font-semibold text-[#5e8238]">
+                    <span className="bg-brand/15 text-brand-deep rounded-full px-2 py-0.5 text-[11px] font-semibold">
                       מנהל האתר
                     </span>
                   ) : null}
                 </div>
-                <time className="text-xs text-slate-400">{formatDate(comment.created_at)}</time>
+                <time className="text-xs text-slate-600">{formatDate(comment.created_at)}</time>
               </div>
               <p className="pr-9 text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
                 {comment.content}
@@ -159,20 +159,20 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                 value={authorName}
                 onChange={(e) => setAuthorName(e.target.value)}
                 placeholder="השם שלכם"
-                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:ring-[#8CB65F] focus:outline-none"
+                className="focus:ring-brand-strong w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none"
               />
             </div>
 
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-600">
-                אימייל <span className="font-normal text-slate-400">(לא יוצג באתר)</span>
+                אימייל <span className="font-normal text-slate-500">(לא יוצג באתר)</span>
               </label>
               <input
                 type="email"
                 value={authorEmail}
                 onChange={(e) => setAuthorEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:ring-[#8CB65F] focus:outline-none"
+                className="focus:ring-brand-strong w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none"
               />
             </div>
           </div>
@@ -187,7 +187,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="כתבו את תגובתכם או שאלתכם כאן..."
-              className="w-full resize-y rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:ring-[#8CB65F] focus:outline-none"
+              className="focus:ring-brand-strong w-full resize-y rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none"
             />
           </div>
 
@@ -195,7 +195,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
             <button
               type="submit"
               disabled={submitting || !authorName.trim() || !content.trim()}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#8CB65F] px-5 py-2.5 text-sm font-bold text-white shadow-xs transition-all hover:bg-[#7aa252] disabled:opacity-50"
+              className="bg-brand-strong hover:bg-brand-deep inline-flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-xs transition-all disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
               <span>{submitting ? 'שולח...' : 'פרסום תגובה'}</span>

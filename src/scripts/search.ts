@@ -53,7 +53,7 @@ function renderResults(list: HTMLElement, results: PagefindResult[], query: stri
     title.className = 'font-bold text-slate-800';
     title.textContent = result.meta.title ?? result.url;
     const excerpt = document.createElement('p');
-    excerpt.className = 'mt-1 text-xs leading-relaxed text-slate-600 [&_mark]:bg-[#8CB65F]/25';
+    excerpt.className = 'mt-1 text-xs leading-relaxed text-slate-600 [&_mark]:bg-brand/25';
     excerpt.innerHTML = result.excerpt; // Pagefind escapes content; only <mark> is added.
     link.append(title, excerpt);
     item.append(link);
