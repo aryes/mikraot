@@ -19,6 +19,8 @@
 - [x] Delete the pre-rewrite backup bundle once the new history is confirmed
 - [x] Stop tracking `.idea/`
 - [x] Delete Supabase API keys and reset its DB password
+- [x] Security headers: CSP (Astro, hashed inline scripts), HSTS, nosniff, frame-ancestors, Referrer-Policy, Permissions-Policy, COOP (`public/_headers`); `e2e/security.spec.ts` checks every feature works with no violations
+- [x] Security review of the new build (local, 2026-10-02): no exposed files or source maps, CSRF blocked (Astro origin check), SQL parameterized, comments rendered as text. Fixed: comments for nonexistent pages, no rate limit (now 5/min per IP), no bot trap (honeypot field), unbounded body size, API responses without nosniff
 - [ ] Decide Supabase's fate together with the Google sign-in decision (checked 2026-09-30: its only data, 4 comments, is identical in D1)
 
 ## 2. Foundations
@@ -53,7 +55,7 @@
 
 - [ ] Full inventory of mikraot.net pages and features (crawl and compare)
 - [ ] Courses, lessons and quizzes (LearnPress): **deferred** (decided 2026-09-30); the new site has no course pages or links until then. Also deferred: the 7 LearnPress system pages (All Courses, Profile, Checkout, Instructor(s), Become A Teacher, Term Conditions). When migrating: lessons/quizzes are course-scoped URLs, and most published course content is the LearnPress demo "Sample course"
-- [ ] Comments: moderation, Turnstile, rate limit
+- [ ] Comments: moderation and/or Turnstile (Arye: comments are still published immediately; rate limit and honeypot done). Also: anyone can post under the name "מנהל האתר" (the admin badge itself can't be faked)
 - [ ] Analytics (Cloudflare Web Analytics)
 - [x] Accessibility: axe (WCAG 2.2 AA) passes on every page, desktop + mobile, incl. loaded comments, search dialog, mobile menu (`e2e/accessibility.spec.ts`). Fixed: brand green links/buttons (2.3:1) -> `brand-strong` #5b763e; footer, form hint, breadcrumb and status text
 - [ ] **Decision (Arye): teaching colours vs. contrast.** Orange taught letters #ff6600 (2.9:1), grey context #c3c3c3 (1.8:1) and silent letters #d1cfcf (1.6:1) are below WCAG AA (4.5:1). Options: keep (meaning over contrast; excluded from the audit), or darker shades (e.g. orange #c2410c 5.2:1, grey #767676 4.5:1)

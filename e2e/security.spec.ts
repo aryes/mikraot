@@ -54,3 +54,15 @@ test('search (WebAssembly) and the video popup work under the CSP', async ({ pag
 
   expect(violations).toEqual([]);
 });
+
+test('the comments API refuses junk: unknown pages, bots, oversized bodies', async ({
+  request,
+}) => {
+  const post = (data: unknown) => request.post('/api/comments/', { data });
+  const comment = { page_slug: 'דגש-קל', author_name: 'בודק', content: 'בדיקה' };
+  expect((await post({ ...comment, page_slug: 'no/such/page' })).status()).toBe(400);
+  expect((await post({ ...comment, website: 'https://spam.example' })).status()).toBe(400);
+  expect((await post({ ...comment, content: 'x'.repeat(40_000) })).status()).toBe(413);
+  const response = await request.get('/api/comments/?page_slug=x');
+  expect(response.headers()['x-content-type-options']).toBe('nosniff');
+});

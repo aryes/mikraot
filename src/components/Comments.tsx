@@ -44,6 +44,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
     e.preventDefault();
     if (!authorName.trim() || !content.trim()) return;
 
+    const website = new FormData(e.currentTarget).get('website');
     setSubmitting(true);
     setErrorMessage('');
 
@@ -53,6 +54,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
         author_name: authorName.trim(),
         author_email: authorEmail.trim() || undefined,
         content: content.trim(),
+        website: typeof website === 'string' ? website : '',
       });
 
       if (saved.id) {
@@ -148,6 +150,13 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
         )}
 
         <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
+          {/* Anti-spam: hidden from people (and screen readers); bots tend to fill it in. */}
+          <div aria-hidden="true" className="sr-only">
+            <label>
+              אתר
+              <input type="text" name="website" tabIndex={-1} autoComplete="off" />
+            </label>
+          </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-600">

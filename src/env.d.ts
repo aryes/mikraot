@@ -8,6 +8,10 @@ declare module 'cloudflare:workers' {
   export const env: {
     // oxlint-disable-next-line typescript/consistent-type-imports
     DB: import('./server/comments').CommentsDb;
+    /** The static files (dist/client). */
+    ASSETS: { fetch(input: string | URL): Promise<Response> };
+    /** Per-visitor limit on posting comments (wrangler.jsonc `ratelimits`). */
+    COMMENT_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
   };
 }
 

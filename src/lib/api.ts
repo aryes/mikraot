@@ -20,6 +20,8 @@ export async function postComment(comment: {
   author_name: string;
   author_email?: string | undefined;
   content: string;
+  /** The hidden anti-spam field; people leave it empty. */
+  website: string;
 }): Promise<CommentItem> {
   const res = await fetch('/api/comments/', {
     method: 'POST',

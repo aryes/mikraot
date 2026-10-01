@@ -25,7 +25,8 @@ The plan and known issues are in `docs/ROADMAP.md`.
 ## Architecture
 
 - Content: one Markdoc file per page/post in `src/content/pages/` (frontmatter: title, wpId, parent, order, date, draft, seo), schema in `src/content.config.ts`. Menu and site settings in `src/data/menu.json` and `src/data/site.json`. Astro builds one static page per URL (`src/pages/[...path].astro`; URLs nest under parent pages like WordPress, `src/lib/urls.ts`). Content tags (colour marks highlight/muted/silent, collapse, audio, youtube, latest-posts, kbd, heading anchors) render via `markdoc.config.mjs` and `src/components/content/`; `src/scripts/content.ts` adds audio/collapse/video behaviour.
-- `wrangler.jsonc` configures the new single Worker `mikraot` (static assets + D1 binding `DB`); not deployed yet.
+- `wrangler.jsonc` configures the new single Worker `mikraot` (static assets `ASSETS`, D1 `DB`, rate limit `COMMENT_RATE_LIMIT`); not deployed yet. `npm run deploy:dry` bundles it without uploading.
+- Security headers: CSP via `security.csp` in `astro.config.mjs` (meta tag, hashed scripts; no inline scripts without it), other headers in `public/_headers` (static files only; the API sets its own). CI: `.github/workflows/ci.yml` (not pushed).
 - Comments API: `src/pages/api/comments.ts` (on-demand route in the site Worker) using `src/server/comments.ts`; D1 schema in `migrations/`. Local dev/tests use a local D1 (`npm run db:local:reset` loads fictional fixtures).
 - The old separate Worker `worker/` → `mikraot-api` on `mikraot.net/api/*` is still deployed and serves only the old staging app; remove it at cutover. Production D1 has no migration history yet: apply `migrations/` remotely (0001 is a no-op there) before the new Worker goes live.
 - `npm run compare:live` (after `npm run build`) checks every page against the live site; use it after any change to content rendering.

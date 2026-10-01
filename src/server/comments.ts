@@ -36,6 +36,10 @@ export interface NewComment {
 const PUBLIC_COLUMNS = 'id, page_slug, author_name, content, is_admin_reply, created_at';
 const MAX_KEYS = 10;
 const LIMITS = { page_slug: 300, author_name: 100, author_email: 200, content: 5000 } as const;
+/** Largest POST body accepted (bytes): the field limits plus JSON overhead, with room to spare. */
+export const MAX_BODY_BYTES = 32_000;
+/** A form field hidden from people; bots that fill in every field give themselves away. */
+export const HONEYPOT_FIELD = 'website';
 
 /** Page keys from the `page_slug` query parameter (comma-separated), deduplicated and capped. */
 export function parsePageKeys(param: string | null): string[] {
@@ -60,6 +64,7 @@ export function parseNewComment(body: unknown): NewComment | { error: string } {
     content: field('content'),
   };
 
+  if (field(HONEYPOT_FIELD)) return { error: 'Rejected' };
   if (!comment.page_slug || !comment.author_name || !comment.content) {
     return { error: 'Missing required fields' };
   }

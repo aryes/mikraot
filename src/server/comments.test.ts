@@ -78,6 +78,12 @@ describe('parseNewComment', () => {
     expect(parseNewComment(body)).toEqual({ error: 'Missing required fields' });
   });
 
+  it('rejects a filled-in honeypot field (bots)', () => {
+    expect(parseNewComment({ ...valid, website: 'https://spam.example' })).toEqual({
+      error: 'Rejected',
+    });
+  });
+
   it('rejects over-long fields and invalid emails', () => {
     expect(parseNewComment({ ...valid, content: 'x'.repeat(5001) })).toEqual({
       error: 'content is too long',
