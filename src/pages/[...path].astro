@@ -1,12 +1,12 @@
 ---
 import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
 import { Comments } from '../components/Comments';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { sitePages, urlForId, type SitePage } from '../lib/site';
-import { wpHtmlToSiteHtml } from '../lib/wp-html';
+import { getSitePages, site, type SitePage } from '../lib/site';
 
-export const getStaticPaths = (() =>
-  sitePages.map((page) => ({
+export const getStaticPaths = (async () =>
+  (await getSitePages()).map((page) => ({
     params: { path: page.path || undefined },
     props: { page },
   }))) satisfies GetStaticPaths;
@@ -15,12 +15,25 @@ interface Props {
   page: SitePage;
 }
 
-const { item, path, seo } = Astro.props.page;
-const commentKeys = [...new Set([path, item.slug, item.rawSlug, String(item.id)].filter(Boolean))];
+const { entry, path } = Astro.props.page;
+const { title, wpId, seo } = entry.data;
+const { Content } = await render(entry);
+// Old comments are stored under the page path, the WordPress slug (plain or percent-encoded) or ID.
+const commentKeys = [
+  ...new Set(
+    [path, entry.id, encodeURIComponent(entry.id).toLowerCase(), wpId?.toString()].filter(
+      (key): key is string => Boolean(key),
+    ),
+  ),
+];
 const isFrontPage = path === '';
 ---
 
-<BaseLayout title={seo.title} description={seo.description} ogImage={seo.ogImage}>
+<BaseLayout
+  title={seo?.title ?? `${title} - ${site.title}`}
+  description={seo?.description}
+  ogImage={seo?.ogImage}
+>
   <!-- data-pagefind-body: only page content is indexed for search (not header, footer, comments). -->
   <article data-pagefind-body class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
     {!isFrontPage && (
@@ -32,7 +45,7 @@ const isFrontPage = path === '';
           ראשי
         </a>
         <span>/</span>
-        <span class="max-w-xs truncate font-semibold text-slate-800">{item.title}</span>
+        <span class="max-w-xs truncate font-semibold text-slate-800">{title}</span>
       </nav>
     )}
 
@@ -42,17 +55,16 @@ const isFrontPage = path === '';
           data-pagefind-meta="title"
           class="font-hebrew mb-2 text-3xl leading-tight font-extrabold tracking-tight text-[#334155] sm:text-4xl"
         >
-          {item.title}
+          {title}
         </h1>
       </header>
 
-      <div
-        class="wp-content-rendered prose prose-slate max-w-none text-right"
-        set:html={wpHtmlToSiteHtml(item.content, urlForId)}
-      />
+      <div class="wp-content-rendered prose prose-slate max-w-none text-right">
+        <Content />
+      </div>
 
       <div data-pagefind-ignore>
-        <Comments client:visible pageKey={path || String(item.id)} lookupKeys={commentKeys} />
+        <Comments client:visible pageKey={path || entry.id} lookupKeys={commentKeys} />
       </div>
     </div>
   </article>

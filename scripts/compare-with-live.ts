@@ -8,11 +8,17 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { parseHTML } from 'linkedom';
-import { sitePages } from '../src/lib/site.ts';
 
 const LIVE = 'https://mikraot.net';
 const CACHE = '.migration/live';
 const refresh = process.argv.includes('--refresh');
+
+/** The built site's pages, from its sitemap (so exactly what would be deployed is compared). */
+const pageUrls = [
+  ...readFileSync('dist/client/sitemap-0.xml', 'utf8').matchAll(
+    /<loc>https:\/\/mikraot\.net([^<]*)<\/loc>/g,
+  ),
+].map((m) => decodeURI(m[1] ?? '/'));
 
 type Doc = ReturnType<typeof parseHTML>['document'];
 type Root = NonNullable<ReturnType<Doc['querySelector']>>;
@@ -31,13 +37,17 @@ const WIDGETS = {
 const plainTypography = (text: string) =>
   text.replace(/[’‘]/g, "'").replace(/[”“]/g, '"').replace(/–/g, '-');
 
-/** Colour of a text run: from an inline style, a WordPress palette class, or a <mark>. */
+/** Colour of a text run: inline style, WordPress palette class, or this site's mark classes. */
 function highlightKind(el: Root): string | null {
   const style = (el.getAttribute('style') ?? '').toLowerCase().replace(/\s/g, '');
   const cls = el.getAttribute('class') ?? '';
   const color = /(?:^|;)color:(#[0-9a-f]{3,6})/.exec(style)?.[1];
   if (color && ['#ff6600', '#ff7304', '#ff6a02', '#f5ab09'].includes(color)) return 'orange';
-  if (cls.includes('has-luminous-vivid-orange-color')) return 'orange';
+  if (cls.includes('has-luminous-vivid-orange-color') || cls.includes('mark-highlight')) {
+    return 'orange';
+  }
+  if (cls.includes('mark-muted')) return 'gray';
+  if (cls.includes('mark-silent')) return 'silent';
   if (color === '#c3c3c3') return 'gray';
   if (color === '#d1cfcf') return 'silent';
   return null;
@@ -52,6 +62,14 @@ function metrics(root: Root, side: keyof typeof WIDGETS) {
     `${widgets.collapses}, ${widgets.audio}, ${widgets.noise}`,
   )) {
     el.remove();
+  }
+  // Block boundaries and line breaks separate words visually even when the HTML has no
+  // whitespace there (the build output is compressed), so they count as spaces.
+  for (const el of root.querySelectorAll(
+    'p, li, ul, ol, h1, h2, h3, h4, h5, h6, table, tr, td, th, div, blockquote, br',
+  )) {
+    el.before(' ');
+    el.after(' ');
   }
   const highlights: Record<string, number> = {};
   for (const el of root.querySelectorAll('span, mark')) {
@@ -94,13 +112,13 @@ async function livePage(url: string): Promise<string> {
 
 const rows: string[] = [];
 let differing = 0;
-for (const page of sitePages) {
-  const live = parseHTML(await livePage(page.url)).document.querySelector('.entry-content');
+for (const url of pageUrls) {
+  const live = parseHTML(await livePage(url)).document.querySelector('.entry-content');
   const ours = parseHTML(
-    readFileSync(`dist/client${page.url}index.html`, 'utf8'),
+    readFileSync(`dist/client${url}index.html`, 'utf8'),
   ).document.querySelector('.wp-content-rendered');
   if (!live || !ours) {
-    rows.push(`| ${page.url} | missing content container (live: ${!!live}, ours: ${!!ours}) |`);
+    rows.push(`| ${url} | missing content container (live: ${!!live}, ours: ${!!ours}) |`);
     differing++;
     continue;
   }
@@ -112,10 +130,10 @@ for (const page of sitePages) {
   const text = textDifference(String(a['text']), String(b['text']));
   if (text) diffs.push(text);
   if (diffs.length > 0) differing++;
-  rows.push(`| ${page.url} | ${diffs.length === 0 ? 'same' : diffs.join('; ')} |`);
+  rows.push(`| ${url} | ${diffs.length === 0 ? 'same' : diffs.join('; ')} |`);
 }
 
-const report = `# Live vs new: ${sitePages.length} pages, ${differing} differ\n\n| Page | Result |\n| --- | --- |\n${rows.join('\n')}\n`;
+const report = `# Live vs new: ${pageUrls.length} pages, ${differing} differ\n\n| Page | Result |\n| --- | --- |\n${rows.join('\n')}\n`;
 writeFileSync('.migration/compare-report.md', report);
 console.log(report);
 process.exitCode = differing > 0 ? 1 : 0;

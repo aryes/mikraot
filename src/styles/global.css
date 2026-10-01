@@ -134,14 +134,34 @@
   background: #f1f5f9;
 }
 
-/* WordPress block classes that carry meaning in the migrated content (values from WordPress core). */
-.wp-content-rendered .has-text-align-center {
-  text-align: center;
+/* Content tags (markdoc.config.mjs). The colours carry meaning in the lessons. */
+.wp-content-rendered .mark-highlight {
+  color: #ff6600; /* the letter or vowel being taught */
 }
-.wp-content-rendered .has-text-align-right {
-  text-align: right;
+.wp-content-rendered .mark-muted {
+  color: #c3c3c3; /* context, e.g. the surrounding words of a trope chain */
 }
-/* Orange marks the letter or vowel being taught; some spans get it only from this class. */
-.wp-content-rendered .has-luminous-vivid-orange-color {
-  color: #ff6900;
+.wp-content-rendered .mark-silent {
+  color: #d1cfcf; /* silent letters */
+}
+.wp-content-rendered .content-kbd {
+  display: inline-block;
+  padding: 0 0.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  background: #f8fafc;
+}
+/* In tables a recording sits under its letter. */
+.wp-content-rendered td .inline-audio-btn {
+  display: flex;
+  margin: 0.25rem auto 0;
+}
+.wp-content-rendered .latest-posts {
+  list-style: none;
+  padding: 0;
+}
+.wp-content-rendered .latest-posts time {
+  display: block;
+  font-size: 0.8rem;
+  color: #64748b;
 }

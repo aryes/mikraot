@@ -1,5 +1,6 @@
 // @ts-check
 import cloudflare from '@astrojs/cloudflare';
+import markdoc from '@astrojs/markdoc';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
@@ -13,6 +14,6 @@ export default defineConfig({
   // Optimize images at build time (no Cloudflare Images binding); the site uses no sessions.
   adapter: cloudflare({ imageService: 'compile' }),
   session: false,
-  integrations: [react(), sitemap()],
+  integrations: [react(), markdoc(), sitemap()],
   vite: { plugins: [tailwindcss()] },
 });

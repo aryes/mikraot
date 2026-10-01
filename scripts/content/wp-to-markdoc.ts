@@ -6,7 +6,7 @@
  * - [bg_collapse]     -> {% collapse %} inline, or as a block when it wraps whole paragraphs
  * - [sc_embed_player] -> {% audio src="…" /%}
  * - YouTube embeds    -> {% youtube videoId="…" /%}; latest-posts block -> {% latest-posts /%}
- * - centred blocks    -> {% center %}; heading anchors -> {% #id %}; <kbd> -> {% kbd %}
+ * - heading anchors   -> {% anchor="…" %}; <kbd> -> {% kbd %}
  */
 // Markdoc is CommonJS: under Node only its default export exists, so members are used through it.
 // oxlint-disable import/no-named-as-default-member
@@ -291,11 +291,13 @@ function table(el: El, options: ConvertOptions): MdNode {
 
 /** Converts block-level DOM nodes, grouping runs of inline content into paragraphs. */
 function blocks(nodes: DomNode[], options: ConvertOptions): MdNode[] {
-  const out: { node: MdNode; centred: boolean }[] = [];
+  const out: MdNode[] = [];
   let pending: DomNode[] = [];
+  const push = (m: MdNode | null) => {
+    if (m) out.push(m);
+  };
   const flush = () => {
-    const p = paragraph(inlines(pending, options));
-    if (p) out.push({ node: p, centred: false });
+    push(paragraph(inlines(pending, options)));
     pending = [];
   };
   for (const n of nodes) {
@@ -305,8 +307,10 @@ function blocks(nodes: DomNode[], options: ConvertOptions): MdNode[] {
     }
     flush();
     if (!isElement(n)) continue;
-    const centred = (n.getAttribute('class') ?? '').includes('has-text-align-center');
-    const push = (m: MdNode | null) => m && out.push({ node: m, centred });
+    // All centring in the WordPress content is on table cells, which the site's CSS centres.
+    if ((n.getAttribute('class') ?? '').includes('has-text-align-center')) {
+      throw new UnsupportedContentError(`Centred <${n.localName}> is not supported`);
+    }
     switch (n.localName) {
       case 'p':
         push(paragraph(inlines([...n.childNodes], options)));
@@ -336,7 +340,7 @@ function blocks(nodes: DomNode[], options: ConvertOptions): MdNode[] {
         push(tag('table', {}, [table(n, options)], false));
         break;
       case 'figure':
-        for (const b of blocks([...n.childNodes], options)) out.push({ node: b, centred });
+        out.push(...blocks([...n.childNodes], options));
         break;
       case 'blockquote': {
         // WordPress quote block: the quote text sits in <cite>, with an empty <p> before it.
@@ -355,23 +359,14 @@ function blocks(nodes: DomNode[], options: ConvertOptions): MdNode[] {
         push(tag('collapse', collapseAttrs(n), blocks([...n.childNodes], options), false));
         break;
       case 'div':
-        for (const b of blocks([...n.childNodes], options)) out.push({ node: b, centred });
+        out.push(...blocks([...n.childNodes], options));
         break;
       default:
         throw new UnsupportedContentError(`Unexpected block <${n.localName}>`);
     }
   }
   flush();
-
-  // Consecutive centred blocks share one {% center %} wrapper.
-  const result: MdNode[] = [];
-  for (const { node: b, centred } of out) {
-    const previous = result.at(-1);
-    if (!centred) result.push(b);
-    else if (previous?.type === 'tag' && previous.tag === 'center') previous.children.push(b);
-    else result.push(tag('center', {}, [b], false));
-  }
-  return result;
+  return out;
 }
 
 const EMPHASIS = new Set(['strong', 'em', 's']);

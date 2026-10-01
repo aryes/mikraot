@@ -1,41 +1,32 @@
-import rawSeo from '../data/seo.json';
-import rawSiteData from '../data/siteData.json';
-import type { ContentItem, SiteData } from '../types';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import menu from '../data/menu.json';
+import siteSettings from '../data/site.json';
+import type { MenuItem } from '../types';
 import { buildMenuTree } from './menu';
-import { isPublicPage, pathSegmentsFor, urlForPath } from './urls';
+import { pagePath, urlForPath } from './urls';
 
-/** Site content exported from WordPress, typed once here instead of cast at each use. */
-export const siteData: SiteData = rawSiteData;
+/** Site title, tagline, copyright and front page (src/data/site.json). */
+export const site = siteSettings;
 
-export interface PageSeo {
-  title: string;
-  description?: string;
-  ogImage?: string;
-}
+export const menuTree = buildMenuTree(menu satisfies MenuItem[]);
 
-/** Head tags captured from the live site (scripts/fetch-live-seo.ts), keyed by page path. */
-const seoByPath: Record<string, PageSeo | undefined> = rawSeo;
+export type PageEntry = CollectionEntry<'pages'>;
 
 export interface SitePage {
-  item: ContentItem;
-  seo: PageSeo;
-  /** Decoded path without surrounding slashes; '' for the front page. */
+  entry: PageEntry;
+  /** Path without surrounding slashes; '' for the front page. */
   path: string;
   url: string;
 }
 
-const byId = new Map(siteData.content.map((item) => [item.id, item]));
-
-/** Every published item that has its own URL; drafts and quiz questions are left out. */
-export const sitePages: SitePage[] = siteData.content.filter(isPublicPage).map((item) => {
-  const path = pathSegmentsFor(item, byId, siteData.site.frontPageId);
-  const seo = seoByPath[path] ?? { title: `${item.title} - ${siteData.site.title}` };
-  return { item, seo, path, url: urlForPath(path) };
-});
-
-export const menuTree = buildMenuTree(siteData.menu);
-
-const urlsById = new Map(sitePages.map((page) => [page.item.id, page.url]));
-
-/** Site URL of a published page or post by its WordPress ID. */
-export const urlForId = (id: number): string | undefined => urlsById.get(id);
+/** Every published page and post with its URL (drafts are left out). */
+export async function getSitePages(): Promise<SitePage[]> {
+  const entries = await getCollection('pages');
+  const parents = new Map(entries.map((e) => [e.id, e.data.parent]));
+  return entries
+    .filter((entry) => !entry.data.draft)
+    .map((entry) => {
+      const path = pagePath(entry.id, (slug) => parents.get(slug), site.frontPage);
+      return { entry, path, url: urlForPath(path) };
+    });
+}

@@ -1,7 +1,6 @@
 ---
 import { ArrowUp, BookOpen } from 'lucide-react';
-import { menuTree, siteData } from '../lib/site';
-import { menuItemUrl } from '../lib/urls';
+import { menuTree, site } from '../lib/site';
 
 const quickLinks = menuTree.slice(0, 6);
 ---
@@ -14,7 +13,7 @@ const quickLinks = menuTree.slice(0, 6);
           <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#8CB65F] font-bold text-white">
             <BookOpen size={18} />
           </div>
-          <span class="text-xl font-bold">{siteData.site.title}</span>
+          <span class="text-xl font-bold">{site.title}</span>
         </div>
         <p class="max-w-md text-sm leading-relaxed text-slate-400">
           אתר מוקדש ללימוד, שיפור והעמקת הקריאה בתנ"ך, כולל דיוקי הגיה, כללי דקדוק, טעמי המקרא
@@ -32,10 +31,7 @@ const quickLinks = menuTree.slice(0, 6);
           </li>
           {quickLinks.map((item) => (
             <li>
-              <a
-                href={menuItemUrl(item) ?? undefined}
-                class="transition-colors hover:text-[#8CB65F]"
-              >
+              <a href={item.url ?? undefined} class="transition-colors hover:text-[#8CB65F]">
                 {item.title}
               </a>
             </li>
@@ -54,7 +50,7 @@ const quickLinks = menuTree.slice(0, 6);
     </div>
 
     <div class="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-800/80 pt-6 text-xs text-slate-500 sm:flex-row">
-      <p>{siteData.site.copyright}</p>
+      <p>{site.copyright}</p>
       <p>לימוד מקראות וטעמי המקרא</p>
     </div>
   </div>

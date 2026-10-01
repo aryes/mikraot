@@ -1,0 +1,15 @@
+---
+/** Links in page content: other sites open in a new tab, as on the WordPress site. */
+interface Props {
+  href: string;
+  title?: string;
+}
+const { href, title } = Astro.props;
+const external = /^https?:\/\//.test(href);
+const target = external ? '_blank' : undefined;
+const rel = external ? 'noopener noreferrer' : undefined;
+// The markup stays on one line: whitespace inside <a> would add visible spaces around the text.
+---
+
+<!-- prettier-ignore -->
+<a href={href} title={title} target={target} rel={rel}><slot /></a>

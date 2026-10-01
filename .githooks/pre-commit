@@ -2,12 +2,14 @@
 # Pre-commit checks: staged files must be formatted, and must not contain secrets.
 # Requires gitleaks (winget install Gitleaks.Gitleaks).
 
-staged=$(git diff --cached --name-only --diff-filter=ACMR)
-if [ -n "$staged" ]; then
+# NUL-separated, unquoted paths: file names may be Hebrew (git would otherwise octal-escape them).
+if [ -n "$(git diff --cached --name-only --diff-filter=ACMR)" ]; then
   # Prettier skips files it can't format and those in .prettierignore.
-  if ! echo "$staged" | tr '\n' '\0' | xargs -0 npx --no-install prettier --check --ignore-unknown >/dev/null 2>&1; then
+  if ! git -c core.quotePath=false diff --cached --name-only --diff-filter=ACMR -z |
+    xargs -0 npx --no-install prettier --check --ignore-unknown >/dev/null 2>&1; then
     echo "pre-commit: staged files are not formatted. Run: npm run format" >&2
-    echo "$staged" | tr '\n' '\0' | xargs -0 npx --no-install prettier --check --ignore-unknown >&2
+    git -c core.quotePath=false diff --cached --name-only --diff-filter=ACMR -z |
+      xargs -0 npx --no-install prettier --check --ignore-unknown >&2
     exit 1
   fi
 fi

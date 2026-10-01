@@ -22,7 +22,6 @@ function renderMarkdoc(source: string): El {
     'kbd',
     'audio',
     'collapse',
-    'center',
     'youtube',
     'latest-posts',
   ];
@@ -30,7 +29,7 @@ function renderMarkdoc(source: string): El {
     tagNames.map((name) => [
       name,
       {
-        render: name === 'center' || name === 'collapse' ? 'div' : 'span',
+        render: name === 'collapse' ? 'div' : 'span',
         attributes: {
           'data-tag': { type: String, default: name },
           src: { type: String },

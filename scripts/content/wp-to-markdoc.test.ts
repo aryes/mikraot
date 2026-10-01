@@ -95,12 +95,10 @@ describe('shortcodes and embeds', () => {
 });
 
 describe('structure', () => {
-  it('groups consecutive centred blocks into one center wrapper', () => {
-    expect(
-      roundTrip(
-        '<p class="has-text-align-center">א</p><p class="has-text-align-center">ב</p><p>ג</p>',
-      ),
-    ).toBe('{% center %}\nא\n\nב\n{% /center %}\n\nג');
+  it('rejects centred blocks (WordPress only centres table cells, which CSS handles)', () => {
+    expect(() => convert('<p class="has-text-align-center">א</p>')).toThrow(
+      UnsupportedContentError,
+    );
   });
 
   it('keeps heading anchors (including Hebrew ones) as an anchor attribute', () => {

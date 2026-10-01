@@ -3,7 +3,7 @@ import '../styles/global.css';
 import SearchDialog from '../components/SearchDialog.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
-import { siteData } from '../lib/site';
+import { site } from '../lib/site';
 
 interface Props {
   /** Full document title, as the live site renders it (see src/data/seo.json). */
@@ -32,7 +32,7 @@ const icon = (size: number) =>
     <link rel="icon" href={icon(192)} sizes="192x192" />
     <link rel="apple-touch-icon" href={icon(180)} />
     <meta property="og:locale" content="he_IL" />
-    <meta property="og:site_name" content={`${siteData.site.title} - ${siteData.site.tagline}`} />
+    <meta property="og:site_name" content={`${site.title} - ${site.tagline}`} />
     <meta property="og:type" content="article" />
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}

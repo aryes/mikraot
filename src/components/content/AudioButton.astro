@@ -1,0 +1,41 @@
+---
+/** Plays a short recording in place; behaviour in src/scripts/content.ts. */
+interface Props {
+  src: string;
+}
+const { src } = Astro.props;
+---
+
+<button
+  type="button"
+  class="inline-audio-btn mx-1 inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-[#8CB65F] align-middle text-white shadow-xs transition-transform hover:bg-[#7aa252] active:scale-95"
+  data-audio-src={src}
+  title="השמע צליל"
+  aria-label="השמע צליל"
+>
+  <svg
+    class="play-icon pointer-events-none h-4 w-4"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+  </svg>
+  <svg
+    class="pause-icon pointer-events-none hidden h-4 w-4"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="6" y="4" width="4" height="16"></rect>
+    <rect x="14" y="4" width="4" height="16"></rect>
+  </svg>
+</button>

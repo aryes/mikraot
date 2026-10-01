@@ -36,9 +36,10 @@
   - Content of all 340 items is identical to the old staging-based `siteData.json`.
   - All 174 generated page URLs match WordPress permalinks exactly — but LearnPress serves lessons and quizzes only inside their course (`/courses/<course>/lessons/<lesson>/`, `/courses/<course>/quizzes/<quiz>/`); standalone `/lessons/…/` and `/quizzes/…/` return 404 on the live site. Our 131 standalone lesson/quiz URLs must move under their course.
   - "Sample course" (published) is LearnPress demo content: 127 of the 131 lessons/quizzes, Latin filler text. Real course material: "טעמי המקרא" (1 test lesson with placeholder text + 1 real quiz) and the draft "ניקוד" (1 lesson + 1 quiz). **Decision needed (Arye):** drop the demo course?
-- [ ] Convert WordPress HTML/shortcodes to content files with custom blocks (audio, collapsible, YouTube, tables)
+- [x] Content files: 39 Markdoc pages/posts (5 drafts) in `src/content/pages/` with semantic tags; every conversion verified against the source, and every page against the live site (34/34 identical apart from typography; word sequences identical). Notes: the 2 header-less tables now render their first row as a header; build prints harmless MODULE_LEVEL_DIRECTIVE warnings (Astro Markdoc + bundler)
 - [x] Media into the repo (`public/wp-content/uploads/`, 12 MB, same paths as WordPress; plugin data and user avatars excluded); all 33 media files referenced by published pages verified present; content media URLs made site-relative. Also fixed: `?page_id=` links now resolve to the page URL; staging URLs removed from link tooltips
-- [x] SEO parity: titles, descriptions and og tags captured from the live pages (`scripts/fetch-live-seo.ts` → `src/data/seo.json`, the source of truth once WordPress is gone), live favicon, sitemap (34 URLs) with `/sitemap.xml` → `/sitemap-index.xml` 301, `robots.txt`
+- [x] SEO parity: titles, descriptions and og tags captured from the live pages (captured by `npm run seo:fetch`; now in each page's frontmatter), live favicon, sitemap (34 URLs) with `/sitemap.xml` → `/sitemap-index.xml` 301, `robots.txt`
+- [x] Home page "latest posts" block (was missing)
 - [ ] Open: WordPress feeds (`/feed/`, `/sitemap.rss`) are not replicated; decide whether they are needed
 - [ ] Keystatic editor with the custom blocks (local first; browser editing after GitHub)
 - [x] Self-hosted fonts (@fontsource: Assistant, Frank Ruhl Libre, Alef; Hebrew + Latin subsets)
@@ -66,4 +67,3 @@
 ## Known issues (current app)
 
 - Comments: POST auto-approves, no rate limit or captcha, CORS `*`. (Raw DB errors no longer returned: fixed in `worker/`, not yet deployed.)
-- `wp-html.ts` doesn't handle `[learn_press_*]` and `[elementor]` shortcodes or the 7 raw `<table>`s.

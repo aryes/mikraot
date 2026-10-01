@@ -24,12 +24,12 @@ The plan and known issues are in `docs/ROADMAP.md`.
 
 ## Architecture
 
-- Astro builds one static page per WordPress URL (`src/pages/[...path].astro`, URLs from `src/lib/urls.ts`). Content currently comes from `src/data/siteData.json` (an older export of the WordPress staging copy), converted by `src/lib/wp-html.ts`; `src/scripts/content.ts` adds audio/collapsible/video behaviour in the browser. React only for islands (`Comments`).
+- Content: one Markdoc file per page/post in `src/content/pages/` (frontmatter: title, wpId, parent, order, date, draft, seo), schema in `src/content.config.ts`. Menu and site settings in `src/data/menu.json` and `src/data/site.json`. Astro builds one static page per URL (`src/pages/[...path].astro`; URLs nest under parent pages like WordPress, `src/lib/urls.ts`). Content tags (colour marks highlight/muted/silent, collapse, audio, youtube, latest-posts, kbd, heading anchors) render via `markdoc.config.mjs` and `src/components/content/`; `src/scripts/content.ts` adds audio/collapse/video behaviour.
 - `wrangler.jsonc` configures the new single Worker `mikraot` (static assets + D1 binding `DB`); not deployed yet.
 - Comments API: `src/pages/api/comments.ts` (on-demand route in the site Worker) using `src/server/comments.ts`; D1 schema in `migrations/`. Local dev/tests use a local D1 (`npm run db:local:reset` loads fictional fixtures).
 - The old separate Worker `worker/` → `mikraot-api` on `mikraot.net/api/*` is still deployed and serves only the old staging app; remove it at cutover. Production D1 has no migration history yet: apply `migrations/` remotely (0001 is a no-op there) before the new Worker goes live.
 - `npm run compare:live` (after `npm run build`) checks every page against the live site; use it after any change to content rendering.
-- SEO head tags come from `src/data/seo.json`, captured from the live site by `npx tsx scripts/fetch-live-seo.ts`; after cutover edit that file directly.
+- The content was imported from WordPress by `npm run content:import` (scripts/content/: converter + verification; inputs `.migration/wp-export.json` and `.migration/seo.json` from `npm run seo:fetch`). Re-running it overwrites `src/content/pages/`: only until edits start. SEO tags live in each page's frontmatter.
 - Media (76 MP3s, 52 images) is in `public/wp-content/uploads/`, at the same paths as on WordPress; content URLs are rewritten to site-relative `/wp-content/...`. Plugin folders and user avatars from WordPress uploads were deliberately not copied.
 - Live site is still WordPress. Staging app: https://mikraot.net/staging/app/
 

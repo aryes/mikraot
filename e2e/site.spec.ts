@@ -120,16 +120,35 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
   );
 });
 
-test('WordPress formatting classes render: centred text and class-only orange', async ({
+test('content formatting renders: centred table cells and the meaningful colours', async ({
   page,
 }) => {
   await page.goto('/דגש-קל/');
-  const centred = page.locator('.wp-content-rendered .has-text-align-center').first();
-  await expect(centred).toHaveCSS('text-align', 'center');
+  const cell = page.locator('.wp-content-rendered td').first();
+  await expect(cell).toHaveCSS('text-align', 'center');
 
   await page.goto('/שווא-נע/');
-  const orange = page.locator('.wp-content-rendered .has-luminous-vivid-orange-color').first();
-  await expect(orange).toHaveCSS('color', 'rgb(255, 105, 0)');
+  const taught = page.locator('.wp-content-rendered .mark-highlight').first();
+  await expect(taught).toHaveCSS('color', 'rgb(255, 102, 0)');
+
+  await page.goto('/silent-letters/');
+  const silent = page.locator('.wp-content-rendered .mark-silent').first();
+  await expect(silent).toHaveCSS('color', 'rgb(209, 207, 207)');
+});
+
+test('heading anchors from WordPress survive (Hebrew ones included)', async ({ page }) => {
+  await page.goto('/trope-hierarchy/');
+  await expect(page.locator('#connected-tropes')).toHaveCount(1);
+  await page.goto('/');
+  await expect(page.locator('[id="הגיה"]')).toHaveCount(1);
+});
+
+test('the home page lists the latest posts, as on WordPress', async ({ page }) => {
+  await page.goto('/');
+  const post = page.locator('.latest-posts li').first();
+  await expect(post.locator('a')).toHaveAttribute('href', '/בראשית/');
+  await expect(post.locator('time')).toHaveText('11/08/2021');
+  await expect(post.locator('.latest-posts-excerpt')).toContainText('בשמחה ובהתרגשות');
 });
 
 test('fonts are self-hosted and load (no third-party font requests)', async ({ page }) => {

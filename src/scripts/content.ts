@@ -1,8 +1,14 @@
 /**
- * Browser behaviour for converted WordPress content (see lib/wp-html.ts):
- * inline audio buttons, collapsible explanations, and YouTube links in lists opening a popup.
+ * Browser behaviour for page content (components in src/components/content/): audio buttons,
+ * collapsible explanations, and YouTube links in lists opening a popup.
  */
-import { getYouTubeId } from '../lib/wp-html';
+
+const YOUTUBE_ID =
+  /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/;
+
+function getYouTubeId(url: string): string | null {
+  return YOUTUBE_ID.exec(url)?.[1] ?? null;
+}
 
 let audio: HTMLAudioElement | null = null;
 let audioButton: HTMLElement | null = null;
