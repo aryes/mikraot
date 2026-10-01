@@ -22,6 +22,7 @@ interface WpPost {
   parentId: number;
   menuOrder: number;
   date: string;
+  modified: string;
   excerpt: string;
   content: string;
   url: string | null;
@@ -89,6 +90,17 @@ function siteLink(pathAndQuery: string): string {
   return `/${clean ? `${clean}/` : ''}${rest}`;
 }
 
+/**
+ * The post's calendar day in Israel (WordPress shows the date only; Keystatic stores YYYY-MM-DD).
+ * Never-published drafts have the date 0000-00-00 in WordPress, so they use the last edit.
+ */
+function israelDay(p: WpPost): string {
+  const gmt = p.date.startsWith('0000') ? p.modified : p.date;
+  return new Date(`${gmt.replace(' ', 'T')}Z`).toLocaleDateString('en-CA', {
+    timeZone: 'Asia/Jerusalem',
+  });
+}
+
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 
@@ -106,7 +118,7 @@ for (const p of posts) {
     kind: p.type,
     ...(parent && { parent: fileSlug(parent) }),
     order: p.menuOrder,
-    date: `${p.date.replace(' ', 'T')}Z`,
+    date: israelDay(p),
     ...(p.excerpt && { excerpt: p.excerpt }),
     ...(p.status !== 'publish' && { draft: true }),
     ...(pageSeo && { seo: pageSeo }),

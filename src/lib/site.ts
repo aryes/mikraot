@@ -26,7 +26,7 @@ export async function getSitePages(): Promise<SitePage[]> {
   return entries
     .filter((entry) => !entry.data.draft)
     .map((entry) => {
-      const path = pagePath(entry.id, (slug) => parents.get(slug), site.frontPage);
+      const path = pagePath(entry.id, (slug) => parents.get(slug) ?? undefined, site.frontPage);
       return { entry, path, url: urlForPath(path) };
     });
 }

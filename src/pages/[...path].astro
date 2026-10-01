@@ -30,9 +30,9 @@ const isFrontPage = path === '';
 ---
 
 <BaseLayout
-  title={seo?.title ?? `${title} - ${site.title}`}
-  description={seo?.description}
-  ogImage={seo?.ogImage}
+  title={seo?.title || `${title} - ${site.title}`}
+  description={seo?.description || undefined}
+  ogImage={seo?.ogImage || undefined}
 >
   <!-- data-pagefind-body: only page content is indexed for search (not header, footer, comments). -->
   <article data-pagefind-body class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">

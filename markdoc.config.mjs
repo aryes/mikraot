@@ -11,6 +11,15 @@ const styled = (/** @type {string} */ element, /** @type {string} */ className) 
   attributes: { class: { type: String, default: className } },
 });
 
+const collapse = (/** @type {boolean} */ inline) => ({
+  render: component('./src/components/content/Collapse.astro'),
+  attributes: {
+    expandText: { type: String },
+    collapseText: { type: String },
+    inline: { type: Boolean, default: inline },
+  },
+});
+
 export default defineMarkdocConfig({
   nodes: {
     heading: {
@@ -39,19 +48,9 @@ export default defineMarkdocConfig({
       attributes: { src: { type: String, required: true } },
       selfClosing: true,
     },
-    collapse: {
-      render: component('./src/components/content/Collapse.astro'),
-      attributes: { expandText: { type: String }, collapseText: { type: String } },
-      // The same tag wraps a few words or whole paragraphs; the component needs to know which.
-      transform(node, config) {
-        return new Markdoc.Tag(
-          // @ts-expect-error `this` is the schema, whose render is the component config
-          this.render,
-          { ...node.transformAttributes(config), inline: node.inline },
-          node.transformChildren(config),
-        );
-      },
-    },
+    // A hidden explanation within a sentence, or (collapse-block) whole hidden paragraphs.
+    collapse: collapse(true),
+    'collapse-block': collapse(false),
     youtube: {
       render: component('./src/components/content/YouTube.astro'),
       attributes: { videoId: { type: String, required: true } },

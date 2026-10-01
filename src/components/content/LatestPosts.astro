@@ -18,7 +18,7 @@ const formatDate = (date: Date) => date.toLocaleDateString('en-GB', { timeZone: 
       </a>
       <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
       <div class="latest-posts-excerpt">
-        {entry.data.excerpt ?? excerptOf(entry.body ?? '', EXCERPT_WORDS)}
+        {entry.data.excerpt || excerptOf(entry.body ?? '', EXCERPT_WORDS)}
       </div>
     </li>
   ))}

@@ -3,7 +3,7 @@
  *
  * WordPress constructs map to Markdoc tags that Keystatic can edit and Astro renders:
  * - colour spans      -> {% highlight %} (orange: taught letter), {% muted %} (grey), {% silent %}
- * - [bg_collapse]     -> {% collapse %} inline, or as a block when it wraps whole paragraphs
+ * - [bg_collapse]     -> {% collapse %} inline, {% collapse-block %} when it wraps paragraphs
  * - [sc_embed_player] -> {% audio src="…" /%}
  * - YouTube embeds    -> {% youtube videoId="…" /%}; latest-posts block -> {% latest-posts /%}
  * - heading anchors   -> {% anchor="…" %}; <kbd> -> {% kbd %}
@@ -356,7 +356,7 @@ function blocks(nodes: DomNode[], options: ConvertOptions): MdNode[] {
         push(tag('latest-posts', {}, [], false));
         break;
       case 'x-collapse-block':
-        push(tag('collapse', collapseAttrs(n), blocks([...n.childNodes], options), false));
+        push(tag('collapse-block', collapseAttrs(n), blocks([...n.childNodes], options), false));
         break;
       case 'div':
         out.push(...blocks([...n.childNodes], options));

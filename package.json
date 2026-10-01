@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "cms": "astro dev --config astro.config.cms.mjs --port 4400",
     "build": "astro check && npm run build:site",
     "build:site": "astro build && pagefind --site dist/client",
     "preview": "astro preview",
@@ -41,6 +42,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@astrojs/cloudflare": "^14.3.3",
+    "@astrojs/node": "^11.1.6",
     "@astrojs/sitemap": "^3.7.4",
     "@markdoc/markdoc": "^0.5.10",
     "@playwright/test": "^1.63.0",

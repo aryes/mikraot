@@ -22,6 +22,7 @@ function renderMarkdoc(source: string): El {
     'kbd',
     'audio',
     'collapse',
+    'collapse-block',
     'youtube',
     'latest-posts',
   ];
@@ -29,7 +30,7 @@ function renderMarkdoc(source: string): El {
     tagNames.map((name) => [
       name,
       {
-        render: name === 'collapse' ? 'div' : 'span',
+        render: name === 'collapse-block' ? 'div' : 'span',
         attributes: {
           'data-tag': { type: String, default: name },
           src: { type: String },
@@ -76,7 +77,12 @@ function counts(root: El, side: 'source' | 'markdoc'): Record<string, number> {
     tables: n('table'),
     rows: n('tr'),
     audio: tagged('x-audio', 'audio'),
-    collapses: tagged('x-collapse, x-collapse-block', 'collapse'),
+    collapses: n(
+      side === 'source'
+        ? 'x-collapse, x-collapse-block'
+        : '[data-tag="collapse"], [data-tag="collapse-block"]',
+    ),
+    collapseBlocks: tagged('x-collapse-block', 'collapse-block'),
     youtube: tagged('x-youtube', 'youtube'),
     ...marks,
   };

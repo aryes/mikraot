@@ -70,8 +70,8 @@ describe('shortcodes and embeds', () => {
       '<p>[bg_collapse expand_text="" ]</p><p>א</p><ul><li>ב</li></ul><p>[/bg_collapse]</p>',
     );
     const inline = roundTrip('<p>[bg_collapse expand_text="" ]</p><p>א</p><p>ב[/bg_collapse]</p>');
-    expect(own).toBe('{% collapse %}\nא\n\n- ב\n{% /collapse %}');
-    expect(inline).toBe('{% collapse %}\nא\n\nב\n{% /collapse %}');
+    expect(own).toBe('{% collapse-block %}\nא\n\n- ב\n{% /collapse-block %}');
+    expect(inline).toBe('{% collapse-block %}\nא\n\nב\n{% /collapse-block %}');
   });
 
   it('turns YouTube embeds and bare YouTube paragraphs into youtube tags', () => {

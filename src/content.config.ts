@@ -13,21 +13,22 @@ const pages = defineCollection({
   schema: z.object({
     title: z.string(),
     /** WordPress post ID: kept so old comments and links can be matched. */
-    wpId: z.number().int().optional(),
+    wpId: z.number().int().nullish(),
     kind: z.enum(['page', 'post']).default('page'),
     /** Slug of the parent page; the URL nests under it, like WordPress. */
-    parent: z.string().optional(),
+    parent: z.string().nullish(),
     order: z.number().int().default(0),
     date: z.coerce.date(),
-    excerpt: z.string().optional(),
+    // Keystatic writes empty fields as '' or null; both mean "not set".
+    excerpt: z.string().nullish(),
     draft: z.boolean().default(false),
     seo: z
       .object({
         title: z.string(),
-        description: z.string().optional(),
-        ogImage: z.string().optional(),
+        description: z.string().nullish(),
+        ogImage: z.string().nullish(),
       })
-      .optional(),
+      .nullish(),
   }),
 });
 
