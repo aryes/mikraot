@@ -13,6 +13,7 @@
     "build": "astro check && npm run build:site",
     "build:site": "astro build && pagefind --site dist/client",
     "preview": "astro preview",
+    "deploy:dry": "wrangler deploy --dry-run",
     "typecheck": "astro check",
     "lint": "oxlint --type-aware",
     "test": "vitest run",
