@@ -109,10 +109,13 @@
 }
 
 /* Table styling matching Kahuna clean table */
+.wp-content-rendered .table-scroll {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
 .wp-content-rendered table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1.5rem 0;
   background: #ffffff;
   border-radius: 8px;
   overflow: hidden;

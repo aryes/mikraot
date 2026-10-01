@@ -28,11 +28,6 @@ import { Search, X } from 'lucide-react';
   <ul data-search-results class="max-h-[60vh] overflow-y-auto p-2"></ul>
 </dialog>
 
-<!--
-  Pagefind is loaded by a tiny unbundled script: bundled (and inlined) scripts get a Vite preload
-  helper around import() that breaks at runtime, and the index only exists in built output anyway.
--->
-<script is:inline>
-  window.loadPagefind = () => import('/pagefind/pagefind.js');
-</script>
+<!-- Pagefind loader: a plain file in public/ (see the comment there). -->
+<script is:inline src="/scripts/pagefind-loader.js"></script>
 <script src="../scripts/search.ts"></script>

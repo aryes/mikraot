@@ -36,6 +36,7 @@ export default defineMarkdocConfig({
       },
     },
     link: { ...nodes.link, render: component('./src/components/content/ContentLink.astro') },
+    table: { ...nodes.table, render: component('./src/components/content/ContentTable.astro') },
   },
   tags: {
     // Colour marks: the taught letter/vowel, de-emphasised context, silent letters.

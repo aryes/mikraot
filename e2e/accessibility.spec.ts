@@ -16,8 +16,15 @@ const paths = [
 ];
 
 for (const path of paths) {
-  test(`no accessibility violations (WCAG 2.2 AA): ${path}`, async ({ page }) => {
+  test(`no accessibility violations (WCAG 2.2 AA): ${path}`, async ({ page, isMobile }) => {
     await page.goto(path);
+    // Reflow: on a phone the page itself never scrolls sideways (wide tables scroll on their own).
+    if (isMobile) {
+      const scrollsSideways = await page.evaluate(
+        () => document.documentElement.scrollWidth > innerWidth,
+      );
+      expect(scrollsSideways).toBe(false);
+    }
     const results = await new AxeBuilder({ page })
       // Third-party frames (the YouTube player) are outside our control.
       .exclude('iframe')

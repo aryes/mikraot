@@ -179,6 +179,9 @@ test('search finds pages by keyword (Ctrl+K), ignoring niqqud', async ({ page })
   await dialog.getByRole('searchbox').fill('דגש קל');
   const first = dialog.getByRole('listitem').first().getByRole('link');
   await expect(first).toContainText('דגש קל');
+  await page.keyboard.press('Escape'); // closes even with text in the box
+  await expect(dialog).toBeHidden();
+  await page.keyboard.press('Control+k');
   await first.click();
   await expect(page.locator('h1')).toHaveText('דגש קל');
 });

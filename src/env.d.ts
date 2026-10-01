@@ -12,6 +12,6 @@ declare module 'cloudflare:workers' {
 }
 
 interface Window {
-  /** Loads Pagefind's search module; defined by an inline script in SearchDialog.astro. */
+  /** Loads Pagefind's search module; defined by public/scripts/pagefind-loader.js. */
   loadPagefind?: () => Promise<unknown>;
 }

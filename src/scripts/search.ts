@@ -68,6 +68,14 @@ function setUpSearch(dialog: HTMLDialogElement): void {
   if (!input || !list || !status) return;
 
   let latest = 0;
+  // In a search box the browser's first Escape only clears the text; close the dialog instead.
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      dialog.close();
+    }
+  });
+
   input.addEventListener('input', () => {
     const query = input.value.trim();
     const run = ++latest;

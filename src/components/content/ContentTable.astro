@@ -1,0 +1,12 @@
+---
+/**
+ * Tables scroll sideways on their own when wider than the screen, instead of widening the page.
+ * The scroll area is focusable so keyboard users can scroll it too.
+ */
+---
+
+<div class="table-scroll" tabindex="0" role="region" aria-label="טבלה">
+  <table>
+    <slot />
+  </table>
+</div>
