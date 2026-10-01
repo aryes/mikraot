@@ -37,6 +37,7 @@ The plan and known issues are in `docs/ROADMAP.md`.
 
 - Build: `npm run build` = type check + `build:site` (Astro build, then the Pagefind search index into `dist/client/pagefind/`; search only works in built output, not in `npm run dev`).
 - Content editing: `npm run cms` (http://localhost:4400/keystatic): Keystatic edits `src/content/pages/` and `src/data/site.json` directly; config in `keystatic.config.tsx` must stay in sync with `markdoc.config.mjs` (`src/keystatic.test.ts` reads all content through it). Runs on Node via `astro.config.cms.mjs`.
+- Before every commit: `npm run check` (type check, lint with warnings as errors, formatting, unit tests).
 - Dev server: `npm run dev` (http://localhost:4321, runs in Cloudflare's workerd). Checks: `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm run build`.
 - `.dev.vars` must exist (it may be empty): it stops wrangler from loading `.env`, whose operations credentials must never reach the Worker.
 - SSH to Bluehost goes directly to the origin IP (`SSH_HOST` / `SSH_USER` in `.env`), because Cloudflare doesn't proxy port 22. The old staging app at /staging/app/ is no longer updated.

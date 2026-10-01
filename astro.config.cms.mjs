@@ -5,13 +5,15 @@
  */
 import keystatic from '@keystatic/astro';
 import node from '@astrojs/node';
-import { defineConfig } from 'astro/config';
 import site from './astro.config.mjs';
 
-export default defineConfig({
+/** @type {import('astro').AstroUserConfig} */
+const config = {
   ...site,
   // Keystatic's API calls have no trailing slash; the site's own URLs are unaffected.
   trailingSlash: 'ignore',
   adapter: node({ mode: 'standalone' }),
   integrations: [...(site.integrations ?? []), keystatic()],
-});
+};
+
+export default config;

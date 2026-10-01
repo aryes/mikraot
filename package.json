@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "astro dev",
     "cms": "astro dev --config astro.config.cms.mjs --port 4400",
+    "check": "astro check && oxlint --type-aware --deny-warnings && prettier --check . && vitest run",
     "build": "astro check && npm run build:site",
     "build:site": "astro build && pagefind --site dist/client",
     "preview": "astro preview",
