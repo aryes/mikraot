@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   addComment,
   listComments,
+  listRecentComments,
   parseNewComment,
   parsePageKeys,
   type CommentsDb,
@@ -91,6 +92,17 @@ describe('parseNewComment', () => {
     expect(parseNewComment({ ...valid, author_email: 'not-an-email' })).toEqual({
       error: 'Invalid email',
     });
+  });
+});
+
+describe('listRecentComments', () => {
+  it('queries the newest approved comments, public columns only', async () => {
+    const { db, calls } = fakeDb([comment]);
+    expect(await listRecentComments(db, 20)).toEqual([comment]);
+    expect(calls[0]?.values).toEqual([20]);
+    expect(calls[0]?.query).toContain('approved = 1');
+    expect(calls[0]?.query).toContain('ORDER BY created_at DESC');
+    expect(calls[0]?.query).not.toContain('author_email');
   });
 });
 

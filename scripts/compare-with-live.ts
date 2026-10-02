@@ -8,17 +8,26 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { parseHTML } from 'linkedom';
+// WordPress "texturizes" quotes and dashes, and this site uses Hebrew geresh/gershayim:
+// text is also compared without those differences.
+import { plainTypography } from './content/typography.ts';
 
 const LIVE = 'https://mikraot.net';
 const CACHE = '.migration/live';
 const refresh = process.argv.includes('--refresh');
 
-/** The built site's pages, from its sitemap (so exactly what would be deployed is compared). */
+/**
+ * The built site's content pages, from its sitemap (so exactly what would be deployed is
+ * compared). Archive listings (month, category) have no page content; e2e/archives.spec.ts
+ * covers them.
+ */
 const pageUrls = [
   ...readFileSync('dist/client/sitemap-0.xml', 'utf8').matchAll(
     /<loc>https:\/\/mikraot\.net([^<]*)<\/loc>/g,
   ),
-].map((m) => decodeURI(m[1] ?? '/'));
+]
+  .map((m) => decodeURI(m[1] ?? '/'))
+  .filter((url) => !/^\/(\d{4}\/\d{2}|category\/[^/]+)\/$/.test(url));
 
 type Doc = ReturnType<typeof parseHTML>['document'];
 type Root = NonNullable<ReturnType<Doc['querySelector']>>;
@@ -32,10 +41,6 @@ const WIDGETS = {
   },
   ours: { collapses: '.collapse-toggle-btn', audio: '.inline-audio-btn', noise: 'script, style' },
 };
-
-/** WordPress "texturizes" quotes and dashes; text is also compared without that difference. */
-const plainTypography = (text: string) =>
-  text.replace(/[’‘]/g, "'").replace(/[”“]/g, '"').replace(/–/g, '-');
 
 /** Colour of a text run: inline style, WordPress palette class, or this site's mark classes. */
 function highlightKind(el: Root): string | null {
@@ -92,7 +97,7 @@ function metrics(root: Root, side: keyof typeof WIDGETS) {
 function textDifference(live: string, ours: string): string | null {
   if (live === ours) return null;
   const [x, y] = [plainTypography(live), plainTypography(ours)];
-  if (x === y) return 'text: typography only (’ ” –)';
+  if (x === y) return 'text: typography only (’ ” – ׳ ״)';
   if (x.replace(/\s/g, '') === y.replace(/\s/g, '')) return 'text: whitespace only';
   let i = 0;
   while (i < x.length && x[i] === y[i]) i++;

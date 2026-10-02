@@ -108,6 +108,8 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
           comments.map((comment) => (
             <div
               key={comment.id}
+              // WordPress comment links (#comment-426) keep working.
+              id={`comment-${comment.id}`}
               className={`rounded-xl border p-4 transition-all sm:p-5 ${
                 comment.is_admin_reply
                   ? 'mr-4 border-emerald-200/80 bg-emerald-50/50 sm:mr-8'

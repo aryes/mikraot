@@ -111,6 +111,14 @@ function setUpSearch(dialog: HTMLDialogElement): void {
   dialog.addEventListener('click', (event) => {
     if (event.target === dialog) dialog.close(); // click on the backdrop
   });
+
+  // WordPress search links (/?s=שווא) open the search with that query.
+  const query = new URLSearchParams(location.search).get('s');
+  if (query) {
+    open();
+    input.value = query;
+    input.dispatchEvent(new Event('input'));
+  }
 }
 
 const dialog = document.querySelector<HTMLDialogElement>('dialog[data-search]');

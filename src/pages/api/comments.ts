@@ -7,6 +7,7 @@ import {
   parseNewComment,
   parsePageKeys,
 } from '../../server/comments';
+import { findPage, getPageIndex } from '../../server/page-index';
 import { tokenFrom, verifyTurnstile } from '../../server/turnstile';
 
 // Runs in the Worker on each request (the rest of the site is static).
@@ -22,20 +23,6 @@ const json = (data: unknown, status = 200) =>
       'X-Content-Type-Options': 'nosniff',
     },
   });
-
-/** The pages comments may be posted to, from the static comment-pages.json (read once). */
-let commentPages: Promise<Set<string>> | undefined;
-function getCommentPages(origin: string): Promise<Set<string>> {
-  commentPages ??= env.ASSETS.fetch(new URL('/comment-pages.json', origin))
-    .then(async (res): Promise<string[]> => {
-      if (!res.ok) throw new Error(`comment-pages.json: ${res.status}`);
-      return res.json();
-    })
-    .then((keys) => new Set(keys));
-  // A failed read is retried on the next request instead of being cached.
-  commentPages.catch(() => (commentPages = undefined));
-  return commentPages;
-}
 
 export const GET: APIRoute = async ({ url }) =>
   json(await listComments(env.DB, parsePageKeys(url.searchParams.get('page_slug'))));
@@ -58,7 +45,7 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
   if ('error' in comment) return json(comment, 400);
 
   try {
-    if (!(await getCommentPages(url.origin)).has(comment.page_slug)) {
+    if (!findPage(await getPageIndex(env.ASSETS, url.origin), comment.page_slug)) {
       return json({ error: 'Unknown page' }, 400);
     }
     const turnstileKey = env.TURNSTILE_SECRET_KEY;

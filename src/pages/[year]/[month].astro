@@ -1,0 +1,32 @@
+---
+/** Monthly post archive, e.g. /2021/08/ (WordPress date archives). */
+import type { GetStaticPaths } from 'astro';
+import PostList from '../../components/PostList.astro';
+import ContentLayout from '../../layouts/ContentLayout.astro';
+import { archiveMonths, monthOf } from '../../lib/archive';
+import { getPosts, site } from '../../lib/site';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return archiveMonths(posts.map(({ entry }) => entry.data.date)).map((month) => ({
+    params: { year: month.year, month: month.month },
+    props: {
+      month,
+      posts: posts.filter(({ entry }) => monthOf(entry.data.date).url === month.url),
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { month, posts } = Astro.props;
+const [monthName, year] = month.label.split(' ');
+---
+
+<ContentLayout
+  documentTitle={`${monthName}, ${year} - ${site.title}`}
+  title={`חודש: ${month.label}`}
+  crumbs={[]}
+>
+  <div class="wp-content-rendered">
+    <PostList posts={posts} />
+  </div>
+</ContentLayout>

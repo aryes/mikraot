@@ -96,6 +96,10 @@ export default config({
         parent: fields.relationship({ label: 'עמוד אב', collection: 'pages' }),
         order: fields.integer({ label: 'סדר', defaultValue: 0 }),
         date: fields.date({ label: 'תאריך', defaultValue: { kind: 'today' } }),
+        categories: fields.array(fields.text({ label: 'קטגוריה (slug, מהגדרות האתר)' }), {
+          label: 'קטגוריות (לפוסטים)',
+          itemLabel: (props) => props.value,
+        }),
         excerpt: fields.text({ label: 'תקציר', multiline: true }),
         draft: fields.checkbox({ label: 'טיוטה (לא מתפרסם)', defaultValue: false }),
         seo: fields.object(
@@ -121,6 +125,20 @@ export default config({
         tagline: fields.text({ label: 'תיאור קצר' }),
         copyright: fields.text({ label: 'זכויות יוצרים' }),
         frontPage: fields.relationship({ label: 'עמוד הבית', collection: 'pages' }),
+        author: fields.object(
+          {
+            name: fields.text({ label: 'שם' }),
+            slug: fields.text({ label: 'כתובת (slug)' }),
+          },
+          { label: 'כותב הפוסטים' },
+        ),
+        categories: fields.array(
+          fields.object({
+            slug: fields.text({ label: 'כתובת (slug)' }),
+            name: fields.text({ label: 'שם' }),
+          }),
+          { label: 'קטגוריות', itemLabel: (props) => props.fields.name.value },
+        ),
       },
     }),
   },

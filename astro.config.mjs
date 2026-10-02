@@ -47,6 +47,11 @@ export default defineConfig({
       }),
     },
   },
-  integrations: [react(), markdoc(), sitemap()],
+  integrations: [
+    react(),
+    markdoc(),
+    // The author archive is noindex, as on the live site.
+    sitemap({ filter: (page) => !page.includes('/author/') }),
+  ],
   vite: { plugins: [tailwindcss()] },
 });

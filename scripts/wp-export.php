@@ -5,8 +5,8 @@
  * Run on the server from the WordPress root (reads this file from stdin):
  *   ssh <user>@<host> 'cd ~/public_html && wp eval-file -' < scripts/wp-export.php > .migration/wp-export.json
  *
- * Exports content only: posts of the site's content types, menus, SEO fields, media and the
- * LearnPress course/quiz structure. Deliberately excludes comments, users, orders and newsletter
+ * Exports content only: posts of the site's content types (with author name and categories),
+ * categories, menus, SEO fields, media and the LearnPress course/quiz structure. Deliberately excludes comments, users, orders and newsletter
  * subscribers (personal data), which are migrated separately if at all.
  */
 
@@ -37,6 +37,14 @@ foreach (get_posts(array(
         'url' => $post->post_status === 'publish' ? get_permalink($post) : null,
         'template' => get_page_template_slug($post),
         'thumbnailId' => (int) get_post_thumbnail_id($post),
+        // The public byline and archive links (shown on the live site): name and URL slug only.
+        'author' => array(
+            'name' => get_the_author_meta('display_name', $post->post_author),
+            'slug' => get_the_author_meta('user_nicename', $post->post_author),
+        ),
+        'categories' => $post->post_type === 'post'
+            ? array_map(function ($id) { return urldecode(get_category($id)->slug); }, wp_get_post_categories($post->ID))
+            : array(),
     );
 }
 
@@ -112,6 +120,9 @@ echo wp_json_encode(array(
         'permalinkStructure' => get_option('permalink_structure'),
     ),
     'posts' => $posts,
+    'categories' => array_values(array_map(function ($c) {
+        return array('slug' => urldecode($c->slug), 'name' => $c->name, 'description' => $c->description);
+    }, get_categories(array('hide_empty' => true)))),
     'postMeta' => $postMeta,
     'menus' => $menus,
     'seo' => $seo,

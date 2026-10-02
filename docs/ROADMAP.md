@@ -42,28 +42,40 @@
 - [x] Media into the repo (`public/wp-content/uploads/`, 12 MB, same paths as WordPress; plugin data and user avatars excluded); all 33 media files referenced by published pages verified present; content media URLs made site-relative. Also fixed: `?page_id=` links now resolve to the page URL; staging URLs removed from link tooltips
 - [x] SEO parity: titles, descriptions and og tags captured from the live pages (captured by `npm run seo:fetch`; now in each page's frontmatter), live favicon, sitemap (34 URLs) with `/sitemap.xml` → `/sitemap-index.xml` 301, `robots.txt`
 - [x] Home page "latest posts" block (was missing)
-- [ ] Open: WordPress feeds (`/feed/`, `/sitemap.rss`) are not replicated; decide whether they are needed
 - [x] Keystatic editor, local mode (`npm run cms`): pages/posts with all custom blocks and the meaningful colours, site settings; every content file verified to open in it
 - [ ] Keystatic: the Hebrew interface (needed for right-to-left editing) has poor built-in translations, e.g. Save = "להציל", Singletons = "רווקים" (could be fixed upstream); menu (`src/data/menu.json`) not editable there yet; GitHub mode for browser editing after GitHub
 - [x] Self-hosted fonts (@fontsource: Assistant, Frank Ruhl Libre, Alef; Hebrew + Latin subsets)
 - [x] Pagefind search (Ctrl+K / header button): 34 pages indexed at build; plain queries match text with niqqud. Possible refinement: leave the single-letter transliteration tables out of the index (they cause weak matches for queries with no real hit)
 - [x] Playwright e2e basics (`npm run test:e2e`, desktop + mobile, against the production build in workerd): URLs, 404, collapsibles, comments, menu
 - [x] Compare every page with the live site (`npm run compare:live`, after a build; report in `.migration/compare-report.md`): text, links, images, headings, lists, tables, collapsibles, audio and colour highlights. Result 2026-10-01: 33/34 pages identical except typography; the home page lacks the "latest posts" block (needs post dates: comes with the content migration)
-- [ ] **Decision (Arye): typography.** WordPress shows ’ ” “ – where the content has ' " -. Options: match WordPress; proper Hebrew geresh/gershayim (׳ ״) with – dashes (recommended); or keep as typed
+- [x] Typography (decided 2026-10-02: Hebrew): geresh ׳ and gershayim ״ in abbreviations (ו׳, תנ״ך), – for a spaced hyphen; quotation marks stay straight. Applied by the importer (`scripts/content/typography.ts`) to content, titles, SEO, menu and site settings; `compare:live` and the conversion check fold these differences
 
 ## 4. Parity with original
 
-- [ ] Full inventory of mikraot.net pages and features (crawl and compare)
+- [x] Full inventory of mikraot.net (2026-10-02: live sitemaps, WP-CLI on the server, URL probes). All 40 pages and the 1 post exist in the new site; all 4 approved comments are in D1 (the rest of WordPress's comments are spam; Akismet has caught 2,504). Not yet in the new site:
+  - [x] Header banner (cottonbro photo with the page title and breadcrumb trail; site name and tagline on the front page) and sidebar with Archives and Categories (decided 2026-10-02: keep both; headings now in Hebrew). Posts show author, category and date links, as on the live site. The left sidebar (Recent Posts, Recent Comments) is configured but not shown on the live site
+  - [ ] Sidebar newsletter form: waits for the newsletter decision (plugins, below)
+  - [x] Archive pages: month `/2021/08/`, category `/category/חדשות-האתר/`, author `/author/arye_s/` (each lists the one post)
+  - [x] Feeds: `/feed/`, `/comments/feed/` (built by the Worker per request), `/category/חדשות-האתר/feed/`, `/sitemap.rss`; comments keep WordPress's `#comment-<id>` anchors
+  - [x] Old link forms: `/?s=<query>` opens the search with the query; `/?p=<id>` and `/?page_id=<id>` go to the page (in the browser, via `/page-index.json`); `/page/<n>/` → home (301)
+  - [x] BuddyPress pages `/פעילות/` (activity) and `/חברים/` (members, 4 users): 301 to the home page (see plugins)
+  - LearnPress URLs (courses, 119 lessons, 12 quizzes, 159 questions): deferred, see below
+  - Not public content: `/wp-json/`, `/wp-login.php`, `/xmlrpc.php` (gone after cutover; nothing links to them)
 - [ ] Courses, lessons and quizzes (LearnPress): **deferred** (decided 2026-09-30); the new site has no course pages or links until then. Also deferred: the 7 LearnPress system pages (All Courses, Profile, Checkout, Instructor(s), Become A Teacher, Term Conditions). When migrating: lessons/quizzes are course-scoped URLs, and most published course content is the LearnPress demo "Sample course"
 - [x] Comments: Turnstile human check (decided 2026-10-02: Turnstile, comments still published immediately), plus rate limit and honeypot. Built with Cloudflare's test keys
 - [ ] At deploy: `wrangler secret put TURNSTILE_SECRET_KEY` (value in `.env`; widget "mikraot.net comments" created 2026-10-02, site key in `astro.config.mjs`)
 - [ ] Anyone can post under the name "מנהל האתר" (the admin badge itself can't be faked)
-- [ ] Analytics (Cloudflare Web Analytics)
 - [x] Accessibility: axe (WCAG 2.2 AA) passes on every page, desktop + mobile, incl. loaded comments, search dialog, mobile menu (`e2e/accessibility.spec.ts`). Fixed: brand green links/buttons (2.3:1) -> `brand-strong` #5b763e; footer, form hint, breadcrumb and status text
 - [ ] **Decision (Arye): teaching colours vs. contrast.** Orange taught letters #ff6600 (2.9:1), grey context #c3c3c3 (1.8:1) and silent letters #d1cfcf (1.6:1) are below WCAG AA (4.5:1). Options: keep (meaning over contrast; excluded from the audit), or darker shades (e.g. orange #c2410c 5.2:1, grey #767676 4.5:1)
-- [ ] Design differences seen in side-by-side screenshots (2026-10-01): the live site has a photo header banner (site name over the cottonbro image) and a sidebar with Archives, Categories and the newsletter sign-up; the new site has neither
-- [ ] Decide per plugin: Email Subscribers (newsletter + subscriber list), GamiPress (points/badges), BuddyPress (profiles), OptinMonster (popups), Nextend (Facebook login), Google sign-in
-- Not needed: WPForms and TablePress (no forms or tables exist)
+- Plugins: what each does on the live site (checked 2026-10-02) and its replacement
+  - Already replaced: Collapse-O-Matic + Show/Hide (collapse tags), Compact Audio Player (audio tag), Elementor (one page built with it, converted and verified), All in One SEO (frontmatter SEO, sitemap, robots.txt), Akismet (Turnstile + rate limit + honeypot)
+  - Not needed: EmbedPress, TablePress, WPForms (unused in content); OptinMonster (never connected); FileBird (media folders: files are in the repo); WP-Optimize, LiteSpeed (inactive), Bluehost plugin, Endurance cache, SSO (hosting); Wordfence, Loginizer, Jetpack Protect (guard the WordPress login, which goes away)
+  - [ ] **Email Subscribers (newsletter):** 6 confirmed subscribers (16 never confirmed), form in the sidebar, a "new post" notification and 1 newsletter sent. Recommended: own sign-up form → D1 table with double opt-in, emails sent by the Worker (Cloudflare Email Service) from the mikraot.net domain; import the 6 confirmed subscribers. Depends on moving email off Bluehost (DNS). Alternative: a hosted service (e.g. Buttondown, free tier) with its form embedded
+  - [ ] **Jetpack:** stats → Cloudflare Web Analytics (no cookies, no consent banner; CSP must allow it); uptime monitor → Cloudflare health check or a free uptime service; image CDN (Photon) → static images on Cloudflare; related posts (one post: not needed). Jetpack "subscriptions" is also on: check in WordPress.com whether it has subscribers before cutover
+  - [ ] **MonsterInsights (Google Analytics):** replace with Cloudflare Web Analytics (same as Jetpack stats); export any GA history wanted before cutover
+  - [ ] **BuddyPress + GamiPress (+ integrations):** member profiles and activity (4 users, 4 activity entries) and points (none ever awarded): drop; redirect their pages to home. Revisit with courses if learners need accounts and progress
+  - [ ] **Nextend Social Login (Facebook):** only for those accounts: drop now; accounts (e.g. Google sign-in) come with the course migration
+  - LearnPress (+ GamiPress integration): deferred, see above
 
 ## 5. Launch
 

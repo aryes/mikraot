@@ -1,0 +1,27 @@
+---
+/** Posts with date and a short excerpt (the WordPress "latest posts" block and archive pages). */
+import { formatDate } from '../lib/archive';
+import type { SitePage } from '../lib/site';
+import { excerptOf } from '../lib/urls';
+
+interface Props {
+  posts: SitePage[];
+}
+
+const EXCERPT_WORDS = 20;
+const { posts } = Astro.props;
+---
+
+<ul class="latest-posts">
+  {posts.map(({ entry, url }) => (
+    <li>
+      <a href={url} class="latest-posts-title">
+        {entry.data.title}
+      </a>
+      <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
+      <div class="latest-posts-excerpt">
+        {entry.data.excerpt || excerptOf(entry.body ?? '', EXCERPT_WORDS)}
+      </div>
+    </li>
+  ))}
+</ul>

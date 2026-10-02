@@ -1,0 +1,24 @@
+---
+/** The author's archive, /author/<slug>/: every post (the site has one author). */
+import type { GetStaticPaths } from 'astro';
+import PostList from '../../components/PostList.astro';
+import ContentLayout from '../../layouts/ContentLayout.astro';
+import { getPosts, site } from '../../lib/site';
+
+export const getStaticPaths = (async () => [
+  { params: { slug: site.author.slug }, props: { posts: await getPosts() } },
+]) satisfies GetStaticPaths;
+
+const { posts } = Astro.props;
+---
+
+<ContentLayout
+  documentTitle={`${site.author.name} - ${site.title}`}
+  title={`מחבר: ${site.author.name}`}
+  crumbs={[]}
+  noindex
+>
+  <div class="wp-content-rendered">
+    <PostList posts={posts} />
+  </div>
+</ContentLayout>

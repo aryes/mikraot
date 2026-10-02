@@ -1,0 +1,37 @@
+---
+/** A post's byline, as on the live site: author, categories and date, each linking to its archive. */
+import { authorUrl, categoryUrl, formatDate, monthOf } from '../lib/archive';
+import { categoryName, site, type PageEntry } from '../lib/site';
+
+interface Props {
+  entry: PageEntry;
+}
+
+const { date, categories } = Astro.props.entry.data;
+const link = 'text-brand-strong hover:text-brand-deep hover:underline';
+---
+
+<p class="mb-8 flex flex-wrap gap-x-4 gap-y-1 border-b border-slate-100 pb-4 text-sm text-slate-600">
+  <span>
+    מאת{' '}
+    <a href={authorUrl(site.author.slug)} class={link}>
+      {site.author.name}
+    </a>
+  </span>
+  {categories.length > 0 && (
+    <span>
+      בקטגוריה{' '}
+      {categories.map((slug, i) => (
+        <>
+          {i > 0 && ', '}
+          <a href={categoryUrl(slug)} class={link}>
+            {categoryName(slug)}
+          </a>
+        </>
+      ))}
+    </span>
+  )}
+  <a href={monthOf(date).url} class={link}>
+    <time datetime={date.toISOString()}>{formatDate(date)}</time>
+  </a>
+</p>

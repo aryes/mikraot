@@ -12,6 +12,7 @@
 // oxlint-disable import/no-named-as-default-member
 import Markdoc, { type NodeType } from '@markdoc/markdoc';
 import { parseHTML } from 'linkedom';
+import { hebrewTypography } from './typography.ts';
 
 const { Ast } = Markdoc;
 type MdNode = InstanceType<typeof Ast.Node>;
@@ -49,7 +50,7 @@ function text(content: string): MdNode {
   if (content.includes('{%') || content.includes('%}')) {
     throw new UnsupportedContentError(`Text contains Markdoc tag delimiters: ${content}`);
   }
-  return node('text', { content: content.replace(/[\\`[\]<]/g, '\\$&') });
+  return node('text', { content: hebrewTypography(content).replace(/[\\`[\]<]/g, '\\$&') });
 }
 
 const YOUTUBE_ID =

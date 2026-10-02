@@ -6,6 +6,7 @@
 // oxlint-disable import/no-named-as-default-member
 import Markdoc from '@markdoc/markdoc';
 import { parseHTML } from 'linkedom';
+import { plainTypography } from './typography.ts';
 import { colourMark, preprocess } from './wp-to-markdoc.ts';
 
 type Doc = ReturnType<typeof parseHTML>['document'];
@@ -88,7 +89,8 @@ function counts(root: El, side: 'source' | 'markdoc'): Record<string, number> {
   };
 }
 
-const plain = (s: string) => s.replace(/\s/g, '');
+// Typography (geresh, gershayim, dashes) is changed on purpose, so it is compared folded.
+const plain = (s: string) => plainTypography(s).replace(/\s/g, '');
 
 /** Differences between the source HTML and the converted Markdoc; empty when they match. */
 export function verifyConversion(html: string, markdoc: string): string[] {

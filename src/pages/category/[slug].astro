@@ -1,0 +1,32 @@
+---
+/** Category archive, e.g. /category/חדשות-האתר/. */
+import type { GetStaticPaths } from 'astro';
+import PostList from '../../components/PostList.astro';
+import ContentLayout from '../../layouts/ContentLayout.astro';
+import { getPosts, site } from '../../lib/site';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return site.categories
+    .map((category) => ({
+      params: { slug: category.slug },
+      props: {
+        category,
+        posts: posts.filter(({ entry }) => entry.data.categories.includes(category.slug)),
+      },
+    }))
+    .filter(({ props }) => props.posts.length > 0);
+}) satisfies GetStaticPaths;
+
+const { category, posts } = Astro.props;
+---
+
+<ContentLayout
+  documentTitle={`${category.name} - ${site.title}`}
+  title={`קטגוריה: ${category.name}`}
+  crumbs={[]}
+>
+  <div class="wp-content-rendered">
+    <PostList posts={posts} />
+  </div>
+</ContentLayout>

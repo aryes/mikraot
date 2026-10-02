@@ -7,7 +7,8 @@ const COMMENTS_LOADED = { timeout: 15_000 };
 test('front page renders at /', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle(/^מקראות/);
-  await expect(page.locator('h1')).toHaveText('ראשית קריאה בתנ"ך');
+  // As on the live site: the site name is the heading, the tagline under it.
+  await expect(page.locator('h1')).toHaveText('מקראות');
 });
 
 test('hierarchical Hebrew WordPress URLs are served', async ({ page }) => {
@@ -109,7 +110,9 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
   const index = await request.get('/sitemap-index.xml');
   expect(index.status()).toBe(200);
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
-  expect(sitemap.match(/<loc>/g)).toHaveLength(34);
+  // 34 pages and posts, the month and category archives (the author archive is noindex).
+  expect(sitemap.match(/<loc>/g)).toHaveLength(36);
+  expect(sitemap).not.toContain('/author/');
 
   const old = await request.get('/sitemap.xml', { maxRedirects: 0 });
   expect(old.status()).toBe(301);

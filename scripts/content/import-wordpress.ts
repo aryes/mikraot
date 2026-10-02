@@ -10,6 +10,7 @@
  */
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { stringify } from 'yaml';
+import { hebrewTypography } from './typography.ts';
 import { verifyConversion } from './verify-conversion.ts';
 import { wpToMarkdoc } from './wp-to-markdoc.ts';
 
@@ -26,6 +27,8 @@ interface WpPost {
   excerpt: string;
   content: string;
   url: string | null;
+  author: { name: string; slug: string };
+  categories: string[];
 }
 interface WpMenuItem {
   id: number;
@@ -37,6 +40,7 @@ interface WpMenuItem {
 interface WpExport {
   site: { title: string; tagline: string; frontPageId: number };
   posts: WpPost[];
+  categories: { slug: string; name: string }[];
   menus: { name: string; locations: string[]; items: WpMenuItem[] }[];
 }
 
@@ -104,6 +108,9 @@ function israelDay(p: WpPost): string {
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 
+/** Text from WordPress: entities decoded, Hebrew typography applied. */
+const typeset = (text: string) => hebrewTypography(decodeEntities(text));
+
 const failures: string[] = [];
 for (const p of posts) {
   const body = wpToMarkdoc(p.content, { siteLink });
@@ -113,14 +120,16 @@ for (const p of posts) {
   const parent = byId.get(p.parentId);
   const pageSeo = p.status === 'publish' ? seo[sitePath(p)] : undefined;
   const frontmatter = {
-    title: decodeEntities(p.title),
+    title: typeset(p.title),
     wpId: p.id,
     kind: p.type,
     ...(parent && { parent: fileSlug(parent) }),
     order: p.menuOrder,
     date: israelDay(p),
+    ...(p.categories.length > 0 && { categories: p.categories }),
     ...(p.excerpt && { excerpt: p.excerpt }),
     ...(p.status !== 'publish' && { draft: true }),
+    // SEO tags stay exactly as on the live site (search engines already know them).
     ...(pageSeo && { seo: pageSeo }),
   };
   writeFileSync(`${OUT}/${fileSlug(p)}.mdoc`, `---\n${stringify(frontmatter)}---\n\n${body}`);
@@ -135,10 +144,13 @@ writeFileSync(
   'src/data/site.json',
   `${JSON.stringify(
     {
-      title: decodeEntities(data.site.title),
-      tagline: decodeEntities(data.site.tagline),
-      copyright: '© מקראות, קריאה בתורה - הגיה דקדוק וטעמים.',
+      title: typeset(data.site.title),
+      tagline: typeset(data.site.tagline),
+      copyright: '© מקראות, קריאה בתורה – הגיה דקדוק וטעמים.',
       frontPage: fileSlug(frontPage),
+      // The site has one author; posts show this byline and link to the author's archive.
+      author: frontPage.author,
+      categories: data.categories.map(({ slug, name }) => ({ slug, name: typeset(name) })),
     },
     null,
     2,
@@ -162,7 +174,7 @@ writeFileSync(
   `${JSON.stringify(
     menu.items.map((i) => ({
       id: i.id,
-      title: decodeEntities(i.title),
+      title: typeset(i.title),
       url: menuUrl(i.url),
       parentId: i.parentId,
       order: i.order,

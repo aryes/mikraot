@@ -91,6 +91,20 @@ export async function listComments(db: CommentsDb, pageKeys: string[]): Promise<
   return results;
 }
 
+/** The newest approved comments on the whole site, newest first (for the comments feed). */
+export async function listRecentComments(db: CommentsDb, limit: number): Promise<PublicComment[]> {
+  const { results } = await db
+    .prepare(
+      `SELECT ${PUBLIC_COLUMNS} FROM comments
+       WHERE approved = 1
+       ORDER BY created_at DESC, id DESC
+       LIMIT ?`,
+    )
+    .bind(limit)
+    .all<PublicComment>();
+  return results;
+}
+
 /** Stores a comment. New comments are approved immediately, as on the current site. */
 export async function addComment(db: CommentsDb, comment: NewComment): Promise<PublicComment> {
   const saved = await db

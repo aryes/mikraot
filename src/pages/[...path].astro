@@ -2,72 +2,66 @@
 import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import { Comments } from '../components/Comments';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getSitePages, site, type SitePage } from '../lib/site';
+import PostMeta from '../components/PostMeta.astro';
+import ContentLayout from '../layouts/ContentLayout.astro';
+import { categoryUrl } from '../lib/archive';
+import {
+  categoryName,
+  commentKey,
+  commentKeys,
+  getSitePages,
+  parentCrumbs,
+  site,
+  type SitePage,
+} from '../lib/site';
 
-export const getStaticPaths = (async () =>
-  (await getSitePages()).map((page) => ({
+export const getStaticPaths = (async () => {
+  const pages = await getSitePages();
+  return pages.map((page) => ({
     params: { path: page.path || undefined },
-    props: { page },
-  }))) satisfies GetStaticPaths;
+    props: { page, pages },
+  }));
+}) satisfies GetStaticPaths;
 
 interface Props {
   page: SitePage;
+  pages: SitePage[];
 }
 
-const { entry, path } = Astro.props.page;
-const { title, wpId, seo } = entry.data;
+const { page, pages } = Astro.props;
+const { entry, path } = page;
+const { title, seo, kind, categories } = entry.data;
 const { Content } = await render(entry);
-// Old comments are stored under the page path, the WordPress slug (plain or percent-encoded) or ID.
-const commentKeys = [
-  ...new Set(
-    [path, entry.id, encodeURIComponent(entry.id).toLowerCase(), wpId?.toString()].filter(
-      (key): key is string => Boolean(key),
-    ),
-  ),
-];
 const isFrontPage = path === '';
+const isPost = kind === 'post';
+// A post's trail runs through its category, as on WordPress; a page's through its parents.
+const crumbs = isPost
+  ? categories.map((slug) => ({ title: categoryName(slug), url: categoryUrl(slug) })).slice(0, 1)
+  : parentCrumbs(page, pages);
 ---
 
-<BaseLayout
-  title={seo?.title || `${title} - ${site.title}`}
+<ContentLayout
+  documentTitle={seo?.title || `${title} - ${site.title}`}
   description={seo?.description || undefined}
   ogImage={seo?.ogImage || undefined}
+  title={isFrontPage ? site.title : title}
+  subtitle={isFrontPage ? site.tagline : undefined}
+  crumbs={isFrontPage ? undefined : crumbs}
 >
+  {isPost && <PostMeta entry={entry} />}
+
   <!-- data-pagefind-body: only page content is indexed for search (not header, footer, comments). -->
-  <article data-pagefind-body class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-    {!isFrontPage && (
-      <nav
-        class="mb-6 flex items-center gap-2 text-xs font-medium text-slate-600"
-        aria-label="פירורי לחם"
-      >
-        <a href="/" class="hover:text-brand-strong">
-          ראשי
-        </a>
-        <span>/</span>
-        <span class="max-w-xs truncate font-semibold text-slate-800">{title}</span>
-      </nav>
-    )}
+  <div
+    data-pagefind-body
+    data-pagefind-meta={`title:${title}`}
+    class="wp-content-rendered prose prose-slate max-w-none text-right"
+  >
+    <Content />
+  </div>
 
-    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs sm:p-10">
-      <header class="mb-8 border-b border-slate-100 pb-6">
-        <h1
-          data-pagefind-meta="title"
-          class="font-hebrew mb-2 text-3xl leading-tight font-extrabold tracking-tight text-[#334155] sm:text-4xl"
-        >
-          {title}
-        </h1>
-      </header>
-
-      <div class="wp-content-rendered prose prose-slate max-w-none text-right">
-        <Content />
-      </div>
-
-      <div data-pagefind-ignore>
-        <Comments client:visible pageKey={path || entry.id} lookupKeys={commentKeys} />
-      </div>
-    </div>
-  </article>
-</BaseLayout>
+  <div data-pagefind-ignore>
+    <Comments client:visible pageKey={commentKey(page)} lookupKeys={commentKeys(page)} />
+  </div>
+</ContentLayout>
 
 <script src="../scripts/content.ts"></script>

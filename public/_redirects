@@ -1,2 +1,13 @@
 # WordPress (All in One SEO) sitemap URL -> Astro sitemap
 /sitemap.xml /sitemap-index.xml 301
+
+# RSS feeds at their WordPress URLs (built as index.xml files, src/lib/feeds.ts)
+/feed/ /feed/index.xml 200
+/category/:slug/feed/ /category/:slug/feed/index.xml 200
+
+# Front-page pagination (the front page is a static page)
+/page/* / 301
+
+# BuddyPress activity and member pages (plugin dropped, docs/ROADMAP.md)
+/%D7%A4%D7%A2%D7%99%D7%9C%D7%95%D7%AA/* / 301
+/%D7%97%D7%91%D7%A8%D7%99%D7%9D/* / 301

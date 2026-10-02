@@ -11,9 +11,11 @@ interface Props {
   description?: string | undefined;
   /** Site-relative image path for social previews. */
   ogImage?: string | undefined;
+  /** Keep the page out of search engines (as the live site does for the author archive). */
+  noindex?: boolean | undefined;
 }
 
-const { title, description, ogImage } = Astro.props;
+const { title, description, ogImage, noindex } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const icon = (size: number) =>
   `/wp-content/uploads/2021/08/cropped-pexels-cottonbro-5986498-scaled-1-${size}x${size}.jpg`;
@@ -26,8 +28,21 @@ const icon = (size: number) =>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${site.title} - פוסטים`}
+      href="/feed/"
+    />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${site.title} - תגובות`}
+      href="/comments/feed/"
+    />
     <link rel="icon" href={icon(32)} sizes="32x32" />
     <link rel="icon" href={icon(192)} sizes="192x192" />
     <link rel="apple-touch-icon" href={icon(180)} />
@@ -50,5 +65,6 @@ const icon = (size: number) =>
     </main>
     <SiteFooter />
     <SearchDialog />
+    <script src="../scripts/legacy-links.ts"></script>
   </body>
 </html>

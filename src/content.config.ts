@@ -19,6 +19,8 @@ const pages = defineCollection({
     parent: z.string().nullish(),
     order: z.number().int().default(0),
     date: z.coerce.date(),
+    /** Posts only: category slugs (src/data/site.json lists the categories). */
+    categories: z.array(z.string()).default([]),
     // Keystatic writes empty fields as '' or null; both mean "not set".
     excerpt: z.string().nullish(),
     draft: z.boolean().default(false),
