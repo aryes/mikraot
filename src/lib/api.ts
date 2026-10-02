@@ -15,6 +15,13 @@ export async function fetchComments(pageKeys: string[]): Promise<CommentItem[]> 
   }
 }
 
+/** A refused or failed comment post, with the HTTP status. */
+export class CommentError extends Error {
+  constructor(readonly status: number) {
+    super(`Failed to submit comment: ${status}`);
+  }
+}
+
 export async function postComment(comment: {
   page_slug: string;
   author_name: string;
@@ -22,12 +29,14 @@ export async function postComment(comment: {
   content: string;
   /** The hidden anti-spam field; people leave it empty. */
   website: string;
+  /** Proof from the Turnstile widget that a person is posting. */
+  turnstile_token: string;
 }): Promise<CommentItem> {
   const res = await fetch('/api/comments/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(comment),
   });
-  if (!res.ok) throw new Error(`Failed to submit comment: ${res.status}`);
+  if (!res.ok) throw new CommentError(res.status);
   return await res.json();
 }

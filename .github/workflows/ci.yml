@@ -48,6 +48,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      # The Worker's local .dev.vars, with Cloudflare's public always-pass Turnstile test key.
+      - run: echo 'TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA' > .dev.vars
       # Builds the site, resets the local D1 to the fixture data, and serves it in workerd.
       - run: npm run test:e2e
       - name: Deploy dry run (bundles the Worker, uploads nothing)

@@ -20,7 +20,7 @@ test('security headers are sent', async ({ page }) => {
   expect(headers['permissions-policy']).toContain('camera=()');
   await expect(page.locator('meta[http-equiv="content-security-policy"]')).toHaveAttribute(
     'content',
-    /script-src 'self' 'wasm-unsafe-eval' 'sha256-/,
+    /script-src 'self' 'wasm-unsafe-eval' https:\/\/challenges\.cloudflare\.com 'sha256-/,
   );
 });
 
@@ -55,7 +55,7 @@ test('search (WebAssembly) and the video popup work under the CSP', async ({ pag
   expect(violations).toEqual([]);
 });
 
-test('the comments API refuses junk: unknown pages, bots, oversized bodies', async ({
+test('the comments API refuses junk: unknown pages, bots, oversized bodies, no human check', async ({
   request,
 }) => {
   const post = (data: unknown) => request.post('/api/comments/', { data });
@@ -63,6 +63,7 @@ test('the comments API refuses junk: unknown pages, bots, oversized bodies', asy
   expect((await post({ ...comment, page_slug: 'no/such/page' })).status()).toBe(400);
   expect((await post({ ...comment, website: 'https://spam.example' })).status()).toBe(400);
   expect((await post({ ...comment, content: 'x'.repeat(40_000) })).status()).toBe(413);
+  expect((await post(comment)).status()).toBe(403); // no Turnstile token
   const response = await request.get('/api/comments/?page_slug=x');
   expect(response.headers()['x-content-type-options']).toBe('nosniff');
 });

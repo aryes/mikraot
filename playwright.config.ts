@@ -25,5 +25,7 @@ export default defineConfig({
     url: `http://localhost:${port}/`,
     reuseExistingServer: !process.env['CI'],
     timeout: 180_000,
+    // Cloudflare's always-pass Turnstile test key (.dev.vars has the matching test secret).
+    env: { PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA' },
   },
 });

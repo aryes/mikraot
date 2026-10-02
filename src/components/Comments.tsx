@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { fetchComments, postComment, type CommentItem } from '../lib/api';
+import { CommentError, fetchComments, postComment, type CommentItem } from '../lib/api';
+import { Turnstile } from './Turnstile';
 import { MessageSquare, Send, CheckCircle2, User, ShieldCheck } from 'lucide-react';
 
 interface CommentsProps {
@@ -24,6 +25,9 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  // Changing the key remounts the Turnstile widget for a fresh token (each works once).
+  const [turnstileKey, setTurnstileKey] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
 
   const slugKey = lookupKeys.join(',');
@@ -42,7 +46,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!authorName.trim() || !content.trim()) return;
+    if (!authorName.trim() || !content.trim() || !turnstileToken) return;
 
     const website = new FormData(e.currentTarget).get('website');
     setSubmitting(true);
@@ -55,6 +59,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
         author_email: authorEmail.trim() || undefined,
         content: content.trim(),
         website: typeof website === 'string' ? website : '',
+        turnstile_token: turnstileToken,
       });
 
       if (saved.id) {
@@ -66,9 +71,18 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
       setTimeout(() => setSubmitted(false), 5000);
     } catch (err) {
       console.error('Failed to submit comment:', err);
-      setErrorMessage('אירעה שגיאה בשליחת התגובה. אנא נסו שוב.');
+      const status = err instanceof CommentError ? err.status : 0;
+      setErrorMessage(
+        status === 403
+          ? 'בדיקת האבטחה נכשלה. אנא נסו שוב.'
+          : status === 429
+            ? 'נשלחו תגובות רבות מדי. אנא נסו שוב בעוד דקה.'
+            : 'אירעה שגיאה בשליחת התגובה. אנא נסו שוב.',
+      );
     } finally {
       setSubmitting(false);
+      setTurnstileToken('');
+      setTurnstileKey((key) => key + 1);
     }
   };
 
@@ -200,10 +214,11 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
             />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <Turnstile key={turnstileKey} onToken={setTurnstileToken} />
             <button
               type="submit"
-              disabled={submitting || !authorName.trim() || !content.trim()}
+              disabled={submitting || !authorName.trim() || !content.trim() || !turnstileToken}
               className="bg-brand-strong hover:bg-brand-deep inline-flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-xs transition-all disabled:opacity-50"
             >
               <Send className="h-4 w-4" />

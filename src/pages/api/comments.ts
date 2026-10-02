@@ -7,6 +7,7 @@ import {
   parseNewComment,
   parsePageKeys,
 } from '../../server/comments';
+import { tokenFrom, verifyTurnstile } from '../../server/turnstile';
 
 // Runs in the Worker on each request (the rest of the site is static).
 export const prerender = false;
@@ -59,6 +60,11 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
   try {
     if (!(await getCommentPages(url.origin)).has(comment.page_slug)) {
       return json({ error: 'Unknown page' }, 400);
+    }
+    const turnstileKey = env.TURNSTILE_SECRET_KEY;
+    if (!turnstileKey) throw new Error('TURNSTILE_SECRET_KEY is not set');
+    if (!(await verifyTurnstile(turnstileKey, tokenFrom(body), clientAddress))) {
+      return json({ error: 'Human check failed' }, 403);
     }
     // Counted only for comments that would be saved, so rejected junk doesn't use up the quota.
     const { success } = await env.COMMENT_RATE_LIMIT.limit({ key: clientAddress });

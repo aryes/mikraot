@@ -55,7 +55,9 @@
 
 - [ ] Full inventory of mikraot.net pages and features (crawl and compare)
 - [ ] Courses, lessons and quizzes (LearnPress): **deferred** (decided 2026-09-30); the new site has no course pages or links until then. Also deferred: the 7 LearnPress system pages (All Courses, Profile, Checkout, Instructor(s), Become A Teacher, Term Conditions). When migrating: lessons/quizzes are course-scoped URLs, and most published course content is the LearnPress demo "Sample course"
-- [ ] Comments: moderation and/or Turnstile (Arye: comments are still published immediately; rate limit and honeypot done). Also: anyone can post under the name "מנהל האתר" (the admin badge itself can't be faked)
+- [x] Comments: Turnstile human check (decided 2026-10-02: Turnstile, comments still published immediately), plus rate limit and honeypot. Built with Cloudflare's test keys
+- [ ] At deploy: `wrangler secret put TURNSTILE_SECRET_KEY` (value in `.env`; widget "mikraot.net comments" created 2026-10-02, site key in `astro.config.mjs`)
+- [ ] Anyone can post under the name "מנהל האתר" (the admin badge itself can't be faked)
 - [ ] Analytics (Cloudflare Web Analytics)
 - [x] Accessibility: axe (WCAG 2.2 AA) passes on every page, desktop + mobile, incl. loaded comments, search dialog, mobile menu (`e2e/accessibility.spec.ts`). Fixed: brand green links/buttons (2.3:1) -> `brand-strong` #5b763e; footer, form hint, breadcrumb and status text
 - [ ] **Decision (Arye): teaching colours vs. contrast.** Orange taught letters #ff6600 (2.9:1), grey context #c3c3c3 (1.8:1) and silent letters #d1cfcf (1.6:1) are below WCAG AA (4.5:1). Options: keep (meaning over contrast; excluded from the audit), or darker shades (e.g. orange #c2410c 5.2:1, grey #767676 4.5:1)
