@@ -67,22 +67,34 @@
 - [ ] Anyone can post under the name "מנהל האתר" (the admin badge itself can't be faked)
 - [x] Accessibility: axe (WCAG 2.2 AA) passes on every page, desktop + mobile, incl. loaded comments, search dialog, mobile menu (`e2e/accessibility.spec.ts`). Fixed: brand green links/buttons (2.3:1) -> `brand-strong` #5b763e; footer, form hint, breadcrumb and status text
 - [ ] **Decision (Arye): teaching colours vs. contrast.** Orange taught letters #ff6600 (2.9:1), grey context #c3c3c3 (1.8:1) and silent letters #d1cfcf (1.6:1) are below WCAG AA (4.5:1). Options: keep (meaning over contrast; excluded from the audit), or darker shades (e.g. orange #c2410c 5.2:1, grey #767676 4.5:1)
-- Plugins: what each does on the live site (checked 2026-10-02) and its replacement
-  - Already replaced: Collapse-O-Matic + Show/Hide (collapse tags), Compact Audio Player (audio tag), Elementor (one page built with it, converted and verified), All in One SEO (frontmatter SEO, sitemap, robots.txt), Akismet (Turnstile + rate limit + honeypot)
-  - Not needed: EmbedPress, TablePress, WPForms (unused in content); OptinMonster (never connected); FileBird (media folders: files are in the repo); WP-Optimize, LiteSpeed (inactive), Bluehost plugin, Endurance cache, SSO (hosting); Wordfence, Loginizer, Jetpack Protect (guard the WordPress login, which goes away)
-  - [ ] **Email Subscribers (newsletter):** 6 confirmed subscribers (16 never confirmed), form in the sidebar, a "new post" notification and 1 newsletter sent. Recommended: own sign-up form → D1 table with double opt-in, emails sent by the Worker (Cloudflare Email Service) from the mikraot.net domain; import the 6 confirmed subscribers. Depends on moving email off Bluehost (DNS). Alternative: a hosted service (e.g. Buttondown, free tier) with its form embedded
-  - [ ] **Jetpack:** stats → Cloudflare Web Analytics (no cookies, no consent banner; CSP must allow it); uptime monitor → Cloudflare health check or a free uptime service; image CDN (Photon) → static images on Cloudflare; related posts (one post: not needed). Jetpack "subscriptions" is also on: check in WordPress.com whether it has subscribers before cutover
-  - [ ] **MonsterInsights (Google Analytics):** replace with Cloudflare Web Analytics (same as Jetpack stats); export any GA history wanted before cutover
-  - [ ] **BuddyPress + GamiPress (+ integrations):** member profiles and activity (4 users, 4 activity entries) and points (none ever awarded): drop; redirect their pages to home. Revisit with courses if learners need accounts and progress
-  - [ ] **Nextend Social Login (Facebook):** only for those accounts: drop now; accounts (e.g. Google sign-in) come with the course migration
+- Plugins: every feature of every active plugin, with its replacement, is in `docs/PLUGINS.md` (checked 2026-10-03). Open items:
+  - [ ] **Periodic link check** (replaces Broken Link Checker; links can break after they are added): every internal link and `#anchor` checked on each build (CI fails), and a scheduled weekly check of all external links (YouTube, outside sites) that reports broken ones to Arye by email or a GitHub issue. Until GitHub exists: `npm run check:links` run locally
+  - [ ] **Email from the Worker** (needed by the next three): a way to send mail from mikraot.net (Cloudflare Email Service or Email Routing's send binding), with SPF/DKIM so it isn't spam
+  - [ ] Email to Arye on every new comment (WordPress did this)
+  - [ ] Reply to a specific comment (threaded replies, as on WordPress), and email the commenter when someone replies (Jetpack "notify me of follow-up comments")
+  - [ ] Remember the commenter's name and email in the browser (opt-in checkbox, as on WordPress)
+  - [ ] Comment moderation page behind Cloudflare Access (approve, delete, edit, reply as admin)
+  - [ ] Structured data (JSON-LD: WebSite, WebPage, BreadcrumbList, BlogPosting, Person) and Twitter title/description, as All in One SEO output
+  - [ ] Previous/next post links and related posts (same category) under posts
+  - [ ] Uptime monitor with email alerts (replaces Jetpack Monitor)
+  - [ ] Renovate for dependency updates (replaces WordPress auto-updates); preview URL per change (replaces staging)
+  - [ ] 2FA and login alerts on GitHub, Cloudflare and GoDaddy (replaces Wordfence 2FA and login alerts)
+  - [ ] Minor: images in the sitemap, `loading="lazy"` on content images
+  - [ ] Before cutover: check WordPress.com for Jetpack subscribers; export Google Analytics history if wanted; when finishing the draft "משמעות הטעמים", take its content from Elementor's data (the page text is incomplete)
+  - [ ] **Decisions (Arye):** newsletter (own form + Cloudflare email, recommended, or a hosted service; must cover double opt-in, welcome mail, new-post mail, unsubscribe, admin notice); statistics (Cloudflare Web Analytics recommended; optional click events and a monthly summary); accounts (BuddyPress, GamiPress, Facebook login: drop now, the live register page is already broken)
   - LearnPress (+ GamiPress integration): deferred, see above
 
 ## 5. Launch
 
-- [ ] GitHub + CI deploys (browser editing via Keystatic becomes available)
-- [ ] **Move email off Bluehost** (`admin@mikraot.net` + 1 forwarder; MX `mail.mikraot.net`), e.g. Cloudflare Email Routing, before any decommission
-- [ ] Cutover plan with rollback
-- [ ] Decommission WordPress/Bluehost only after sign-off
+Order (decided 2026-10-03): one change at a time; the site first, email last, Bluehost cancelled only after both.
+Hosting after the move: Cloudflare (one Worker: pages, media, comments API, D1); free plan expected. The domain is registered at GoDaddy (renews by 2027-08-10) with DNS already on Cloudflare.
+
+1. - [ ] Rewrite the privacy policy (it describes the WordPress plugins and cookies that go away)
+2. - [ ] GitHub + CI deploys (browser editing via Keystatic becomes available)
+3. - [ ] Cutover plan with rollback, then switch the site to the new Worker (approval needed). WordPress stays on Bluehost untouched as the fallback
+4. - [ ] Retire WordPress after a few stable weeks (sign-off needed; full backup first)
+5. - [ ] **Move email off Bluehost**, e.g. Cloudflare Email Routing. Today (checked 2026-10-03): MX `mail.mikraot.net` = the Bluehost web server; `admin@` is a mailbox there and also forwards to an outside address; SPF `v=spf1 a mx include:websitewelcome.com ~all`, DKIM `default._domainkey`, no DMARC. Before switching: save the mailbox if wanted, and if WordPress still sends mail, put Bluehost's server explicitly in SPF (its `mx` entry stops covering it once MX moves). Rollback: restore the MX record. Then add DMARC
+6. - [ ] Cancel Bluehost only after sign-off (final backup of files, database and mailbox kept off the server)
 
 ## Known issues (current app)
 
