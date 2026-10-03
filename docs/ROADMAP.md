@@ -21,7 +21,8 @@
 - [x] Delete Supabase API keys and reset its DB password
 - [x] Security headers: CSP (Astro, hashed inline scripts), HSTS, nosniff, frame-ancestors, Referrer-Policy, Permissions-Policy, COOP (`public/_headers`); `e2e/security.spec.ts` checks every feature works with no violations
 - [x] Security review of the new build (local, 2026-10-02): no exposed files or source maps, CSRF blocked (Astro origin check), SQL parameterized, comments rendered as text. Fixed: comments for nonexistent pages, no rate limit (now 5/min per IP), no bot trap (honeypot field), unbounded body size, API responses without nosniff
-- [ ] Decide Supabase's fate together with the Google sign-in decision (checked 2026-09-30: its only data, 4 comments, is identical in D1)
+- [x] Supabase's fate (decided 2026-10-03): not needed. Logins use Better Auth in our own Worker and D1; its only data (4 comments) is already in D1
+- [ ] Delete the Supabase project (after a final export; approval needed)
 
 ## 2. Foundations
 
@@ -54,7 +55,7 @@
 
 - [x] Full inventory of mikraot.net (2026-10-02: live sitemaps, WP-CLI on the server, URL probes). All 40 pages and the 1 post exist in the new site; all 4 approved comments are in D1 (the rest of WordPress's comments are spam; Akismet has caught 2,504). Not yet in the new site:
   - [x] Header banner (cottonbro photo with the page title and breadcrumb trail; site name and tagline on the front page) and sidebar with Archives and Categories (decided 2026-10-02: keep both; headings now in Hebrew). Posts show author, category and date links, as on the live site. The left sidebar (Recent Posts, Recent Comments) is configured but not shown on the live site
-  - [ ] Sidebar newsletter form: waits for the newsletter decision (plugins, below)
+  - [ ] Sidebar newsletter form: Brevo's sign-up form (see the newsletter tasks below)
   - [x] Archive pages: month `/2021/08/`, category `/category/חדשות-האתר/`, author `/author/arye_s/` (each lists the one post)
   - [x] Feeds: `/feed/`, `/comments/feed/` (built by the Worker per request), `/category/חדשות-האתר/feed/`, `/sitemap.rss`; comments keep WordPress's `#comment-<id>` anchors
   - [x] Old link forms: `/?s=<query>` opens the search with the query; `/?p=<id>` and `/?page_id=<id>` go to the page (in the browser, via `/page-index.json`); `/page/<n>/` → home (301)
@@ -62,6 +63,11 @@
   - LearnPress URLs (courses, 119 lessons, 12 quizzes, 159 questions): deferred, see below
   - Not public content: `/wp-json/`, `/wp-login.php`, `/xmlrpc.php` (gone after cutover; nothing links to them)
 - [ ] Courses, lessons and quizzes (LearnPress): **deferred** (decided 2026-09-30); the new site has no course pages or links until then. Also deferred: the 7 LearnPress system pages (All Courses, Profile, Checkout, Instructor(s), Become A Teacher, Term Conditions). When migrating: lessons/quizzes are course-scoped URLs, and most published course content is the LearnPress demo "Sample course"
+- [x] **Learner accounts for the courses** (decided 2026-10-03): individual learning, no teacher groups. **Hybrid:** learning starts at once with no account, progress and quiz results kept in the browser; optional sign-in copies them to an account and syncs across devices
+  - Login tool: **Better Auth** (open-source library, runs in our Worker, accounts in D1, our own Hebrew RTL screens, free at any size). Chosen over hosted Supabase Auth and Clerk (user data with a third party)
+  - Sign-in methods at launch, all free: **email link** (no password; sent via Brevo), **Google**, **Facebook**, **Microsoft**, **passkeys**. Apple later if wanted (Apple Developer Program, $99/year); no SMS (paid per message)
+  - [ ] Arye: create the provider apps/keys (Google Cloud OAuth client, Meta for Developers app, Microsoft Entra app registration), keys into `.env` / Worker secrets; Claude guides each
+  - [ ] Privacy policy: what an account stores (email, name, progress), how to delete it; account deletion in the profile
 - [x] Comments: Turnstile human check (decided 2026-10-02: Turnstile, comments still published immediately), plus rate limit and honeypot. Built with Cloudflare's test keys
 - [ ] At deploy: `wrangler secret put TURNSTILE_SECRET_KEY` (value in `.env`; widget "mikraot.net comments" created 2026-10-02, site key in `astro.config.mjs`)
 - [ ] Anyone can post under the name "מנהל האתר" (the admin badge itself can't be faked)
@@ -81,7 +87,18 @@
   - [ ] 2FA and login alerts on GitHub, Cloudflare and GoDaddy (replaces Wordfence 2FA and login alerts)
   - [ ] Minor: images in the sitemap, `loading="lazy"` on content images
   - [ ] Before cutover: check WordPress.com for Jetpack subscribers; export Google Analytics history if wanted; when finishing the draft "משמעות הטעמים", take its content from Elementor's data (the page text is incomplete)
-  - [ ] **Decisions (Arye):** newsletter (own form + Cloudflare email, recommended, or a hosted service; must cover double opt-in, welcome mail, new-post mail, unsubscribe, admin notice); statistics (Cloudflare Web Analytics recommended; optional click events and a monthly summary); accounts (BuddyPress, GamiPress, Facebook login: drop now, the live register page is already broken)
+  - [x] **Newsletter: Brevo** (decided 2026-10-03; ready-made service, free plan: unlimited contacts, 300 emails/day, RSS campaigns, double opt-in, unsubscribe, open/click reports, EU company). Chosen over MailerLite (free plan cut to 250 subscribers) and building our own (Cloudflare email sending needs the paid Workers plan)
+  - [ ] Arye: create the Brevo account and an API key (into `.env`); Claude configures the rest via the API where possible
+  - [ ] "Announce" checkbox (with a one-line note) on every page and post in Keystatic → a "What's new" page and a "What's new" RSS feed
+  - [ ] Brevo RSS campaign on that feed: weekly digest, only when there is something new; Hebrew right-to-left template; sender "מקראות"
+  - [ ] Brevo sign-up form in the sidebar (CSP allowance for it), double opt-in and welcome email; Arye notified of new subscribers; block `mail.ru` as today
+  - [ ] Import the 6 confirmed Email Subscribers contacts (and any Jetpack subscribers found on WordPress.com); the 16 unconfirmed are not imported
+  - [ ] Privacy policy: name Brevo as the newsletter processor; reports as totals
+  - [x] **Statistics: Cloudflare Web Analytics** (decided 2026-10-03): free, no cookies, no consent banner (the live site loads Google Analytics with no consent banner at all). Covers visits, page views, referrers, countries, devices, page speed; no custom events (recordings played, exercises solved): if those are wanted later, Umami Cloud's free plan is the ready-made option
+  - [ ] Set up Web Analytics for the new site at cutover with the manual beacon (not automatic injection, which would also change the live WordPress pages and doesn't fit the CSP); allow `static.cloudflareinsights.com` (script) and `cloudflareinsights.com` (connect) in the CSP
+  - [ ] Google Search Console for mikraot.net (verified by DNS; no script): search queries and indexing problems
+  - [ ] Before cutover: export the Google Analytics history if wanted, then remove GA with WordPress
+  - [x] **Accounts** (decided 2026-10-03): the old WordPress accounts are not carried over (Arye's admin account, 2 spam sign-ups with no role, 1 Facebook subscriber inactive since January 2025); BuddyPress profiles/activity, GamiPress points and the Nextend Facebook login are dropped. New accounts come with the courses (below)
   - LearnPress (+ GamiPress integration): deferred, see above
 
 ## 5. Launch

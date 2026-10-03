@@ -9,24 +9,24 @@ Status: ✅ in the new site · ⬜ to do (task in `docs/ROADMAP.md`) · ❓ need
 
 ## Comments (WordPress core, Akismet, Jetpack)
 
-| Feature                                                              | Live                       | New site                                                                         |
-| -------------------------------------------------------------------- | -------------------------- | -------------------------------------------------------------------------------- |
-| Comment form: name and email required, comment published immediately | yes                        | ✅                                                                               |
-| Website (URL) field                                                  | yes                        | ➖ dropped: mostly used by spammers                                              |
-| Spam filtering (Akismet: 2,504 caught)                               | yes                        | ✅ Turnstile, rate limit, honeypot                                               |
-| **Email to Arye on every new comment** (core `comments_notify`)      | yes                        | ⬜ needs email sending from the Worker                                           |
-| **Replies to a specific comment** (threaded, 5 levels)               | yes (1 admin reply so far) | ⬜ new site shows a flat list with an admin badge; no "reply" button             |
-| "Remember my name and email" checkbox (cookie)                       | yes                        | ⬜ remember in the browser (localStorage), opt-in                                |
-| "Notify me of follow-up comments by email" (Jetpack)                 | yes, on posts              | ⬜ reply notifications (needs email sending)                                     |
-| "Notify me of new posts by email" (Jetpack Subscriptions)            | yes, on posts              | ❓ part of the newsletter decision; check WordPress.com for existing subscribers |
-| Gravatar avatars                                                     | yes                        | ➖ replaced by plain icons (no third-party requests, better privacy)             |
-| Pingbacks / trackbacks                                               | open, none ever received   | ➖                                                                               |
-| Old comment links `#comment-<id>`                                    | yes                        | ✅                                                                               |
-| Moderation (approve, delete, edit, reply as admin)                   | WordPress admin            | ⬜ moderation page behind Cloudflare Access (today: database commands only)      |
+| Feature                                                              | Live                       | New site                                                                    |
+| -------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------- |
+| Comment form: name and email required, comment published immediately | yes                        | ✅                                                                          |
+| Website (URL) field                                                  | yes                        | ➖ dropped: mostly used by spammers                                         |
+| Spam filtering (Akismet: 2,504 caught)                               | yes                        | ✅ Turnstile, rate limit, honeypot                                          |
+| **Email to Arye on every new comment** (core `comments_notify`)      | yes                        | ⬜ needs email sending from the Worker                                      |
+| **Replies to a specific comment** (threaded, 5 levels)               | yes (1 admin reply so far) | ⬜ new site shows a flat list with an admin badge; no "reply" button        |
+| "Remember my name and email" checkbox (cookie)                       | yes                        | ⬜ remember in the browser (localStorage), opt-in                           |
+| "Notify me of follow-up comments by email" (Jetpack)                 | yes, on posts              | ⬜ reply notifications (needs email sending)                                |
+| "Notify me of new posts by email" (Jetpack Subscriptions)            | yes, on posts              | ⬜ Brevo newsletter; check WordPress.com for existing subscribers           |
+| Gravatar avatars                                                     | yes                        | ➖ replaced by plain icons (no third-party requests, better privacy)        |
+| Pingbacks / trackbacks                                               | open, none ever received   | ➖                                                                          |
+| Old comment links `#comment-<id>`                                    | yes                        | ✅                                                                          |
+| Moderation (approve, delete, edit, reply as admin)                   | WordPress admin            | ⬜ moderation page behind Cloudflare Access (today: database commands only) |
 
-## Newsletter (Email Subscribers, Jetpack Subscriptions) ❓
+## Newsletter (Email Subscribers, Jetpack Subscriptions)
 
-Decision pending (own form + Cloudflare email recommended). Whatever is chosen must cover:
+Decided 2026-10-03: **Brevo** (tasks in `docs/ROADMAP.md`). It must cover:
 
 | Feature                                                                               | Live                       |
 | ------------------------------------------------------------------------------------- | -------------------------- |
@@ -60,16 +60,18 @@ Decision pending (own form + Cloudflare email recommended). Whatever is chosen m
 | Search-engine verification codes                                                     | none set         | ➖ (Search Console via DNS when set up)             |
 | Redirects module                                                                     | not used         | ➖ (`public/_redirects` when needed)                |
 
-## Statistics and monitoring (MonsterInsights, Jetpack Stats, Jetpack Monitor) ❓
+## Statistics and monitoring (MonsterInsights, Jetpack Stats, Jetpack Monitor)
 
-| Feature                                                   | Live                 | New site                                              |
-| --------------------------------------------------------- | -------------------- | ----------------------------------------------------- |
-| Page views, visitors, referrers, countries                | GA4 + Jetpack Stats  | ❓ Cloudflare Web Analytics (cookie-free) recommended |
-| Demographics (age, gender)                                | on (GA)              | ➖ needs Google's ad tracking and a consent banner    |
-| Outbound-link and file-download clicks                    | on (GA events)       | ⬜ optional: own events via Workers Analytics Engine  |
-| Email summaries of statistics                             | on (MonsterInsights) | ⬜ optional: monthly summary email                    |
-| Historical GA data                                        | yes                  | ❓ export before cutover if wanted                    |
-| **Uptime monitoring with email alerts** (Jetpack Monitor) | on                   | ⬜ free uptime check with email                       |
+Decided 2026-10-03: **Cloudflare Web Analytics** (cookie-free; tasks in `docs/ROADMAP.md`).
+
+| Feature                                                   | Live                 | New site                                             |
+| --------------------------------------------------------- | -------------------- | ---------------------------------------------------- |
+| Page views, visitors, referrers, countries                | GA4 + Jetpack Stats  | ⬜ Cloudflare Web Analytics (at cutover)             |
+| Demographics (age, gender)                                | on (GA)              | ➖ needs Google's ad tracking and a consent banner   |
+| Outbound-link and file-download clicks                    | on (GA events)       | ⬜ optional: own events via Workers Analytics Engine |
+| Email summaries of statistics                             | on (MonsterInsights) | ⬜ optional: monthly summary email                   |
+| Historical GA data                                        | yes                  | ❓ export before cutover if wanted                   |
+| **Uptime monitoring with email alerts** (Jetpack Monitor) | on                   | ⬜ free uptime check with email                      |
 
 ## Content display (Collapse-O-Matic, Show/Hide, Compact Audio Player, Elementor, EmbedPress, TablePress)
 
@@ -98,14 +100,16 @@ Decision pending (own form + Cloudflare email recommended). Whatever is chosen m
 | **Related posts** ("קשור", Jetpack)                  | yes, on posts         | ⬜ same-category posts (useful once there are more posts) |
 | Sharing buttons (Jetpack)                            | configured, not shown | ➖                                                        |
 
-## Accounts (WordPress registration, BuddyPress, GamiPress, Nextend Social Login) ❓
+## Accounts (WordPress registration, BuddyPress, GamiPress, Nextend Social Login)
 
-| Feature                                                       | Live                                                                | New site                                             |
-| ------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------- |
-| Registration and login links                                  | shown, but the BuddyPress register page is **404 on the live site** | ❓ drop now; accounts come with the courses          |
-| Member profiles, activity stream, notifications, settings     | 4 users, 4 activity entries                                         | ❓ drop; `/חברים/`, `/פעילות/` already redirect home |
-| Points "נעימה" (GamiPress, + YouTube/LearnPress integrations) | configured, no points ever awarded                                  | ❓ drop                                              |
-| Facebook login (Nextend)                                      | 2 accounts linked                                                   | ❓ drop                                              |
+Decided 2026-10-03: old accounts and these plugins are dropped; learner accounts come with the courses (hybrid: optional sign-in via Better Auth with email link, Google, Facebook, Microsoft, passkeys). Details in `docs/ROADMAP.md`.
+
+| Feature                                                       | Live                                                                | New site                                                    |
+| ------------------------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Registration and login links                                  | shown, but the BuddyPress register page is **404 on the live site** | ➖ dropped; optional learner sign-in comes with the courses |
+| Member profiles, activity stream, notifications, settings     | 4 users, 4 activity entries                                         | ➖ dropped; `/חברים/`, `/פעילות/` redirect home             |
+| Points "נעימה" (GamiPress, + YouTube/LearnPress integrations) | configured, no points ever awarded                                  | ➖ dropped                                                  |
+| Facebook login (Nextend)                                      | 2 accounts linked                                                   | ➖ dropped                                                  |
 
 ## Security (Wordfence, Loginizer, Jetpack Protect / Account protection)
 

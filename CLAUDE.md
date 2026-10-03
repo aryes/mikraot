@@ -14,7 +14,8 @@ The plan and known issues are in `docs/ROADMAP.md`.
 5. **No GitHub until the repo is safe:** no secrets in files or git history, secret scanning in place.
 6. Claude acts as web developer, security expert and UX advisor — raise concerns proactively.
 7. Maintainable, high-quality code: strict TypeScript, lint/format, tests, current stable packages, small focused modules, no dead code.
-8. Ask before anything irreversible or public-facing: DNS/cutover, deleting WordPress data or backups, deleting D1 data, billing. Always back up before destructive server/DB operations.
+8. **Prefer ready-made standard solutions** (hosted services, maintained libraries, platform features) over writing a feature ourselves; custom code only with a stated reason. Prefer free options (for now).
+9. Ask before anything irreversible or public-facing: DNS/cutover, deleting WordPress data or backups, deleting D1 data, billing. Always back up before destructive server/DB operations.
 
 ## Secrets policy
 
