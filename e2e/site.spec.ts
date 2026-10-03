@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 // Comments load lazily (island script on scroll) and then call a Worker endpoint that may start
 // cold, which can exceed the default 5s under parallel test load.
@@ -157,16 +157,51 @@ test('the home page lists the latest posts, as on WordPress', async ({ page }) =
 test('fonts are self-hosted and load (no third-party font requests)', async ({ page }) => {
   const external: string[] = [];
   page.on('request', (req) => {
-    if (/fonts\.(googleapis|gstatic)\.com/.test(req.url())) external.push(req.url());
+    if (/fonts.(googleapis|gstatic).com/.test(req.url())) external.push(req.url());
   });
   await page.goto('/שווא-נע/');
   await page.evaluate(() => document.fonts.ready);
   const loaded = await page.evaluate(() => ({
-    body: document.fonts.check('16px "Assistant Variable"', 'שווא'),
-    heading: document.fonts.check('16px "Frank Ruhl Libre Variable"', 'שווא'),
+    body: document.fonts.check('16px "Noto Sans Hebrew Variable"', 'שווא'),
+    heading: document.fonts.check('16px "Noto Serif Hebrew Variable"', 'שווא'),
   }));
   expect(loaded).toEqual({ body: true, heading: true });
   expect(external).toEqual([]);
+});
+
+/** Font families Chrome actually used to draw the matched elements (including fallbacks). */
+async function renderedFonts(page: Page, path: string, selector: string): Promise<string[]> {
+  await page.goto(path);
+  await page.evaluate(() => document.fonts.ready);
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('DOM.enable');
+  await cdp.send('CSS.enable');
+  const { root } = await cdp.send('DOM.getDocument', { depth: -1 });
+  const { nodeIds } = await cdp.send('DOM.querySelectorAll', { nodeId: root.nodeId, selector });
+  const perNode = await Promise.all(
+    nodeIds.map(
+      async (nodeId) => (await cdp.send('CSS.getPlatformFontsForNode', { nodeId })).fonts,
+    ),
+  );
+  return [...new Set(perNode.flat().map((font) => font.familyName))];
+}
+
+/** Families other than the site's own fonts (Noto Hebrew for the interface, Taamey D for lessons). */
+const notNoto = (families: string[]) =>
+  families.filter((f) => !f.startsWith('Noto ') && f !== 'Taamey D');
+
+test('text with cantillation marks renders in the site fonts only (no system fallback)', async ({
+  page,
+  browserName,
+}) => {
+  test.skip(browserName !== 'chromium', 'uses the Chrome DevTools protocol');
+  // The rarest marks in the content (קרני פרה, ירח בן יומו…) are on this page.
+  const content = '.wp-content-rendered p, .wp-content-rendered li, h1';
+  const lesson = await renderedFonts(page, '/טעמים-נדירים/', content);
+  expect(lesson).toContain('Taamey D');
+  expect(notNoto(lesson)).toEqual([]);
+  // A post title with niqqud and a טעם, in an archive list.
+  expect(notNoto(await renderedFonts(page, '/2021/08/', '.latest-posts a'))).toEqual([]);
 });
 
 test('search finds pages by keyword (Ctrl+K), ignoring niqqud', async ({ page }) => {

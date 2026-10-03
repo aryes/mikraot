@@ -53,5 +53,10 @@ export default defineConfig({
     // The author archive is noindex, as on the live site.
     sitemap({ filter: (page) => !page.includes('/author/') }),
   ],
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    plugins: [tailwindcss()],
+    // Vite inlines small files as data: URLs; fonts must stay files, since the CSP allows only
+    // font-src 'self' (Noto's tiny Cyrillic/Greek subsets were being inlined).
+    build: { assetsInlineLimit: (file) => (file.endsWith('.woff2') ? false : undefined) },
+  },
 });

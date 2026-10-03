@@ -3,6 +3,7 @@ import { ArrowUp, BookOpen } from 'lucide-react';
 import { menuTree, site } from '../lib/site';
 
 const quickLinks = menuTree.slice(0, 6);
+import Pointed from './Pointed.astro';
 ---
 
 <footer class="mt-20 border-t border-slate-800 bg-[#1E2C35] text-[#BBBBBB]">
@@ -32,7 +33,7 @@ const quickLinks = menuTree.slice(0, 6);
           {quickLinks.map((item) => (
             <li>
               <a href={item.url ?? undefined} class="transition-colors hover:text-brand-strong">
-                {item.title}
+                <Pointed text={item.title} />
               </a>
             </li>
           ))}

@@ -15,6 +15,7 @@ interface Props {
 
 const { title, subtitle, crumbs } = Astro.props;
 const photo = (size: string) => `/wp-content/uploads/2021/08/pexels-cottonbro-5986498-${size}.jpg`;
+import Pointed from '../Pointed.astro';
 ---
 
 <div class="relative isolate overflow-hidden bg-slate-700">
@@ -29,7 +30,7 @@ const photo = (size: string) => `/wp-content/uploads/2021/08/pexels-cottonbro-59
   <div class="mx-auto flex min-h-40 max-w-7xl items-center px-4 py-8 sm:min-h-[250px] sm:px-6 lg:px-8">
     <div class="w-full rounded-lg bg-slate-900/65 px-6 py-5 text-white">
       <h1 class="font-hebrew text-3xl leading-tight font-extrabold tracking-tight sm:text-4xl">
-        {title}
+        <Pointed text={title} />
       </h1>
       {subtitle && <p class="mt-2 text-lg text-slate-100">{subtitle}</p>}
       {crumbs && (
@@ -44,14 +45,14 @@ const photo = (size: string) => `/wp-content/uploads/2021/08/pexels-cottonbro-59
               <li class="flex items-center gap-2">
                 <span aria-hidden="true">/</span>
                 <a href={crumb.url} class="underline-offset-2 hover:underline">
-                  {crumb.title}
+                  <Pointed text={crumb.title} />
                 </a>
               </li>
             ))}
             <li class="flex items-center gap-2">
               <span aria-hidden="true">/</span>
               <span aria-current="page" class="font-semibold">
-                {title}
+                <Pointed text={title} />
               </span>
             </li>
           </ol>

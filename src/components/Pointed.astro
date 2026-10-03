@@ -1,0 +1,12 @@
+---
+/** Text (a title) with its pointed words wrapped for the biblical-text font (src/lib/pointed.ts). */
+import { splitPointed } from '../lib/pointed';
+
+interface Props {
+  text: string;
+}
+---
+
+{splitPointed(Astro.props.text).map((part) =>
+  part.pointed ? <span class="pointed">{part.text}</span> : part.text,
+)}

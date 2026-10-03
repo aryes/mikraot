@@ -1,9 +1,17 @@
 @import 'tailwindcss';
-/* Self-hosted fonts (Hebrew + Latin subsets; browsers fetch only what a page uses). */
-@import '@fontsource-variable/assistant';
-@import '@fontsource-variable/frank-ruhl-libre';
-@import '@fontsource/alef/400.css';
-@import '@fontsource/alef/700.css';
+/* Self-hosted fonts (Hebrew + Latin subsets; browsers fetch only what a page uses). Noto Hebrew
+   covers every niqqud and cantillation mark (טעמים) in the content, with mark positioning;
+   fonts without them make the browser switch fonts inside words. */
+@import '@fontsource-variable/noto-sans-hebrew';
+@import '@fontsource-variable/noto-serif-hebrew';
+
+/* Lesson text: Taamey D, made for biblical text; its cantillation marks are much clearer than
+   Noto's (chosen 2026-10-03 from side-by-side comparisons). public/fonts/taamey-d/ */
+@font-face {
+  font-family: 'Taamey D';
+  src: url('/fonts/taamey-d/Taamey_D.woff2') format('woff2');
+  font-display: swap;
+}
 
 /* Theme fonts: `font-sans` (body text) and `font-hebrew` (headings), used as Tailwind utilities. */
 @theme {
@@ -12,8 +20,20 @@
   --color-brand: #8cb65f;
   --color-brand-strong: #5b763e;
   --color-brand-deep: #4d6434;
-  --font-sans: 'Assistant Variable', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-hebrew: 'Frank Ruhl Libre Variable', 'Alef', 'SBL Hebrew', 'Ezra SIL', serif;
+  --font-sans: 'Noto Sans Hebrew Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-hebrew: 'Noto Serif Hebrew Variable', serif;
+  --font-bible: 'Taamey D', 'Noto Serif Hebrew Variable', serif;
+}
+
+/* Pointed (vocalised) Hebrew, i.e. the biblical text, in the biblical-text font; plain
+   explanatory text stays in the interface font. Marked at build time (src/lib/pointed.ts). */
+.pointed {
+  font-family: var(--font-bible);
+  font-size: 1.15em;
+}
+.wp-content-rendered .pointed {
+  font-size: 1.25em;
+  line-height: 1.7;
 }
 
 /* Custom Scrollbar */
@@ -56,9 +76,10 @@
 }
 .wp-content-rendered p {
   margin-bottom: 1rem;
-  line-height: 1.8;
-  color: #475569;
-  font-size: 1.05rem;
+  /* Room above and below the letters for stacked niqqud and cantillation marks. */
+  line-height: 2.1;
+  color: #1e293b;
+  font-size: 1.1rem;
 }
 .wp-content-rendered a {
   color: var(--color-brand-strong);
@@ -91,9 +112,9 @@
 }
 .wp-content-rendered li {
   margin-bottom: 0.4rem;
-  line-height: 1.7;
-  color: #334155;
-  font-size: 1.05rem;
+  line-height: 2;
+  color: #1e293b;
+  font-size: 1.1rem;
 }
 .wp-content-rendered li > a {
   display: inline-flex;
@@ -133,7 +154,8 @@
   padding: 12px 16px;
   border: 1px solid #e2e8f0;
   text-align: center;
-  color: #334155;
+  color: #1e293b;
+  font-size: 1.1rem;
 }
 .wp-content-rendered tr:nth-child(even) td {
   background: #f8fafc;
@@ -152,12 +174,10 @@
 .wp-content-rendered .mark-silent {
   color: #d1cfcf; /* silent letters */
 }
+/* As on the live site, kbd has no frame: the content uses it (with spaces) to indent verses. */
 .wp-content-rendered .content-kbd {
-  display: inline-block;
-  padding: 0 0.25rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.25rem;
-  background: #f8fafc;
+  padding: 0 0.3rem;
+  font: inherit;
 }
 /* In tables a recording sits under its letter. */
 .wp-content-rendered td .inline-audio-btn {

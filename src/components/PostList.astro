@@ -10,13 +10,14 @@ interface Props {
 
 const EXCERPT_WORDS = 20;
 const { posts } = Astro.props;
+import Pointed from './Pointed.astro';
 ---
 
 <ul class="latest-posts">
   {posts.map(({ entry, url }) => (
     <li>
       <a href={url} class="latest-posts-title">
-        {entry.data.title}
+        <Pointed text={entry.data.title} />
       </a>
       <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
       <div class="latest-posts-excerpt">

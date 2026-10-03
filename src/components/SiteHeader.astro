@@ -9,6 +9,7 @@ const activeLink = 'bg-white font-bold text-brand-strong shadow-xs';
 const idleLink = 'hover:bg-white/60 hover:text-brand-strong';
 const hasChildren = (item: { children?: unknown[] | undefined }) =>
   item.children !== undefined && item.children.length > 0;
+import Pointed from './Pointed.astro';
 ---
 
 <header class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-xs">
@@ -63,7 +64,7 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
                 href={item.url ?? undefined}
                 class="block rounded-lg px-3 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50"
               >
-                {item.title}
+                <Pointed text={item.title} />
               </a>
               {hasChildren(item) && (
                 <div class="mr-4 space-y-1 border-r-2 border-slate-200 pr-3">
@@ -73,7 +74,7 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
                         href={sub.url ?? undefined}
                         class="block rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-strong"
                       >
-                        {sub.title}
+                        <Pointed text={sub.title} />
                       </a>
                       {hasChildren(sub) && (
                         <div class="mr-3 space-y-0.5 border-r border-slate-200 pr-2">
@@ -82,7 +83,7 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
                               href={subSub.url ?? undefined}
                               class="block px-2 py-1 text-[11px] text-slate-500 hover:text-brand-strong"
                             >
-                              {subSub.title}
+                              <Pointed text={subSub.title} />
                             </a>
                           ))}
                         </div>
@@ -119,7 +120,7 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
                 aria-haspopup={hasChildren(item) ? 'true' : undefined}
                 class:list={[navLink, isActive(url) ? activeLink : idleLink]}
               >
-                {item.title}
+                <Pointed text={item.title} />
                 {hasChildren(item) && (
                   <ChevronDown
                     size={14}
@@ -135,7 +136,9 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
                         href={sub.url ?? undefined}
                         class="flex w-full items-center justify-between px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-strong"
                       >
-                        <span>{sub.title}</span>
+                        <span>
+                          <Pointed text={sub.title} />
+                        </span>
                         {hasChildren(sub) && (
                           <ChevronDown size={12} className="-rotate-90 text-slate-400" />
                         )}
@@ -147,7 +150,7 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
                               href={subSub.url ?? undefined}
                               class="block w-full px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-strong"
                             >
-                              {subSub.title}
+                              <Pointed text={subSub.title} />
                             </a>
                           ))}
                         </div>

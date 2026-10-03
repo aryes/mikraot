@@ -4,11 +4,29 @@
  * produces (scripts/content/wp-to-markdoc.ts) and the Keystatic editor offers (keystatic.config.tsx).
  */
 import { Markdoc, component, defineMarkdocConfig, nodes } from '@astrojs/markdoc/config';
+import { markPointed } from './src/lib/pointed-markdoc.ts';
 
 /** A tag rendered as a plain element with a fixed class. */
 const styled = (/** @type {string} */ element, /** @type {string} */ className) => ({
   render: element,
   attributes: { class: { type: String, default: className } },
+});
+
+/**
+ * A text block whose pointed (vocalised) words are wrapped for the biblical-text font
+ * (src/lib/pointed.ts).
+ */
+const pointedBlock = (/** @type {{ render?: string }} */ schema) => ({
+  ...schema,
+  transform(/** @type {any} */ node, /** @type {any} */ config) {
+    return markPointed(
+      new Markdoc.Tag(
+        schema.render,
+        node.transformAttributes(config),
+        node.transformChildren(config),
+      ),
+    );
+  },
 });
 
 const collapse = (/** @type {boolean} */ inline) => ({
@@ -28,13 +46,19 @@ export default defineMarkdocConfig({
       // An explicit anchor (the target of in-page links) becomes the heading's id.
       transform(node, config) {
         const { level, anchor } = node.transformAttributes(config);
-        return new Markdoc.Tag(
-          `h${level}`,
-          anchor ? { id: anchor } : {},
-          node.transformChildren(config),
+        return markPointed(
+          new Markdoc.Tag(
+            `h${level}`,
+            anchor ? { id: anchor } : {},
+            node.transformChildren(config),
+          ),
         );
       },
     },
+    paragraph: pointedBlock(nodes.paragraph),
+    item: pointedBlock(nodes.item),
+    th: pointedBlock(nodes.th),
+    td: pointedBlock(nodes.td),
     link: { ...nodes.link, render: component('./src/components/content/ContentLink.astro') },
     table: { ...nodes.table, render: component('./src/components/content/ContentTable.astro') },
   },

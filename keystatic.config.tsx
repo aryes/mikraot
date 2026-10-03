@@ -44,7 +44,7 @@ const content = fields.markdoc({
       schema: {},
       style: { color: '#d1cfcf' },
     }),
-    kbd: mark({ label: 'מסגרת (kbd)', icon: <Keyboard />, schema: {}, tag: 'kbd' }),
+    kbd: mark({ label: 'הזחה (kbd)', icon: <Keyboard />, schema: {}, tag: 'kbd' }),
     collapse: mark({
       label: 'ביאור מוסתר',
       icon: <Eye />,
