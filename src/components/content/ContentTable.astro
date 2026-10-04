@@ -1,12 +1,14 @@
 ---
 /**
  * Tables scroll sideways on their own when wider than the screen, instead of widening the page.
- * The scroll area is focusable so keyboard users can scroll it too.
+ * The scroll area is focusable so keyboard users can scroll it too, and a named region so screen
+ * readers announce it; tables are numbered per page because landmark names must be unique.
  */
+Astro.locals.tableCount = (Astro.locals.tableCount ?? 0) + 1;
 ---
 
-<div class="table-scroll" tabindex="0" role="region" aria-label="טבלה">
+<section class="table-scroll" tabindex="0" aria-label={`טבלה ${Astro.locals.tableCount}`}>
   <table>
     <slot />
   </table>
-</div>
+</section>

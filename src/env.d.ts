@@ -19,6 +19,13 @@ declare module 'cloudflare:workers' {
   };
 }
 
+declare namespace App {
+  interface Locals {
+    /** Tables rendered so far on the page (src/components/content/ContentTable.astro). */
+    tableCount?: number;
+  }
+}
+
 interface Window {
   /** Cloudflare Turnstile, once its script has loaded (src/components/Turnstile.tsx). */
   turnstile?: {
