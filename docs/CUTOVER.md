@@ -13,8 +13,7 @@ removing the route.
 `main` runs `wrangler deploy`, which applies the config, so a dashboard-only change could be undone
 by the next deploy. The switch itself is a reviewed commit.
 
-Current state (2026-10-05): routes `mikraot.net/api/*` and `www.mikraot.net/api/*` →
-`mikraot-api` (old Worker, serves only the old staging app). `www.mikraot.net` → WordPress, which
+Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` routes were deleted). `www.mikraot.net` → WordPress, which
 301-redirects to `https://mikraot.net/`. No Page Rules; Rocket Loader and minification off.
 
 ## 1. Before the switch
@@ -43,7 +42,7 @@ Current state (2026-10-05): routes `mikraot.net/api/*` and `www.mikraot.net/api/
 - [ ] Rollback rehearsed once on a throwaway route: deleting a route in the dashboard takes effect
       at once, and a `wrangler deploy` with no routes in the config leaves dashboard routes in place
       (so a revert commit alone may not roll back).
-- [ ] **Approval:** delete the old `…/api/*` → `mikraot-api` routes ahead of the switch (only the old
+- [x] **Approval:** delete the old `…/api/*` → `mikraot-api` routes ahead of the switch (only the old
       staging app uses them; WordPress doesn't use `/api/`), and remove them from
       `worker/wrangler.json` so a redeploy of the old Worker can't bring them back. More specific
       routes win, so while they exist comments would go to the old Worker.

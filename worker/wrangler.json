@@ -3,16 +3,6 @@
   "main": "src/index.ts",
   "compatibility_date": "2024-09-01",
   "workers_dev": false,
-  "routes": [
-    {
-      "pattern": "mikraot.net/api/*",
-      "zone_id": "722d8a463119020c05a4a8b421b138ba"
-    },
-    {
-      "pattern": "www.mikraot.net/api/*",
-      "zone_id": "722d8a463119020c05a4a8b421b138ba"
-    }
-  ],
   "d1_databases": [
     {
       "binding": "DB",

@@ -124,5 +124,5 @@ Hosting after the move: Cloudflare (one Worker: pages, media, comments API, D1);
 
 ## Known issues (current app)
 
-- Old API Worker (`worker/`, still live for the old staging app): comments POST auto-approves, no rate limit or captcha, CORS `*`. (Raw DB errors no longer returned: fixed in `worker/`, not yet deployed.)
+- Old API Worker (`worker/`, no routes since 2026-10-05, so unreachable): comments POST auto-approves, no rate limit or captcha, CORS `*`.
 - `npm audit`: 6 "high" findings, all one advisory in `http-cache-semantics` (GHSA-ch52-4w7c-c8xp, published 2026-09-18, no fixed version yet), reached via Astro. Not exploitable here: it concerns shared caches serving several users, and Astro uses it only at build time to cache remote images, which this site has none of. `npm audit fix --force` would downgrade Astro to v2: don't. Recheck when a fix ships
