@@ -25,6 +25,12 @@
       "namespace_id": "1001",
       "simple": { "limit": 5, "period": 60 },
     },
+    // Browser error reports: at most 10 per minute from one IP address (keeps the logs readable).
+    {
+      "name": "CLIENT_ERROR_RATE_LIMIT",
+      "namespace_id": "1003",
+      "simple": { "limit": 10, "period": 60 },
+    },
   ],
   "observability": { "enabled": true },
   // Worker Previews (one per git branch, `wrangler preview`): their own database and rate-limit
@@ -45,6 +51,11 @@
         "name": "COMMENT_RATE_LIMIT",
         "namespace_id": "1002",
         "simple": { "limit": 5, "period": 60 },
+      },
+      {
+        "name": "CLIENT_ERROR_RATE_LIMIT",
+        "namespace_id": "1004",
+        "simple": { "limit": 10, "period": 60 },
       },
     ],
   },

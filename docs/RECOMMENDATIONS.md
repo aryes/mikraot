@@ -148,8 +148,8 @@ gitleaks, `compare:live`, CI workflow.
   ways that render badly.)
 - **M/M Visual regression:** Playwright screenshots of key pages compared on every change.
 - **M/S Lighthouse CI** with budgets (performance, accessibility, SEO) on a few pages.
-- **M/S Client error reporting:** a tiny handler that sends browser errors to the Worker logs (no
-  third-party service).
+- **Done: client error reporting:** `src/scripts/error-reporting.ts` sends JavaScript errors and
+  CSP blocks from visitors' browsers to the Worker logs ("Browser error:"), no third-party service.
 - **Done: HTML validation** (`html-validate`, config `.htmlvalidate.mjs`) of every built page, inside
   `npm run build:site`, so invalid markup stops a deploy.
 

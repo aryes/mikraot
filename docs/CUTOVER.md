@@ -81,7 +81,8 @@ Success means all of these:
 - [ ] A real test comment posts, appears, and is hidden again (approval for the D1 change).
 - [ ] Response headers (CSP, HSTS…) present; no console errors or CSP blocks on a few pages.
 - [ ] Web Analytics receives visits; Search Console: submit `/sitemap-index.xml`.
-- [ ] Workers logs read for new kinds of errors, and the error rate below 1% of requests over the
+- [ ] Workers logs read for new kinds of errors (including "Browser error:" lines, sent by
+      visitors' browsers: untrusted input, anyone can write them), and the error rate below 1% of requests over the
       observation window (Cloudflare dashboard →
       Workers → mikraot → Observability).
 

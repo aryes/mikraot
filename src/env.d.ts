@@ -16,6 +16,8 @@ declare module 'cloudflare:workers' {
     BREVO_API_KEY?: string;
     /** Per-visitor limit on posting comments (wrangler.jsonc `ratelimits`). */
     COMMENT_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
+    /** Per-visitor limit on browser error reports (src/pages/api/client-errors.ts). */
+    CLIENT_ERROR_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
   };
 }
 

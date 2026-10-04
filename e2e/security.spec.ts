@@ -76,3 +76,30 @@ test('the comments API refuses junk: unknown pages, bots, oversized bodies, no h
   const response = await request.get('/api/comments/?page_slug=x');
   expect(response.headers()['x-content-type-options']).toBe('nosniff');
 });
+
+test('browser errors reach the Worker log endpoint, which refuses junk', async ({
+  page,
+  request,
+}) => {
+  await page.goto('/');
+  const reports: unknown[] = [];
+  page.on('request', (sent) => {
+    if (sent.url().endsWith('/api/client-errors/')) reports.push(sent.postDataJSON());
+  });
+  const delivered = page.waitForResponse((r) => r.url().endsWith('/api/client-errors/'));
+  await page.evaluate(() => {
+    // Not from the site's scripts (like an extension's): ignored.
+    void Promise.reject(new Error('foreign'));
+    // As if thrown by one of the site's scripts.
+    const filename = `${location.origin}/_astro/probe.js`;
+    dispatchEvent(new ErrorEvent('error', { message: 'e2e probe', filename, lineno: 1 }));
+  });
+  expect((await delivered).status()).toBe(204);
+  expect(reports).toEqual([
+    expect.objectContaining({ kind: 'error', message: 'e2e probe', page: '/' }),
+  ]);
+
+  const post = (data: unknown) => request.post('/api/client-errors/', { data });
+  expect((await post({ kind: 'other', message: 'x' })).status()).toBe(400);
+  expect((await post({ kind: 'error', message: 'x'.repeat(5000) })).status()).toBe(413);
+});
