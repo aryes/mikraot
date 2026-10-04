@@ -22,8 +22,7 @@ Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` 
 - [x] Production D1 backed up and migrated; Worker deployed to workers.dev with its Turnstile
       secret (2026-10-04, approved).
 - [ ] Launch items in `docs/ROADMAP.md` done or consciously deferred: privacy policy published,
-      Web Analytics beacon ready. **Decide explicitly** about email to Arye on new comments, which WordPress did and the new
-      site doesn't yet (interim: follow `/comments/feed/` in a feed reader).
+      Web Analytics beacon ready. Email to Arye on new comments: built (Brevo, 2026-10-05).
 - [ ] An **uptime monitor** with email alerts set up (replaces Jetpack Monitor).
 - [ ] **URL parity gate:** every URL in WordPress's sitemaps, Search Console's top pages and the
       known old link forms (`/?p=`, `/?page_id=`, `/?s=`, `/feed/`, `/comments/feed/`,

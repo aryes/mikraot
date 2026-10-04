@@ -10,9 +10,11 @@ declare module 'cloudflare:workers' {
     DB: import('./server/comments').CommentsDb;
     /** The static files (dist/client). */
     ASSETS: { fetch(input: string | URL): Promise<Response> };
-    /** Per-visitor limit on posting comments (wrangler.jsonc `ratelimits`). */
     /** Turnstile secret key (wrangler secret; locally in .dev.vars). */
     TURNSTILE_SECRET_KEY?: string;
+    /** Brevo API key for comment notices (wrangler secret); without it nothing is sent. */
+    BREVO_API_KEY?: string;
+    /** Per-visitor limit on posting comments (wrangler.jsonc `ratelimits`). */
     COMMENT_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
   };
 }

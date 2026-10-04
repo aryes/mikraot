@@ -93,7 +93,7 @@ yet tuned.
   (tikkun-style practice). Text from public-domain sources (Westminster Leningrad Codex, or
   Sefaria's API).
 - **M/S Reply notifications:** email a commenter when the admin answers (they already leave an
-  email; today it is stored and never used).
+  email; today it is used only as the Reply-To of the owner's new-comment notice).
 - **M/S Weekly parasha shortcut** (Hebcal API, free): "this week's reading" linking to recordings.
 - **L/M Printable worksheets** (PDF) for teachers.
 - **Decide later:** accounts (only if progress must follow a learner between devices), an English
@@ -223,8 +223,6 @@ Yes, but privacy-first, with no cookies, so no consent banner is needed:
 - **H/S Weekly habit, two minutes:** when adding or improving content, add an "update" line in the
   editor (date + one sentence). It appears in "מה חדש" and goes to newsletter subscribers
   automatically; without it, new content stays invisible to returning learners.
-- **H/S Know about new comments before email exists:** subscribe to `/comments/feed/` in a feed
-  reader app, or with a free RSS-to-email service, until the site can send email itself.
 - **M/S Plain-letter aliases for URLs with niqqud:** e.g. `/פַּשְׁטָא֙-זָקֵף-קָטָ֔ן/` becomes ~180
   characters when shared and can't be typed. Keep it (search engines know it) and add redirects
   from `/פשטא-זקף-קטן/` style aliases.

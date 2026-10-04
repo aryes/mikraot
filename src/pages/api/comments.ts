@@ -8,6 +8,7 @@ import {
   parseNewComment,
   parsePageKeys,
 } from '../../server/comments';
+import { notifyOwner } from '../../server/notify';
 import { findPage, getPageIndex } from '../../server/page-index';
 import { tokenFrom, verifyTurnstile } from '../../server/turnstile';
 
@@ -28,7 +29,7 @@ const json = (data: unknown, status = 200) =>
 export const GET: APIRoute = async ({ url }) =>
   json(await listComments(env.DB, parsePageKeys(url.searchParams.get('page_slug'))));
 
-export const POST: APIRoute = async ({ request, url, clientAddress }) => {
+export const POST: APIRoute = async ({ request, url, clientAddress, locals }) => {
   if (Number(request.headers.get('content-length')) > MAX_BODY_BYTES) {
     return json({ error: 'Too large' }, 413);
   }
@@ -65,7 +66,20 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
     // Counted only for comments that would be saved, so rejected junk doesn't use up the quota.
     const { success } = await env.COMMENT_RATE_LIMIT.limit({ key: clientAddress });
     if (!success) return json({ error: 'Too many comments, try again in a minute' }, 429);
-    return json(await addComment(env.DB, comment), 201);
+    const saved = await addComment(env.DB, comment);
+    notifyOwner({
+      apiKey: env.BREVO_API_KEY,
+      waitUntil: (promise) => locals.cfContext.waitUntil(promise),
+      notice: () => ({
+        commentId: saved.id,
+        pageTitle: page.title,
+        pageUrl: new URL(page.url, url.origin).href,
+        author: comment.author_name,
+        email: comment.author_email,
+        content: comment.content,
+      }),
+    });
+    return json(saved, 201);
   } catch (error) {
     console.error('POST /api/comments failed:', error);
     return json({ error: 'Internal error' }, 500);
