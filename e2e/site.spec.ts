@@ -136,7 +136,7 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
   expect(sitemap).not.toContain('/author/');
 
   const old = await request.get('/sitemap.xml', { maxRedirects: 0 });
-  expect(old.status()).toBe(301);
+  expect(old.status()).toBe(302); // temporary until WordPress is retired
   expect(old.headers()['location']).toMatch(/\/sitemap-index\.xml$/);
 
   expect(await (await request.get('/robots.txt')).text()).toContain(

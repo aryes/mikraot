@@ -1,5 +1,9 @@
+# Redirects are temporary (302) during the fallback weeks after the cutover: browsers cache 301s
+# for good, which would outlast a rollback to WordPress. They become 301 when WordPress is retired
+# (docs/CUTOVER.md, step 5).
+
 # WordPress (All in One SEO) sitemap URL -> Astro sitemap
-/sitemap.xml /sitemap-index.xml 301
+/sitemap.xml /sitemap-index.xml 302
 
 # RSS feeds at their WordPress URLs (built as index.xml files, src/lib/feeds.ts)
 /feed/ /feed/index.xml 200
@@ -7,8 +11,11 @@
 /%D7%9E%D7%94-%D7%97%D7%93%D7%A9/feed/ /%D7%9E%D7%94-%D7%97%D7%93%D7%A9/feed/index.xml 200
 
 # Front-page pagination (the front page is a static page)
-/page/* / 301
+/page/* / 302
+
+# WordPress's default category: always empty on this site
+/category/uncategorized/ / 302
 
 # BuddyPress activity and member pages (plugin dropped, docs/ROADMAP.md)
-/%D7%A4%D7%A2%D7%99%D7%9C%D7%95%D7%AA/* / 301
-/%D7%97%D7%91%D7%A8%D7%99%D7%9D/* / 301
+/%D7%A4%D7%A2%D7%99%D7%9C%D7%95%D7%AA/* / 302
+/%D7%97%D7%91%D7%A8%D7%99%D7%9D/* / 302

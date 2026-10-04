@@ -75,13 +75,13 @@ test('old WordPress links still work', async ({ page }) => {
   await expect(page.getByRole('dialog').getByRole('link').first()).toBeVisible();
 
   const redirects = await Promise.all(
-    ['/page/2/', '/חברים/arye_s/', '/פעילות/'].map(async (path) => {
+    ['/page/2/', '/חברים/arye_s/', '/פעילות/', '/category/uncategorized/'].map(async (path) => {
       const res = await page.request.get(path, { maxRedirects: 0 });
       return { path, status: res.status(), location: res.headers()['location'] ?? '' };
     }),
   );
   for (const { path, status, location } of redirects) {
-    expect(status, path).toBe(301);
+    expect(status, path).toBe(302); // temporary until WordPress is retired (docs/CUTOVER.md)
     expect(new URL(location, page.url()).pathname, path).toBe('/');
   }
 });

@@ -41,7 +41,7 @@
   - "Sample course" (published) is LearnPress demo content: 127 of the 131 lessons/quizzes, Latin filler text. Real course material: "טעמי המקרא" (1 test lesson with placeholder text + 1 real quiz) and the draft "ניקוד" (1 lesson + 1 quiz). **Decision needed (Arye):** drop the demo course?
 - [x] Content files: 39 Markdoc pages/posts (5 drafts) in `src/content/pages/` with semantic tags; every conversion verified against the source, and every page against the live site (34/34 identical apart from typography; word sequences identical). Notes: the 2 header-less tables now render their first row as a header; build prints harmless MODULE_LEVEL_DIRECTIVE warnings (Astro Markdoc + bundler)
 - [x] Media into the repo (`public/wp-content/uploads/`, 12 MB, same paths as WordPress; plugin data and user avatars excluded); all 33 media files referenced by published pages verified present; content media URLs made site-relative. Also fixed: `?page_id=` links now resolve to the page URL; staging URLs removed from link tooltips
-- [x] SEO parity: titles, descriptions and og tags captured from the live pages (captured by `npm run seo:fetch`; now in each page's frontmatter), live favicon, sitemap (34 URLs) with `/sitemap.xml` → `/sitemap-index.xml` 301, `robots.txt`
+- [x] SEO parity: titles, descriptions and og tags captured from the live pages (captured by `npm run seo:fetch`; now in each page's frontmatter), live favicon, sitemap (34 URLs) with `/sitemap.xml` → `/sitemap-index.xml` (302 until WordPress is retired, then 301), `robots.txt`
 - [x] Home page "latest posts" block (was missing)
 - [x] Keystatic editor, local mode (`npm run cms`): pages/posts with all custom blocks and the meaningful colours, site settings; every content file verified to open in it
 - [ ] Keystatic: the Hebrew interface (needed for right-to-left editing) has poor built-in translations, e.g. Save = "להציל", Singletons = "רווקים" (could be fixed upstream); menu (`src/data/menu.json`) not editable there yet; GitHub mode for browser editing after GitHub
@@ -58,8 +58,8 @@
   - [ ] Sidebar newsletter form: Brevo's sign-up form (see the newsletter tasks below)
   - [x] Archive pages: month `/2021/08/`, category `/category/חדשות-האתר/`, author `/author/arye_s/` (each lists the one post)
   - [x] Feeds: `/feed/`, `/comments/feed/` (built by the Worker per request), `/category/חדשות-האתר/feed/`, `/sitemap.rss`; comments keep WordPress's `#comment-<id>` anchors
-  - [x] Old link forms: `/?s=<query>` opens the search with the query; `/?p=<id>` and `/?page_id=<id>` go to the page (in the browser, via `/page-index.json`); `/page/<n>/` → home (301)
-  - [x] BuddyPress pages `/פעילות/` (activity) and `/חברים/` (members, 4 users): 301 to the home page (see plugins)
+  - [x] Old link forms: `/?s=<query>` opens the search with the query; `/?p=<id>` and `/?page_id=<id>` go to the page (in the browser, via `/page-index.json`); `/page/<n>/` → home and `/category/uncategorized/` (WordPress's empty default category) → home (302 until WordPress is retired, then 301)
+  - [x] BuddyPress pages `/פעילות/` (activity) and `/חברים/` (members, 4 users): redirect to the home page (302 until WordPress is retired, then 301) (see plugins)
   - LearnPress URLs (courses, 119 lessons, 12 quizzes, 159 questions): deferred, see below
   - Not public content: `/wp-json/`, `/wp-login.php`, `/xmlrpc.php` (gone after cutover; nothing links to them)
 - [ ] Courses, lessons and quizzes (LearnPress): **deferred** (decided 2026-09-30); the new site has no course pages or links until then. Also deferred: the 7 LearnPress system pages (All Courses, Profile, Checkout, Instructor(s), Become A Teacher, Term Conditions). When migrating: lessons/quizzes are course-scoped URLs, and most published course content is the LearnPress demo "Sample course"
