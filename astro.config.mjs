@@ -6,6 +6,11 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, envField } from 'astro/config';
 
+/** Cloudflare's always-pass Turnstile test site key. */
+const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
+const ciBranch = process.env['WORKERS_CI_BRANCH'];
+const isPreviewBuild = ciBranch !== undefined && ciBranch !== 'main';
+
 export default defineConfig({
   site: 'https://mikraot.net',
   // WordPress URLs end with a slash; keep them identical.
@@ -39,11 +44,13 @@ export default defineConfig({
   env: {
     schema: {
       // Turnstile site key (public; widget "mikraot.net comments", works only on mikraot.net).
-      // Tests override it with Cloudflare's test key (playwright.config.ts); the secret is a Worker secret.
+      // Builds of branches other than main (Cloudflare Workers Builds sets WORKERS_CI_BRANCH) are
+      // previews on workers.dev, so they get Cloudflare's test key, matching the previews' test
+      // secret (wrangler.jsonc). Tests override it too (playwright.config.ts).
       PUBLIC_TURNSTILE_SITE_KEY: envField.string({
         context: 'client',
         access: 'public',
-        default: '0x4AAAAAAFL0OyR8bp2yP3s0',
+        default: isPreviewBuild ? TURNSTILE_TEST_SITE_KEY : '0x4AAAAAAFL0OyR8bp2yP3s0',
       }),
     },
   },
