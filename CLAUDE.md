@@ -1,7 +1,7 @@
 # Mikraot.net
 
 The website https://mikraot.net: a Hebrew site teaching Bible reading (pronunciation, grammar, cantillation), with courses, lessons, quizzes and audio.
-Stack: Astro (static pages) + React islands + TypeScript + Tailwind, one Cloudflare Worker (pages + API, D1), git → GitHub later.
+Stack: Astro (static pages) + React islands + TypeScript + Tailwind, one Cloudflare Worker (pages + API, D1). Code: https://github.com/aryes/mikraot (public).
 The live site currently runs on WordPress (Bluehost) and is being migrated to this stack.
 The plan and known issues are in `docs/ROADMAP.md`.
 
@@ -11,7 +11,7 @@ The plan and known issues are in `docs/ROADMAP.md`.
 2. Claude installs/uninstalls packages and runs all commands. Arye supervises and approves; he does not run commands or write code.
 3. **Commits** (no approval needed since 2026-10-04): every commit leaves the project working (`npm run check`, plus e2e for what it touches); one commit per logical change (many small commits over one big one); the message says what changed and explains the technical decisions. History rewrites (amend of pushed work, rebase, filter-repo) still need Arye's approval.
 4. **The original site is the reference.** All content and features of mikraot.net must exist in the new site before cutover. Verify by crawling and comparing, not by assumption.
-5. **No GitHub until the repo is safe:** no secrets in files or git history, secret scanning in place.
+5. **The repo is public** (since 2026-10-04): nothing private in files or history, ever (secrets, server addresses, account names, personal emails). gitleaks runs on every commit; GitHub secret scanning with push protection is on.
 6. Claude acts as web developer, security expert and UX advisor — raise concerns proactively.
 7. Maintainable, high-quality code: strict TypeScript, lint/format, tests, current stable packages, small focused modules, no dead code.
 8. **Prefer ready-made standard solutions** (hosted services, maintained libraries, platform features) over writing a feature ourselves; custom code only with a stated reason. Prefer free options (for now).
@@ -37,6 +37,8 @@ The plan and known issues are in `docs/ROADMAP.md`.
 - Live site is still WordPress. Staging app: https://mikraot.net/staging/app/
 
 ## Procedures
+
+- GitHub: `gh` CLI (winget, logged in as aryes). This repo's git config uses `http.sslBackend schannel` (AVG intercepts TLS; Windows' certificate store trusts it) and `gh` as credential helper. Commits use Arye's GitHub noreply address. `main` is protected against deletion and force-push.
 
 - Build: `npm run build` = type check + `build:site` (Astro build, then the Pagefind search index into `dist/client/pagefind/`; search only works in built output, not in `npm run dev`).
 - Content editing: `npm run cms` (http://localhost:4400/keystatic): Keystatic edits `src/content/pages/` and `src/data/site.json` directly; config in `keystatic.config.tsx` must stay in sync with `markdoc.config.mjs` (`src/keystatic.test.ts` reads all content through it). Runs on Node via `astro.config.cms.mjs`.

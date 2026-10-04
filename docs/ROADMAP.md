@@ -109,7 +109,9 @@ Order (decided 2026-10-03): one change at a time; the site first, email last, Bl
 Hosting after the move: Cloudflare (one Worker: pages, media, comments API, D1); free plan expected. The domain is registered at GoDaddy (renews by 2027-08-10) with DNS already on Cloudflare.
 
 1. - [ ] Privacy policy: new Hebrew draft written 2026-10-04 (`privacy-policy`, still a draft, unpublished; the WordPress one was never published either). Arye to review (optionally a lawyer), then publish and link it from the footer and the comment/newsletter forms
-2. - [ ] GitHub + CI deploys (browser editing via Keystatic becomes available)
+2. - [x] GitHub: public repo https://github.com/aryes/mikraot (2026-10-04). Before the first push the history was rewritten again: author address → GitHub noreply, the old `MIGRATION_DOCUMENTATION*.md` (hosting account name, database name, Cloudflare account ID) removed, the hosting username masked. Secret scanning + push protection, Dependabot alerts, private vulnerability reporting and a `main` ruleset (no deletion or force-push) are on
+   - [ ] Arye: two-factor login on GitHub; install the Renovate app on the repo
+   - [ ] CI deploys to Cloudflare with a preview URL per change; Keystatic GitHub mode (browser editing)
 3. - [ ] Cutover with rollback: plan drafted in `docs/CUTOVER.md` (2026-10-04, for Arye's review): a Worker route on the existing domain, DNS unchanged, rollback = removing the route. Then switch (approval needed). WordPress stays on Bluehost untouched as the fallback
 4. - [ ] Retire WordPress after a few stable weeks (sign-off needed; full backup first)
 5. - [ ] **Move email off Bluehost**, e.g. Cloudflare Email Routing. Today (checked 2026-10-03): MX `mail.mikraot.net` = the Bluehost web server; `admin@` is a mailbox there and also forwards to an outside address; SPF `v=spf1 a mx include:websitewelcome.com ~all`, DKIM `default._domainkey`, no DMARC. Before switching: save the mailbox if wanted, and if WordPress still sends mail, put Bluehost's server explicitly in SPF (its `mx` entry stops covering it once MX moves). Rollback: restore the MX record. Then add DMARC
