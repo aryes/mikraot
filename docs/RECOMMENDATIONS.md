@@ -116,8 +116,8 @@ Done: CSP and security headers, Turnstile, rate limit, honeypot, secret scanning
   (scheduled Worker → R2 or a private repo).
 - **M/S Privacy (חוק הגנת הפרטיות, amendment 13):** collect less: stop asking for an email unless
   reply notifications are built; state retention and deletion in the privacy policy.
-- **L/S** `/.well-known/security.txt`, HSTS preload once stable, Cloudflare WAF managed rules (free
-  set).
+- **L/S** HSTS preload once stable, Cloudflare WAF managed rules (free set). (Done:
+  `/.well-known/security.txt`, rebuilt with each deploy so its expiry date (330 days ahead) stays current.)
 
 ## 4. Technical and management
 
