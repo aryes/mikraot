@@ -9,7 +9,7 @@ The plan and known issues are in `docs/ROADMAP.md`.
 
 1. Claude operates the services directly: Cloudflare (wrangler / API / dashboard), Bluehost (SSH, WP-CLI, cPanel), WordPress.
 2. Claude installs/uninstalls packages and runs all commands. Arye supervises and approves; he does not run commands or write code.
-3. **Never commit without Arye's explicit approval.** That includes amends and history rewrites.
+3. **Commits** (no approval needed since 2026-10-04): every commit leaves the project working (`npm run check`, plus e2e for what it touches); one commit per logical change (many small commits over one big one); the message says what changed and explains the technical decisions. History rewrites (amend of pushed work, rebase, filter-repo) still need Arye's approval.
 4. **The original site is the reference.** All content and features of mikraot.net must exist in the new site before cutover. Verify by crawling and comparing, not by assumption.
 5. **No GitHub until the repo is safe:** no secrets in files or git history, secret scanning in place.
 6. Claude acts as web developer, security expert and UX advisor — raise concerns proactively.
