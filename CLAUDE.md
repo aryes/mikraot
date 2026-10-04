@@ -20,7 +20,7 @@ The plan and known issues are in `docs/ROADMAP.md`.
 ## Secrets policy
 
 - Never write credentials into tracked files (including docs, CLAUDE.md, code fallbacks).
-- Local: `.env` / `.dev.vars` (gitignored). Worker: `wrangler secret`. Cloudflare auth: `wrangler login` (OAuth), not pasted tokens.
+- Local: `.env` / `.dev.vars` (gitignored). Worker: `wrangler secret`. Cloudflare auth: `wrangler login` (OAuth) for everything wrangler covers (Workers, D1, secrets, Turnstile, email routing). For what its OAuth scopes can't reach, one scoped API token `CF_CONFIG_API_TOKEN` in `.env` (created by Arye 2026-10-05, expires 2027-01-31; DNS, zone settings, cache purge, Workers Builds, Access; mikraot.net only). Never name it `CLOUDFLARE_API_TOKEN` (wrangler would use it instead of the login). Cloudflare's own "Workers Builds" token is for the build system: leave it alone.
 - Secret scanning: gitleaks pre-commit hook in `.githooks/`, rules in `.gitleaks.toml`. `npm install` enables it (`prepare` script); gitleaks itself: `winget install Gitleaks.Gitleaks`.
 
 ## Architecture
