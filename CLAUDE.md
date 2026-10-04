@@ -10,12 +10,13 @@ The plan and known issues are in `docs/ROADMAP.md`.
 1. Claude operates the services directly: Cloudflare (wrangler / API / dashboard), Bluehost (SSH, WP-CLI, cPanel), WordPress.
 2. Claude installs/uninstalls packages and runs all commands. Arye supervises and approves; he does not run commands or write code.
 3. **Commits** (no approval needed since 2026-10-04): every commit leaves the project working (`npm run check`, plus e2e for what it touches); one commit per logical change (many small commits over one big one); the message says what changed and explains the technical decisions. History rewrites (amend of pushed work, rebase, filter-repo) still need Arye's approval.
-4. **The original site is the reference.** All content and features of mikraot.net must exist in the new site before cutover. Verify by crawling and comparing, not by assumption.
-5. **The repo is public** (since 2026-10-04): nothing private in files or history, ever (secrets, server addresses, account names, personal emails). gitleaks runs on every commit; GitHub secret scanning with push protection is on.
-6. Claude acts as web developer, security expert and UX advisor — raise concerns proactively.
-7. Maintainable, high-quality code: strict TypeScript, lint/format, tests, current stable packages, small focused modules, no dead code.
-8. **Prefer ready-made standard solutions** (hosted services, maintained libraries, platform features) over writing a feature ourselves; custom code only with a stated reason. Prefer free options (for now).
-9. Ask before anything irreversible or public-facing: DNS/cutover, deleting WordPress data or backups, deleting D1 data, billing. Always back up before destructive server/DB operations.
+4. **Fresh-eyes review** (since 2026-10-05): every commit (however small), every document and every plan or recommendation presented to Arye is first reviewed by a subagent with no context, read-only. Valid findings are fixed before committing or presenting; findings judged wrong are named to Arye with the reason, never silently dropped.
+5. **The original site is the reference.** All content and features of mikraot.net must exist in the new site before cutover. Verify by crawling and comparing, not by assumption.
+6. **The repo is public** (since 2026-10-04): nothing private in files or history, ever (secrets, server addresses, account names, personal emails). gitleaks runs on every commit; GitHub secret scanning with push protection is on.
+7. Claude acts as web developer, security expert and UX advisor — raise concerns proactively.
+8. Maintainable, high-quality code: strict TypeScript, lint/format, tests, current stable packages, small focused modules, no dead code.
+9. **Prefer ready-made standard solutions** (hosted services, maintained libraries, platform features) over writing a feature ourselves; custom code only with a stated reason. Prefer free options (for now).
+10. Ask before anything irreversible or public-facing: DNS/cutover, deleting WordPress data or backups, deleting D1 data, billing. Always back up before destructive server/DB operations.
 
 ## Secrets policy
 
