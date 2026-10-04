@@ -31,8 +31,11 @@ Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` 
       workers.dev address: 200, or a deliberate redirect or 404: `npm run check:urls -- <address> [--urls <Search Console export>]`;
       `npm run compare:live` for content.
 - [x] The Turnstile widget's hostnames include `mikraot.net` (set at creation, 2026-10-02).
-- [ ] **Comments tested before the switch:** temporarily add the workers.dev hostname to the
-      Turnstile widget, post and remove a test comment there, then take the hostname off again.
+- [x] **Comments tested before the switch** (2026-10-05): with the workers.dev hostname briefly
+      allowed in the Turnstile widget, Arye posted a real comment from his browser (automated
+      browsers are blocked by Turnstile, as intended); it was stored and shown, then hidden
+      (`UPDATE comments SET approved = 0 WHERE id = 6`: the row stays in D1, the API no longer
+      returns it), and the hostname removed again.
 - [ ] Zone rules audited: Redirect, Transform, Cache and Configuration rules (Cloudflare dashboard
       → Rules → Overview; the API key can't read them) must not touch `mikraot.net/*` responses.
 - [ ] **Content freeze on WordPress.** Carry over content edited and comments approved on
