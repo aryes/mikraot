@@ -27,4 +27,25 @@
     },
   ],
   "observability": { "enabled": true },
+  // Worker Previews (one per git branch, `wrangler preview`): their own database and rate-limit
+  // counter, so test comments never reach production. Previews are built with Turnstile's test
+  // site key, so they use Cloudflare's public always-pass test secret (a documented test value,
+  // not a credential; production's real secret is a Worker secret).
+  "previews": {
+    "vars": { "TURNSTILE_SECRET_KEY": "1x0000000000000000000000000000000AA" },
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "mikraot-db-preview",
+        "database_id": "8e22a15a-bb5d-467c-8ca6-1d0b65f0e468",
+      },
+    ],
+    "ratelimits": [
+      {
+        "name": "COMMENT_RATE_LIMIT",
+        "namespace_id": "1002",
+        "simple": { "limit": 5, "period": 60 },
+      },
+    ],
+  },
 }
