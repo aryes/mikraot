@@ -9,9 +9,10 @@ proxied domain: requests to `mikraot.net/*` go to the new Worker; everything els
 cPanel subdomains) still reaches Bluehost. WordPress stays running and untouched, so rollback =
 removing the route.
 
-**Routes and workers.dev live in `wrangler.jsonc`, never only in the dashboard:** every push to
-`main` runs `wrangler deploy`, which applies the config, so a dashboard-only change could be undone
-by the next deploy. The switch itself is a reviewed commit.
+**Routes and workers.dev live in `wrangler.jsonc`:** every push to `main` runs `wrangler deploy`,
+which applies the config, so the config is the source of truth and the switch is a reviewed
+commit. (Rehearsed: a deploy does not remove routes missing from the config; it adds the ones in
+it. So a route deleted in the dashboard only comes back if it's still in the config.)
 
 Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` routes were deleted). `www.mikraot.net` → WordPress, which
 301-redirects to `https://mikraot.net/`. No Page Rules; Rocket Loader and minification off.
@@ -36,12 +37,12 @@ Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` 
       → Rules → Overview; the API key can't read them) must not touch `mikraot.net/*` responses.
 - [ ] **Content freeze on WordPress.** Carry over content edited and comments approved on
       WordPress since the export (2026-09-30).
-- [ ] Check that branch previews still work with `workers_dev: false` (their URLs are on
-      workers.dev): set it on a test branch and open its preview URL. If they don't, keep workers.dev on and rely on the pages' canonical tags,
-      which already point to mikraot.net.
-- [ ] Rollback rehearsed once on a throwaway route: deleting a route in the dashboard takes effect
-      at once, and a `wrangler deploy` with no routes in the config leaves dashboard routes in place
-      (so a revert commit alone may not roll back).
+- [x] Branch previews ignore `workers_dev` (tested 2026-10-05: a preview built with
+      `workers_dev: false` answered 200). The production deploy does apply it, and `preview_urls`
+      may default to the same value, so the switch sets `preview_urls: true` explicitly.
+- [x] Rollback rehearsed 2026-10-05 on `mikraot.net/__rollback-rehearsal/*`: adding the route took
+      effect in 6 s, deleting it in 5 s; a Workers Builds deploy whose config has no routes left the
+      route in place. So a revert commit alone does not roll back: delete the route first (step 4).
 - [x] **Approval:** delete the old `…/api/*` → `mikraot-api` routes ahead of the switch (only the old
       staging app uses them; WordPress doesn't use `/api/`), and remove them from
       `worker/wrangler.json` so a redeploy of the old Worker can't bring them back. More specific
@@ -54,7 +55,8 @@ Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` 
 
 ## 2. The switch (one commit, about 15 minutes)
 
-1. One commit to `wrangler.jsonc`: route `mikraot.net/*` → `mikraot`, and `workers_dev: false`.
+1. One commit to `wrangler.jsonc`: route `mikraot.net/*` → `mikraot`, `workers_dev: false` and
+   `preview_urls: true` (keeps branch previews).
    After the go/no-go approval it is reviewed and pushed directly to `main`; its deploy
    (Workers Builds) **is** the switch.
 2. www is not routed: WordPress keeps redirecting it to mikraot.net during the fallback period.
@@ -67,6 +69,11 @@ Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` 
 
 Success means all of these:
 
+- [ ] The route exists (API) and mikraot.net answers from the new Worker: not yet tested is whether
+      the Workers Builds deploy creates a route from the config (its token may lack route rights).
+      If it didn't, add it via the API at once, then investigate.
+- [ ] A branch preview still works (`preview_urls: true`).
+- [ ] Email addresses on pages are obfuscated by Cloudflare (Scrape Shield), as for WordPress.
 - [ ] The URL parity checks from step 1 pass against `https://mikraot.net`, plus
       `npm run check:links -- https://mikraot.net`.
 - [ ] A real test comment posts, appears, and is hidden again (approval for the D1 change).
@@ -86,8 +93,9 @@ header or CSP problem breaking pages.
    back while the config still contains it.
 2. **Delete the `mikraot.net/*` route** (Cloudflare API or dashboard: Workers → mikraot →
    Settings → Domains & Routes). WordPress serves the site again at once; no cache purge needed.
-3. The very next commit is the revert (route out of `wrangler.jsonc`, `workers_dev` back on) so the config
-   matches, and confirm in the dashboard that the route is still gone after that deploy.
+3. The very next commit is the revert (route out of `wrangler.jsonc`, `workers_dev` back on). It
+   doesn't remove routes itself; it keeps a later deploy from re-adding the route. Confirm the route
+   is still gone after that deploy.
 
 Comments posted on the new site in between stay in D1 and are not shown by WordPress; they
 reappear when switching forward again.
