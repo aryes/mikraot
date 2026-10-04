@@ -30,19 +30,19 @@ const content = fields.markdoc({
       label: 'אות נלמדת (כתום)',
       icon: <Highlighter />,
       schema: {},
-      style: { color: '#ff6600' },
+      style: { color: '#c2410c', fontWeight: 'bold' },
     }),
     muted: mark({
       label: 'הקשר (אפור)',
       icon: <EyeOff />,
       schema: {},
-      style: { color: '#c3c3c3' },
+      style: { color: '#475569' },
     }),
     silent: mark({
       label: 'אות שאינה נשמעת (אפור בהיר)',
       icon: <EyeOff />,
       schema: {},
-      style: { color: '#d1cfcf' },
+      style: { color: '#707070', textDecoration: 'underline dotted' },
     }),
     kbd: mark({ label: 'הזחה (kbd)', icon: <Keyboard />, schema: {}, tag: 'kbd' }),
     collapse: mark({

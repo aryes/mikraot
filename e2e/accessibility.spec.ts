@@ -3,9 +3,6 @@ import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 
 /** Every page of the build (from its sitemap), plus the 404 page. */
-// The lessons' meaningful colours (orange taught letter, grey context, faint silent letters) are
-// below WCAG contrast on purpose; whether to darken them is pending a decision (docs/ROADMAP.md),
-// so the scans exclude .mark-highlight/.mark-muted/.mark-silent.
 const paths = [
   ...[
     ...readFileSync('dist/client/sitemap-0.xml', 'utf8').matchAll(
@@ -28,9 +25,6 @@ for (const path of paths) {
     const results = await new AxeBuilder({ page })
       // Third-party frames (the YouTube player) are outside our control.
       .exclude('iframe')
-      .exclude('.mark-highlight')
-      .exclude('.mark-muted')
-      .exclude('.mark-silent')
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .analyze();
     const summary = results.violations.map(
@@ -44,9 +38,6 @@ const scan = (page: Page) =>
   new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
     .exclude('iframe')
-    .exclude('.mark-highlight')
-    .exclude('.mark-muted')
-    .exclude('.mark-silent')
     .analyze()
     .then((r) => r.violations.map((v) => `${v.id}: ${v.nodes[0]?.target.join(' ')}`));
 

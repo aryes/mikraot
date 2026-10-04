@@ -153,11 +153,13 @@ test('content formatting renders: centred table cells and the meaningful colours
 
   await page.goto('/שווא-נע/');
   const taught = page.locator('.wp-content-rendered .mark-highlight').first();
-  await expect(taught).toHaveCSS('color', 'rgb(255, 102, 0)');
+  await expect(taught).toHaveCSS('color', 'rgb(194, 65, 12)');
+  await expect(taught).toHaveCSS('font-weight', '700');
 
   await page.goto('/silent-letters/');
   const silent = page.locator('.wp-content-rendered .mark-silent').first();
-  await expect(silent).toHaveCSS('color', 'rgb(209, 207, 207)');
+  await expect(silent).toHaveCSS('color', 'rgb(112, 112, 112)');
+  await expect(silent).toHaveCSS('text-decoration-style', 'dotted');
 });
 
 test('heading anchors from WordPress survive (Hebrew ones included)', async ({ page }) => {
