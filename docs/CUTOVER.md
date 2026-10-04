@@ -16,16 +16,16 @@ Current state (checked 2026-10-04): routes `mikraot.net/api/*` and `www.mikraot.
       GitHub + CI deploys, Web Analytics beacon ready.
 - [ ] **Content freeze on WordPress** (no edits there from now on). Check for content edited and
       comments approved on WordPress since the export (2026-09-30); carry them over.
-- [ ] **Backup the production database:** `npx wrangler d1 export mikraot-db --remote --output
+- [x] **Backup the production database:** `npx wrangler d1 export mikraot-db --remote --output _(done 2026-10-04: `Documents/mikraot-backups/d1-mikraot-db-2026-10-04.sql`)_
 backups/d1-<date>.sql` (kept outside the repo).
-- [ ] **Approval:** apply `migrations/` to production D1 (`npx wrangler d1 migrations apply
+- [x] **Approval:** apply `migrations/` to production D1 (`npx wrangler d1 migrations apply _(done 2026-10-04, approved; old API unaffected)_
 mikraot-db --remote`): 0001 records the existing schema (no change), 0002 adds an index,
       0003 adds `parent_id` for replies. Old Worker keeps working (it ignores the new column).
-- [ ] Worker secret: `npx wrangler secret put TURNSTILE_SECRET_KEY` (value in `.env`).
-- [ ] **Approval:** first deploy of the Worker `mikraot` (no route yet: reachable only at its
+- [x] Worker secret: `npx wrangler secret put TURNSTILE_SECRET_KEY` (value in `.env`). _(done 2026-10-04)_
+- [x] **Approval:** first deploy of the Worker `mikraot` (no route yet: reachable only at its
       workers.dev address). Check pages, search, audio, feeds, headers there. Comments can't be
       tested on workers.dev (the Turnstile widget only accepts mikraot.net); they are tested right
-      after the switch.
+      after the switch. _(done 2026-10-04, approved: https://mikraot.mikraot-app.workers.dev)_
 
 ## 2. The switch (about 15 minutes, at a quiet hour)
 
@@ -36,6 +36,7 @@ mikraot-db --remote`): 0001 records the existing schema (no change), 0002 adds a
       and `mikraot.net/wp-login.php*` with **no Worker** (they go to Bluehost).
 - [ ] Remove the two `…/api/*` → `mikraot-api` routes (the new Worker serves `/api/` itself).
 - [ ] Purge the Cloudflare cache (old WordPress pages may be cached at the edge).
+- [ ] Turn off the workers.dev address of the production Worker (`workers_dev: false`), so only mikraot.net serves the site (pages already declare mikraot.net as canonical).
 
 ## 3. Right after the switch
 
