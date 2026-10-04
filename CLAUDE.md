@@ -41,7 +41,7 @@ The plan and known issues are in `docs/ROADMAP.md`.
 
 - GitHub: `gh` CLI (winget, logged in as aryes). This repo's git config uses `http.sslBackend schannel` (AVG intercepts TLS; Windows' certificate store trusts it) and `gh` as credential helper. Commits use Arye's GitHub noreply address. `main` is protected against deletion and force-push.
 
-- Build: `npm run build` = type check + `build:site` (Astro build, then the Pagefind search index into `dist/client/pagefind/`; search only works in built output, not in `npm run dev`).
+- Build: `npm run build` = type check + `build:site` (Astro build, then html-validate on every page (`.htmlvalidate.mjs`; invalid markup fails the build and so the deploy), then the Pagefind search index into `dist/client/pagefind/`; search only works in built output, not in `npm run dev`).
 - Content editing: `npm run cms` (http://localhost:4400/keystatic): Keystatic edits `src/content/pages/` and `src/data/site.json` directly; config in `keystatic.config.tsx` must stay in sync with `markdoc.config.mjs` (`src/keystatic.test.ts` reads all content through it). Runs on Node via `astro.config.cms.mjs`.
 - Before every commit: `npm run check` (type check, lint with warnings as errors, formatting, unit tests).
 - Dev server: `npm run dev` (http://localhost:4321, runs in Cloudflare's workerd). Checks: `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm run build`.

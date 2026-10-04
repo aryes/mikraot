@@ -150,7 +150,8 @@ gitleaks, `compare:live`, CI workflow.
 - **M/S Lighthouse CI** with budgets (performance, accessibility, SEO) on a few pages.
 - **M/S Client error reporting:** a tiny handler that sends browser errors to the Worker logs (no
   third-party service).
-- **L/S HTML validation** (`html-validate`) of the build.
+- **Done: HTML validation** (`html-validate`, config `.htmlvalidate.mjs`) of every built page, inside
+  `npm run build:site`, so invalid markup stops a deploy.
 
 ## 6. Tracking the user experience
 
