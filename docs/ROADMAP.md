@@ -113,7 +113,7 @@ Hosting after the move: Cloudflare (one Worker: pages, media, comments API, D1);
    - [ ] Arye: confirm two-factor login on GitHub
    - [x] Renovate installed (Dependency Dashboard: issue #1)
    - [x] Production Worker deployed to workers.dev (not mikraot.net); production D1 migrated (backup first); preview D1 `mikraot-db-preview` and Worker Previews tested: a comment on a preview lands in the preview DB only
-   - [ ] Automatic deploys from GitHub (Cloudflare Workers Builds: `main` → production, other branches → preview URL); Arye connects GitHub in the Cloudflare dashboard
+   - [x] Automatic deploys from GitHub: Cloudflare Workers Builds connected 2026-10-04 (build `npm run build`, deploy `npx wrangler deploy` for `main`, `npx wrangler preview` for other branches = preview URL per branch)
    - [ ] Keystatic GitHub mode (browser editing)
 3. - [ ] Cutover with rollback: plan drafted in `docs/CUTOVER.md` (2026-10-04, for Arye's review): a Worker route on the existing domain, DNS unchanged, rollback = removing the route. Then switch (approval needed). WordPress stays on Bluehost untouched as the fallback
 4. - [ ] Retire WordPress after a few stable weeks (sign-off needed; full backup first)
