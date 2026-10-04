@@ -65,9 +65,13 @@ const crumbs = isPost
     <Content />
   </div>
 
-  {isPost && <PostNav page={page} />}
+  {isPost && (
+    <div class="print:hidden">
+      <PostNav page={page} />
+    </div>
+  )}
 
-  <div data-pagefind-ignore>
+  <div data-pagefind-ignore class="print:hidden">
     <Comments client:visible pageKey={commentKey(page)} lookupKeys={commentKeys(page)} />
   </div>
 </ContentLayout>

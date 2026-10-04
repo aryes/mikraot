@@ -5,7 +5,7 @@ interface Props {
 const { videoId } = Astro.props;
 ---
 
-<div class="mx-auto my-6 aspect-video w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-md">
+<div class="print:hidden mx-auto my-6 aspect-video w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-md">
   <iframe
     src={`https://www.youtube-nocookie.com/embed/${videoId}`}
     title="YouTube video player"

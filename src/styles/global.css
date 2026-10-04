@@ -199,3 +199,37 @@
   font-size: 0.8rem;
   color: #64748b;
 }
+
+/* Printing (teachers print lessons): the layout parts are hidden with Tailwind `print:` classes in
+   the components; these rules cover the content. Collapsed explanations print as they are on
+   screen, so a lesson prints as a worksheet, or with its answers after opening them. */
+@media print {
+  .wp-content-rendered .inline-audio-btn,
+  .wp-content-rendered td .inline-audio-btn {
+    display: none;
+  }
+  .wp-content-rendered .table-scroll {
+    overflow: visible;
+  }
+  /* Printers drop backgrounds by default, which would leave white header text on white. */
+  .wp-content-rendered th {
+    background: none;
+    color: #000000;
+    border-bottom-width: 2px;
+  }
+  /* The same for an opened collapse button (white on the brand colour on screen). */
+  .wp-content-rendered .collapse-toggle-btn {
+    background: none;
+    color: #000000;
+  }
+  /* Open dialogs (search, the video popup) would print over the page. */
+  dialog {
+    display: none;
+  }
+  .wp-content-rendered :is(h2, h3, h4) {
+    break-after: avoid;
+  }
+  .wp-content-rendered :is(tr, img, blockquote) {
+    break-inside: avoid;
+  }
+}

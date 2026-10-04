@@ -18,23 +18,23 @@ const photo = (size: string) => `/wp-content/uploads/2021/08/pexels-cottonbro-59
 import Pointed from '../Pointed.astro';
 ---
 
-<div class="relative isolate overflow-hidden bg-slate-700">
+<div class="relative isolate overflow-hidden bg-slate-700 print:bg-transparent">
   <img
     src={photo('1536x1024')}
     srcset={`${photo('768x512')} 768w, ${photo('1024x683')} 1024w, ${photo('1536x1024')} 1536w, ${photo('2048x1365')} 2048w`}
     sizes="100vw"
     alt=""
     fetchpriority="high"
-    class="absolute inset-0 -z-10 h-full w-full object-cover"
+    class="banner-photo absolute inset-0 -z-10 h-full w-full object-cover print:hidden"
   />
-  <div class="mx-auto flex min-h-40 max-w-7xl items-center px-4 py-8 sm:min-h-[250px] sm:px-6 lg:px-8">
-    <div class="w-full rounded-lg bg-slate-900/65 px-6 py-5 text-white">
+  <div class="mx-auto flex min-h-40 max-w-7xl items-center px-4 py-8 sm:min-h-[250px] sm:px-6 lg:px-8 print:min-h-0 print:p-0">
+    <div class="w-full rounded-lg bg-slate-900/65 px-6 py-5 text-white print:bg-transparent print:p-0 print:text-black">
       <h1 class="font-hebrew text-3xl leading-tight font-extrabold tracking-tight sm:text-4xl">
         <Pointed text={title} />
       </h1>
-      {subtitle && <p class="mt-2 text-lg text-slate-100">{subtitle}</p>}
+      {subtitle && <p class="mt-2 text-lg text-slate-100 print:text-slate-700">{subtitle}</p>}
       {crumbs && (
-        <nav aria-label="פירורי לחם" class="mt-3 text-sm text-slate-100">
+        <nav aria-label="פירורי לחם" class="mt-3 text-sm text-slate-100 print:hidden">
           <ol class="flex flex-wrap items-center gap-2">
             <li>
               <a href="/" class="underline-offset-2 hover:underline">

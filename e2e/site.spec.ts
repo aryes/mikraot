@@ -294,3 +294,30 @@ test('search matches abbreviations however they are typed: " or ״, apostrophe o
   expect(await results('תנ"ך')).toEqual(await results('תנ״ך'));
   expect(await results("ו' החיבור")).toEqual(await results('ו׳ החיבור'));
 });
+
+test('a printed lesson keeps the content and drops navigation, comments and players', async ({
+  page,
+}) => {
+  await page.goto('/דגש-קל/');
+  // An opened explanation prints with its button readable (white on colour on screen).
+  await page.locator('.collapse-toggle-btn').first().click();
+  await page.emulateMedia({ media: 'print' });
+  const layoutParts = page.locator(
+    'header, footer, aside, .banner-photo, .inline-audio-btn, [data-pagefind-ignore], dialog',
+  );
+  expect(await layoutParts.count()).toBeGreaterThan(5);
+  const visible = await layoutParts.evaluateAll((parts) =>
+    parts.filter((part) => part.checkVisibility()).map((part) => part.outerHTML.slice(0, 80)),
+  );
+  expect(visible).toEqual([]);
+  await expect(page.locator('h1')).toBeVisible();
+  await expect(page.locator('table').first()).toBeVisible();
+  // Printers drop backgrounds by default: text that relied on one must turn dark.
+  const black = 'rgb(0, 0, 0)';
+  await expect(page.locator('th').first()).toHaveCSS('color', black);
+  await expect(page.locator('.collapse-toggle-btn[aria-expanded="true"]')).toHaveCSS(
+    'color',
+    black,
+  );
+  await expect(page.getByText('מקראות: https://mikraot.net/דגש-קל/')).toBeVisible();
+});

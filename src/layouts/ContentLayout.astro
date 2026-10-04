@@ -49,9 +49,13 @@ const structured = structuredData(
 <BaseLayout title={documentTitle} description={description} ogImage={ogImage} noindex={noindex}>
   <script slot="head" type="application/ld+json" set:html={jsonLd(structured)} />
   <PageBanner title={title} subtitle={subtitle} crumbs={crumbs} />
-  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:px-8">
-    <div class="min-w-0 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs sm:p-10">
+  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:px-8 print:block print:max-w-none print:p-0 print:pt-4">
+    <div class="min-w-0 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs sm:p-10 print:border-0 print:p-0 print:shadow-none">
       <slot />
+      <!-- Printed copies say where they come from. -->
+      <p class="mt-8 hidden border-t border-slate-300 pt-2 text-xs print:block">
+        {site.title}: <bdi dir="ltr">{decodeURI(absolute(Astro.url.pathname))}</bdi>
+      </p>
     </div>
     <Sidebar />
   </div>
