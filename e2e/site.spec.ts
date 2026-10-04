@@ -44,6 +44,22 @@ test('approved comments load when the comments section scrolls into view', async
   await expect(page.getByText('ממתין לאישור')).toHaveCount(0); // unapproved stays hidden
 });
 
+test('replies appear under the comment they answer, and "reply" sets up the form', async ({
+  page,
+}) => {
+  await page.goto('/טעמים/נוסח-אשכנז/');
+  await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
+  const first = page.locator('[id^="comment-"]', { hasText: 'תגובת בדיקה ראשונה' });
+  await expect(first).toBeVisible(COMMENTS_LOADED);
+  // The admin answer (a reply in the fixtures) sits in the thread right under the first comment.
+  await expect(first.locator('xpath=following-sibling::div')).toContainText('תשובת מנהל לדוגמה');
+
+  await first.getByRole('button', { name: 'השיבו לקורא לדוגמה' }).click();
+  await expect(page.getByText('תגובה לקורא לדוגמה')).toBeVisible();
+  await page.getByRole('button', { name: 'ביטול התגובה לתגובה' }).click();
+  await expect(page.getByText('תגובה לקורא לדוגמה')).toHaveCount(0);
+});
+
 test('a visitor can post a comment', async ({ page }, testInfo) => {
   const text = `תגובת בדיקה ${testInfo.project.name} ${Date.now()}`;
   await page.goto('/about/');
@@ -52,12 +68,16 @@ test('a visitor can post a comment', async ({ page }, testInfo) => {
   await expect(page.getByText('אורח לדוגמה 0')).toHaveCount(0); // no stray '0' from is_admin_reply
   await page.getByPlaceholder('השם שלכם').fill('מבקר בדיקה');
   await page.getByPlaceholder('כתבו את תגובתכם').fill(text);
+  await page.getByLabel('שמרו את השם והאימייל שלי').check();
   await page.getByRole('button', { name: 'פרסום תגובה' }).click();
   await expect(page.getByText('התגובה נוספה בהצלחה!')).toBeVisible(COMMENTS_LOADED);
   await expect(page.getByText(text)).toBeVisible();
   await page.reload();
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
   await expect(page.getByText(text)).toBeVisible(COMMENTS_LOADED); // persisted in D1
+  // "Remember me": the name comes back from this browser's storage.
+  await expect(page.getByPlaceholder('השם שלכם')).toHaveValue('מבקר בדיקה');
+  await expect(page.getByLabel('שמרו את השם והאימייל שלי')).toBeChecked();
 });
 
 test('menu links point to real WordPress URLs', async ({ page, isMobile }) => {
@@ -110,8 +130,9 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
   const index = await request.get('/sitemap-index.xml');
   expect(index.status()).toBe(200);
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
-  // 34 pages and posts, the month and category archives (the author archive is noindex).
-  expect(sitemap.match(/<loc>/g)).toHaveLength(36);
+  // 34 pages and posts, the month and category archives, "What's new" (the author archive is
+  // noindex).
+  expect(sitemap.match(/<loc>/g)).toHaveLength(37);
   expect(sitemap).not.toContain('/author/');
 
   const old = await request.get('/sitemap.xml', { maxRedirects: 0 });
@@ -237,4 +258,37 @@ test('search opens from the header button and reports no results', async ({ page
   const dialog = page.getByRole('dialog', { name: 'חיפוש באתר' });
   await dialog.getByRole('searchbox').fill('מילה');
   await expect(dialog.getByText('לא נמצאו תוצאות עבור "מילה"')).toBeVisible();
+});
+
+test('pages carry structured data for search engines (as All in One SEO did)', async ({ page }) => {
+  const jsonLd = async (path: string) => {
+    await page.goto(path);
+    const json = (await page.locator('script[type="application/ld+json"]').textContent()) ?? '';
+    expect(() => JSON.parse(json), path).not.toThrow();
+    return json;
+  };
+  const front = await jsonLd('/');
+  expect(front).toContain('"@type":"WebSite"');
+  expect(front).not.toContain('BreadcrumbList');
+  expect(await jsonLd('/טעמים/נוסח-אשכנז/')).toContain('"@type":"BreadcrumbList"');
+  expect(await jsonLd('/בראשית/')).toContain('"@type":"BlogPosting"');
+  await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute('content', / - מקראות$/);
+});
+
+test('search matches abbreviations however they are typed: " or ״, apostrophe or ׳', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.keyboard.press('Control+k');
+  const dialog = page.getByRole('dialog', { name: 'חיפוש באתר' });
+  const results = async (query: string) => {
+    // Clear first, so the previous query's results can't be read as this one's.
+    await dialog.getByRole('searchbox').fill('');
+    await expect(dialog.getByRole('link')).toHaveCount(0);
+    await dialog.getByRole('searchbox').fill(query);
+    await expect(dialog.getByRole('link').first()).toBeVisible();
+    return dialog.getByRole('link').allTextContents();
+  };
+  expect(await results('תנ"ך')).toEqual(await results('תנ״ך'));
+  expect(await results("ו' החיבור")).toEqual(await results('ו׳ החיבור'));
 });

@@ -3,7 +3,10 @@ import menu from '../data/menu.json';
 import siteSettings from '../data/site.json';
 import type { MenuItem } from '../types';
 import { buildMenuTree } from './menu';
-import { pagePath, urlForPath } from './urls';
+import { collectUpdates, type Update } from './updates';
+import { excerptOf, pagePath, urlForPath } from './urls';
+
+const UPDATE_SUMMARY_WORDS = 30;
 
 /** Site title, tagline, copyright and front page (src/data/site.json). */
 export const site = siteSettings;
@@ -74,3 +77,20 @@ export function parentCrumbs({ path }: SitePage, pages: SitePage[]): Crumb[] {
 /** Category names by slug (src/data/site.json). */
 export const categoryName = (slug: string) =>
   site.categories.find((c) => c.slug === slug)?.name ?? slug;
+
+/** The "What's new" list (src/lib/updates.ts) for all published pages and posts. */
+export async function getUpdates(): Promise<Update[]> {
+  return collectUpdates(
+    (await getSitePages()).map(({ entry, url }) => ({
+      title: entry.data.title,
+      url,
+      kind: entry.data.kind,
+      date: entry.data.date,
+      summary: entry.data.excerpt || excerptOf(entry.body ?? '', UPDATE_SUMMARY_WORDS),
+      updates: entry.data.updates,
+    })),
+  );
+}
+
+/** URL of the "What's new" page; its feed is at `${WHATS_NEW_URL}feed/`. */
+export const WHATS_NEW_URL = '/מה-חדש/';

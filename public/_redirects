@@ -4,6 +4,7 @@
 # RSS feeds at their WordPress URLs (built as index.xml files, src/lib/feeds.ts)
 /feed/ /feed/index.xml 200
 /category/:slug/feed/ /category/:slug/feed/index.xml 200
+/%D7%9E%D7%94-%D7%97%D7%93%D7%A9/feed/ /%D7%9E%D7%94-%D7%97%D7%93%D7%A9/feed/index.xml 200
 
 # Front-page pagination (the front page is a static page)
 /page/* / 301

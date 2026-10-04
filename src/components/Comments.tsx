@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CommentError, fetchComments, postComment, type CommentItem } from '../lib/api';
+import { buildThreads } from '../lib/comment-threads';
+import { loadCommenter, rememberCommenter } from '../lib/commenter';
+import { isReservedName } from '../lib/reserved-names';
 import { Turnstile } from './Turnstile';
-import { MessageSquare, Send, CheckCircle2, User, ShieldCheck } from 'lucide-react';
+import { MessageSquare, Reply, Send, CheckCircle2, User, ShieldCheck, X } from 'lucide-react';
 
 interface CommentsProps {
   /** Key new comments are stored under: the page's decoded path, e.g. `טעמים/נוסח-אשכנז`. */
@@ -29,10 +32,28 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
   // Changing the key remounts the Turnstile widget for a fresh token (each works once).
   const [turnstileKey, setTurnstileKey] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
+  const [remember, setRemember] = useState(false);
+  /** The comment being answered, if the visitor clicked "reply". */
+  const [replyTo, setReplyTo] = useState<CommentItem | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
 
   const slugKey = lookupKeys.join(',');
   const loading = loaded?.key !== slugKey;
   const comments = loaded?.key === slugKey ? loaded.comments : [];
+
+  // Name and email saved in this browser by an earlier comment ("remember me"). Read after
+  // hydration: the server-rendered form has no access to the browser's storage.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const saved = loadCommenter();
+      if (!saved) return;
+      setAuthorName(saved.name);
+      setAuthorEmail(saved.email);
+      setRemember(true);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     let current = true;
@@ -46,7 +67,9 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!authorName.trim() || !content.trim() || !turnstileToken) return;
+    if (!authorName.trim() || !content.trim() || !turnstileToken || isReservedName(authorName)) {
+      return;
+    }
 
     const website = new FormData(e.currentTarget).get('website');
     setSubmitting(true);
@@ -60,13 +83,16 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
         content: content.trim(),
         website: typeof website === 'string' ? website : '',
         turnstile_token: turnstileToken,
+        parent_id: replyTo?.id,
       });
 
       if (saved.id) {
         setLoaded((prev) => prev && { ...prev, comments: [...prev.comments, saved] });
       }
 
+      rememberCommenter({ name: authorName.trim(), email: authorEmail.trim() }, remember);
       setContent('');
+      setReplyTo(null);
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 5000);
     } catch (err) {
@@ -84,6 +110,76 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
       setTurnstileToken('');
       setTurnstileKey((key) => key + 1);
     }
+  };
+
+  const startReply = (comment: CommentItem) => {
+    setReplyTo(comment);
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    contentRef.current?.focus({ preventScroll: true });
+  };
+
+  const nameReserved = isReservedName(authorName);
+  const threads = buildThreads(comments);
+  // Replies are indented under the comment they answer; deeper levels stop indenting on phones.
+  const renderComment = (comment: CommentItem, depth: number): React.ReactNode => {
+    const replies = threads.replies(comment);
+    return (
+      <div key={comment.id}>
+        <div
+          // WordPress comment links (#comment-426) keep working.
+          id={`comment-${comment.id}`}
+          className={`rounded-xl border p-4 transition-all sm:p-5 ${
+            comment.is_admin_reply
+              ? `border-emerald-200/80 bg-emerald-50/50 ${comment.parent_id === null ? 'mr-4 sm:mr-8' : ''}`
+              : 'border-slate-200/80 bg-slate-50/80'
+          }`}
+        >
+          <div className="mb-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div
+                className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
+                  comment.is_admin_reply
+                    ? 'bg-brand-strong text-white'
+                    : 'bg-slate-200 text-slate-600'
+                }`}
+              >
+                {comment.is_admin_reply ? (
+                  <ShieldCheck className="h-4 w-4" />
+                ) : (
+                  <User className="h-3.5 w-3.5" />
+                )}
+              </div>
+              <span className="text-sm font-bold text-slate-800">{comment.author_name}</span>
+              {comment.is_admin_reply ? (
+                <span className="bg-brand/15 text-brand-deep rounded-full px-2 py-0.5 text-[11px] font-semibold">
+                  מנהל האתר
+                </span>
+              ) : null}
+            </div>
+            <time className="text-xs text-slate-600">{formatDate(comment.created_at)}</time>
+          </div>
+          <p className="pr-9 text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
+            {comment.content}
+          </p>
+          <button
+            type="button"
+            onClick={() => startReply(comment)}
+            className="text-brand-strong hover:text-brand-deep mt-2 mr-9 inline-flex cursor-pointer items-center gap-1 text-xs font-semibold"
+            aria-label={`השיבו ל${comment.author_name}`}
+          >
+            <Reply className="h-3.5 w-3.5" />
+            השיבו
+          </button>
+        </div>
+        {replies.length > 0 && (
+          <div
+            className={`mt-3 space-y-3 ${depth < 2 ? 'border-r-2 border-slate-200 pr-3 sm:pr-6' : ''}`}
+          >
+            {replies.map((reply) => renderComment(reply, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -105,46 +201,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
             אין תגובות עדיין. היו הראשונים להגיב או לשאול שאלה!
           </div>
         ) : (
-          comments.map((comment) => (
-            <div
-              key={comment.id}
-              // WordPress comment links (#comment-426) keep working.
-              id={`comment-${comment.id}`}
-              className={`rounded-xl border p-4 transition-all sm:p-5 ${
-                comment.is_admin_reply
-                  ? 'mr-4 border-emerald-200/80 bg-emerald-50/50 sm:mr-8'
-                  : 'border-slate-200/80 bg-slate-50/80'
-              }`}
-            >
-              <div className="mb-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div
-                    className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
-                      comment.is_admin_reply
-                        ? 'bg-brand-strong text-white'
-                        : 'bg-slate-200 text-slate-600'
-                    }`}
-                  >
-                    {comment.is_admin_reply ? (
-                      <ShieldCheck className="h-4 w-4" />
-                    ) : (
-                      <User className="h-3.5 w-3.5" />
-                    )}
-                  </div>
-                  <span className="text-sm font-bold text-slate-800">{comment.author_name}</span>
-                  {comment.is_admin_reply ? (
-                    <span className="bg-brand/15 text-brand-deep rounded-full px-2 py-0.5 text-[11px] font-semibold">
-                      מנהל האתר
-                    </span>
-                  ) : null}
-                </div>
-                <time className="text-xs text-slate-600">{formatDate(comment.created_at)}</time>
-              </div>
-              <p className="pr-9 text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
-                {comment.content}
-              </p>
-            </div>
-          ))
+          threads.roots.map((comment) => renderComment(comment, 0))
         )}
       </div>
 
@@ -165,7 +222,22 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
           </div>
         )}
 
-        <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
+        <form ref={formRef} onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
+          {replyTo && (
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+              <span>
+                תגובה ל<strong>{replyTo.author_name}</strong>
+              </span>
+              <button
+                type="button"
+                onClick={() => setReplyTo(null)}
+                className="cursor-pointer rounded p-1 text-slate-500 hover:bg-slate-200"
+                aria-label="ביטול התגובה לתגובה"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
           {/* Anti-spam: hidden from people (and screen readers); bots tend to fill it in. */}
           <div aria-hidden="true" className="sr-only">
             <label>
@@ -184,8 +256,15 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                 value={authorName}
                 onChange={(e) => setAuthorName(e.target.value)}
                 placeholder="השם שלכם"
+                aria-invalid={nameReserved}
+                aria-describedby={nameReserved ? 'name-reserved' : undefined}
                 className="focus:ring-brand-strong w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none"
               />
+              {nameReserved && (
+                <p id="name-reserved" className="mt-1 text-xs text-red-700">
+                  השם הזה שמור למנהל האתר. אנא בחרו שם אחר.
+                </p>
+              )}
             </div>
 
             <div>
@@ -207,6 +286,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
               תוכן התגובה <span className="text-red-500">*</span>
             </label>
             <textarea
+              ref={contentRef}
               required
               rows={3}
               value={content}
@@ -216,11 +296,27 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
             />
           </div>
 
+          <label className="flex items-center gap-2 text-xs text-slate-600">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              className="accent-brand-strong h-4 w-4"
+            />
+            שמרו את השם והאימייל שלי בדפדפן הזה לתגובה הבאה
+          </label>
+
           <div className="flex flex-wrap items-center justify-between gap-4">
             <Turnstile key={turnstileKey} onToken={setTurnstileToken} />
             <button
               type="submit"
-              disabled={submitting || !authorName.trim() || !content.trim() || !turnstileToken}
+              disabled={
+                submitting ||
+                !authorName.trim() ||
+                !content.trim() ||
+                !turnstileToken ||
+                nameReserved
+              }
               className="bg-brand-strong hover:bg-brand-deep inline-flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-xs transition-all disabled:opacity-50"
             >
               <Send className="h-4 w-4" />

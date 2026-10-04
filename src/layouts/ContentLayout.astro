@@ -5,7 +5,9 @@
  */
 import PageBanner from '../components/layout/PageBanner.astro';
 import Sidebar from '../components/layout/Sidebar.astro';
-import type { Crumb } from '../lib/site';
+import { authorUrl } from '../lib/archive';
+import { site, type Crumb } from '../lib/site';
+import { jsonLd, structuredData } from '../lib/structured-data';
 import BaseLayout from './BaseLayout.astro';
 
 interface Props {
@@ -18,12 +20,34 @@ interface Props {
   subtitle?: string | undefined;
   crumbs?: Crumb[] | undefined;
   noindex?: boolean | undefined;
+  /** For posts: the article's date and category, for search engines. */
+  post?: { date: Date; category?: string | undefined } | undefined;
 }
 
-const { documentTitle, description, ogImage, title, subtitle, crumbs, noindex } = Astro.props;
+const { documentTitle, description, ogImage, title, subtitle, crumbs, noindex, post } = Astro.props;
+const origin = (Astro.site ?? Astro.url).origin;
+const absolute = (path: string) => new URL(path, origin).href;
+const structured = structuredData(
+  {
+    url: absolute(Astro.url.pathname),
+    name: documentTitle,
+    description,
+    crumbs: (crumbs ?? []).map((crumb) => ({ title: crumb.title, url: absolute(crumb.url) })),
+    heading: title,
+    isFrontPage: crumbs === undefined,
+    post: post && { datePublished: post.date, section: post.category },
+  },
+  {
+    origin,
+    title: site.title,
+    tagline: site.tagline,
+    author: { name: site.author.name, url: absolute(authorUrl(site.author.slug)) },
+  },
+);
 ---
 
 <BaseLayout title={documentTitle} description={description} ogImage={ogImage} noindex={noindex}>
+  <script slot="head" type="application/ld+json" set:html={jsonLd(structured)} />
   <PageBanner title={title} subtitle={subtitle} crumbs={crumbs} />
   <div class="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:px-8">
     <div class="min-w-0 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs sm:p-10">

@@ -3,6 +3,8 @@
  * so the logic is testable without the Workers runtime.
  */
 
+import { isReservedName } from '../lib/reserved-names';
+
 /** The part of D1's API this module uses; the real `D1Database` binding satisfies it. */
 export interface CommentsDb {
   prepare(query: string): {
@@ -23,6 +25,8 @@ export interface PublicComment {
   author_name: string;
   content: string;
   is_admin_reply: number;
+  /** The comment this one replies to; null for a top-level comment. */
+  parent_id: number | null;
   created_at: string;
 }
 
@@ -31,9 +35,10 @@ export interface NewComment {
   author_name: string;
   author_email: string | null;
   content: string;
+  parent_id: number | null;
 }
 
-const PUBLIC_COLUMNS = 'id, page_slug, author_name, content, is_admin_reply, created_at';
+const PUBLIC_COLUMNS = 'id, page_slug, author_name, content, is_admin_reply, parent_id, created_at';
 const MAX_KEYS = 10;
 const LIMITS = { page_slug: 300, author_name: 100, author_email: 200, content: 5000 } as const;
 /** Largest POST body accepted (bytes): the field limits plus JSON overhead, with room to spare. */
@@ -65,6 +70,7 @@ export function parseNewComment(body: unknown): NewComment | { error: string } {
   };
 
   if (field(HONEYPOT_FIELD)) return { error: 'Rejected' };
+  if (isReservedName(comment.author_name)) return { error: 'Reserved name' };
   if (!comment.page_slug || !comment.author_name || !comment.content) {
     return { error: 'Missing required fields' };
   }
@@ -74,7 +80,19 @@ export function parseNewComment(body: unknown): NewComment | { error: string } {
   if (comment.author_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(comment.author_email)) {
     return { error: 'Invalid email' };
   }
-  return { ...comment, author_email: comment.author_email || null };
+  const parent = body && typeof body === 'object' ? Reflect.get(body, 'parent_id') : undefined;
+  if (
+    parent !== undefined &&
+    parent !== null &&
+    !(Number.isSafeInteger(parent) && Number(parent) > 0)
+  ) {
+    return { error: 'Invalid parent' };
+  }
+  return {
+    ...comment,
+    author_email: comment.author_email || null,
+    parent_id: typeof parent === 'number' ? parent : null,
+  };
 }
 
 export async function listComments(db: CommentsDb, pageKeys: string[]): Promise<PublicComment[]> {
@@ -105,15 +123,31 @@ export async function listRecentComments(db: CommentsDb, limit: number): Promise
   return results;
 }
 
+/** The page key of an approved comment (to check that a reply is on the same page), or null. */
+export async function approvedCommentPage(db: CommentsDb, id: number): Promise<string | null> {
+  const row = await db
+    .prepare('SELECT page_slug FROM comments WHERE id = ? AND approved = 1')
+    .bind(id)
+    .first<{ page_slug: string }>();
+  return row?.page_slug ?? null;
+}
+
 /** Stores a comment. New comments are approved immediately, as on the current site. */
 export async function addComment(db: CommentsDb, comment: NewComment): Promise<PublicComment> {
   const saved = await db
     .prepare(
-      `INSERT INTO comments (page_slug, author_name, author_email, content, is_admin_reply, approved)
-       VALUES (?, ?, ?, ?, 0, 1)
+      `INSERT INTO comments
+         (page_slug, author_name, author_email, content, parent_id, is_admin_reply, approved)
+       VALUES (?, ?, ?, ?, ?, 0, 1)
        RETURNING ${PUBLIC_COLUMNS}`,
     )
-    .bind(comment.page_slug, comment.author_name, comment.author_email, comment.content)
+    .bind(
+      comment.page_slug,
+      comment.author_name,
+      comment.author_email,
+      comment.content,
+      comment.parent_id,
+    )
     .first<PublicComment>();
   if (!saved) throw new Error('Insert returned no row');
   return saved;

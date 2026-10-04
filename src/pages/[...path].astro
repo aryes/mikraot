@@ -3,6 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import { Comments } from '../components/Comments';
 import PostMeta from '../components/PostMeta.astro';
+import PostNav from '../components/PostNav.astro';
 import ContentLayout from '../layouts/ContentLayout.astro';
 import { categoryUrl } from '../lib/archive';
 import {
@@ -47,6 +48,11 @@ const crumbs = isPost
   title={isFrontPage ? site.title : title}
   subtitle={isFrontPage ? site.tagline : undefined}
   crumbs={isFrontPage ? undefined : crumbs}
+  post={
+    isPost
+      ? { date: entry.data.date, category: categories[0] && categoryName(categories[0]) }
+      : undefined
+  }
 >
   {isPost && <PostMeta entry={entry} />}
 
@@ -58,6 +64,8 @@ const crumbs = isPost
   >
     <Content />
   </div>
+
+  {isPost && <PostNav page={page} />}
 
   <div data-pagefind-ignore>
     <Comments client:visible pageKey={commentKey(page)} lookupKeys={commentKeys(page)} />

@@ -32,7 +32,7 @@ The plan and known issues are in `docs/ROADMAP.md`.
 - Comments API: `src/pages/api/comments.ts` (on-demand route in the site Worker) using `src/server/comments.ts`; D1 schema in `migrations/`. Local dev/tests use a local D1 (`npm run db:local:reset` loads fictional fixtures).
 - The old separate Worker `worker/` → `mikraot-api` on `mikraot.net/api/*` is still deployed and serves only the old staging app; remove it at cutover. Production D1 has no migration history yet: apply `migrations/` remotely (0001 is a no-op there) before the new Worker goes live.
 - `npm run compare:live` (after `npm run build`) checks every page against the live site; use it after any change to content rendering.
-- The content was imported from WordPress by `npm run content:import` (scripts/content/: converter + verification; inputs `.migration/wp-export.json` and `.migration/seo.json` from `npm run seo:fetch`). Re-running it overwrites `src/content/pages/`: only until edits start. SEO tags live in each page's frontmatter.
+- The content was imported from WordPress by `npm run content:import` (scripts/content/: converter + verification; inputs `.migration/wp-export.json` and `.migration/seo.json` from `npm run seo:fetch`). Re-running it overwrites `src/content/pages/`: **edits have started (2026-10-04, privacy policy), so don't re-run it** without merging by hand. SEO tags live in each page's frontmatter.
 - Media (76 MP3s, 52 images) is in `public/wp-content/uploads/`, at the same paths as on WordPress; content URLs are rewritten to site-relative `/wp-content/...`. Plugin folders and user avatars from WordPress uploads were deliberately not copied.
 - Live site is still WordPress. Staging app: https://mikraot.net/staging/app/
 

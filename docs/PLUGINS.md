@@ -15,8 +15,8 @@ Status: ✅ in the new site · ⬜ to do (task in `docs/ROADMAP.md`) · ❓ need
 | Website (URL) field                                                  | yes                        | ➖ dropped: mostly used by spammers                                         |
 | Spam filtering (Akismet: 2,504 caught)                               | yes                        | ✅ Turnstile, rate limit, honeypot                                          |
 | **Email to Arye on every new comment** (core `comments_notify`)      | yes                        | ⬜ needs email sending from the Worker                                      |
-| **Replies to a specific comment** (threaded, 5 levels)               | yes (1 admin reply so far) | ⬜ new site shows a flat list with an admin badge; no "reply" button        |
-| "Remember my name and email" checkbox (cookie)                       | yes                        | ⬜ remember in the browser (localStorage), opt-in                           |
+| **Replies to a specific comment** (threaded, 5 levels)               | yes (1 admin reply so far) | ✅ "השיבו" button, replies nested                                           |
+| "Remember my name and email" checkbox (cookie)                       | yes                        | ✅ remembered in the browser (localStorage), opt-in                         |
 | "Notify me of follow-up comments by email" (Jetpack)                 | yes, on posts              | ⬜ reply notifications (needs email sending)                                |
 | "Notify me of new posts by email" (Jetpack Subscriptions)            | yes, on posts              | ⬜ Brevo newsletter; check WordPress.com for existing subscribers           |
 | Gravatar avatars                                                     | yes                        | ➖ replaced by plain icons (no third-party requests, better privacy)        |
@@ -43,22 +43,22 @@ Decided 2026-10-03: **Brevo** (tasks in `docs/ROADMAP.md`). It must cover:
 
 ## SEO (All in One SEO)
 
-| Feature                                                                              | Live             | New site                                            |
-| ------------------------------------------------------------------------------------ | ---------------- | --------------------------------------------------- |
-| Page titles and meta descriptions                                                    | yes              | ✅ (identical, from frontmatter)                    |
-| XML sitemap                                                                          | yes              | ✅ (`/sitemap.xml` → `/sitemap-index.xml`)          |
-| Images listed in the sitemap                                                         | yes              | ⬜ minor: add image entries                         |
-| RSS sitemap `/sitemap.rss`                                                           | yes              | ✅                                                  |
-| HTML sitemap                                                                         | enabled, but 404 | ➖                                                  |
-| Open Graph tags (Facebook, WhatsApp previews)                                        | yes              | ✅                                                  |
-| Twitter card with title and description                                              | yes              | ⬜ only `twitter:card` today; add title/description |
-| **Structured data (JSON-LD):** WebSite, WebPage, BreadcrumbList, BlogPosting, Person | yes              | ⬜ none yet                                         |
-| Canonical URLs                                                                       | yes              | ✅                                                  |
-| Author archive noindex; date archives indexed                                        | yes              | ✅                                                  |
-| robots.txt                                                                           | default          | ✅                                                  |
-| Text added after each item in RSS ("appeared first on…")                             | yes              | ➖ minor; not worth copying                         |
-| Search-engine verification codes                                                     | none set         | ➖ (Search Console via DNS when set up)             |
-| Redirects module                                                                     | not used         | ➖ (`public/_redirects` when needed)                |
+| Feature                                                                              | Live             | New site                                   |
+| ------------------------------------------------------------------------------------ | ---------------- | ------------------------------------------ |
+| Page titles and meta descriptions                                                    | yes              | ✅ (identical, from frontmatter)           |
+| XML sitemap                                                                          | yes              | ✅ (`/sitemap.xml` → `/sitemap-index.xml`) |
+| Images listed in the sitemap                                                         | yes              | ➖ no images in page content               |
+| RSS sitemap `/sitemap.rss`                                                           | yes              | ✅                                         |
+| HTML sitemap                                                                         | enabled, but 404 | ➖                                         |
+| Open Graph tags (Facebook, WhatsApp previews)                                        | yes              | ✅                                         |
+| Twitter card with title and description                                              | yes              | ✅                                         |
+| **Structured data (JSON-LD):** WebSite, WebPage, BreadcrumbList, BlogPosting, Person | yes              | ✅ (`src/lib/structured-data.ts`)          |
+| Canonical URLs                                                                       | yes              | ✅                                         |
+| Author archive noindex; date archives indexed                                        | yes              | ✅                                         |
+| robots.txt                                                                           | default          | ✅                                         |
+| Text added after each item in RSS ("appeared first on…")                             | yes              | ➖ minor; not worth copying                |
+| Search-engine verification codes                                                     | none set         | ➖ (Search Console via DNS when set up)    |
+| Redirects module                                                                     | not used         | ➖ (`public/_redirects` when needed)       |
 
 ## Statistics and monitoring (MonsterInsights, Jetpack Stats, Jetpack Monitor)
 
@@ -84,21 +84,21 @@ Decided 2026-10-03: **Cloudflare Web Analytics** (cookie-free; tasks in `docs/RO
 | Embeds: YouTube                                     | yes                             | ✅                                                                                                                                                     |
 | Embeds: PDF, Google Docs/Sheets/Slides/Maps, Vimeo… | enabled, unused                 | ➖ a content tag is added when first needed                                                                                                            |
 | Tables                                              | core tables (TablePress unused) | ✅                                                                                                                                                     |
-| Image lazy loading                                  | yes                             | ⬜ minor: `loading="lazy"` on content images                                                                                                           |
+| Image lazy loading                                  | yes                             | ➖ no images in page content                                                                                                                           |
 | Image CDN (Jetpack Photon)                          | yes                             | ✅ Cloudflare                                                                                                                                          |
 
 ## Posts and navigation (theme Kahuna, Jetpack)
 
-| Feature                                              | Live                  | New site                                                  |
-| ---------------------------------------------------- | --------------------- | --------------------------------------------------------- |
-| Header banner, breadcrumbs, sticky menu, mobile menu | yes                   | ✅                                                        |
-| Search box                                           | yes                   | ✅ (Pagefind; `/?s=` links work)                          |
-| Post byline: author, category, date                  | yes                   | ✅                                                        |
-| Month, category, author archives; RSS feeds          | yes                   | ✅                                                        |
-| Footer menu, back-to-top                             | yes                   | ✅                                                        |
-| **Previous/next post links** under a post            | yes                   | ⬜                                                        |
-| **Related posts** ("קשור", Jetpack)                  | yes, on posts         | ⬜ same-category posts (useful once there are more posts) |
-| Sharing buttons (Jetpack)                            | configured, not shown | ➖                                                        |
+| Feature                                              | Live                  | New site                                                 |
+| ---------------------------------------------------- | --------------------- | -------------------------------------------------------- |
+| Header banner, breadcrumbs, sticky menu, mobile menu | yes                   | ✅                                                       |
+| Search box                                           | yes                   | ✅ (Pagefind; `/?s=` links work)                         |
+| Post byline: author, category, date                  | yes                   | ✅                                                       |
+| Month, category, author archives; RSS feeds          | yes                   | ✅                                                       |
+| Footer menu, back-to-top                             | yes                   | ✅                                                       |
+| **Previous/next post links** under a post            | yes                   | ✅                                                       |
+| **Related posts** ("קשור", Jetpack)                  | yes, on posts         | ✅ same-category posts (shown once there are more posts) |
+| Sharing buttons (Jetpack)                            | configured, not shown | ➖                                                       |
 
 ## Accounts (WordPress registration, BuddyPress, GamiPress, Nextend Social Login)
 
@@ -127,15 +127,15 @@ protection for what does exist:
 
 ## Site maintenance (WP-Optimize, Bluehost plugin, Endurance cache, FileBird, Broken Link Checker)
 
-| Feature                                                                      | Live      | New site                                                             |
-| ---------------------------------------------------------------------------- | --------- | -------------------------------------------------------------------- |
-| Minified HTML, CSS, JS                                                       | yes       | ✅ Astro build                                                       |
-| Page cache                                                                   | off       | ✅ static pages on Cloudflare                                        |
-| Database clean-up                                                            | available | ➖                                                                   |
-| Automatic updates (WordPress, plugins, themes)                               | on        | ⬜ Renovate (dependency updates as reviewed pull requests)           |
-| Staging copy                                                                 | yes       | ⬜ preview URL per change                                            |
-| Media folders (FileBird, 2 folders)                                          | yes       | ✅ folders in the repo                                               |
-| **Broken links: checked every 72 h, email report** (158 links, 1 broken now) | yes       | ⬜ internal links on every build + weekly external check with report |
+| Feature                                                                      | Live      | New site                                                                                |
+| ---------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------- |
+| Minified HTML, CSS, JS                                                       | yes       | ✅ Astro build                                                                          |
+| Page cache                                                                   | off       | ✅ static pages on Cloudflare                                                           |
+| Database clean-up                                                            | available | ➖                                                                                      |
+| Automatic updates (WordPress, plugins, themes)                               | on        | ⬜ Renovate (dependency updates as reviewed pull requests)                              |
+| Staging copy                                                                 | yes       | ⬜ preview URL per change                                                               |
+| Media folders (FileBird, 2 folders)                                          | yes       | ✅ folders in the repo                                                                  |
+| **Broken links: checked every 72 h, email report** (158 links, 1 broken now) | yes       | ✅ internal links, anchors and recordings on every test run; outside links weekly in CI |
 
 ## Not used at all on the live site
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   addComment,
+  approvedCommentPage,
   listComments,
   listRecentComments,
   parseNewComment,
@@ -34,6 +35,7 @@ const comment: PublicComment = {
   author_name: 'a',
   content: 'b',
   is_admin_reply: 0,
+  parent_id: null,
   created_at: '2024-01-01 00:00:00',
 };
 
@@ -64,6 +66,7 @@ describe('parseNewComment', () => {
       author_name: 'Name',
       author_email: null,
       content: 'Text',
+      parent_id: null,
     });
     expect(parseNewComment({ ...valid, author_email: 'a@b.co' })).toMatchObject({
       author_email: 'a@b.co',
@@ -83,6 +86,19 @@ describe('parseNewComment', () => {
     expect(parseNewComment({ ...valid, website: 'https://spam.example' })).toEqual({
       error: 'Rejected',
     });
+  });
+
+  it('refuses names reserved for the admin', () => {
+    expect(parseNewComment({ ...valid, author_name: 'מנהל האתר' })).toEqual({
+      error: 'Reserved name',
+    });
+  });
+
+  it('accepts a reply to another comment, and refuses a malformed parent', () => {
+    expect(parseNewComment({ ...valid, parent_id: 7 })).toMatchObject({ parent_id: 7 });
+    for (const parent_id of [0, -1, 1.5, '7', 'x']) {
+      expect(parseNewComment({ ...valid, parent_id })).toEqual({ error: 'Invalid parent' });
+    }
   });
 
   it('rejects over-long fields and invalid emails', () => {
@@ -123,6 +139,15 @@ describe('listComments', () => {
   });
 });
 
+describe('approvedCommentPage', () => {
+  it('finds the page of an approved comment only', async () => {
+    const { db, calls } = fakeDb([comment]);
+    expect(await approvedCommentPage(db, 1)).toBe('about');
+    expect(calls[0]?.query).toContain('approved = 1');
+    expect(await approvedCommentPage(fakeDb([]).db, 9)).toBeNull();
+  });
+});
+
 describe('addComment', () => {
   it('inserts with bound values and returns public columns only', async () => {
     const { db, calls } = fakeDb([comment]);
@@ -131,16 +156,23 @@ describe('addComment', () => {
       author_name: 'a',
       author_email: 'a@b.co',
       content: 'b',
+      parent_id: 3,
     });
     expect(saved).toEqual(comment);
-    expect(calls[0]?.values).toEqual(['about', 'a', 'a@b.co', 'b']);
+    expect(calls[0]?.values).toEqual(['about', 'a', 'a@b.co', 'b', 3]);
     expect(calls[0]?.query).toMatch(/RETURNING id, page_slug, author_name, content/);
   });
 
   it('fails loudly if the insert returns nothing', async () => {
     const { db } = fakeDb([]);
     await expect(
-      addComment(db, { page_slug: 'a', author_name: 'b', author_email: null, content: 'c' }),
+      addComment(db, {
+        page_slug: 'a',
+        author_name: 'b',
+        author_email: null,
+        content: 'c',
+        parent_id: null,
+      }),
     ).rejects.toThrow('Insert returned no row');
   });
 });

@@ -70,30 +70,32 @@
   - [ ] Privacy policy: what an account stores (email, name, progress), how to delete it; account deletion in the profile
 - [x] Comments: Turnstile human check (decided 2026-10-02: Turnstile, comments still published immediately), plus rate limit and honeypot. Built with Cloudflare's test keys
 - [ ] At deploy: `wrangler secret put TURNSTILE_SECRET_KEY` (value in `.env`; widget "mikraot.net comments" created 2026-10-02, site key in `astro.config.mjs`)
-- [ ] Anyone can post under the name "מנהל האתר" (the admin badge itself can't be faked)
+- [x] Names reserved for the admin ("מנהל האתר", "admin", "מקראות"…) are refused, in the form and by the API, regardless of spacing, niqqud or case (`src/lib/reserved-names.ts`); the admin badge itself can't be faked
 - [x] Accessibility: axe (WCAG 2.2 AA) passes on every page, desktop + mobile, incl. loaded comments, search dialog, mobile menu (`e2e/accessibility.spec.ts`). Fixed: brand green links/buttons (2.3:1) -> `brand-strong` #5b763e; footer, form hint, breadcrumb and status text
 - [ ] **Decision (Arye): teaching colours vs. contrast.** Orange taught letters #ff6600 (2.9:1), grey context #c3c3c3 (1.8:1) and silent letters #d1cfcf (1.6:1) are below WCAG AA (4.5:1). Options: keep (meaning over contrast; excluded from the audit), or darker shades (e.g. orange #c2410c 5.2:1, grey #767676 4.5:1)
 - Plugins: every feature of every active plugin, with its replacement, is in `docs/PLUGINS.md` (checked 2026-10-03). Open items:
-  - [ ] **Periodic link check** (replaces Broken Link Checker; links can break after they are added): every internal link and `#anchor` checked on each build (CI fails), and a scheduled weekly check of all external links (YouTube, outside sites) that reports broken ones to Arye by email or a GitHub issue. Until GitHub exists: `npm run check:links` run locally
+  - [x] **Periodic link check** (replaces Broken Link Checker): `e2e/links.spec.ts` crawls the site with linkinator (every internal link, image and `#anchor`) and checks every recording, on every test run; `npm run check:links` checks all outside links, weekly in CI (`.github/workflows/links.yml`; GitHub emails a failed run). First run 2026-10-04: all 180 outside links work (ykr.org.il blocks automated checkers, which is also the 1 "broken" link WordPress's checker reports; the check uses a browser-like user agent)
   - [ ] **Email from the Worker** (needed by the next three): a way to send mail from mikraot.net (Cloudflare Email Service or Email Routing's send binding), with SPF/DKIM so it isn't spam
   - [ ] Email to Arye on every new comment (WordPress did this)
-  - [ ] Reply to a specific comment (threaded replies, as on WordPress), and email the commenter when someone replies (Jetpack "notify me of follow-up comments")
-  - [ ] Remember the commenter's name and email in the browser (opt-in checkbox, as on WordPress)
+  - [x] Reply to a specific comment (threaded replies, as on WordPress): "השיבו" button, replies nested under their comment, the API checks the parent is an approved comment on the same page. Needs migration `0003_comment_replies.sql` (adds `parent_id`) on production D1 before the new Worker goes live
+  - [ ] Email the commenter when someone replies (Jetpack "notify me of follow-up comments"): needs email sending
+  - [x] Remember the commenter's name and email in the browser (opt-in checkbox, as on WordPress; `src/lib/commenter.ts`, localStorage, nothing sent)
   - [ ] Comment moderation page behind Cloudflare Access (approve, delete, edit, reply as admin)
-  - [ ] Structured data (JSON-LD: WebSite, WebPage, BreadcrumbList, BlogPosting, Person) and Twitter title/description, as All in One SEO output
-  - [ ] Previous/next post links and related posts (same category) under posts
+  - [x] Structured data (JSON-LD: WebSite, WebPage, BreadcrumbList, BlogPosting, Person) and Twitter title/description, as All in One SEO output (`src/lib/structured-data.ts`, typed with schema-dts)
+  - [x] Previous/next post links and related posts (same category) under posts (`src/components/PostNav.astro`; nothing shows while the site has a single post)
   - [ ] Uptime monitor with email alerts (replaces Jetpack Monitor)
-  - [ ] Renovate for dependency updates (replaces WordPress auto-updates); preview URL per change (replaces staging)
+  - [x] Renovate for dependency updates (replaces WordPress auto-updates): `renovate.json` (weekly pull requests, security fixes at once, 3-day release age, grouped Astro and dev tools, no auto-merge); active once the repo is on GitHub with the Renovate app installed
+  - [ ] Preview URL per change (replaces staging): with the GitHub deploy pipeline
   - [ ] 2FA and login alerts on GitHub, Cloudflare and GoDaddy (replaces Wordfence 2FA and login alerts)
-  - [ ] Minor: images in the sitemap, `loading="lazy"` on content images
+  - [x] Minor: images in the sitemap and `loading="lazy"`: not applicable (checked 2026-10-04: no page content has images; the only image is the banner, which must load first; images are off in the Keystatic editor). Revisit if content images are added
   - [ ] Before cutover: check WordPress.com for Jetpack subscribers; export Google Analytics history if wanted; when finishing the draft "משמעות הטעמים", take its content from Elementor's data (the page text is incomplete)
   - [x] **Newsletter: Brevo** (decided 2026-10-03; ready-made service, free plan: unlimited contacts, 300 emails/day, RSS campaigns, double opt-in, unsubscribe, open/click reports, EU company). Chosen over MailerLite (free plan cut to 250 subscribers) and building our own (Cloudflare email sending needs the paid Workers plan)
   - [ ] Arye: create the Brevo account and an API key (into `.env`); Claude configures the rest via the API where possible
-  - [ ] "Announce" checkbox (with a one-line note) on every page and post in Keystatic → a "What's new" page and a "What's new" RSS feed
+  - [x] Announcements: an "updates" list (date + one-line note) on every page in Keystatic; posts are announced automatically. They feed the "מה חדש" page (`/מה-חדש/`), its RSS feed (`/מה-חדש/feed/`, for the Brevo campaign) and a sidebar box with the latest three
   - [ ] Brevo RSS campaign on that feed: weekly digest, only when there is something new; Hebrew right-to-left template; sender "מקראות"
   - [ ] Brevo sign-up form in the sidebar (CSP allowance for it), double opt-in and welcome email; Arye notified of new subscribers; block `mail.ru` as today
   - [ ] Import the 6 confirmed Email Subscribers contacts (and any Jetpack subscribers found on WordPress.com); the 16 unconfirmed are not imported
-  - [ ] Privacy policy: name Brevo as the newsletter processor; reports as totals
+  - [x] Privacy policy: name Brevo as the newsletter processor; reports as totals (in the 2026-10-04 draft)
   - [x] **Statistics: Cloudflare Web Analytics** (decided 2026-10-03): free, no cookies, no consent banner (the live site loads Google Analytics with no consent banner at all). Covers visits, page views, referrers, countries, devices, page speed; no custom events (recordings played, exercises solved): if those are wanted later, Umami Cloud's free plan is the ready-made option
   - [ ] Set up Web Analytics for the new site at cutover with the manual beacon (not automatic injection, which would also change the live WordPress pages and doesn't fit the CSP); allow `static.cloudflareinsights.com` (script) and `cloudflareinsights.com` (connect) in the CSP
   - [ ] Google Search Console for mikraot.net (verified by DNS; no script): search queries and indexing problems
@@ -106,13 +108,14 @@
 Order (decided 2026-10-03): one change at a time; the site first, email last, Bluehost cancelled only after both.
 Hosting after the move: Cloudflare (one Worker: pages, media, comments API, D1); free plan expected. The domain is registered at GoDaddy (renews by 2027-08-10) with DNS already on Cloudflare.
 
-1. - [ ] Rewrite the privacy policy (it describes the WordPress plugins and cookies that go away)
+1. - [ ] Privacy policy: new Hebrew draft written 2026-10-04 (`privacy-policy`, still a draft, unpublished; the WordPress one was never published either). Arye to review (optionally a lawyer), then publish and link it from the footer and the comment/newsletter forms
 2. - [ ] GitHub + CI deploys (browser editing via Keystatic becomes available)
-3. - [ ] Cutover plan with rollback, then switch the site to the new Worker (approval needed). WordPress stays on Bluehost untouched as the fallback
+3. - [ ] Cutover with rollback: plan drafted in `docs/CUTOVER.md` (2026-10-04, for Arye's review): a Worker route on the existing domain, DNS unchanged, rollback = removing the route. Then switch (approval needed). WordPress stays on Bluehost untouched as the fallback
 4. - [ ] Retire WordPress after a few stable weeks (sign-off needed; full backup first)
 5. - [ ] **Move email off Bluehost**, e.g. Cloudflare Email Routing. Today (checked 2026-10-03): MX `mail.mikraot.net` = the Bluehost web server; `admin@` is a mailbox there and also forwards to an outside address; SPF `v=spf1 a mx include:websitewelcome.com ~all`, DKIM `default._domainkey`, no DMARC. Before switching: save the mailbox if wanted, and if WordPress still sends mail, put Bluehost's server explicitly in SPF (its `mx` entry stops covering it once MX moves). Rollback: restore the MX record. Then add DMARC
 6. - [ ] Cancel Bluehost only after sign-off (final backup of files, database and mailbox kept off the server)
 
 ## Known issues (current app)
 
-- Comments: POST auto-approves, no rate limit or captcha, CORS `*`. (Raw DB errors no longer returned: fixed in `worker/`, not yet deployed.)
+- Old API Worker (`worker/`, still live for the old staging app): comments POST auto-approves, no rate limit or captcha, CORS `*`. (Raw DB errors no longer returned: fixed in `worker/`, not yet deployed.)
+- `npm audit`: 6 "high" findings, all one advisory in `http-cache-semantics` (GHSA-ch52-4w7c-c8xp, published 2026-09-18, no fixed version yet), reached via Astro. Not exploitable here: it concerns shared caches serving several users, and Astro uses it only at build time to cache remote images, which this site has none of. `npm audit fix --force` would downgrade Astro to v2: don't. Recheck when a fix ships

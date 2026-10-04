@@ -1,9 +1,12 @@
 ---
 /** The sidebar of the live site: post archives by month and the categories. */
 import { archiveMonths, categoryUrl } from '../../lib/archive';
-import { getPosts, site } from '../../lib/site';
+import { formatDate } from '../../lib/archive';
+import { getPosts, getUpdates, site, WHATS_NEW_URL } from '../../lib/site';
+import Pointed from '../Pointed.astro';
 
 const posts = await getPosts();
+const latest = (await getUpdates()).slice(0, 3);
 const months = archiveMonths(posts.map(({ entry }) => entry.data.date));
 const used = new Set(posts.flatMap(({ entry }) => entry.data.categories));
 const categories = site.categories.filter((c) => used.has(c.slug));
@@ -13,6 +16,24 @@ const link = 'text-brand-strong hover:text-brand-deep hover:underline';
 ---
 
 <aside aria-label="סרגל צד" class="space-y-6">
+  <section class={box} aria-labelledby="sidebar-whats-new">
+    <h2 id="sidebar-whats-new" class={heading}>
+      מה חדש
+    </h2>
+    <ul class="space-y-2">
+      {latest.map((update) => (
+        <li>
+          <a href={update.url} class={link}>
+            <Pointed text={update.title} />
+          </a>
+          <span class="block text-xs text-slate-600">{formatDate(update.date)}</span>
+        </li>
+      ))}
+    </ul>
+    <a href={WHATS_NEW_URL} class={`${link} mt-3 inline-block text-sm`}>
+      לכל העדכונים
+    </a>
+  </section>
   {months.length > 0 && (
     <section class={box} aria-labelledby="sidebar-archives">
       <h2 id="sidebar-archives" class={heading}>

@@ -31,6 +31,8 @@ export async function postComment(comment: {
   website: string;
   /** Proof from the Turnstile widget that a person is posting. */
   turnstile_token: string;
+  /** The comment this one replies to, if any. */
+  parent_id?: number | undefined;
 }): Promise<CommentItem> {
   const res = await fetch('/api/comments/', {
     method: 'POST',

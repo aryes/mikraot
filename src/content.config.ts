@@ -24,6 +24,11 @@ const pages = defineCollection({
     // Keystatic writes empty fields as '' or null; both mean "not set".
     excerpt: z.string().nullish(),
     draft: z.boolean().default(false),
+    /**
+     * Announcements of new or changed content on this page, for the "What's new" page and feed
+     * (which the newsletter sends). New posts are announced without one.
+     */
+    updates: z.array(z.object({ date: z.coerce.date(), note: z.string() })).default([]),
     seo: z
       .object({
         title: z.string(),

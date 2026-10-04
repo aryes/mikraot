@@ -18,16 +18,17 @@ const refresh = process.argv.includes('--refresh');
 
 /**
  * The built site's content pages, from its sitemap (so exactly what would be deployed is
- * compared). Archive listings (month, category) have no page content; e2e/archives.spec.ts
- * covers them.
+ * compared). Archive listings (month, category) have no page content, and "מה חדש" is new in this
+ * site; e2e/archives.spec.ts covers them.
  */
+const NOT_CONTENT = /^\/(\d{4}\/\d{2}|category\/[^/]+|מה-חדש)\/$/;
 const pageUrls = [
   ...readFileSync('dist/client/sitemap-0.xml', 'utf8').matchAll(
     /<loc>https:\/\/mikraot\.net([^<]*)<\/loc>/g,
   ),
 ]
   .map((m) => decodeURI(m[1] ?? '/'))
-  .filter((url) => !/^\/(\d{4}\/\d{2}|category\/[^/]+)\/$/.test(url));
+  .filter((url) => !NOT_CONTENT.test(url));
 
 type Doc = ReturnType<typeof parseHTML>['document'];
 type Root = NonNullable<ReturnType<Doc['querySelector']>>;

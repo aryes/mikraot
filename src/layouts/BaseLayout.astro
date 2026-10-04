@@ -54,6 +54,9 @@ const icon = (size: number) =>
     <meta property="og:url" content={canonical} />
     {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
     <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    {description && <meta name="twitter:description" content={description} />}
+    <slot name="head" />
   </head>
   <body
     id="top"

@@ -3,6 +3,7 @@ import { env } from 'cloudflare:workers';
 import {
   MAX_BODY_BYTES,
   addComment,
+  approvedCommentPage,
   listComments,
   parseNewComment,
   parsePageKeys,
@@ -45,8 +46,16 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
   if ('error' in comment) return json(comment, 400);
 
   try {
-    if (!findPage(await getPageIndex(env.ASSETS, url.origin), comment.page_slug)) {
-      return json({ error: 'Unknown page' }, 400);
+    const index = await getPageIndex(env.ASSETS, url.origin);
+    const page = findPage(index, comment.page_slug);
+    if (!page) return json({ error: 'Unknown page' }, 400);
+    // A reply must answer an approved comment on the same page (old comments may be stored
+    // under another key of the same page).
+    if (comment.parent_id !== null) {
+      const parentKey = await approvedCommentPage(env.DB, comment.parent_id);
+      if (!parentKey || findPage(index, parentKey)?.url !== page.url) {
+        return json({ error: 'Unknown parent' }, 400);
+      }
     }
     const turnstileKey = env.TURNSTILE_SECRET_KEY;
     if (!turnstileKey) throw new Error('TURNSTILE_SECRET_KEY is not set');

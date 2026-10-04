@@ -1,0 +1,29 @@
+# Weekly check of every outside link (YouTube, other sites): they can break long after they were
+# added (this replaces WordPress's Broken Link Checker). A failed run is emailed by GitHub to the
+# repository owner. Internal links are checked on every change by e2e/links.spec.ts.
+name: Outside links
+
+on:
+  schedule:
+    - cron: '0 6 * * 0' # Sundays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build:site
+      - name: Serve the build and check its outside links
+        run: |
+          npx astro preview --port 4321 &
+          npx --yes wait-on@9 http-get://localhost:4321/ --timeout 120000
+          npm run check:links -- http://localhost:4321

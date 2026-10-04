@@ -1,0 +1,32 @@
+---
+/** "What's new": every announced update and post, newest first (src/lib/updates.ts). */
+import Pointed from '../../components/Pointed.astro';
+import ContentLayout from '../../layouts/ContentLayout.astro';
+import { formatDate } from '../../lib/archive';
+import { getUpdates, site, WHATS_NEW_URL } from '../../lib/site';
+
+const updates = await getUpdates();
+---
+
+<ContentLayout documentTitle={`מה חדש - ${site.title}`} title="מה חדש" crumbs={[]}>
+  <div class="wp-content-rendered">
+    <p>
+      תוכן חדש ועדכונים באתר. אפשר לעקוב גם ב-<a href={`${WHATS_NEW_URL}feed/`}>RSS</a>.
+    </p>
+    {updates.length === 0 ? (
+      <p>אין עדכונים עדיין.</p>
+    ) : (
+      <ul class="latest-posts">
+        {updates.map((update) => (
+          <li>
+            <a href={update.url} class="latest-posts-title">
+              <Pointed text={update.title} />
+            </a>
+            <time datetime={update.date.toISOString()}>{formatDate(update.date)}</time>
+            <div class="latest-posts-excerpt">{update.note}</div>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</ContentLayout>

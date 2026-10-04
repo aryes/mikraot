@@ -91,3 +91,19 @@ test('comments keep their WordPress anchors', async ({ page }) => {
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
   await expect(page.locator('[id^="comment-"]').first()).toBeVisible({ timeout: 15_000 });
 });
+
+test('"מה חדש" lists announcements: in the sidebar, on its page and in its feed', async ({
+  page,
+  request,
+}) => {
+  await page.goto('/about/');
+  const sidebar = page.getByRole('complementary', { name: 'סרגל צד' });
+  await expect(sidebar.locator(`a[href="${POST}"]`)).toBeVisible(); // the post is announced
+  await sidebar.getByRole('link', { name: 'לכל העדכונים' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('מה חדש');
+  await expect(postLink(page)).toBeVisible();
+
+  const feed = await request.get('/מה-חדש/feed/');
+  expect(feed.headers()['content-type']).toContain('application/rss+xml');
+  expect(await feed.text()).toContain(`https://mikraot.net${encodeURI(POST)}#`);
+});

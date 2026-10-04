@@ -102,6 +102,16 @@ export default config({
         }),
         excerpt: fields.text({ label: 'תקציר', multiline: true }),
         draft: fields.checkbox({ label: 'טיוטה (לא מתפרסם)', defaultValue: false }),
+        updates: fields.array(
+          fields.object({
+            date: fields.date({ label: 'תאריך', defaultValue: { kind: 'today' } }),
+            note: fields.text({ label: 'מה חדש (שורה אחת, נשלח למנויים)' }),
+          }),
+          {
+            label: 'הודעות על תוכן חדש בעמוד ("מה חדש" והניוזלטר)',
+            itemLabel: (props) => `${props.fields.date.value ?? ''} – ${props.fields.note.value}`,
+          },
+        ),
         seo: fields.object(
           {
             title: fields.text({ label: 'כותרת לחיפוש (title)' }),

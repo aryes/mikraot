@@ -58,7 +58,7 @@ Rating today: **6.5/10.** Clean, readable, accessible (WCAG AA audit passes), fa
 like a generic template, and the reading experience of pointed text (the heart of the site) is not
 yet tuned.
 
-- **H/S Reading typography for pointed text.** Biblical examples need a larger size than body text
+- ✅ **H/S Reading typography for pointed text.** Biblical examples need a larger size than body text _(done 2026-10-03: Taamey D for pointed text, Noto Hebrew for the rest)_
   (about 1.35–1.5×), generous line height (≥ 1.9, so niqqud and טעמים don't collide), and a font
   that renders every טעם correctly. Test the current fonts against all cantillation marks
   (including rare ones: קרני פרה, ירח בן יומו, שלשלת); if any is missing, use a font made for it,
@@ -111,7 +111,7 @@ Done: CSP and security headers, Turnstile, rate limit, honeypot, secret scanning
   `reject`), so nobody can send mail as @mikraot.net.
 - **H/M Comment moderation page** behind Cloudflare Access (free; login by Arye's email only): delete,
   hide, reply as admin. Today moderation means a database command.
-- **M/S Dependency updates:** Renovate (or Dependabot) with CI, plus `npm audit` in CI.
+- ✅ **M/S Dependency updates:** Renovate (or Dependabot) with CI, plus `npm audit` in CI. _(done 2026-10-04: renovate.json, active once on GitHub)_
 - **M/S Backups:** D1 Time Travel keeps 30 days; add a weekly export of the comments table
   (scheduled Worker → R2 or a private repo).
 - **M/S Privacy (חוק הגנת הפרטיות, amendment 13):** collect less: stop asking for an email unless
@@ -138,7 +138,7 @@ Done: CSP and security headers, Turnstile, rate limit, honeypot, secret scanning
 Already in place: strict TypeScript, oxlint, Prettier, Vitest, Playwright (desktop + phone), axe,
 gitleaks, `compare:live`, CI workflow.
 
-- **H/S Link checker in CI** (replaces the Broken Link Checker plugin): every internal link and
+- ✅ **H/S Link checker in CI** (replaces the Broken Link Checker plugin): every internal link and _(done 2026-10-04: linkinator, every test run + weekly outside links)_
   `#anchor` must resolve at build; external links checked weekly, report only.
 - **H/S Content checks at build:** every audio and image file exists, every YouTube ID is valid,
   every `?page_id` is converted, no empty headings.
@@ -217,3 +217,20 @@ Yes, but privacy-first, with no cookies, so no consent banner is needed:
 - **Questions for Arye** (answered 2026-10-03, see Direction): who is the main audience (adult beginners,
   bar/bat-mitzvah, synagogue readers, teachers)? What is success (reach, impact, income)? How many
   hours a month go to new content?
+
+## 10. Found while building (2026-10-04)
+
+- **H/S Weekly habit, two minutes:** when adding or improving content, add an "update" line in the
+  editor (date + one sentence). It appears in "מה חדש" and goes to newsletter subscribers
+  automatically; without it, new content stays invisible to returning learners.
+- **H/S Know about new comments before email exists:** subscribe to `/comments/feed/` in a feed
+  reader app, or with a free RSS-to-email service, until the site can send email itself.
+- **M/S Plain-letter aliases for URLs with niqqud:** e.g. `/פַּשְׁטָא֙-זָקֵף-קָטָ֔ן/` becomes ~180
+  characters when shared and can't be typed. Keep it (search engines know it) and add redirects
+  from `/פשטא-זקף-קטן/` style aliases.
+- **M/S Check production after every deploy:** run the link crawl and a few read-only browser tests
+  against https://mikraot.net (a base-URL option for the test setup).
+- **M/S Better Hebrew in the editor:** Keystatic is open source; contributing proper Hebrew
+  interface strings (today "Save" = "להציל") fixes it for us and every Hebrew user.
+- **L/S** The rarest טעמים (e.g. ירח בן יומו) now render correctly in Taamey D; a one-page
+  "how the marks look" reference (all marks, enlarged) would double as a visual test.

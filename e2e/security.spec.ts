@@ -63,6 +63,8 @@ test('the comments API refuses junk: unknown pages, bots, oversized bodies, no h
   expect((await post({ ...comment, page_slug: 'no/such/page' })).status()).toBe(400);
   expect((await post({ ...comment, website: 'https://spam.example' })).status()).toBe(400);
   expect((await post({ ...comment, content: 'x'.repeat(40_000) })).status()).toBe(413);
+  expect((await post({ ...comment, parent_id: 999_999 })).status()).toBe(400); // no such comment
+  expect((await post({ ...comment, author_name: 'מנהל האתר' })).status()).toBe(400); // reserved
   expect((await post(comment)).status()).toBe(403); // no Turnstile token
   const response = await request.get('/api/comments/?page_slug=x');
   expect(response.headers()['x-content-type-options']).toBe('nosniff');
