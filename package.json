@@ -21,6 +21,7 @@
     "test:e2e": "playwright test",
     "compare:live": "tsx scripts/compare-with-live.ts",
     "check:links": "tsx scripts/check-external-links.ts",
+    "check:urls": "tsx scripts/check-url-parity.ts",
     "seo:fetch": "tsx scripts/content/fetch-live-seo.ts",
     "content:import": "tsx scripts/content/import-wordpress.ts",
     "format": "prettier --write .",

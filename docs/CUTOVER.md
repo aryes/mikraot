@@ -28,7 +28,8 @@ Current state (2026-10-05): routes `mikraot.net/api/*` and `www.mikraot.net/api/
 - [ ] **URL parity gate:** every URL in WordPress's sitemaps, Search Console's top pages and the
       known old link forms (`/?p=`, `/?page_id=`, `/?s=`, `/feed/`, `/comments/feed/`,
       `/sitemap.xml`, `/robots.txt`, `/page/2/`, `/category/…`, `/author/…`) checked against the
-      workers.dev address: 200, or a deliberate 301/404. `npm run compare:live` for content.
+      workers.dev address: 200, or a deliberate redirect or 404: `npm run check:urls -- <address> [--urls <Search Console export>]`;
+      `npm run compare:live` for content.
 - [x] The Turnstile widget's hostnames include `mikraot.net` (set at creation, 2026-10-02).
 - [ ] **Comments tested before the switch:** temporarily add the workers.dev hostname to the
       Turnstile widget, post and remove a test comment there, then take the hostname off again.
@@ -46,7 +47,7 @@ Current state (2026-10-05): routes `mikraot.net/api/*` and `www.mikraot.net/api/
       staging app uses them; WordPress doesn't use `/api/`), and remove them from
       `worker/wrangler.json` so a redeploy of the old Worker can't bring them back. More specific
       routes win, so while they exist comments would go to the old Worker.
-- [ ] Redirects in `public/_redirects` (`/sitemap.xml`, `/page/*`, BuddyPress) as 302 during the
+- [x] Redirects in `public/_redirects` (`/sitemap.xml`, `/page/*`, `/category/uncategorized/`, BuddyPress) as 302 during the
       fallback weeks: browsers keep 301s, which would survive a rollback. Back to 301 in step 5.
 - [ ] A fresh production D1 export the same day.
 - [ ] **Approval (go/no-go)**, with a fixed date and time (a quiet hour) and the observation
