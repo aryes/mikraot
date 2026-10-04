@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { MAX_REPORT_BYTES, parseClientError } from '../../server/client-errors';
+import { rateLimitKey } from '../../server/rate-limit-key';
 
 // Runs in the Worker on each request (the rest of the site is static).
 export const prerender = false;
@@ -24,7 +25,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
   const report = parseClientError(body);
   if (!report) return done(400);
-  const { success } = await env.CLIENT_ERROR_RATE_LIMIT.limit({ key: clientAddress });
+  const { success } = await env.CLIENT_ERROR_RATE_LIMIT.limit({ key: rateLimitKey(clientAddress) });
   if (!success) return done(429);
   console.warn(
     'Browser error:',

@@ -10,6 +10,7 @@ import {
 } from '../../server/comments';
 import { notifyOwner } from '../../server/notify';
 import { findPage, getPageIndex } from '../../server/page-index';
+import { rateLimitKey } from '../../server/rate-limit-key';
 import { tokenFrom, verifyTurnstile } from '../../server/turnstile';
 
 // Runs in the Worker on each request (the rest of the site is static).
@@ -64,7 +65,7 @@ export const POST: APIRoute = async ({ request, url, clientAddress, locals }) =>
       return json({ error: 'Human check failed' }, 403);
     }
     // Counted only for comments that would be saved, so rejected junk doesn't use up the quota.
-    const { success } = await env.COMMENT_RATE_LIMIT.limit({ key: clientAddress });
+    const { success } = await env.COMMENT_RATE_LIMIT.limit({ key: rateLimitKey(clientAddress) });
     if (!success) return json({ error: 'Too many comments, try again in a minute' }, 429);
     const saved = await addComment(env.DB, comment);
     notifyOwner({
