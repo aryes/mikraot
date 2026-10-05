@@ -25,6 +25,24 @@ test('security headers are sent', async ({ page }) => {
   );
 });
 
+test('hashed build files are cached for a year; pages are not', async ({ page, request }) => {
+  const response = await page.goto('/');
+  expect(response?.headers()['cache-control'] ?? '').not.toContain('immutable');
+  // Any build file the page uses (a stylesheet may be inlined when small; scripts and the
+  // banner image are files). The header comes from @astrojs/cloudflare, which writes it into
+  // _headers at build time: this guards against an update dropping it.
+  const asset = await page.evaluate(
+    () =>
+      [...document.querySelectorAll('[href^="/_astro/"], [src^="/_astro/"]')]
+        .map((element) => element.getAttribute('href') ?? element.getAttribute('src'))
+        .find(Boolean) ?? '',
+  );
+  expect(asset).toMatch(/^\/_astro\//);
+  const cached = await request.get(asset);
+  expect(cached.ok()).toBe(true);
+  expect(cached.headers()['cache-control']).toBe('public, max-age=31536000, immutable');
+});
+
 test('security.txt is served (RFC 9116)', async ({ request }) => {
   const response = await request.get('/.well-known/security.txt');
   expect(response.status()).toBe(200);
