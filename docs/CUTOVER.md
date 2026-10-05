@@ -77,7 +77,7 @@ Success means all of these:
 - [ ] A branch preview still works (`preview_urls: true`).
 - [ ] Email addresses on pages are obfuscated by Cloudflare (Scrape Shield), as for WordPress.
 - [ ] The URL parity checks from step 1 pass against `https://mikraot.net`, plus
-      `npm run check:links -- https://mikraot.net`.
+      `npm run check:links -- https://mikraot.net` and `npm run test:deployed -- https://mikraot.net`.
 - [ ] A real test comment posts, appears, and is hidden again (approval for the D1 change).
 - [ ] Response headers (CSP, HSTS…) present; no console errors or CSP blocks on a few pages.
 - [ ] Web Analytics receives visits; Search Console: submit `/sitemap-index.xml`.

@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { LinkChecker, LinkState } from 'linkinator';
 
@@ -27,7 +26,8 @@ test('every internal link, image and #anchor works', async ({ baseURL }) => {
 
 test('every recording the pages play exists', async ({ request }) => {
   // Audio buttons keep their file in a data attribute, which a link checker doesn't follow.
-  const sitemap = readFileSync('dist/client/sitemap-0.xml', 'utf8');
+  // The sitemap of the site under test (local build or deployed).
+  const sitemap = await (await request.get('/sitemap-0.xml')).text();
   const pages = [...sitemap.matchAll(/<loc>https:\/\/mikraot\.net([^<]*)<\/loc>/g)].map(
     (m) => m[1],
   );

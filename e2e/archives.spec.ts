@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { LOCAL_ONLY } from './tags';
 
 const POST = '/בראשית/';
 /** A link to the post (matched by address: its title has niqqud and cantillation marks). */
@@ -63,8 +64,8 @@ test('RSS feeds at the WordPress URLs', async ({ request }) => {
   }
   const comments = await request.get('/comments/feed/');
   expect(comments.headers()['content-type']).toContain('application/rss+xml');
-  // Fixture comments, linked to their anchor on the page (WordPress's #comment-<id>).
-  expect(await comments.text()).toMatch(/<link>[^<]*\/about\/#comment-\d+<\/link>/);
+  // Comments link to their anchor on the page (WordPress's #comment-<id>).
+  expect(await comments.text()).toMatch(/<link>[^<]*\/#comment-\d+<\/link>/);
 });
 
 test('old WordPress links still work', async ({ page }) => {
@@ -86,7 +87,8 @@ test('old WordPress links still work', async ({ page }) => {
   }
 });
 
-test('comments keep their WordPress anchors', async ({ page }) => {
+// Needs the fictional comment on /about/ (e2e/fixtures/comments.sql).
+test('comments keep their WordPress anchors', LOCAL_ONLY, async ({ page }) => {
   await page.goto('/about/');
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
   await expect(page.locator('[id^="comment-"]').first()).toBeVisible({ timeout: 15_000 });

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { LOCAL_ONLY } from './tags';
 
 /** Collects Content-Security-Policy violations reported in the console. */
 function watchCsp(page: Page): string[] {
@@ -38,8 +39,11 @@ test('features work under the CSP: comments, collapsibles, audio, embedded video
   await page.goto('/טעמים/נוסח-אשכנז/');
   await page.locator('iframe[src*="youtube-nocookie.com"]').first().waitFor();
   await page.locator('.collapse-toggle-btn').first().click();
+  // Comments load from the API (any site: no reliance on the local fictional comments).
+  const loaded = page.waitForResponse((r) => r.url().includes('/api/comments/') && r.ok());
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
-  await expect(page.getByText('קורא לדוגמה')).toBeVisible({ timeout: 15_000 });
+  await loaded;
+  await expect(page.getByText('טוען תגובות...')).toHaveCount(0);
 
   await page.goto('/דגש-קל/');
   await page.locator('.inline-audio-btn').first().click();
@@ -77,40 +81,41 @@ test('the comments API refuses junk: unknown pages, bots, oversized bodies, no h
   expect(response.headers()['x-content-type-options']).toBe('nosniff');
 });
 
-test('browser errors reach the Worker log endpoint, which refuses junk', async ({
-  page,
-  request,
-}) => {
-  await page.goto('/');
-  const reports: unknown[] = [];
-  page.on('request', (sent) => {
-    if (sent.url().endsWith('/api/client-errors/')) reports.push(sent.postDataJSON());
-  });
-  const delivered = page.waitForResponse((r) => r.url().endsWith('/api/client-errors/'));
-  await page.evaluate(() => {
-    // Not from the site's scripts (like an extension's): ignored.
-    void Promise.reject(new Error('foreign'));
-    // As if thrown by one of the site's scripts.
-    const filename = `${location.origin}/_astro/probe.js`;
-    dispatchEvent(new ErrorEvent('error', { message: 'e2e probe', filename, lineno: 1 }));
-  });
-  expect((await delivered).status()).toBe(204);
-  expect(reports).toEqual([
-    expect.objectContaining({ kind: 'error', message: 'e2e probe', page: '/' }),
-  ]);
+test(
+  'browser errors reach the Worker log endpoint, which refuses junk',
+  LOCAL_ONLY,
+  async ({ page, request }) => {
+    await page.goto('/');
+    const reports: unknown[] = [];
+    page.on('request', (sent) => {
+      if (sent.url().endsWith('/api/client-errors/')) reports.push(sent.postDataJSON());
+    });
+    const delivered = page.waitForResponse((r) => r.url().endsWith('/api/client-errors/'));
+    await page.evaluate(() => {
+      // Not from the site's scripts (like an extension's): ignored.
+      void Promise.reject(new Error('foreign'));
+      // As if thrown by one of the site's scripts.
+      const filename = `${location.origin}/_astro/probe.js`;
+      dispatchEvent(new ErrorEvent('error', { message: 'e2e probe', filename, lineno: 1 }));
+    });
+    expect((await delivered).status()).toBe(204);
+    expect(reports).toEqual([
+      expect.objectContaining({ kind: 'error', message: 'e2e probe', page: '/' }),
+    ]);
 
-  const post = (data: unknown) => request.post('/api/client-errors/', { data });
-  expect((await post({ kind: 'other', message: 'x' })).status()).toBe(400);
-  // Other websites can't make their visitors' browsers send reports (Astro's origin check;
-  // a JSON post would need a CORS preflight, which the API doesn't allow).
-  const crossSite = await Promise.all(
-    ['/api/client-errors/', '/api/search-misses/'].map((endpoint) =>
-      request.post(endpoint, {
-        headers: { origin: 'https://other.example', 'content-type': 'text/plain' },
-        data: JSON.stringify({ kind: 'error', message: 'x', query: 'x' }),
-      }),
-    ),
-  );
-  expect(crossSite.map((response) => response.status())).toEqual([403, 403]);
-  expect((await post({ kind: 'error', message: 'x'.repeat(5000) })).status()).toBe(413);
-});
+    const post = (data: unknown) => request.post('/api/client-errors/', { data });
+    expect((await post({ kind: 'other', message: 'x' })).status()).toBe(400);
+    // Other websites can't make their visitors' browsers send reports (Astro's origin check;
+    // a JSON post would need a CORS preflight, which the API doesn't allow).
+    const crossSite = await Promise.all(
+      ['/api/client-errors/', '/api/search-misses/'].map((endpoint) =>
+        request.post(endpoint, {
+          headers: { origin: 'https://other.example', 'content-type': 'text/plain' },
+          data: JSON.stringify({ kind: 'error', message: 'x', query: 'x' }),
+        }),
+      ),
+    );
+    expect(crossSite.map((response) => response.status())).toEqual([403, 403]);
+    expect((await post({ kind: 'error', message: 'x'.repeat(5000) })).status()).toBe(413);
+  },
+);

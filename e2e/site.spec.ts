@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { LOCAL_ONLY } from './tags';
 
 // Comments load lazily (island script on scroll) and then call a Worker endpoint that may start
 // cold, which can exceed the default 5s under parallel test load.
@@ -35,32 +36,39 @@ test('collapsible explanations open and close', async ({ page }) => {
   await expect(panel).toBeHidden();
 });
 
-test('approved comments load when the comments section scrolls into view', async ({ page }) => {
-  await page.goto('/טעמים/נוסח-אשכנז/');
-  await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
-  await expect(page.getByText('קורא לדוגמה')).toBeVisible(COMMENTS_LOADED);
-  await expect(page.getByText('מנהל האתר')).toBeVisible(); // admin reply badge
-  await expect(page.getByRole('heading', { name: 'תגובות ושאלות (2)' })).toBeVisible();
-  await expect(page.getByText('ממתין לאישור')).toHaveCount(0); // unapproved stays hidden
-});
+// The fictional comments in e2e/fixtures/comments.sql exist only in the local database.
+test(
+  'approved comments load when the comments section scrolls into view',
+  LOCAL_ONLY,
+  async ({ page }) => {
+    await page.goto('/טעמים/נוסח-אשכנז/');
+    await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
+    await expect(page.getByText('קורא לדוגמה')).toBeVisible(COMMENTS_LOADED);
+    await expect(page.getByText('מנהל האתר')).toBeVisible(); // admin reply badge
+    await expect(page.getByRole('heading', { name: 'תגובות ושאלות (2)' })).toBeVisible();
+    await expect(page.getByText('ממתין לאישור')).toHaveCount(0); // unapproved stays hidden
+  },
+);
 
-test('replies appear under the comment they answer, and "reply" sets up the form', async ({
-  page,
-}) => {
-  await page.goto('/טעמים/נוסח-אשכנז/');
-  await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
-  const first = page.locator('[id^="comment-"]', { hasText: 'תגובת בדיקה ראשונה' });
-  await expect(first).toBeVisible(COMMENTS_LOADED);
-  // The admin answer (a reply in the fixtures) sits in the thread right under the first comment.
-  await expect(first.locator('xpath=following-sibling::div')).toContainText('תשובת מנהל לדוגמה');
+test(
+  'replies appear under the comment they answer, and "reply" sets up the form',
+  LOCAL_ONLY,
+  async ({ page }) => {
+    await page.goto('/טעמים/נוסח-אשכנז/');
+    await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
+    const first = page.locator('[id^="comment-"]', { hasText: 'תגובת בדיקה ראשונה' });
+    await expect(first).toBeVisible(COMMENTS_LOADED);
+    // The admin answer (a reply in the fixtures) sits in the thread right under the first comment.
+    await expect(first.locator('xpath=following-sibling::div')).toContainText('תשובת מנהל לדוגמה');
 
-  await first.getByRole('button', { name: 'השיבו לקורא לדוגמה' }).click();
-  await expect(page.getByText('תגובה לקורא לדוגמה')).toBeVisible();
-  await page.getByRole('button', { name: 'ביטול התגובה לתגובה' }).click();
-  await expect(page.getByText('תגובה לקורא לדוגמה')).toHaveCount(0);
-});
+    await first.getByRole('button', { name: 'השיבו לקורא לדוגמה' }).click();
+    await expect(page.getByText('תגובה לקורא לדוגמה')).toBeVisible();
+    await page.getByRole('button', { name: 'ביטול התגובה לתגובה' }).click();
+    await expect(page.getByText('תגובה לקורא לדוגמה')).toHaveCount(0);
+  },
+);
 
-test('a visitor can post a comment', async ({ page }, testInfo) => {
+test('a visitor can post a comment', LOCAL_ONLY, async ({ page }, testInfo) => {
   const text = `תגובת בדיקה ${testInfo.project.name} ${Date.now()}`;
   await page.goto('/about/');
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
@@ -247,7 +255,8 @@ test('search finds pages by keyword (Ctrl+K), ignoring niqqud', async ({ page })
   await expect(page.locator('h1')).toHaveText('דגש קל');
 });
 
-test('search opens from the header button and reports no results', async ({ page }) => {
+// Typing a query that finds nothing would count it on a deployed site (src/scripts/search.ts).
+test('search opens from the header button and reports no results', LOCAL_ONLY, async ({ page }) => {
   // Stub the index: real Pagefind still returns weak single-letter matches for most queries.
   await page.route('**/pagefind/pagefind.js', (route) =>
     route.fulfill({
@@ -322,53 +331,58 @@ test('a printed lesson keeps the content and drops navigation, comments and play
   await expect(page.getByText('מקראות: https://mikraot.net/דגש-קל/')).toBeVisible();
 });
 
-test('a search that found nothing is counted once the visitor closes the search', async ({
-  page,
-  request,
-}) => {
-  await page.route('**/pagefind/pagefind.js', (route) =>
-    route.fulfill({
-      contentType: 'text/javascript',
-      body: 'export const search = async () => ({ results: [] });',
-    }),
-  );
-  const reports: unknown[] = [];
-  page.on('request', (sent) => {
-    if (sent.url().endsWith('/api/search-misses/')) reports.push(sent.postDataJSON());
-  });
-  await page.goto('/');
-  await page.getByRole('button', { name: 'חיפוש באתר' }).click();
-  const dialog = page.getByRole('dialog', { name: 'חיפוש באתר' });
-  const searchbox = dialog.getByRole('searchbox');
-  // Letters typed on the way to the query are not counted, only the query that was left.
-  await searchbox.fill('קמ');
-  await searchbox.fill('קמץ חטוף');
-  await expect(dialog.getByText('לא נמצאו תוצאות עבור "קמץ חטוף"')).toBeVisible();
-  const delivered = page.waitForResponse((r) => r.url().endsWith('/api/search-misses/'));
-  await page.keyboard.press('Escape');
-  expect((await delivered).status()).toBe(204);
-  expect(reports).toEqual([{ query: 'קמץ חטוף' }]);
+test(
+  'a search that found nothing is counted once the visitor closes the search',
+  LOCAL_ONLY,
+  async ({ page, request }) => {
+    await page.route('**/pagefind/pagefind.js', (route) =>
+      route.fulfill({
+        contentType: 'text/javascript',
+        body: 'export const search = async () => ({ results: [] });',
+      }),
+    );
+    const reports: unknown[] = [];
+    page.on('request', (sent) => {
+      if (sent.url().endsWith('/api/search-misses/')) reports.push(sent.postDataJSON());
+    });
+    await page.goto('/');
+    await page.getByRole('button', { name: 'חיפוש באתר' }).click();
+    const dialog = page.getByRole('dialog', { name: 'חיפוש באתר' });
+    const searchbox = dialog.getByRole('searchbox');
+    // Letters typed on the way to the query are not counted, only the query that was left.
+    await searchbox.fill('קמ');
+    await searchbox.fill('קמץ חטוף');
+    await expect(dialog.getByText('לא נמצאו תוצאות עבור "קמץ חטוף"')).toBeVisible();
+    const delivered = page.waitForResponse((r) => r.url().endsWith('/api/search-misses/'));
+    await page.keyboard.press('Escape');
+    expect((await delivered).status()).toBe(204);
+    expect(reports).toEqual([{ query: 'קמץ חטוף' }]);
 
-  const post = (data: unknown) => request.post('/api/search-misses/', { data });
-  expect((await post({ query: 'dana@example.com' })).status()).toBe(400);
-  expect((await post({ query: 'x'.repeat(2000) })).status()).toBe(413);
-});
+    const post = (data: unknown) => request.post('/api/search-misses/', { data });
+    expect((await post({ query: 'dana@example.com' })).status()).toBe(400);
+    expect((await post({ query: 'x'.repeat(2000) })).status()).toBe(413);
+  },
+);
 
-test('an old /?s= search link is not counted as a search that found nothing', async ({ page }) => {
-  await page.route('**/pagefind/pagefind.js', (route) =>
-    route.fulfill({
-      contentType: 'text/javascript',
-      body: 'export const search = async () => ({ results: [] });',
-    }),
-  );
-  let reported = false;
-  page.on('request', (sent) => {
-    if (sent.url().endsWith('/api/search-misses/')) reported = true;
-  });
-  await page.goto('/?s=casino');
-  const dialog = page.getByRole('dialog', { name: 'חיפוש באתר' });
-  await expect(dialog.getByText('לא נמצאו תוצאות עבור "casino"')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await page.goto('/about/'); // pagehide
-  expect(reported).toBe(false);
-});
+test(
+  'an old /?s= search link is not counted as a search that found nothing',
+  LOCAL_ONLY,
+  async ({ page }) => {
+    await page.route('**/pagefind/pagefind.js', (route) =>
+      route.fulfill({
+        contentType: 'text/javascript',
+        body: 'export const search = async () => ({ results: [] });',
+      }),
+    );
+    let reported = false;
+    page.on('request', (sent) => {
+      if (sent.url().endsWith('/api/search-misses/')) reported = true;
+    });
+    await page.goto('/?s=casino');
+    const dialog = page.getByRole('dialog', { name: 'חיפוש באתר' });
+    await expect(dialog.getByText('לא נמצאו תוצאות עבור "casino"')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await page.goto('/about/'); // pagehide
+    expect(reported).toBe(false);
+  },
+);

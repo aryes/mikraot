@@ -43,8 +43,10 @@ const scan = (page: Page) =>
 
 test('no accessibility violations with comments loaded', async ({ page }) => {
   await page.goto('/טעמים/נוסח-אשכנז/');
+  const loaded = page.waitForResponse((r) => r.url().includes('/api/comments/') && r.ok());
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
-  await page.getByText('קורא לדוגמה').waitFor({ timeout: 15_000 });
+  await loaded;
+  await expect(page.getByText('טוען תגובות...')).toHaveCount(0);
   expect(await scan(page)).toEqual([]);
 });
 
