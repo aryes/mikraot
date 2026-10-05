@@ -29,7 +29,8 @@
     "db:local:reset": "wrangler d1 migrations apply mikraot-db --local && wrangler d1 execute mikraot-db --local --file e2e/fixtures/comments.sql",
     "cf-typegen": "wrangler types",
     "prepare": "git config core.hooksPath .githooks",
-    "test:deployed": "tsx scripts/test-deployed.ts"
+    "test:deployed": "tsx scripts/test-deployed.ts",
+    "search:misses": "tsx scripts/search-misses.ts"
   },
   "dependencies": {
     "@astrojs/markdoc": "^2.0.9",

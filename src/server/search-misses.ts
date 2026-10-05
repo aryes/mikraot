@@ -2,7 +2,7 @@
  * Searches that found nothing: a list of content visitors look for and don't find. Written to
  * Workers Analytics Engine (dataset `mikraot_search_misses`), Cloudflare's store for this kind of
  * counting: its own free quota (so a flood can't use up the database's writes, which comments
- * need) and data deleted after three months. Read it with the SQL API (see CLAUDE.md).
+ * need) and data deleted after three months. List it with `npm run search:misses`.
  */
 
 export const MAX_QUERY_LENGTH = 100;
