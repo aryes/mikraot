@@ -127,8 +127,9 @@ Done: CSP and security headers, Turnstile, rate limit, honeypot, secret scanning
   preview; approving publishes. No terminal needed for content.
 - **M/S Monitoring:** Workers observability is on; add alerts on error rate and a free uptime check
   (Cloudflare health check or UptimeRobot) that notifies by email.
-- **M/S Images:** serve the banner and content images as AVIF/WebP via Astro's image pipeline (the
-  banner is the page's largest element).
+- **M/S Images:** the banner is done (AVIF/WebP via Astro's image pipeline, 92 KB instead of 375 KB
+  on wide screens). Content images (52, in `public/wp-content/uploads/`) could follow, but their
+  WordPress URLs are linked from outside, so they would need to stay as well.
 - **M/S Clean-up at cutover:** remove the old `mikraot-api` Worker, `/staging/` on Bluehost, Supabase
   (if unused), the `worker/` folder.
 - **L/S** A short "how to" for Arye: add a page, add audio, reply to a comment, publish.

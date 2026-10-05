@@ -14,17 +14,22 @@ interface Props {
 }
 
 const { title, subtitle, crumbs } = Astro.props;
-const photo = (size: string) => `/wp-content/uploads/2021/08/pexels-cottonbro-5986498-${size}.jpg`;
+import { Picture } from 'astro:assets';
+// The WordPress banner photo (also kept at its old URLs in public/wp-content/uploads/), resized
+// and converted to AVIF/WebP at build time; the banner shows only a strip of it.
+import banner from '../../assets/banner-cottonbro.jpg';
 import Pointed from '../Pointed.astro';
 ---
 
 <div class="relative isolate overflow-hidden bg-slate-700 print:bg-transparent">
-  <img
-    src={photo('1536x1024')}
-    srcset={`${photo('768x512')} 768w, ${photo('1024x683')} 1024w, ${photo('1536x1024')} 1536w, ${photo('2048x1365')} 2048w`}
+  <Picture
+    src={banner}
+    formats={['avif', 'webp']}
+    widths={[768, 1024, 1536, 2048]}
     sizes="100vw"
     alt=""
     fetchpriority="high"
+    loading="eager"
     class="banner-photo absolute inset-0 -z-10 h-full w-full object-cover print:hidden"
   />
   <div class="mx-auto flex min-h-40 max-w-7xl items-center px-4 py-8 sm:min-h-[250px] sm:px-6 lg:px-8 print:min-h-0 print:p-0">
