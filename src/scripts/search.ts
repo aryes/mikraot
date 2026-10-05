@@ -13,6 +13,8 @@ interface Pagefind {
 }
 
 const MAX_RESULTS = 8;
+/** How long a search with no results must stay unchanged before it counts as a miss. */
+const MISS_DELAY_MS = 2000;
 let pagefind: Promise<Pagefind> | null = null;
 
 function isPagefind(value: unknown): value is Pagefind {
@@ -68,6 +70,27 @@ function setUpSearch(dialog: HTMLDialogElement): void {
   if (!input || !list || !status) return;
 
   let latest = 0;
+
+  // A search that found nothing is reported (src/pages/api/search-misses.ts) once the visitor
+  // stops typing, closes the search or leaves the page, so the letters typed on the way to a
+  // real query aren't counted. Each query at most once per page view.
+  const reported = new Set<string>();
+  let miss = '';
+  let missTimer: ReturnType<typeof setTimeout> | undefined;
+  const reportMiss = () => {
+    clearTimeout(missTimer);
+    if (miss && !reported.has(miss)) {
+      reported.add(miss);
+      navigator.sendBeacon('/api/search-misses/', JSON.stringify({ query: miss }));
+    }
+    miss = '';
+  };
+  dialog.addEventListener('close', reportMiss);
+  addEventListener('pagehide', reportMiss);
+  // Phones often background and then kill a tab without a pagehide.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') reportMiss();
+  });
   // In a search box the browser's first Escape only clears the text; close the dialog instead.
   input.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
@@ -76,9 +99,14 @@ function setUpSearch(dialog: HTMLDialogElement): void {
     }
   });
 
-  input.addEventListener('input', () => {
+  input.addEventListener('input', (event) => {
+    // Only what a person typed counts: old /?s= links fill the box with a synthetic event, and
+    // crawlers that run scripts open spam search links.
+    const typed = event.isTrusted;
     const query = input.value.trim();
     const run = ++latest;
+    clearTimeout(missTimer);
+    miss = '';
     if (!query) {
       list.replaceChildren();
       return;
@@ -87,7 +115,12 @@ function setUpSearch(dialog: HTMLDialogElement): void {
       .then((pf) => pf.search(query))
       .then((search) => Promise.all(search.results.slice(0, MAX_RESULTS).map((r) => r.data())))
       .then((results) => {
-        if (run === latest) renderResults(list, results, query); // ignore stale responses
+        if (run !== latest) return; // ignore stale responses
+        renderResults(list, results, query);
+        if (results.length === 0 && typed && dialog.open) {
+          miss = query;
+          missTimer = setTimeout(reportMiss, MISS_DELAY_MS);
+        }
       })
       .catch((error: unknown) => {
         console.error('Search failed:', error);

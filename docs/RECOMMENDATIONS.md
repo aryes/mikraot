@@ -160,7 +160,9 @@ Yes, but privacy-first, with no cookies, so no consent banner is needed:
 - **H/S Cloudflare Web Analytics:** page views, referrers, countries, devices, Core Web Vitals.
 - **H/S Google Search Console** (and Bing Webmaster Tools): the queries that bring people, pages
   with indexing problems.
-- **H/S Search with no results:** log the query (anonymous) → a ready-made list of missing content.
+- **Done: searches with no results** are counted anonymously in Workers Analytics Engine
+  (`src/server/search-misses.ts`, kept 3 months) → a ready-made list of missing content. Searches
+  that find results, but not the right ones, are not measured.
 - **M/S Content events** via Workers Analytics Engine (free tier): audio plays, video plays, hidden
   answers opened, 404 URLs.
 - **M/S "Was this page helpful?"** 👍/👎 with an optional comment, stored in D1.

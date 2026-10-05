@@ -321,3 +321,54 @@ test('a printed lesson keeps the content and drops navigation, comments and play
   );
   await expect(page.getByText('מקראות: https://mikraot.net/דגש-קל/')).toBeVisible();
 });
+
+test('a search that found nothing is counted once the visitor closes the search', async ({
+  page,
+  request,
+}) => {
+  await page.route('**/pagefind/pagefind.js', (route) =>
+    route.fulfill({
+      contentType: 'text/javascript',
+      body: 'export const search = async () => ({ results: [] });',
+    }),
+  );
+  const reports: unknown[] = [];
+  page.on('request', (sent) => {
+    if (sent.url().endsWith('/api/search-misses/')) reports.push(sent.postDataJSON());
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'חיפוש באתר' }).click();
+  const dialog = page.getByRole('dialog', { name: 'חיפוש באתר' });
+  const searchbox = dialog.getByRole('searchbox');
+  // Letters typed on the way to the query are not counted, only the query that was left.
+  await searchbox.fill('קמ');
+  await searchbox.fill('קמץ חטוף');
+  await expect(dialog.getByText('לא נמצאו תוצאות עבור "קמץ חטוף"')).toBeVisible();
+  const delivered = page.waitForResponse((r) => r.url().endsWith('/api/search-misses/'));
+  await page.keyboard.press('Escape');
+  expect((await delivered).status()).toBe(204);
+  expect(reports).toEqual([{ query: 'קמץ חטוף' }]);
+
+  const post = (data: unknown) => request.post('/api/search-misses/', { data });
+  expect((await post({ query: 'dana@example.com' })).status()).toBe(400);
+  expect((await post({ query: 'x'.repeat(2000) })).status()).toBe(413);
+});
+
+test('an old /?s= search link is not counted as a search that found nothing', async ({ page }) => {
+  await page.route('**/pagefind/pagefind.js', (route) =>
+    route.fulfill({
+      contentType: 'text/javascript',
+      body: 'export const search = async () => ({ results: [] });',
+    }),
+  );
+  let reported = false;
+  page.on('request', (sent) => {
+    if (sent.url().endsWith('/api/search-misses/')) reported = true;
+  });
+  await page.goto('/?s=casino');
+  const dialog = page.getByRole('dialog', { name: 'חיפוש באתר' });
+  await expect(dialog.getByText('לא נמצאו תוצאות עבור "casino"')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.goto('/about/'); // pagehide
+  expect(reported).toBe(false);
+});

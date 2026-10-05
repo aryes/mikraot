@@ -18,6 +18,11 @@ declare module 'cloudflare:workers' {
     COMMENT_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
     /** Per-visitor limit on browser error reports (src/pages/api/client-errors.ts). */
     CLIENT_ERROR_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
+    /** Searches that found nothing (Analytics Engine dataset; src/server/search-misses.ts). */
+    // oxlint-disable-next-line typescript/consistent-type-imports
+    SEARCH_MISSES: import('./server/search-misses').SearchMissesDataset;
+    /** Per-visitor limit on reports of searches with no results (src/pages/api/search-misses.ts). */
+    SEARCH_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
   };
 }
 

@@ -101,5 +101,16 @@ test('browser errors reach the Worker log endpoint, which refuses junk', async (
 
   const post = (data: unknown) => request.post('/api/client-errors/', { data });
   expect((await post({ kind: 'other', message: 'x' })).status()).toBe(400);
+  // Other websites can't make their visitors' browsers send reports (Astro's origin check;
+  // a JSON post would need a CORS preflight, which the API doesn't allow).
+  const crossSite = await Promise.all(
+    ['/api/client-errors/', '/api/search-misses/'].map((endpoint) =>
+      request.post(endpoint, {
+        headers: { origin: 'https://other.example', 'content-type': 'text/plain' },
+        data: JSON.stringify({ kind: 'error', message: 'x', query: 'x' }),
+      }),
+    ),
+  );
+  expect(crossSite.map((response) => response.status())).toEqual([403, 403]);
   expect((await post({ kind: 'error', message: 'x'.repeat(5000) })).status()).toBe(413);
 });

@@ -31,7 +31,15 @@
       "namespace_id": "1003",
       "simple": { "limit": 10, "period": 60 },
     },
+    // Searches that found nothing: at most 20 reports per minute from one visitor.
+    {
+      "name": "SEARCH_RATE_LIMIT",
+      "namespace_id": "1005",
+      "simple": { "limit": 20, "period": 60 },
+    },
   ],
+  // Searches that found nothing (src/server/search-misses.ts): Analytics Engine keeps 3 months.
+  "analytics_engine_datasets": [{ "binding": "SEARCH_MISSES", "dataset": "mikraot_search_misses" }],
   "observability": { "enabled": true },
   // Worker Previews (one per git branch, `wrangler preview`): their own database and rate-limit
   // counter, so test comments never reach production. Previews are built with Turnstile's test
@@ -46,6 +54,9 @@
         "database_id": "8e22a15a-bb5d-467c-8ca6-1d0b65f0e468",
       },
     ],
+    "analytics_engine_datasets": [
+      { "binding": "SEARCH_MISSES", "dataset": "mikraot_search_misses_preview" },
+    ],
     "ratelimits": [
       {
         "name": "COMMENT_RATE_LIMIT",
@@ -56,6 +67,11 @@
         "name": "CLIENT_ERROR_RATE_LIMIT",
         "namespace_id": "1004",
         "simple": { "limit": 10, "period": 60 },
+      },
+      {
+        "name": "SEARCH_RATE_LIMIT",
+        "namespace_id": "1006",
+        "simple": { "limit": 20, "period": 60 },
       },
     ],
   },
