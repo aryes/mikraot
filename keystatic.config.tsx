@@ -6,6 +6,7 @@
 import { collection, config, fields, singleton } from '@keystatic/core';
 import { block, inline, mark, wrapper } from '@keystatic/core/content-components';
 import { Eye, EyeOff, Highlighter, Keyboard, Newspaper, Video, Volume2 } from 'lucide-react';
+import { slugFromTitle } from './src/lib/slug';
 
 const collapseSchema = {
   expandText: fields.text({ label: 'טקסט לפתיחה (ריק = אייקון עין בלבד)' }),
@@ -97,7 +98,11 @@ export default config({
       entryLayout: 'content',
       columns: ['title'],
       schema: {
-        title: fields.slug({ name: { label: 'כותרת' }, slug: { label: 'כתובת (slug)' } }),
+        // The address is proposed from the title (src/lib/slug.ts; Keystatic's own drops Hebrew).
+        title: fields.slug({
+          name: { label: 'כותרת' },
+          slug: { label: 'כתובת (slug)', generate: slugFromTitle },
+        }),
         kind: fields.select({
           label: 'סוג',
           options: [
