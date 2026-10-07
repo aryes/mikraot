@@ -13,9 +13,9 @@ export default defineConfig({
   // (seen as comments hanging on "loading"); serial runs are stable and barely slower.
   workers: 1,
   forbidOnly: Boolean(process.env['CI']),
-  // One retry absorbs a rare stall of the local server on Windows (a page load aborted after 30 s,
-  // in a different test each time; investigated 2026-10-07, never seen in CI on Linux). Retried
-  // tests are still reported as flaky.
+  // One retry (in every run, CI and deployed ones too) absorbs a rare page load that aborts after
+  // 30 s, in a different test each time: likely a stall of the local server on Windows
+  // (investigated 2026-10-07; not seen in CI on Linux). Retried tests are still reported as flaky.
   retries: 1,
   use: {
     baseURL: deployed ?? `http://localhost:${port}`,
