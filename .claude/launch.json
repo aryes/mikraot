@@ -12,6 +12,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["astro", "preview", "--port", "4323"],
       "port": 4323
+    },
+    {
+      "name": "cms",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "cms"],
+      "port": 4400
     }
   ]
 }

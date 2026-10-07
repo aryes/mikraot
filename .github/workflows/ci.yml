@@ -39,6 +39,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      # The editor's Hebrew labels (patches/): a Keystatic update that breaks the patch fails
+      # here, in its Renovate PR, rather than silently in the editor.
+      - run: npm run patches
 
   e2e:
     name: Build and browser tests
