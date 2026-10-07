@@ -227,9 +227,9 @@ Yes, but privacy-first, with no cookies, so no consent banner is needed:
 - **H/S Weekly habit, two minutes:** when adding or improving content, add an "update" line in the
   editor (date + one sentence). It appears in "מה חדש" and goes to newsletter subscribers
   automatically; without it, new content stays invisible to returning learners.
-- **M/S Plain-letter aliases for URLs with niqqud:** e.g. `/פַּשְׁטָא֙-זָקֵף-קָטָ֔ן/` becomes ~180
-  characters when shared and can't be typed. Keep it (search engines know it) and add redirects
-  from `/פשטא-זקף-קטן/` style aliases.
+- **Done: plain-letter aliases for URLs with niqqud:** the two pages with marks in their address
+  also answer at the same words without marks (e.g. `/פשטא-זקף-קטן`), via `public/_redirects`; a
+  test makes sure any new marked page gets one.
 - **Done: check production after a deploy:** `npm run test:deployed -- <URL>` runs the read-only
   browser tests (link crawl included) against a deployed site, automatically after each deploy
   (`.github/workflows/deployed.yml`).

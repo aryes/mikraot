@@ -386,3 +386,32 @@ test(
     expect(reported).toBe(false);
   },
 );
+
+/** Hebrew vowel points, cantillation marks and the maqaf (U+0591 to U+05C7). */
+const HEBREW_MARK = /[\u0591-\u05C7]/;
+
+test('pages with vowel points in their address also answer at a short address without them', async ({
+  request,
+}) => {
+  const sitemap = await (await request.get('/sitemap-0.xml')).text();
+  const marked = [...sitemap.matchAll(/<loc>https:\/\/mikraot\.net([^<]*)<\/loc>/g)]
+    .map((match) => decodeURI(match[1] ?? ''))
+    .filter((path) => HEBREW_MARK.test(path));
+  expect(marked.length).toBeGreaterThan(0);
+  // Each page's address without the marks (a maqaf becomes a hyphen), typed with or without
+  // the final slash.
+  const shortForms = marked.flatMap((path) => {
+    const short = path.replace(/[\u0591-\u05BD\u05BF-\u05C7]/g, '').replace(/\u05BE/g, '-');
+    return [short, short.replace(/\/$/, '')].map((form) => ({ form, page: path }));
+  });
+  const results = await Promise.all(
+    shortForms.map(async ({ form, page }) => {
+      const res = await request.get(encodeURI(form), { maxRedirects: 0 });
+      return { form, page, status: res.status(), to: res.headers()['location'] ?? '' };
+    }),
+  );
+  for (const { form, page, status, to } of results) {
+    expect(status, form).toBe(302); // temporary until WordPress is retired (docs/CUTOVER.md)
+    expect(decodeURI(new URL(to, 'https://mikraot.net').pathname), form).toBe(page);
+  }
+});
