@@ -140,7 +140,8 @@ Done: CSP and security headers, Turnstile, rate limit, honeypot, secret scanning
   WordPress URLs are linked from outside, so they would need to stay as well.
 - **M/S Clean-up at cutover:** remove the old `mikraot-api` Worker, `/staging/` on Bluehost, Supabase
   (if unused), the `worker/` folder.
-- **L/S** A short "how to" for Arye: add a page, add audio, reply to a comment, publish.
+- **Done: a short "how to" for Arye** (`docs/GUIDE.md`): open the editor, change and add pages,
+  recordings, videos, "מה חדש" lines, headings, publishing, comments.
 
 ## 5. Tools that prevent bugs
 
