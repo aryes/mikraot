@@ -149,12 +149,14 @@ gitleaks, `compare:live`, CI workflow.
 
 - ✅ **H/S Link checker in CI** (replaces the Broken Link Checker plugin): every internal link and _(done 2026-10-04: linkinator, every test run + weekly outside links)_
   `#anchor` must resolve at build; external links checked weekly, report only.
-- **H/S Content checks at build:** every audio and image file exists, every YouTube ID is valid,
-  every `?page_id` is converted, no empty headings.
+- **Done: content checks** (`src/content.test.ts`, in `npm run check` and CI): every recording,
+  image and file exists, every YouTube id is well formed, no old WordPress link forms, no empty
+  headings.
 - **M/S Consistent Hebrew encoding:** the same word can be stored with its marks in different orders
   (seen in tests: two spellings of בראשית that look identical). A check that flags mixed orderings
   keeps search and links reliable. (Don't auto-normalize: Unicode normalization can reorder marks in
-  ways that render badly.)
+  ways that render badly.) Measured 2026-10-08: 12 of 39 pages are not in the standard (NFC) order;
+  left as they are for that reason.
 - **M/M Visual regression:** Playwright screenshots of key pages compared on every change.
 - **Done: Lighthouse CI** (`npm run lighthouse`, `lighthouserc.cjs`; in CI after the browser tests):
   minimum scores on four page types. It found the address-less menu and footer links, the comments
