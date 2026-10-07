@@ -74,6 +74,13 @@
 .wp-content-rendered h4 {
   font-size: 1.1rem;
 }
+/* A heading drawn smaller than its level (markdoc.config.mjs, size="small"). */
+.wp-content-rendered .heading-small {
+  font-size: 1.1rem;
+  color: #334155;
+  border-bottom: 0;
+  padding-bottom: 0;
+}
 .wp-content-rendered p {
   margin-bottom: 1rem;
   /* Room above and below the letters for stacked niqqud and cantillation marks. */

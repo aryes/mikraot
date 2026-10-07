@@ -487,3 +487,18 @@ test('embedded videos show their picture and load YouTube only when played', asy
   await expect(player).toHaveAttribute('title', title ?? '');
   await expect(buttons).toHaveCount(before - 1);
 });
+
+test('home page outline: topic headings at level 2, drawn small as on WordPress', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const headings = page.locator('.wp-content-rendered').getByRole('heading');
+  await expect(headings).toHaveText(['הגיה', 'דקדוק', 'טעמים', 'דברי הימים']);
+  // No level is skipped: the page title is h1 and these are all h2.
+  for (const level of await headings.evaluateAll((all) => all.map((h) => h.tagName))) {
+    expect(level).toBe('H2');
+  }
+  const topic = headings.first();
+  await expect(topic).toHaveCSS('font-size', '17.6px'); // 1.1rem, the former h4 size
+  await expect(topic).toHaveCSS('border-bottom-width', '0px');
+});

@@ -18,7 +18,20 @@ const content = fields.markdoc({
   options: {
     heading: {
       levels: [2, 3, 4, 5, 6],
-      schema: { anchor: fields.text({ label: 'עוגן (לקישורים בתוך העמוד)' }) },
+      schema: {
+        anchor: fields.text({ label: 'עוגן (לקישורים בתוך העמוד)' }),
+        // Markdoc attribute size="small" (markdoc.config.mjs); empty means the level's own size.
+        // A dropdown is easier than typing "small"; it does write size="" into headings on a
+        // page's first save, which is harmless (markdoc.config.mjs accepts it).
+        size: fields.select({
+          label: 'גודל',
+          options: [
+            { label: 'לפי הרמה', value: '' },
+            { label: 'קטן', value: 'small' },
+          ],
+          defaultValue: '',
+        }),
+      },
     },
     table: true,
     image: false,

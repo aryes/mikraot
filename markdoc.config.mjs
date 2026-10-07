@@ -42,14 +42,20 @@ export default defineMarkdocConfig({
   nodes: {
     heading: {
       ...nodes.heading,
-      attributes: { level: { type: Number, required: true }, anchor: { type: String } },
+      attributes: {
+        level: { type: Number, required: true },
+        anchor: { type: String },
+        // The level is the page's outline (screen readers navigate by it); size="small" draws a
+        // heading smaller than its level, so the outline can be right without changing the look.
+        size: { type: String, matches: ['', 'small'] },
+      },
       // An explicit anchor (the target of in-page links) becomes the heading's id.
       transform(node, config) {
-        const { level, anchor } = node.transformAttributes(config);
+        const { level, anchor, size } = node.transformAttributes(config);
         return markPointed(
           new Markdoc.Tag(
             `h${level}`,
-            anchor ? { id: anchor } : {},
+            { ...(anchor && { id: anchor }), ...(size === 'small' && { class: 'heading-small' }) },
             node.transformChildren(config),
           ),
         );
