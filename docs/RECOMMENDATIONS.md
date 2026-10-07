@@ -231,8 +231,8 @@ Yes, but privacy-first, with no cookies, so no consent banner is needed:
   characters when shared and can't be typed. Keep it (search engines know it) and add redirects
   from `/פשטא-זקף-קטן/` style aliases.
 - **Done: check production after a deploy:** `npm run test:deployed -- <URL>` runs the read-only
-  browser tests (link crawl included) against a deployed site. Still to do: run it automatically
-  after each Workers Builds deploy.
+  browser tests (link crawl included) against a deployed site, automatically after each deploy
+  (`.github/workflows/deployed.yml`).
 - **M/S Better Hebrew in the editor:** Keystatic is open source; contributing proper Hebrew
   interface strings (today "Save" = "להציל") fixes it for us and every Hebrew user.
 - **L/S** The rarest טעמים (e.g. ירח בן יומו) now render correctly in Taamey D; a one-page

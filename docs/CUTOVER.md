@@ -58,7 +58,8 @@ Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` 
 ## 2. The switch (one commit, about 15 minutes)
 
 1. One commit to `wrangler.jsonc`: route `mikraot.net/*` → `mikraot`, `workers_dev: false` and
-   `preview_urls: true` (keeps branch previews).
+   `preview_urls: true` (keeps branch previews); in the same commit, `DEPLOYED_URL` in
+   `.github/workflows/deployed.yml` becomes `https://mikraot.net` (workers.dev goes away).
    After the go/no-go approval it is reviewed and pushed directly to `main`; its deploy
    (Workers Builds) **is** the switch.
 2. www is not routed: WordPress keeps redirecting it to mikraot.net during the fallback period.

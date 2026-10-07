@@ -1,0 +1,74 @@
+# After every deploy, the read-only browser tests run against the deployed site (link crawl,
+# headers, CSP, search, accessibility…; tests that write data are left out, see e2e/tags.ts).
+# Cloudflare's Workers Builds reports each deploy to GitHub as a check run named
+# "Workers Builds: mikraot"; a successful one on main starts this workflow. A failed run is
+# emailed by GitHub to the repository owner. It can also be run by hand for any address.
+name: Deployed site
+
+on:
+  check_run:
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Address of the deployed site
+        required: true
+        default: https://mikraot.mikraot-app.workers.dev
+
+permissions:
+  contents: read
+
+env:
+  # The production address; becomes https://mikraot.net at the cutover (docs/CUTOVER.md, step 2).
+  DEPLOYED_URL: ${{ inputs.url || 'https://mikraot.mikraot-app.workers.dev' }}
+
+jobs:
+  test:
+    # Only Cloudflare's own app reports deploys (any app could name a check run the same).
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.check_run.app.slug == 'cloudflare-workers-and-pages' &&
+      github.event.check_run.name == 'Workers Builds: mikraot' &&
+      github.event.check_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deployed-site
+      cancel-in-progress: true
+    env:
+      SHA: ${{ github.event.check_run.head_sha || github.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The commit that was deployed (the accessibility tests list pages from its build).
+          ref: ${{ env.SHA }}
+          fetch-depth: 0
+          persist-credentials: false
+      # Branch previews are reported under the same name; only production deploys (commits on
+      # main) are tested, and nothing from another branch or a fork runs here.
+      - name: Deployed from main?
+        id: main
+        run: |
+          if git merge-base --is-ancestor "$SHA" origin/main; then
+            echo "deployed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "$SHA is not on main (a branch preview): nothing to test."
+          fi
+      - if: steps.main.outputs.deployed == 'true'
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - if: steps.main.outputs.deployed == 'true'
+        run: npm ci
+      - if: steps.main.outputs.deployed == 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.main.outputs.deployed == 'true'
+        run: npm run build:site
+      - if: steps.main.outputs.deployed == 'true'
+        run: npm run test:deployed -- "$DEPLOYED_URL"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7
