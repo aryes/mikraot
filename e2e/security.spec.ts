@@ -58,6 +58,7 @@ test('features work under the CSP: comments, collapsibles, audio, embedded video
 }) => {
   const violations = watchCsp(page);
   await page.goto('/טעמים/נוסח-אשכנז/');
+  await page.getByRole('button', { name: 'הפעלת הסרטון' }).first().click();
   await page.locator('iframe[src*="youtube-nocookie.com"]').first().waitFor();
   await page.locator('.collapse-toggle-btn').first().click();
   // Comments load from the API (any site: no reliance on the local fictional comments).

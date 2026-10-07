@@ -1,17 +1,56 @@
 ---
+/**
+ * An embedded YouTube video as its picture and a play button; src/scripts/content.ts swaps in the
+ * player on click. A page thus loads no YouTube code (about 1 MB) and contacts YouTube only when
+ * a visitor plays a video. The picture is fetched from YouTube once, at build time, and served by
+ * the site (AVIF/WebP), as the security policy allows images from the site only.
+ *
+ * On iPhones the click doesn't carry into YouTube's player, so it waits for a second tap there.
+ *
+ * Custom rather than the lite-youtube-embed library: on phones and Safari that library loads
+ * YouTube's player API script, which the security policy blocks, and it pre-connects to ad servers.
+ */
+import { Picture } from 'astro:assets';
+import { videoDetails } from '../../lib/youtube-video';
+
 interface Props {
   videoId: string;
 }
 const { videoId } = Astro.props;
+
+const { poster, title } = await videoDetails(videoId);
+// The play button and, after the swap, the player are announced with the video's title.
+const name = title ? `הפעלת הסרטון: ${title}` : 'הפעלת הסרטון';
 ---
 
-<div class="print:hidden mx-auto my-6 aspect-video w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-md">
-  <iframe
-    src={`https://www.youtube-nocookie.com/embed/${videoId}`}
-    title="YouTube video player"
-    class="h-full w-full border-0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-    allowfullscreen
-    loading="lazy"
-  ></iframe>
+<div class="print:hidden relative mx-auto my-6 aspect-video w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-md">
+  <Picture
+    src={poster}
+    inferSize
+    formats={['avif', 'webp']}
+    widths={[480, 960]}
+    fallbackFormat="jpg"
+    sizes="(min-width: 672px) 672px, 100vw"
+    alt=""
+    class="absolute inset-0 h-full w-full object-cover"
+  />
+  <button
+    type="button"
+    class="video-play-btn group absolute inset-0 flex cursor-pointer items-center justify-center bg-black/10 transition-colors hover:bg-black/0"
+    data-video-id={videoId}
+    data-video-title={title || 'סרטון YouTube'}
+    aria-label={name}
+  >
+    <svg
+      class="h-16 w-16 drop-shadow-lg transition-transform group-hover:scale-110"
+      viewBox="0 0 68 48"
+      aria-hidden="true"
+    >
+      <path
+        d="M66.5 7.7A8.5 8.5 0 0 0 60.5 1.7C55.2.3 34 .3 34 .3S12.8.3 7.5 1.7a8.5 8.5 0 0 0-6 6C.1 13 .1 24 .1 24s0 11 1.4 16.3a8.5 8.5 0 0 0 6 6C12.8 47.7 34 47.7 34 47.7s21.2 0 26.5-1.4a8.5 8.5 0 0 0 6-6C67.9 35 67.9 24 67.9 24s0-11-1.4-16.3Z"
+        fill="#cc0000"
+      ></path>
+      <path d="M45 24 27 14v20" fill="#fff"></path>
+    </svg>
+  </button>
 </div>

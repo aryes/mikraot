@@ -22,25 +22,16 @@ module.exports = {
       chromePath: chromium.executablePath(),
       settings: { chromeFlags: '--headless=new --no-sandbox' },
     },
-    // Somewhat below the medians measured 2026-10-07 in workerd (performance: home 92, lesson 92,
-    // post 82, video page 61; accessibility 98-100; best practices 96-100; SEO 100), so run-to-run
+    // Somewhat below the medians measured 2026-10-07 in workerd (performance: home 95, lesson 92,
+    // post 82, video page 93; accessibility 98-100; best practices and SEO 100), so run-to-run
     // noise on shared CI machines passes and a real step back fails.
     assert: {
-      assertMatrix: [
-        {
-          matchingUrlPattern: '.*',
-          assertions: {
-            'categories:accessibility': atLeast(0.95),
-            'categories:best-practices': atLeast(0.9),
-            'categories:seo': atLeast(0.95),
-          },
-        },
-        {
-          // Embedded YouTube players weigh about 1 MB of scripts (docs/RECOMMENDATIONS.md).
-          matchingUrlPattern: '^(?!.*%D7%A0%D7%95%D7%A1%D7%97-%D7%90%D7%A9%D7%9B%D7%A0%D7%96).*$',
-          assertions: { 'categories:performance': atLeast(0.75) },
-        },
-      ],
+      assertions: {
+        'categories:performance': atLeast(0.75),
+        'categories:accessibility': atLeast(0.95),
+        'categories:best-practices': atLeast(0.9),
+        'categories:seo': atLeast(0.95),
+      },
     },
     upload: { target: 'filesystem', outputDir: '.lighthouseci' },
   },

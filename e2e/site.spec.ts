@@ -453,3 +453,37 @@ test('the human check loads only when a visitor starts on the comment form', asy
   await page.getByRole('textbox', { name: 'שם *', exact: true }).focus();
   await script;
 });
+
+test('embedded videos show their picture and load YouTube only when played', async ({ page }) => {
+  const youtube: string[] = [];
+  page.on('request', (sent) => {
+    if (/youtube|ytimg|googlevideo|doubleclick/.test(new URL(sent.url()).hostname)) {
+      youtube.push(sent.url());
+    }
+  });
+  await page.goto('/טעמים/נוסח-אשכנז/');
+  const play = page.getByRole('button', { name: 'הפעלת הסרטון' }).first();
+  await play.scrollIntoViewIfNeeded();
+  // The picture is served by the site itself (no request to YouTube for it).
+  const picture = page.locator('div:has(> .video-play-btn) img').first();
+  await expect(picture).toHaveJSProperty('complete', true);
+  expect(await picture.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+  expect(
+    new URL(await picture.evaluate((img: HTMLImageElement) => img.currentSrc)).pathname,
+  ).toMatch(/^\/_astro\//);
+  expect(youtube).toEqual([]);
+
+  const buttons = page.getByRole('button', { name: 'הפעלת הסרטון' });
+  const before = await buttons.count();
+  const name = (await play.getAttribute('aria-label')) ?? '';
+  await play.click();
+  // The player takes the picture's place and starts.
+  const player = page.locator('iframe[src*="youtube-nocookie.com/embed/"]').first();
+  await expect(player).toHaveAttribute('src', /autoplay=1/);
+  // Screen readers hear which video: its title (from YouTube at build time) names the button and
+  // then the player.
+  const title = /^הפעלת הסרטון: (.+)$/.exec(name)?.[1];
+  expect(title, name).toBeTruthy();
+  await expect(player).toHaveAttribute('title', title ?? '');
+  await expect(buttons).toHaveCount(before - 1);
+});

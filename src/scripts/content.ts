@@ -64,6 +64,31 @@ function toggleCollapse(button: HTMLElement): void {
   }
 }
 
+/** A YouTube player (privacy-enhanced domain) that starts playing: created only on a click. */
+function youtubePlayer(id: string, title: string): HTMLIFrameElement {
+  const frame = document.createElement('iframe');
+  frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
+  frame.title = title;
+  frame.allow =
+    'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+  frame.allowFullscreen = true;
+  return frame;
+}
+
+/**
+ * An embedded video shows its picture and a play button (src/components/content/YouTube.astro);
+ * the player replaces them on click, so pages load no YouTube code until a visitor plays a video.
+ */
+function playEmbeddedVideo(button: HTMLElement): void {
+  const id = button.dataset['videoId'];
+  const box = button.parentElement;
+  if (!id || !box) return;
+  const frame = youtubePlayer(id, button.dataset['videoTitle'] ?? 'סרטון YouTube');
+  frame.className = 'h-full w-full border-0';
+  box.replaceChildren(frame);
+  frame.focus();
+}
+
 function openVideo(id: string, title: string): void {
   const dialog = document.createElement('dialog');
   dialog.className =
@@ -82,13 +107,8 @@ function openVideo(id: string, title: string): void {
   close.addEventListener('click', () => dialog.close());
   header.append(heading, close);
 
-  const frame = document.createElement('iframe');
-  frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
-  frame.title = title;
+  const frame = youtubePlayer(id, title);
   frame.className = 'aspect-video w-full border-0 bg-black';
-  frame.allow =
-    'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-  frame.allowFullscreen = true;
 
   dialog.append(header, frame);
   dialog.addEventListener('close', () => dialog.remove());
@@ -108,6 +128,12 @@ document.addEventListener('click', (event) => {
   if (audioBtn) {
     event.preventDefault();
     toggleAudio(audioBtn);
+    return;
+  }
+
+  const playBtn = event.target.closest<HTMLElement>('.video-play-btn');
+  if (playBtn) {
+    playEmbeddedVideo(playBtn);
     return;
   }
 

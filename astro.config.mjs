@@ -18,6 +18,9 @@ export default defineConfig({
   build: { format: 'directory' },
   // Optimize images at build time (no Cloudflare Images binding); the site uses no sessions.
   adapter: cloudflare({ imageService: 'compile' }),
+  // Video pictures are downloaded from YouTube at build time and served by the site
+  // (src/components/content/YouTube.astro).
+  image: { domains: ['i.ytimg.com'] },
   session: false,
   // Content-Security-Policy as a <meta> on every page: Astro adds hashes for its own inline scripts
   // and styles. frame-ancestors can't be set this way; it is in public/_headers.
