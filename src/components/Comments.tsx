@@ -31,6 +31,9 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
   const [turnstileToken, setTurnstileToken] = useState('');
   // Changing the key remounts the Turnstile widget for a fresh token (each works once).
   const [turnstileKey, setTurnstileKey] = useState(0);
+  // The human check loads when the visitor starts on the form, not with the page: it is about
+  // 150 KB from Cloudflare, and readers who don't comment needn't contact it at all.
+  const [checkStarted, setCheckStarted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [remember, setRemember] = useState(false);
   /** The comment being answered, if the visitor clicked "reply". */
@@ -222,7 +225,12 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
           </div>
         )}
 
-        <form ref={formRef} onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
+        <form
+          ref={formRef}
+          onSubmit={(e) => void handleSubmit(e)}
+          onFocus={() => setCheckStarted(true)}
+          className="space-y-4"
+        >
           {replyTo && (
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
               <span>
@@ -307,7 +315,11 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
           </label>
 
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <Turnstile key={turnstileKey} onToken={setTurnstileToken} />
+            {checkStarted ? (
+              <Turnstile key={turnstileKey} onToken={setTurnstileToken} />
+            ) : (
+              <div className="min-h-[65px] w-[300px] max-w-full" /> // the widget's space, so nothing moves
+            )}
             <button
               type="submit"
               disabled={

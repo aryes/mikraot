@@ -436,3 +436,19 @@ test('menu groups without a page are not links (header and footer), and the keyb
   }).toPass({ intervals: [0], timeout: 5000 });
   await expect(menu.getByRole('link', { name: 'דגש קל', exact: true })).toBeVisible();
 });
+
+test('the human check loads only when a visitor starts on the comment form', async ({ page }) => {
+  const checks: string[] = [];
+  page.on('request', (sent) => {
+    if (sent.url().includes('challenges.cloudflare.com')) checks.push(sent.url());
+  });
+  // Registered before the page loads: the comments may already be in view on a short page.
+  const loaded = page.waitForResponse((r) => r.url().includes('/api/comments/') && r.ok());
+  await page.goto('/about/');
+  await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
+  await loaded;
+  expect(checks).toEqual([]);
+  const script = page.waitForRequest((r) => r.url().includes('challenges.cloudflare.com'));
+  await page.getByPlaceholder('השם שלכם').focus();
+  await script;
+});
