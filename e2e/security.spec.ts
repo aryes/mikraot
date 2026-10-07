@@ -12,13 +12,16 @@ function watchCsp(page: Page): string[] {
 
 test('security headers are sent', async ({ page }) => {
   const response = await page.goto('/');
-  const headers = response?.headers() ?? {};
-  expect(headers['content-security-policy']).toBe("frame-ancestors 'none'");
-  expect(headers['x-frame-options']).toBe('DENY');
-  expect(headers['x-content-type-options']).toBe('nosniff');
-  expect(headers['strict-transport-security']).toContain('max-age=');
-  expect(headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
-  expect(headers['permissions-policy']).toContain('camera=()');
+  // One assertion on the whole set, so a failure shows every header (and the status) received.
+  expect({ status: response?.status(), ...response?.headers() }).toMatchObject({
+    status: 200,
+    'content-security-policy': "frame-ancestors 'none'",
+    'x-frame-options': 'DENY',
+    'x-content-type-options': 'nosniff',
+    'strict-transport-security': expect.stringContaining('max-age='),
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'permissions-policy': expect.stringContaining('camera=()'),
+  });
   await expect(page.locator('meta[http-equiv="content-security-policy"]')).toHaveAttribute(
     'content',
     /script-src 'self' 'wasm-unsafe-eval' https:\/\/challenges\.cloudflare\.com 'sha256-/,
