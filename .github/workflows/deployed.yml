@@ -31,8 +31,10 @@ jobs:
       github.event.check_run.name == 'Workers Builds: mikraot' &&
       github.event.check_run.conclusion == 'success')
     runs-on: ubuntu-latest
+    # One run per deployed commit. Branch previews (e.g. Renovate's) post the same check for other
+    # commits; a shared group let those cancel the production run (seen 2026-10-07).
     concurrency:
-      group: deployed-site
+      group: deployed-site-${{ github.event_name }}-${{ github.event.check_run.head_sha || github.sha }}
       cancel-in-progress: true
     env:
       SHA: ${{ github.event.check_run.head_sha || github.sha }}
