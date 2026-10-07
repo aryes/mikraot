@@ -3,9 +3,11 @@ import { defineConfig, devices } from '@playwright/test';
 const port = 4322;
 /** A deployed site to check instead of the local build (`npm run test:deployed -- <url>`). */
 const deployed = process.env['E2E_BASE_URL'];
-// Against a deployed site only the read-only tests run (see e2e/tags.ts). Set on each project,
-// where a --grep-invert on the command line can't replace it.
-const readOnly = deployed ? { grepInvert: /@local/ } : {};
+// Against a deployed site only the read-only tests run, and CI (Linux) skips the screenshot
+// comparisons made on Windows (see e2e/tags.ts). Set on each project, where a --grep-invert on the
+// command line can't replace it.
+const skipped = deployed ? /@local/ : process.env['CI'] ? /@visual/ : undefined;
+const readOnly = skipped ? { grepInvert: skipped } : {};
 
 export default defineConfig({
   testDir: 'e2e',

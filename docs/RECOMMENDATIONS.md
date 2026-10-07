@@ -158,7 +158,9 @@ gitleaks, `compare:live`, CI workflow.
   keeps search and links reliable. (Don't auto-normalize: Unicode normalization can reorder marks in
   ways that render badly.) Measured 2026-10-08: 12 of 39 pages are not in the standard (NFC) order;
   left as they are for that reason.
-- **M/M Visual regression:** Playwright screenshots of key pages compared on every change.
+- **Done: visual regression** (`e2e/visual.spec.ts`): full-page screenshots of five page types,
+  desktop and phone, compared in every local test run (not in CI: fonts render differently on
+  Linux).
 - **Done: Lighthouse CI** (`npm run lighthouse`, `lighthouserc.cjs`; in CI after the browser tests):
   minimum scores on four page types. It found the address-less menu and footer links, the comments
   heading level and the human check loading with every page (all fixed), and the two items in
