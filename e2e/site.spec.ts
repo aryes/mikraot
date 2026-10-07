@@ -416,13 +416,13 @@ test('pages with vowel points in their address also answer at a short address wi
   }
 });
 
-test('menu groups without a page are not links, and the keyboard opens their submenus', async ({
+test('menu groups without a page are not links (header and footer), and the keyboard opens their submenus', async ({
   page,
   isMobile,
 }) => {
   await page.goto('/');
   // Links without an address are reported as broken by crawlers and screen readers.
-  await expect(page.locator('header a:not([href])')).toHaveCount(0);
+  await expect(page.locator('a:not([href])')).toHaveCount(0);
   test.skip(isMobile, 'the mobile menu shows every level at once');
   const menu = page.getByRole('navigation', { name: 'ניווט ראשי' });
   await menu.getByRole('button', { name: 'הגיה' }).focus();

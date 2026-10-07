@@ -2,7 +2,10 @@
 import { ArrowUp, BookOpen } from 'lucide-react';
 import { menuTree, site } from '../lib/site';
 
-const quickLinks = menuTree.slice(0, 6);
+// Top-level menu items that have a page (groups such as הגיה only open a dropdown in the header).
+const quickLinks = menuTree.filter(
+  (item): item is (typeof menuTree)[number] & { url: string } => item.url !== null,
+);
 import Pointed from './Pointed.astro';
 ---
 
@@ -32,7 +35,7 @@ import Pointed from './Pointed.astro';
           </li>
           {quickLinks.map((item) => (
             <li>
-              <a href={item.url ?? undefined} class="transition-colors hover:text-brand-strong">
+              <a href={item.url} class="transition-colors hover:text-brand-strong">
                 <Pointed text={item.title} />
               </a>
             </li>
