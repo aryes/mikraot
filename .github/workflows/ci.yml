@@ -52,11 +52,16 @@ jobs:
       - run: echo 'TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA' > .dev.vars
       # Builds the site, resets the local D1 to the fixture data, and serves it in workerd.
       - run: npm run test:e2e
+      # Speed, accessibility, best-practice and SEO scores of the build the tests just made
+      # (lighthouserc.cjs).
+      - run: npm run lighthouse
       - name: Deploy dry run (bundles the Worker, uploads nothing)
         run: npm run deploy:dry
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: failure()
         with:
           name: playwright-traces
-          path: test-results/
+          path: |
+            test-results/
+            .lighthouseci/
           retention-days: 7

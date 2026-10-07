@@ -82,6 +82,15 @@ yet tuned.
 
 ## 2. Features
 
+- **H/S Videos load only when played:** a page with embedded YouTube videos (e.g. טעמים בנוסח
+  אשכנז) loads about 1 MB of YouTube scripts at once and scores about 60/100 for speed on a phone, against
+  82-95 elsewhere. The standard fix is a "facade" (e.g. the lite-youtube-embed library): a
+  thumbnail with a play button, the player loading on click. It also means no connection to
+  YouTube until a visitor chooses to play (the thumbnail can be served by the site itself).
+  Decision for Arye: it changes how videos look before they are played.
+- **M/S Heading levels in content:** the home page jumps from the title (h1) to "הגיה" as h4
+  (Lighthouse accessibility 98, not 100); screen-reader users navigate by heading level. In
+  Keystatic, such headings would become level 2 (same look can be kept).
 - **H/M Audio player that teaches:** speed control (0.75×), loop a phrase, a sound for every trope
   name (click "פשטא" → hear it), consistent player on every page.
 - **H/L Read-along ("karaoke") for recorded readings:** highlight each word while the recording
@@ -151,7 +160,10 @@ gitleaks, `compare:live`, CI workflow.
   keeps search and links reliable. (Don't auto-normalize: Unicode normalization can reorder marks in
   ways that render badly.)
 - **M/M Visual regression:** Playwright screenshots of key pages compared on every change.
-- **M/S Lighthouse CI** with budgets (performance, accessibility, SEO) on a few pages.
+- **Done: Lighthouse CI** (`npm run lighthouse`, `lighthouserc.cjs`; in CI after the browser tests):
+  minimum scores on four page types. It found the address-less menu and footer links, the comments
+  heading level and the human check loading with every page (all fixed), and the two items in
+  section 2 (videos, heading levels in content).
 - **Done: client error reporting:** `src/scripts/error-reporting.ts` sends JavaScript errors and
   CSP blocks from visitors' browsers to the Worker logs ("Browser error:"), no third-party service.
 - **Done: HTML validation** (`html-validate`, config `.htmlvalidate.mjs`) of every built page, inside

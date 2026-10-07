@@ -30,7 +30,8 @@
     "cf-typegen": "wrangler types",
     "prepare": "git config core.hooksPath .githooks",
     "test:deployed": "tsx scripts/test-deployed.ts",
-    "search:misses": "tsx scripts/search-misses.ts"
+    "search:misses": "tsx scripts/search-misses.ts",
+    "lighthouse": "lhci autorun"
   },
   "dependencies": {
     "@astrojs/markdoc": "^2.0.9",
@@ -52,6 +53,7 @@
     "@astrojs/node": "^11.1.6",
     "@astrojs/sitemap": "^3.7.4",
     "@axe-core/playwright": "^4.13.0",
+    "@lhci/cli": "^0.15.1",
     "@markdoc/markdoc": "^0.5.10",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
