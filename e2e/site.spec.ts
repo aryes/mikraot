@@ -74,8 +74,9 @@ test('a visitor can post a comment', LOCAL_ONLY, async ({ page }, testInfo) => {
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
   await expect(page.getByText('אורח לדוגמה')).toBeVisible(COMMENTS_LOADED);
   await expect(page.getByText('אורח לדוגמה 0')).toHaveCount(0); // no stray '0' from is_admin_reply
-  await page.getByPlaceholder('השם שלכם').fill('מבקר בדיקה');
-  await page.getByPlaceholder('כתבו את תגובתכם').fill(text);
+  // Found by their labels: each field is tied to its visible label (as screen readers read it).
+  await page.getByRole('textbox', { name: 'שם *', exact: true }).fill('מבקר בדיקה');
+  await page.getByRole('textbox', { name: 'תוכן התגובה *', exact: true }).fill(text);
   await page.getByLabel('שמרו את השם והאימייל שלי').check();
   await page.getByRole('button', { name: 'פרסום תגובה' }).click();
   await expect(page.getByText('התגובה נוספה בהצלחה!')).toBeVisible(COMMENTS_LOADED);
@@ -84,7 +85,7 @@ test('a visitor can post a comment', LOCAL_ONLY, async ({ page }, testInfo) => {
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
   await expect(page.getByText(text)).toBeVisible(COMMENTS_LOADED); // persisted in D1
   // "Remember me": the name comes back from this browser's storage.
-  await expect(page.getByPlaceholder('השם שלכם')).toHaveValue('מבקר בדיקה');
+  await expect(page.getByRole('textbox', { name: 'שם *', exact: true })).toHaveValue('מבקר בדיקה');
   await expect(page.getByLabel('שמרו את השם והאימייל שלי')).toBeChecked();
 });
 
@@ -449,6 +450,6 @@ test('the human check loads only when a visitor starts on the comment form', asy
   await loaded;
   expect(checks).toEqual([]);
   const script = page.waitForRequest((r) => r.url().includes('challenges.cloudflare.com'));
-  await page.getByPlaceholder('השם שלכם').focus();
+  await page.getByRole('textbox', { name: 'שם *', exact: true }).focus();
   await script;
 });

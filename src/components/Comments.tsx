@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { CommentError, fetchComments, postComment, type CommentItem } from '../lib/api';
 import { buildThreads } from '../lib/comment-threads';
 import { loadCommenter, rememberCommenter } from '../lib/commenter';
@@ -28,6 +28,9 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  // Ids that tie each label to its field (screen readers announce the label; clicking it focuses
+  // the field).
+  const fieldId = `comment-form${useId()}`;
   const [turnstileToken, setTurnstileToken] = useState('');
   // Changing the key remounts the Turnstile widget for a fresh token (each works once).
   const [turnstileKey, setTurnstileKey] = useState(0);
@@ -255,32 +258,42 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-600">
+              <label
+                htmlFor={`${fieldId}-name`}
+                className="mb-1 block text-xs font-semibold text-slate-600"
+              >
                 שם <span className="text-red-500">*</span>
               </label>
               <input
+                id={`${fieldId}-name`}
                 type="text"
+                autoComplete="name"
                 required
                 value={authorName}
                 onChange={(e) => setAuthorName(e.target.value)}
                 placeholder="השם שלכם"
                 aria-invalid={nameReserved}
-                aria-describedby={nameReserved ? 'name-reserved' : undefined}
+                aria-describedby={nameReserved ? `${fieldId}-name-reserved` : undefined}
                 className="focus:ring-brand-strong w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none"
               />
               {nameReserved && (
-                <p id="name-reserved" className="mt-1 text-xs text-red-700">
+                <p id={`${fieldId}-name-reserved`} className="mt-1 text-xs text-red-700">
                   השם הזה שמור למנהל האתר. אנא בחרו שם אחר.
                 </p>
               )}
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-600">
+              <label
+                htmlFor={`${fieldId}-email`}
+                className="mb-1 block text-xs font-semibold text-slate-600"
+              >
                 אימייל <span className="font-normal text-slate-500">(לא יוצג באתר)</span>
               </label>
               <input
+                id={`${fieldId}-email`}
                 type="email"
+                autoComplete="email"
                 value={authorEmail}
                 onChange={(e) => setAuthorEmail(e.target.value)}
                 placeholder="your@email.com"
@@ -290,10 +303,14 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-600">
+            <label
+              htmlFor={`${fieldId}-content`}
+              className="mb-1 block text-xs font-semibold text-slate-600"
+            >
               תוכן התגובה <span className="text-red-500">*</span>
             </label>
             <textarea
+              id={`${fieldId}-content`}
               ref={contentRef}
               required
               rows={3}
