@@ -10,6 +10,12 @@ import { defineConfig, envField } from 'astro/config';
 const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
 const ciBranch = process.env['WORKERS_CI_BRANCH'];
 const isPreviewBuild = ciBranch !== undefined && ciBranch !== 'main';
+// `astro dev` keeps its local Cloudflare data (the D1 database…) and its Vite cache apart, so a
+// dev server can stay open while builds, previews and tests run (`npm run dev` sets up its
+// database with the fictional fixtures).
+// Read from the command line: the adapter takes its options before Astro's hooks (which know the
+// command) run. Keystatic's dev server (`--config astro.config.cms.mjs`) keeps the defaults.
+const isDevServer = process.argv[2] === 'dev' && !process.argv.includes('--config');
 
 export default defineConfig({
   site: 'https://mikraot.net',
@@ -17,7 +23,10 @@ export default defineConfig({
   trailingSlash: 'always',
   build: { format: 'directory' },
   // Optimize images at build time (no Cloudflare Images binding); the site uses no sessions.
-  adapter: cloudflare({ imageService: 'compile' }),
+  adapter: cloudflare({
+    imageService: 'compile',
+    ...(isDevServer && { persistState: { path: '.wrangler/state-dev' } }),
+  }),
   // Video pictures are downloaded from YouTube at build time and served by the site
   // (src/components/content/YouTube.astro).
   image: { domains: ['i.ytimg.com'] },
@@ -65,6 +74,9 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    // Likewise its own Vite cache: a build replaced files in node_modules/.vite that a running dev
+    // server still needed (seen 2026-10-08).
+    ...(isDevServer && { cacheDir: 'node_modules/.vite-dev' }),
     // Vite inlines small files as data: URLs; fonts must stay files, since the CSP allows only
     // font-src 'self' (Noto's tiny Cyrillic/Greek subsets were being inlined).
     build: { assetsInlineLimit: (file) => (file.endsWith('.woff2') ? false : undefined) },

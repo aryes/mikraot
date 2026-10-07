@@ -7,7 +7,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev": "astro dev",
+    "dev": "npm run db:dev:reset && astro dev",
     "cms": "astro dev --config astro.config.cms.mjs --port 4400",
     "check": "astro check && oxlint --type-aware --deny-warnings && prettier --check . && vitest run",
     "build": "astro check && npm run build:site",
@@ -31,7 +31,8 @@
     "prepare": "git config core.hooksPath .githooks",
     "test:deployed": "tsx scripts/test-deployed.ts",
     "search:misses": "tsx scripts/search-misses.ts",
-    "lighthouse": "lhci autorun"
+    "lighthouse": "lhci autorun",
+    "db:dev:reset": "wrangler d1 migrations apply mikraot-db --local --persist-to .wrangler/state-dev && wrangler d1 execute mikraot-db --local --persist-to .wrangler/state-dev --file e2e/fixtures/comments.sql"
   },
   "dependencies": {
     "@astrojs/markdoc": "^2.0.9",

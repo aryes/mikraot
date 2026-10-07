@@ -1,4 +1,4 @@
--- Fictional comments for the LOCAL test database only (npm run db:local:reset).
+-- Fictional comments for the LOCAL test database only (npm run db:local:reset; the dev server's copy: npm run db:dev:reset).
 DELETE FROM comments;
 INSERT INTO comments (page_slug, author_name, author_email, content, is_admin_reply, approved, created_at) VALUES
   ('טעמים/נוסח-אשכנז', 'קורא לדוגמה', 'reader@example.com', 'תגובת בדיקה ראשונה', 0, 1, '2024-01-01 10:00:00'),
