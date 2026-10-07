@@ -9,6 +9,9 @@ const activeLink = 'bg-white font-bold text-brand-strong shadow-xs';
 const idleLink = 'hover:bg-white/60 hover:text-brand-strong';
 const hasChildren = (item: { children?: unknown[] | undefined }) =>
   item.children !== undefined && item.children.length > 0;
+// Menu groups without a page of their own are text, not links without an address (which
+// crawlers and screen readers report as broken).
+const linkOrText = (url: string | null) => (url ? 'a' : 'span');
 import Pointed from './Pointed.astro';
 ---
 
@@ -58,42 +61,54 @@ import Pointed from './Pointed.astro';
           >
             <Home size={16} /> ראשי
           </a>
-          {menuTree.map((item) => (
-            <div class="space-y-1">
-              <a
-                href={item.url ?? undefined}
-                class="block rounded-lg px-3 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50"
-              >
-                <Pointed text={item.title} />
-              </a>
-              {hasChildren(item) && (
-                <div class="mr-4 space-y-1 border-r-2 border-slate-200 pr-3">
-                  {item.children?.map((sub) => (
-                    <div>
-                      <a
-                        href={sub.url ?? undefined}
-                        class="block rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-strong"
-                      >
-                        <Pointed text={sub.title} />
-                      </a>
-                      {hasChildren(sub) && (
-                        <div class="mr-3 space-y-0.5 border-r border-slate-200 pr-2">
-                          {sub.children?.map((subSub) => (
-                            <a
-                              href={subSub.url ?? undefined}
-                              class="block px-2 py-1 text-[11px] text-slate-500 hover:text-brand-strong"
-                            >
-                              <Pointed text={subSub.title} />
-                            </a>
-                          ))}
+          {menuTree.map((item) => {
+            const Item = linkOrText(item.url);
+            return (
+              <div class="space-y-1">
+                <Item
+                  href={item.url ?? undefined}
+                  class:list={[
+                    'block rounded-lg px-3 py-2 text-sm font-bold text-slate-800',
+                    item.url && 'hover:bg-slate-50',
+                  ]}
+                >
+                  <Pointed text={item.title} />
+                </Item>
+                {hasChildren(item) && (
+                  <div class="mr-4 space-y-1 border-r-2 border-slate-200 pr-3">
+                    {item.children?.map((sub) => {
+                      const Sub = linkOrText(sub.url);
+                      return (
+                        <div>
+                          <Sub
+                            href={sub.url ?? undefined}
+                            class:list={[
+                              'block rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600',
+                              sub.url && 'hover:bg-slate-50 hover:text-brand-strong',
+                            ]}
+                          >
+                            <Pointed text={sub.title} />
+                          </Sub>
+                          {hasChildren(sub) && (
+                            <div class="mr-3 space-y-0.5 border-r border-slate-200 pr-2">
+                              {sub.children?.map((subSub) => (
+                                <a
+                                  href={subSub.url ?? undefined}
+                                  class="block px-2 py-1 text-[11px] text-slate-500 hover:text-brand-strong"
+                                >
+                                  <Pointed text={subSub.title} />
+                                </a>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
       </details>
     </div>
@@ -110,14 +125,15 @@ import Pointed from './Pointed.astro';
         </li>
         {menuTree.map((item) => {
           const url = item.url;
-          // Items without a URL only open a dropdown; a button keeps them keyboard-focusable.
+          // Items without a URL only open a dropdown; a button keeps them keyboard-focusable, and
+          // focusing it opens the list, whose links come next in Tab order. No aria-haspopup: that
+          // promises an ARIA menu (arrow keys, Enter opens it), which this CSS dropdown isn't.
           const Trigger = url ? 'a' : 'button';
           return (
             <li class="group relative">
               <Trigger
                 href={url ?? undefined}
                 type={url ? undefined : 'button'}
-                aria-haspopup={hasChildren(item) ? 'true' : undefined}
                 class:list={[navLink, isActive(url) ? activeLink : idleLink]}
               >
                 <Pointed text={item.title} />
@@ -130,33 +146,39 @@ import Pointed from './Pointed.astro';
               </Trigger>
               {hasChildren(item) && (
                 <div class="invisible absolute top-full right-0 z-50 min-w-[220px] -translate-y-1 rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-lg transition-all duration-150 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                  {item.children?.map((sub) => (
-                    <div class="group/sub relative">
-                      <a
-                        href={sub.url ?? undefined}
-                        class="flex w-full items-center justify-between px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-strong"
-                      >
-                        <span>
-                          <Pointed text={sub.title} />
-                        </span>
+                  {item.children?.map((sub) => {
+                    // As at the top level: a group without a page is a button, so the keyboard
+                    // can reach it and open its submenu.
+                    const SubTrigger = sub.url ? 'a' : 'button';
+                    return (
+                      <div class="group/sub relative">
+                        <SubTrigger
+                          href={sub.url ?? undefined}
+                          type={sub.url ? undefined : 'button'}
+                          class="flex w-full items-center justify-between px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-strong"
+                        >
+                          <span>
+                            <Pointed text={sub.title} />
+                          </span>
+                          {hasChildren(sub) && (
+                            <ChevronDown size={12} className="-rotate-90 text-slate-400" />
+                          )}
+                        </SubTrigger>
                         {hasChildren(sub) && (
-                          <ChevronDown size={12} className="-rotate-90 text-slate-400" />
+                          <div class="absolute top-0 right-full mr-1 hidden min-w-[200px] rounded-xl border border-slate-200 bg-white py-2 shadow-lg group-focus-within/sub:block group-hover/sub:block">
+                            {sub.children?.map((subSub) => (
+                              <a
+                                href={subSub.url ?? undefined}
+                                class="block w-full px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-strong"
+                              >
+                                <Pointed text={subSub.title} />
+                              </a>
+                            ))}
+                          </div>
                         )}
-                      </a>
-                      {hasChildren(sub) && (
-                        <div class="absolute top-0 right-full mr-1 hidden min-w-[200px] rounded-xl border border-slate-200 bg-white py-2 shadow-lg group-focus-within/sub:block group-hover/sub:block">
-                          {sub.children?.map((subSub) => (
-                            <a
-                              href={subSub.url ?? undefined}
-                              class="block w-full px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-strong"
-                            >
-                              <Pointed text={subSub.title} />
-                            </a>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </li>

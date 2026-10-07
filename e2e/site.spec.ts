@@ -415,3 +415,24 @@ test('pages with vowel points in their address also answer at a short address wi
     expect(decodeURI(new URL(to, 'https://mikraot.net').pathname), form).toBe(page);
   }
 });
+
+test('menu groups without a page are not links, and the keyboard opens their submenus', async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto('/');
+  // Links without an address are reported as broken by crawlers and screen readers.
+  await expect(page.locator('header a:not([href])')).toHaveCount(0);
+  test.skip(isMobile, 'the mobile menu shows every level at once');
+  const menu = page.getByRole('navigation', { name: 'ניווט ראשי' });
+  await menu.getByRole('button', { name: 'הגיה' }).focus();
+  // The dropdown fades in; in its first frame it still counts as hidden for Tab.
+  await expect(menu.getByRole('link', { name: 'מבטא', exact: true })).toBeVisible();
+  // Tab through the dropdown until the 'דגשים' group (it has its own submenu) has focus.
+  const group = menu.getByRole('button', { name: 'דגשים' });
+  await expect(async () => {
+    await page.keyboard.press('Tab');
+    await expect(group).toBeFocused({ timeout: 100 });
+  }).toPass({ intervals: [0], timeout: 5000 });
+  await expect(menu.getByRole('link', { name: 'דגש קל', exact: true })).toBeVisible();
+});

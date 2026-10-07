@@ -13,3 +13,6 @@ dist-ssr
 .migration
 test-results
 playwright-report
+
+# Lighthouse CI reports (npm run lighthouse)
+.lighthouseci/
