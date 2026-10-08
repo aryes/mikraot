@@ -88,8 +88,15 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
   name (click "פשטא" → hear it), the same player on every page. Needs: decision; recordings for the
   trope names.
 - **H/L Read-along ("karaoke") for recorded readings:** highlight each word while the recording
-  plays; what paid trope trainers sell. Needs word timings per recording: start with a few,
-  semi-automatic. Needs: decision.
+  plays; what paid trope trainers (and the free PocketTorah app) offer. The hard part is word
+  timings per recording. Researched 2026-10-08: no ready-made tool for chanted Hebrew, so three
+  options: (a) matching our known text to the audio automatically with ReadAlong Studio (open
+  source, works for new languages without training; our text is fully pointed, which tells the tool
+  how each word sounds, plus a few rules for shva, dagesh and qamats qatan); chanting may confuse
+  it, so test first; (b) a speech-recognition tool with word times (WhisperX): weaker, since it
+  writes its own unpointed transcript instead of following our text; (c) a tap-along tool: Arye
+  plays a recording and taps once per word, about 1.5–2× the recording's length with corrections.
+  Start with a one-day test of (a) on one recording, then decide. Needs: decision.
 - **M/M Glossary** (שווא נע, מפיק, מתג, דבקים…) with tap/hover definitions wherever a term appears;
   also a glossary page. Needs: content (short definitions; Claude can draft from the lessons).
 - **M/M Text view of any verse or chapter** with toggles: letters only / + niqqud / + טעמים
