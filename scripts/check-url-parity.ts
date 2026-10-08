@@ -132,12 +132,23 @@ if (fromSitemaps.length < MIN_URLS) {
     `Only ${fromSitemaps.length} URLs in the WordPress sitemaps (expected ${MIN_URLS}+)`,
   );
 }
-const extra = urlsFile
-  ? readFileSync(urlsFile, 'utf8')
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean)
-  : [];
+/**
+ * The extra URLs: one per line, or Search Console's Pages.csv (a header row, then the URL in the
+ * first column, in quotes when it contains a comma).
+ */
+function readUrls(file: string): string[] {
+  const lines = readFileSync(file, 'utf8')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (!lines[0]?.startsWith('Top pages,')) return lines;
+  return lines.slice(1).map((line) => {
+    const quoted = /^"((?:[^"]|"")*)"/.exec(line);
+    return quoted ? quoted[1]!.replaceAll('""', '"') : line.split(',')[0]!;
+  });
+}
+
+const extra = urlsFile ? readUrls(urlsFile) : [];
 const paths = [...new Set([...fromSitemaps, ...Object.keys(OLD_FORMS), ...extra].map(pathOf))];
 
 // A few at a time: polite to the server, still quick.
