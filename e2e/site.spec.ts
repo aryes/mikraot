@@ -417,25 +417,59 @@ test('pages with vowel points in their address also answer at a short address wi
   }
 });
 
-test('menu groups without a page are not links (header and footer), and the keyboard opens their submenus', async ({
-  page,
-  isMobile,
-}) => {
+test('menu groups without a page are not links (header and footer)', async ({ page }) => {
   await page.goto('/');
   // Links without an address are reported as broken by crawlers and screen readers.
   await expect(page.locator('a:not([href])')).toHaveCount(0);
+});
+
+test('desktop menus open and close from the keyboard (Enter, Escape) and say so', async ({
+  page,
+  isMobile,
+}) => {
   test.skip(isMobile, 'the mobile menu shows every level at once');
+  await page.goto('/');
   const menu = page.getByRole('navigation', { name: 'ניווט ראשי' });
-  await menu.getByRole('button', { name: 'הגיה' }).focus();
-  // The dropdown fades in; in its first frame it still counts as hidden for Tab.
+  const group = menu.getByRole('button', { name: 'הגיה' });
+  const subGroup = menu.getByRole('button', { name: 'דגשים' });
+  await expect(group).toHaveAttribute('aria-expanded', 'false');
+
+  await group.focus();
+  await page.keyboard.press('Enter');
+  await expect(group).toHaveAttribute('aria-expanded', 'true');
   await expect(menu.getByRole('link', { name: 'מבטא', exact: true })).toBeVisible();
-  // Tab through the dropdown until the 'דגשים' group (it has its own submenu) has focus.
-  const group = menu.getByRole('button', { name: 'דגשים' });
+  // Tab through the list to the 'דגשים' group, which has its own list.
   await expect(async () => {
     await page.keyboard.press('Tab');
-    await expect(group).toBeFocused({ timeout: 100 });
+    await expect(subGroup).toBeFocused({ timeout: 100 });
   }).toPass({ intervals: [0], timeout: 5000 });
+  await page.keyboard.press('Enter');
   await expect(menu.getByRole('link', { name: 'דגש קל', exact: true })).toBeVisible();
+
+  // Escape closes the innermost list first, focus returning to its button.
+  await page.keyboard.press('Escape');
+  await expect(subGroup).toHaveAttribute('aria-expanded', 'false');
+  await expect(subGroup).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(group).toHaveAttribute('aria-expanded', 'false');
+  await expect(group).toBeFocused();
+  await expect(menu.getByRole('link', { name: 'מבטא', exact: true })).toBeHidden();
+
+  // A page that is also a group keeps its link, with a separate button for its list.
+  await page.getByRole('button', { name: 'דקדוק' }).click();
+  await expect(menu.getByRole('link', { name: 'אותיות השימוש', exact: true })).toBeVisible();
+  await menu.getByRole('button', { name: 'תפריט: אותיות השימוש' }).click();
+  await expect(menu.getByRole('link', { name: /ה׳ הידיעה/ })).toBeVisible();
+  // In a list opened by hovering, Escape returns to the group's button.
+  await page.getByRole('heading', { level: 1 }).click();
+  await menu.getByRole('button', { name: 'טעמים', exact: true }).hover();
+  await menu.getByRole('link', { name: 'תפקידי הטעמים', exact: true }).focus();
+  await page.keyboard.press('Escape');
+  await expect(menu.getByRole('button', { name: 'טעמים', exact: true })).toBeFocused();
+
+  // A click elsewhere closes everything.
+  await page.getByRole('heading', { level: 1 }).click();
+  await expect(menu.locator('[aria-expanded="true"]')).toHaveCount(0);
 });
 
 test('the human check loads only when a visitor starts on the comment form', async ({ page }) => {

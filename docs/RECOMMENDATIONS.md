@@ -75,9 +75,9 @@ yet tuned.
   the brand green, one distinctive Hebrew display font for headings.
 - **M/S Print stylesheet:** teachers print lessons; hide navigation, comments and sidebar, keep
   colours, show link URLs.
-- **M/S Keyboard-friendly dropdown menus:** the desktop menu opens on hover and keyboard focus (CSS
-  only). The standard "disclosure navigation" pattern adds a tiny script: Enter/Space toggle a group,
-  `aria-expanded` tells screen readers whether it is open, and Escape closes it (WCAG 1.4.13).
+- **Done (approved 2026-10-08): keyboard-friendly dropdown menus.** The WAI "disclosure
+  navigation" pattern (`src/scripts/menu.ts`): Enter/Space opens a group, `aria-expanded` tells
+  screen readers its state, Escape closes it; hover still works.
 - **L/M Dark mode** (respecting the system setting); check the teaching colours in both.
 
 ## 2. Features

@@ -115,7 +115,11 @@ import Pointed from './Pointed.astro';
   </div>
 
   <!-- Desktop menu: dropdowns open on hover and keyboard focus via CSS only. -->
-  <nav class="hidden border-t border-slate-200/60 bg-slate-50 md:block" aria-label="ניווט ראשי">
+  <nav
+    class="hidden border-t border-slate-200/60 bg-slate-50 md:block"
+    aria-label="ניווט ראשי"
+    data-desktop-menu
+  >
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <ul class="flex items-center gap-1 py-1 text-sm font-semibold text-slate-700">
         <li>
@@ -123,49 +127,79 @@ import Pointed from './Pointed.astro';
             <Home size={15} /> ראשי
           </a>
         </li>
-        {menuTree.map((item) => {
-          const url = item.url;
-          // Items without a URL only open a dropdown; a button keeps them keyboard-focusable, and
-          // focusing it opens the list, whose links come next in Tab order. No aria-haspopup: that
-          // promises an ARIA menu (arrow keys, Enter opens it), which this CSS dropdown isn't.
-          const Trigger = url ? 'a' : 'button';
+        {menuTree.map((item, index) => {
+          const panelId = `menu-panel-${index}`;
           return (
-            <li class="group relative">
-              <Trigger
-                href={url ?? undefined}
-                type={url ? undefined : 'button'}
-                class:list={[navLink, isActive(url) ? activeLink : idleLink]}
-              >
-                <Pointed text={item.title} />
-                {hasChildren(item) && (
+            <li class="group relative flex items-center" data-menu-item>
+              {item.url && (
+                <a
+                  href={item.url}
+                  class:list={[navLink, isActive(item.url) ? activeLink : idleLink]}
+                >
+                  <Pointed text={item.title} />
+                </a>
+              )}
+              {hasChildren(item) && (
+                // Disclosure button (WAI "disclosure navigation"): Enter/Space opens the list,
+                // Escape closes it (src/scripts/menu.ts); hover opens it too, for the mouse.
+                <button
+                  type="button"
+                  data-menu-toggle
+                  aria-expanded="false"
+                  aria-controls={panelId}
+                  aria-label={item.url ? `תפריט: ${item.title}` : undefined}
+                  class:list={['peer cursor-pointer', navLink, idleLink]}
+                >
+                  {!item.url && <Pointed text={item.title} />}
                   <ChevronDown
                     size={14}
-                    className="text-slate-400 transition-transform group-hover:rotate-180"
+                    className="text-slate-400 transition-transform group-hover:rotate-180 in-aria-expanded:rotate-180"
                   />
-                )}
-              </Trigger>
+                </button>
+              )}
               {hasChildren(item) && (
-                <div class="invisible absolute top-full right-0 z-50 min-w-[220px] -translate-y-1 rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-lg transition-all duration-150 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                  {item.children?.map((sub) => {
-                    // As at the top level: a group without a page is a button, so the keyboard
-                    // can reach it and open its submenu.
-                    const SubTrigger = sub.url ? 'a' : 'button';
+                <div
+                  id={panelId}
+                  class="invisible absolute top-full right-0 z-50 min-w-[220px] -translate-y-1 rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 peer-aria-expanded:visible peer-aria-expanded:translate-y-0 peer-aria-expanded:opacity-100 noscript:group-focus-within:visible noscript:group-focus-within:translate-y-0 noscript:group-focus-within:opacity-100"
+                >
+                  {item.children?.map((sub, subIndex) => {
+                    const subPanelId = `${panelId}-${subIndex}`;
+                    const subLink =
+                      'flex w-full items-center justify-between px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-strong';
                     return (
-                      <div class="group/sub relative">
-                        <SubTrigger
-                          href={sub.url ?? undefined}
-                          type={sub.url ? undefined : 'button'}
-                          class="flex w-full items-center justify-between px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-strong"
-                        >
-                          <span>
+                      <div class="group/sub relative flex" data-menu-item>
+                        {sub.url && (
+                          <a href={sub.url} class={subLink}>
                             <Pointed text={sub.title} />
-                          </span>
-                          {hasChildren(sub) && (
-                            <ChevronDown size={12} className="-rotate-90 text-slate-400" />
-                          )}
-                        </SubTrigger>
+                          </a>
+                        )}
                         {hasChildren(sub) && (
-                          <div class="absolute top-0 right-full mr-1 hidden min-w-[200px] rounded-xl border border-slate-200 bg-white py-2 shadow-lg group-focus-within/sub:block group-hover/sub:block">
+                          // A group's own button, or (for a page that is also a group) a small
+                          // arrow button beside its link.
+                          <button
+                            type="button"
+                            data-menu-toggle
+                            aria-expanded="false"
+                            aria-controls={subPanelId}
+                            aria-label={sub.url ? `תפריט: ${sub.title}` : undefined}
+                            class:list={[
+                              'peer/sub cursor-pointer',
+                              sub.url ? 'px-3 text-slate-400 hover:bg-slate-50' : subLink,
+                            ]}
+                          >
+                            {!sub.url && (
+                              <span>
+                                <Pointed text={sub.title} />
+                              </span>
+                            )}
+                            <ChevronDown size={12} className="-rotate-90 text-slate-400" />
+                          </button>
+                        )}
+                        {hasChildren(sub) && (
+                          <div
+                            id={subPanelId}
+                            class="absolute top-0 right-full mr-1 hidden min-w-[200px] rounded-xl border border-slate-200 bg-white py-2 shadow-lg group-hover/sub:block peer-aria-expanded/sub:block noscript:group-focus-within/sub:block"
+                          >
                             {sub.children?.map((subSub) => (
                               <a
                                 href={subSub.url ?? undefined}
@@ -188,3 +222,5 @@ import Pointed from './Pointed.astro';
     </div>
   </nav>
 </header>
+
+<script src="../scripts/menu.ts"></script>
