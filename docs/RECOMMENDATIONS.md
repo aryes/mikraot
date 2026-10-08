@@ -81,8 +81,7 @@ After the cutover (`docs/CUTOVER.md`), in this order:
    delete, reply as admin. Once the site is live, comments arrive weekly and today moderating means
    asking Claude. Needs: decision.
 
-Waiting on Arye already: the search descriptions (`docs/SEO-DESCRIPTIONS.md`), reply emails to
-commenters, the newsletter sign-up form.
+Waiting on Arye already: reply emails to commenters, the newsletter sign-up form.
 
 ## 1. UX and design
 
@@ -267,6 +266,7 @@ Privacy-first, without cookies, so no consent banner:
 - 2026-10-08: videos load only when played; home page heading levels; keyboard-friendly menus;
   share pictures per page; content checks; screenshot comparisons (local); Keystatic's Hebrew labels
   (patch) and Hebrew page addresses; the editing guide (`docs/GUIDE.md`); pull requests with
-  required checks; faster tests (two workers, Lighthouse in parallel). Dropped: content images as
+  required checks; faster tests (two workers, Lighthouse in parallel); short search descriptions,
+  "title: description", on 33 pages. Dropped: content images as
   AVIF/WebP (the content has no pictures, and the banner already is; the 52 WordPress images
   serve only the site icon and old links).
