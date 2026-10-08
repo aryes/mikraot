@@ -3,7 +3,7 @@
 The website https://mikraot.net: a Hebrew site teaching Bible reading (pronunciation, grammar, cantillation), with courses, lessons, quizzes and audio.
 Stack: Astro (static pages) + React islands + TypeScript + Tailwind, one Cloudflare Worker (pages + API, D1). Code: https://github.com/aryes/mikraot (public).
 The live site currently runs on WordPress (Bluehost) and is being migrated to this stack.
-The plan and known issues are in `docs/ROADMAP.md`.
+The plan and known issues are in `docs/ROADMAP.md`. Recovery procedures (restore, rollback) and the free-plan limits and assumptions the site depends on: `docs/OPERATIONS.md` (update it in the same pull request as any new service, limit or procedure).
 
 ## Working agreement (owner: Arye)
 
