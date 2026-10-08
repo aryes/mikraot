@@ -195,8 +195,12 @@ security.txt, required checks before any merge, dependency updates with tests.
   Needs: decision (the token would be stored as a GitHub secret).
 - **M/S Content images as AVIF/WebP** like the banner and video pictures (52 images, in
   `public/wp-content/uploads/`; the WordPress URLs must keep working too). Needs: nothing.
-- **M/S Faster automatic checks:** a run takes about 4 minutes (Lighthouse is the longest part);
-  caching the test browser would save another ~30 s. Needs: nothing.
+- **M/S Faster automatic checks:** a run takes about 4 minutes, and Lighthouse sets the pace (about
+  2.7 minutes: four pages, three runs each). Two runs per page instead of three would save about
+  50 s (the browser tests, about 3.2 minutes, would then set the pace), but the score would be the
+  average of two runs instead of the middle of three, so one bad run could fail a change. Caching the test browser is not worth
+  it: installing it takes about 23 s, and Playwright advises against caching it, since restoring
+  takes about as long. Needs: decision (two runs or three).
 - **M/S Clean-up after the cutover:** the old `mikraot-api` Worker, `worker/`, `/staging/` on
   Bluehost, the Supabase project (after a final export). In `docs/CUTOVER.md` step 5. Needs: Arye's
   approval (deletions).
