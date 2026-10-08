@@ -110,10 +110,15 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
   (חטף, מלעיל/מלרע) or nothing at all (הברה פתוחה). About 15 entries would cover them. Needs: content (short
   definitions; Claude can draft from the lessons).
 - **M/M Text view of any verse or chapter** with toggles: letters only / + niqqud / + טעמים
-  (tikkun-style practice), text from public-domain sources (Westminster Leningrad Codex or
-  Sefaria's API). Needs: decision.
-- **M/S Weekly parasha shortcut** (Hebcal API, free): "this week's reading" linking to recordings.
-  Needs: decision.
+  (tikkun-style practice). Source checked 2026-10-08: the current release of the common
+  Westminster Leningrad Codex is licensed "no derivatives" (CC BY-NC-ND; older copies circulated
+  as public domain), which leaves its use for a practice view unclear; _Miqra according to the
+  Masorah_ (Aleppo Codex tradition, made for Jewish use, with documented טעמים, CC BY-SA, available
+  through Sefaria) fits without that doubt, with attribution. Needs: decision.
+- **M/S Weekly parasha shortcut:** "this week's reading" linking to its recordings. Hebcal's
+  reading-schedule library is free (BSD) but depends on a GPL-licensed core, so the clean way is to
+  compute a year of weekly readings at build time into a small data file: no requests from
+  visitors' browsers, no GPL code shipped. Needs: decision.
 - **M/S Reply emails to commenters** (opt-in checkbox, unsubscribe link; reuses
   `src/server/notify.ts`). Needs: decision.
 - **L/M Printable worksheets** (PDF) for teachers; the print layout already prints any lesson
