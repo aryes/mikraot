@@ -24,11 +24,15 @@ Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` 
 - [ ] Launch items in `docs/ROADMAP.md` done or consciously deferred: privacy policy published,
       Web Analytics beacon ready. Email to Arye on new comments: built (Brevo, 2026-10-05).
 - [ ] An **uptime monitor** with email alerts set up (replaces Jetpack Monitor).
-- [ ] **URL parity gate:** every URL in WordPress's sitemaps, Search Console's top pages and the
+- [x] **URL parity gate:** every URL in WordPress's sitemaps, Search Console's top pages and the
       known old link forms (`/?p=`, `/?page_id=`, `/?s=`, `/feed/`, `/comments/feed/`,
       `/sitemap.xml`, `/robots.txt`, `/page/2/`, `/category/…`, `/author/…`) checked against the
-      workers.dev address: 200, or a deliberate redirect or 404: `npm run check:urls -- <address> [--urls <Search Console export>]`;
-      `npm run compare:live` for content.
+      workers.dev address: 200, or a deliberate redirect or 404:
+      `npm run check:urls -- <address> [--urls <Search Console Pages.csv>]`;
+      `npm run compare:live` for content. Passed 2026-10-08: of 353 URLs (Search Console's 8 pages
+      included), 53 pass and 0 fail; the other 300 are LearnPress course URLs, deferred with the
+      courses (`docs/ROADMAP.md`). Content the same except typography and the video posters. Run
+      again on the switch day.
 - [x] The Turnstile widget's hostnames include `mikraot.net` (set at creation, 2026-10-02).
 - [x] **Comments tested before the switch** (2026-10-05): with the workers.dev hostname briefly
       allowed in the Turnstile widget, Arye posted a real comment from his browser (automated
