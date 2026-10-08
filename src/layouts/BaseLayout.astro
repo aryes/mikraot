@@ -75,8 +75,16 @@ const icon = (size: number) =>
     id="top"
     class="flex min-h-screen flex-col bg-[#F3F7F5] font-sans text-[#444444] antialiased selection:bg-brand-strong selection:text-white print:bg-white print:text-black"
   >
+    <!-- The first Tab stop: past the header and menu, straight to the page (hidden until focused;
+         above the sticky header, z-50). -->
+    <a
+      href="#main"
+      class="sr-only rounded-lg bg-brand-strong font-bold text-white focus:not-sr-only focus:fixed focus:top-3 focus:right-3 focus:z-[60] focus:px-4 focus:py-2"
+    >
+      דלג לתוכן
+    </a>
     <SiteHeader />
-    <main class="flex-1">
+    <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
       <slot />
     </main>
     <SiteFooter />

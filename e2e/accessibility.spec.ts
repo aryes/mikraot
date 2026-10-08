@@ -64,3 +64,27 @@ test('no accessibility violations with the mobile menu open', async ({ page, isM
   await page.getByLabel('תפריט').first().click();
   expect(await scan(page)).toEqual([]);
 });
+
+test('the first Tab offers a skip to the content; sound buttons say what they play', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'keyboard navigation');
+  await page.goto(encodeURI('/דגש-קל/'));
+  await page.keyboard.press('Tab');
+  const skip = page.getByRole('link', { name: 'דלג לתוכן' });
+  await expect(skip).toBeFocused();
+  await expect(skip).toBeVisible();
+  // Not hidden under the sticky header: the link itself is what's drawn at its centre.
+  expect(
+    await skip.evaluate((link) => {
+      const box = link.getBoundingClientRect();
+      const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+      return hit?.closest('a') === link;
+    }),
+  ).toBe(true);
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Tab');
+  await expect(page.locator('main :focus')).toHaveCount(1);
+  await expect(page.getByRole('button', { name: 'השמע: ב דגושה' })).toBeVisible();
+});
