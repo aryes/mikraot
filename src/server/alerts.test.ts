@@ -15,6 +15,7 @@ function memoryStore() {
   return { store, ttls };
 }
 
+const allow = { limit: () => Promise.resolve({ success: true }) };
 const okFetch = () => vi.fn<typeof fetch>(() => Promise.resolve(new Response('{}')));
 const now = new Date('2026-10-09T02:17:00Z');
 
@@ -22,7 +23,7 @@ describe('alertOwner', () => {
   it('emails the owner once, then waits an hour before the next email of that kind', async () => {
     const { store, ttls } = memoryStore();
     const fetchFn = okFetch();
-    const options = { apiKey: 'key', store, now, fetchFn };
+    const options = { apiKey: 'key', store, limiter: allow, now, fetchFn };
     await alertOwner({ ...options, kind: 'request', detail: 'GET /api/comments/: 500' });
     await alertOwner({ ...options, kind: 'request', detail: 'GET /comments/feed/: 500' });
     await alertOwner({ ...options, kind: 'backup', detail: 'Error: D1 unavailable' });
@@ -37,23 +38,66 @@ describe('alertOwner', () => {
     expect(body).toContain('GET /api/comments/: 500');
   });
 
+  it('lets the rate limiter turn a burst away before it reaches KV', async () => {
+    const { store, ttls } = memoryStore();
+    const fetchFn = okFetch();
+    const deny = { limit: () => Promise.resolve({ success: false }) };
+    await alertOwner({
+      apiKey: 'key',
+      store,
+      limiter: deny,
+      kind: 'request',
+      detail: 'x',
+      now,
+      fetchFn,
+    });
+    expect(fetchFn).not.toHaveBeenCalled();
+    expect(ttls).toEqual([]);
+  });
+
   it('sends nothing without a key (branch previews, local runs)', async () => {
     const fetchFn = okFetch();
     const { store } = memoryStore();
-    await alertOwner({ apiKey: undefined, store, kind: 'backup', detail: 'x', now, fetchFn });
+    await alertOwner({
+      apiKey: undefined,
+      store,
+      limiter: allow,
+      kind: 'backup',
+      detail: 'x',
+      now,
+      fetchFn,
+    });
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
-  it('never throws, even when the store and the email both fail', async () => {
+  it('never throws, even when the limiter, the store or the email fail', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const failing: AlertStore = {
       get: () => Promise.reject(new Error('KV down')),
       put: () => Promise.reject(new Error('KV down')),
     };
     await expect(
-      alertOwner({ apiKey: 'key', store: failing, kind: 'request', detail: 'x', now }),
+      alertOwner({
+        apiKey: 'key',
+        store: failing,
+        limiter: allow,
+        kind: 'request',
+        detail: 'x',
+        now,
+      }),
     ).resolves.toBeUndefined();
-    expect(consoleError).toHaveBeenCalled();
+    const broken = { limit: () => Promise.reject(new Error('limiter down')) };
+    await expect(
+      alertOwner({
+        apiKey: 'key',
+        store: failing,
+        limiter: broken,
+        kind: 'request',
+        detail: 'x',
+        now,
+      }),
+    ).resolves.toBeUndefined();
+    expect(consoleError).toHaveBeenCalledTimes(2);
     consoleError.mockRestore();
   });
 });

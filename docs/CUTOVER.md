@@ -95,6 +95,12 @@ Success means all of these:
 - [ ] A real test comment posts, appears, and is hidden again (approval for the D1 change).
 - [ ] Response headers (CSP, HSTS…) present; no console errors or CSP blocks on a few pages.
 - [ ] Web Analytics receives visits; Search Console: submit `/sitemap-index.xml`.
+- [ ] A Cloudflare rate limiting rule (the free plan has one, counted per IP over 10 seconds, action
+      block; checked 2026-10-08; Security → WAF → Rate limiting rules) on all of `mikraot.net`
+      (unknown addresses run the Worker too, not only `/api/*`), with a threshold well above normal
+      browsing, e.g. 300 requests per 10 seconds per IP: it blocks a flood before the Worker runs,
+      so it can't use up the free 100,000 requests a day (`docs/OPERATIONS.md`, Limits). Needs
+      Arye's approval (zone configuration; the token can't write WAF rules).
 - [ ] Workers logs read for new kinds of errors (including "Browser error:" lines, sent by
       visitors' browsers: untrusted input, anyone can write them), and the error rate below 1% of requests over the
       observation window (Cloudflare dashboard →

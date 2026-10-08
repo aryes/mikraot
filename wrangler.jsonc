@@ -32,6 +32,14 @@
       "namespace_id": "1003",
       "simple": { "limit": 10, "period": 60 },
     },
+    // Owner alert emails: about one a minute per kind in each Cloudflare location (counted locally
+    // and roughly), before the hourly KV throttle
+    // (src/server/alerts.ts), so a burst of failures can't send a burst of emails.
+    {
+      "name": "ALERT_RATE_LIMIT",
+      "namespace_id": "1009",
+      "simple": { "limit": 1, "period": 60 },
+    },
     // Searches that found nothing: at most 20 reports per minute from one visitor.
     {
       "name": "SEARCH_RATE_LIMIT",
@@ -79,6 +87,11 @@
         "name": "CLIENT_ERROR_RATE_LIMIT",
         "namespace_id": "1004",
         "simple": { "limit": 10, "period": 60 },
+      },
+      {
+        "name": "ALERT_RATE_LIMIT",
+        "namespace_id": "1010",
+        "simple": { "limit": 1, "period": 60 },
       },
       {
         "name": "SEARCH_RATE_LIMIT",

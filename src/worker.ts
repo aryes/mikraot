@@ -14,7 +14,14 @@ interface Context {
 
 const alert = (context: Context, kind: AlertKind, detail: string) => {
   context.waitUntil(
-    alertOwner({ apiKey: env.BREVO_API_KEY, store: env.ALERTS, kind, detail, now: new Date() }),
+    alertOwner({
+      apiKey: env.BREVO_API_KEY,
+      store: env.ALERTS,
+      limiter: env.ALERT_RATE_LIMIT,
+      kind,
+      detail,
+      now: new Date(),
+    }),
   );
 };
 
