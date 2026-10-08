@@ -46,9 +46,8 @@ Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` 
       managed firewall and DDoS rulesets. Check again on the switch day.
 - [ ] **Content freeze on WordPress.** Carry over content edited and comments approved on
       WordPress since the export (2026-09-30). Checked 2026-10-08 (WP-CLI, read-only): nothing to
-      carry over; the last post or page edit is from January 2025, the last comment from November 2023,
-      and no comments await approval. Check
-      again on the switch day.
+      carry over; the last post or page edit is from January 2025, the last comment from November
+      2023, and no comments await approval. Check again on the switch day.
 - [x] Branch previews ignore `workers_dev` (tested 2026-10-05: a preview built with
       `workers_dev: false` answered 200). The production deploy does apply it, and `preview_urls`
       may default to the same value, so the switch sets `preview_urls: true` explicitly.
