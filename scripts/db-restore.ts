@@ -30,7 +30,8 @@ Steps:
   2. Show that plan to Arye; restoring the live site needs his approval.
   3. Run the same command with --yes. It first saves the current database to .backups/,
      then restores, then shows the rows again.
-  4. Open a page with comments to check, then delete the files in .backups/
+  4. Open a page with comments to check, re-apply the deletions on request listed in
+     docs/OPERATIONS.md that are newer than the restored state, then delete the files in .backups/
      (they hold commenters' emails; the folder is never committed).
 
 Options:
@@ -180,4 +181,7 @@ if (plan) {
   console.log(`Time Travel: ${result.trim()}`);
 }
 show('After', rowCounts());
-console.log('Check the comments on a page, then delete the files in .backups/.');
+console.log(
+  'Check the comments on a page. Re-apply the deletions on request newer than the restored state\n' +
+    '(docs/OPERATIONS.md, "Delete a comment or an email on request"), then delete the files in .backups/.',
+);
