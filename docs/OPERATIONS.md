@@ -57,9 +57,30 @@ changes production data, so: show Arye the plan, and add `--yes` only with his a
   `.backups/restore-<date>.sql` to fit, and load it with
   `npx wrangler d1 execute mikraot-db --remote --config wrangler.jsonc --file <it>`.
 
-Afterwards: check the comments on a page, then delete the files in `.backups/`. Tested 2026-10-08:
-locally (`--local`), comments wiped and restored with the same rows and reply links; the Time
-Travel plan against production (read-only).
+Afterwards: check the comments on a page, re-apply the deletions listed below that are newer than
+the restored state, then delete the files in `.backups/`. Tested 2026-10-08: locally (`--local`),
+comments wiped and restored with the same rows and reply links; the Time Travel plan against
+production (read-only).
+
+### Delete a comment or an email on request
+
+The privacy policy promises deletion on request, and that a restore from an older backup won't
+bring the data back. So:
+
+1. Delete the row (with Arye's approval):
+   `npx wrangler d1 execute mikraot-db --remote --config wrangler.jsonc --command "DELETE FROM comments WHERE id = <id>"`
+   (only the email: `UPDATE comments SET author_email = NULL WHERE id = <id>`). If the comment has
+   replies, the database refuses the `DELETE` (each reply points to it); erase it instead:
+   `UPDATE comments SET author_name = '', author_email = NULL, content = '', approved = 0 WHERE id = <id>`.
+   Hiding a comment (`SET approved = 0` alone) is not deletion: its text and email stay.
+2. Add a line to the list below: date, comment number, and what was deleted. Numbers only, never
+   names or emails (this file is public).
+3. Backups taken before the deletion keep the row until they expire (~13 months); after any
+   restore, run step 1 again for every line here newer than the restored state.
+
+Deletions on request (date, comment id, what):
+
+- none yet
 
 ### Before they expire
 
