@@ -164,8 +164,15 @@ security.txt, required checks before any merge, dependency updates with tests.
 
 - **H/M Editing in the browser:** Keystatic in GitHub mode: an edit becomes a pull request with a
   preview; approving publishes, no laptop needed. Needs: decision (a GitHub app for Keystatic).
-- **M/S Monitoring:** uptime check with email (UptimeRobot, in the cutover plan) and Cloudflare
-  notifications on Worker error rates. Needs: Arye (accounts, notification email).
+- **M/S Monitoring:** an uptime check with email (UptimeRobot, in the cutover plan), plus a daily
+  check of the Worker's own numbers. Cloudflare's error-rate alerts are Enterprise-only (checked
+  2026-10-08), so the free way is a scheduled GitHub workflow that reads the Worker's requests and
+  errors through Cloudflare's analytics API (the existing token can read them since 2026-10-05)
+  and fails, emailing Arye, when errors exceed about 1% or requests near the free plan's 100,000 a
+  day. Static pages don't count toward that limit (Cloudflare serves them free); the API (comments,
+  searches counted, error reports), the comments feed and every address with no page (404s,
+  including bots probing old WordPress paths) do, so a bot wave is the likely way to reach it.
+  Needs: decision (the token would be stored as a GitHub secret).
 - **M/S Content images as AVIF/WebP** like the banner and video pictures (52 images, in
   `public/wp-content/uploads/`; the WordPress URLs must keep working too). Needs: nothing.
 - **M/S Faster automatic checks:** a run takes about 4 minutes (Lighthouse is the longest part);
