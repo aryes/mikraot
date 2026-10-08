@@ -26,6 +26,9 @@ declare module 'cloudflare:workers' {
     /** Daily database backups (Workers KV; src/server/backup.ts). */
     // oxlint-disable-next-line typescript/consistent-type-imports
     BACKUPS: import('./server/backup').BackupStore;
+    /** When each kind of failure was last emailed (Workers KV; src/server/alerts.ts). */
+    // oxlint-disable-next-line typescript/consistent-type-imports
+    ALERTS: import('./server/alerts').AlertStore;
   };
 }
 

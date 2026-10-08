@@ -43,7 +43,11 @@
   "analytics_engine_datasets": [{ "binding": "SEARCH_MISSES", "dataset": "mikraot_search_misses" }],
   // Daily database backup (src/server/backup.ts), at 02:17 UTC, a quiet hour.
   "triggers": { "crons": ["17 2 * * *"] },
-  "kv_namespaces": [{ "binding": "BACKUPS", "id": "74ecb19e9d864308bd5f9b0add3e2c11" }],
+  "kv_namespaces": [
+    { "binding": "BACKUPS", "id": "74ecb19e9d864308bd5f9b0add3e2c11" },
+    // When each kind of failure was last emailed, so an outage sends one email an hour.
+    { "binding": "ALERTS", "id": "1d520101c5964450b319f01663e8b890" },
+  ],
   "observability": { "enabled": true },
   // Worker Previews (one per git branch, `wrangler preview`): their own database and rate-limit
   // counter, so test comments never reach production. Previews are built with Turnstile's test
@@ -61,7 +65,10 @@
     "analytics_engine_datasets": [
       { "binding": "SEARCH_MISSES", "dataset": "mikraot_search_misses_preview" },
     ],
-    "kv_namespaces": [{ "binding": "BACKUPS", "id": "e39f0a30655c44d9881659e82e0b9ee6" }],
+    "kv_namespaces": [
+      { "binding": "BACKUPS", "id": "e39f0a30655c44d9881659e82e0b9ee6" },
+      { "binding": "ALERTS", "id": "76d137f506a047fd9adabd9bb52d65c6" },
+    ],
     "ratelimits": [
       {
         "name": "COMMENT_RATE_LIMIT",
