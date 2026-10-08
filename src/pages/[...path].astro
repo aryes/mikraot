@@ -6,7 +6,8 @@ import PostMeta from '../components/PostMeta.astro';
 import PostNav from '../components/PostNav.astro';
 import ContentLayout from '../layouts/ContentLayout.astro';
 import { ogImagePath } from '../lib/og';
-import { categoryUrl } from '../lib/archive';
+import { categoryUrl, formatDate } from '../lib/archive';
+import { lastChanged } from '../lib/last-changed';
 import {
   categoryName,
   commentKey,
@@ -34,6 +35,8 @@ const { page, pages } = Astro.props;
 const { entry, path } = page;
 const { title, seo, kind, categories } = entry.data;
 const { Content } = await render(entry);
+const lastUpdated =
+  entry.data.showLastUpdated && entry.filePath ? lastChanged(entry.filePath) : undefined;
 const isFrontPage = path === '';
 const isPost = kind === 'post';
 // A post's trail runs through its category, as on WordPress; a page's through its parents.
@@ -63,6 +66,11 @@ const crumbs = isPost
     data-pagefind-meta={`title:${title}`}
     class="wp-content-rendered prose prose-slate max-w-none text-right"
   >
+    {lastUpdated && (
+      <p>
+        עודכן לאחרונה: <time datetime={lastUpdated.toISOString()}>{formatDate(lastUpdated)}</time>
+      </p>
+    )}
     <Content />
   </div>
 

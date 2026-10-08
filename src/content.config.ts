@@ -24,6 +24,8 @@ const pages = defineCollection({
     // Keystatic writes empty fields as '' or null; both mean "not set".
     excerpt: z.string().nullish(),
     draft: z.boolean().default(false),
+    /** Show "last updated" with the date this file last changed (src/lib/last-changed.ts). */
+    showLastUpdated: z.boolean().default(false),
     /**
      * Announcements of new or changed content on this page, for the "What's new" page and feed
      * (which the newsletter sends). New posts are announced without one.

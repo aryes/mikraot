@@ -120,6 +120,10 @@ export default config({
         }),
         excerpt: fields.text({ label: 'תקציר', multiline: true }),
         draft: fields.checkbox({ label: 'טיוטה (לא מתפרסם)', defaultValue: false }),
+        showLastUpdated: fields.checkbox({
+          label: 'להציג ״עודכן לאחרונה״ (התאריך מתעדכן מעצמו כשהעמוד משתנה)',
+          defaultValue: false,
+        }),
         updates: fields.array(
           fields.object({
             date: fields.date({ label: 'תאריך', defaultValue: { kind: 'today' } }),
