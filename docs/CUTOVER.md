@@ -40,8 +40,10 @@ Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` 
       browsers are blocked by Turnstile, as intended); it was stored and shown, then hidden
       (`UPDATE comments SET approved = 0 WHERE id = 6`: the row stays in D1, the API no longer
       returns it), and the hostname removed again.
-- [ ] Zone rules audited: Redirect, Transform, Cache and Configuration rules (Cloudflare dashboard
-      → Rules → Overview; the API key can't read them) must not touch `mikraot.net/*` responses.
+- [x] Zone rules audited: Redirect, Transform, Cache, Configuration and Origin rules must not touch
+      `mikraot.net/*` responses. Checked 2026-10-08 through the API: none exist, no Page Rules, and no
+      account-level Bulk Redirects; the zone has only Cloudflare's managed URL normalization, free
+      managed firewall and DDoS rulesets. Check again on the switch day.
 - [ ] **Content freeze on WordPress.** Carry over content edited and comments approved on
       WordPress since the export (2026-09-30).
 - [x] Branch previews ignore `workers_dev` (tested 2026-10-05: a preview built with
