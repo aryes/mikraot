@@ -37,6 +37,8 @@ async function settle(page: Page): Promise<void> {
 
 for (const [name, path] of Object.entries(PAGES)) {
   test(`looks as before: ${name}`, VISUAL, async ({ page, isMobile }) => {
+    // No comments: tests running alongside post some, which would change the page's length.
+    await page.route('**/api/comments/**', (route) => route.fulfill({ json: [] }));
     await page.goto(path);
     await settle(page);
     await expect(page).toHaveScreenshot(`${name}.png`, {
