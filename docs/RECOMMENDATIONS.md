@@ -170,8 +170,10 @@ security.txt, required checks before any merge, dependency updates with tests.
 - **H/S Email authentication** when email moves off Bluehost: SPF, DKIM, DMARC tightened from
   `p=none` to `quarantine`, then `reject`, so nobody can send mail as @mikraot.net. Needs: decision
   (part of the email move).
-- **M/S Backups of comments:** the database keeps 30 days of history; add a weekly export to
-  Cloudflare's private file storage (R2, free at this size). Needs: decision.
+- **H/S Backups of comments:** the database can be restored only 7 days back on the free plan
+  (30 on paid; checked 2026-10-08), so a mistake noticed later is lost. Add a weekly export to
+  Cloudflare's private file storage (R2, free at this size), the way Cloudflare suggests.
+  Needs: decision.
 - **M/S Privacy (amendment 13 of the Privacy Protection Law):** collect less: make the commenter's
   email clearly optional, or drop it unless reply emails are built. Needs: decision.
 - **L/S** Browsers' built-in "HTTPS only" list (HSTS preload) once the site is stable; Cloudflare's
@@ -217,8 +219,9 @@ Privacy-first, without cookies, so no consent banner:
 
 - **H/S Cloudflare Web Analytics** at the switch (in the cutover plan): page views, referrers,
   devices, page speed as visitors experience it. Needs: Arye (switched on in the dashboard).
-- **M/S Bing Webmaster Tools** besides Google Search Console (a few minutes; Bing also feeds
-  DuckDuckGo). Needs: Arye (account).
+- **M/S Bing Webmaster Tools** besides Google Search Console (a few minutes; DuckDuckGo and
+  Copilot draw mainly on Bing's index, checked 2026-10-08; ChatGPT's web search partly).
+  Needs: Arye (account).
 - **M/S Content events** via Workers Analytics Engine (already used for searches): audio plays,
   video plays, hidden answers opened, 404s. Needs: decision.
 - **M/S "Was this page helpful?"** 👍/👎 with an optional comment. Needs: decision.
