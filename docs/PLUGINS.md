@@ -71,7 +71,7 @@ Decided 2026-10-03: **Cloudflare Web Analytics** (cookie-free; tasks in `docs/RO
 | Outbound-link and file-download clicks                    | on (GA events)       | ⬜ optional: own events via Workers Analytics Engine |
 | Email summaries of statistics                             | on (MonsterInsights) | ⬜ optional: monthly summary email                   |
 | Historical GA data                                        | yes                  | ❓ export before cutover if wanted                   |
-| **Uptime monitoring with email alerts** (Jetpack Monitor) | on                   | ⬜ free uptime check with email                      |
+| **Uptime monitoring with email alerts** (Jetpack Monitor) | on                   | ✅ UptimeRobot (free), every 5 minutes, email        |
 
 ## Content display (Collapse-O-Matic, Show/Hide, Compact Audio Player, Elementor, EmbedPress, TablePress)
 
