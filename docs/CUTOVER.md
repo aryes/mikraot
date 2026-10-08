@@ -19,6 +19,10 @@ Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` 
 
 ## 1. Before the switch
 
+On the switch day, `npm run cutover:check` reruns the checks marked "again on the switch day"
+below (URL parity, content, Cloudflare rules, the WordPress freeze) and makes the fresh database
+export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
+
 - [x] Production D1 backed up and migrated; Worker deployed to workers.dev with its Turnstile
       secret (2026-10-04, approved).
 - [ ] Launch items in `docs/ROADMAP.md` done or consciously deferred: privacy policy published,
@@ -60,7 +64,7 @@ Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` 
       routes win, so while they exist comments would go to the old Worker.
 - [x] Redirects in `public/_redirects` (`/sitemap.xml`, `/page/*`, `/category/uncategorized/`, BuddyPress) as 302 during the
       fallback weeks: browsers keep 301s, which would survive a rollback. Back to 301 in step 5.
-- [ ] A fresh production D1 export the same day.
+- [ ] A fresh production D1 export the same day (`npm run cutover:check` makes it).
 - [ ] **Approval (go/no-go)**, with a fixed date and time (a quiet hour) and the observation
       window below.
 
