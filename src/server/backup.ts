@@ -1,7 +1,7 @@
 /**
  * Daily backup of the database (comments, and any later tables) to Workers KV. D1 itself can be
  * restored only 7 days back on the free plan; these copies reach further. Restore with
- * `npm run backup:restore` (scripts/backup-to-sql.ts).
+ * `npm run db:restore` (scripts/db-restore.ts).
  */
 
 interface BackupStatement {
@@ -35,7 +35,7 @@ export const KEEP_SECONDS = 400 * 24 * 60 * 60;
 export const backupKey = (date: Date) => `d1/${date.toISOString().slice(0, 10)}.json`;
 
 /** The application's tables: everything but SQLite's, D1's and the migrations' own. */
-const TABLES_QUERY = `SELECT name FROM sqlite_master WHERE type = 'table'
+export const TABLES_QUERY = `SELECT name FROM sqlite_master WHERE type = 'table'
   AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '\\_cf\\_%' ESCAPE '\\' AND name != 'd1_migrations'
   ORDER BY name`;
 
