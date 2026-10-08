@@ -6,7 +6,7 @@
  */
 const { chromium } = require('@playwright/test');
 
-const port = 4324;
+const port = 4384; // away from the dev server (4321 and up), like the browser tests (4380)
 // One page of each kind: the home page, a lesson, a post, and a page with embedded videos.
 const pages = ['/', '/דגש-קל/', '/בראשית/', '/טעמים/נוסח-אשכנז/'];
 // Single Lighthouse runs vary by several points: each limit applies to the median of three.

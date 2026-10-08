@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const port = 4322;
+// Well above 4321: each time the dev server restarts (a config change) it takes the next free port
+// without releasing its old one, and the tests would reuse whatever answers here.
+const port = 4380;
 /** A deployed site to check instead of the local build (`npm run test:deployed -- <url>`). */
 const deployed = process.env['E2E_BASE_URL'];
 // Against a deployed site only the read-only tests run, and CI (Linux) skips the screenshot
