@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Dependency updates as pull requests (replaces WordPress auto-updates). Each must pass CI; nothing merges automatically: Arye approves every change.",
+  "description": "Dependency updates as pull requests (replaces WordPress auto-updates). Minor and patch updates merge automatically once every check passes (approved by Arye 2026-10-08); major versions wait for review.",
   "extends": ["config:recommended", "helpers:pinGitHubActionDigests", ":semanticCommitsDisabled"],
   "timezone": "Asia/Jerusalem",
   "schedule": ["before 9am on monday"],
@@ -11,7 +11,9 @@
     "schedule": ["at any time"],
     "minimumReleaseAge": null
   },
-  "lockFileMaintenance": { "enabled": true },
+  "lockFileMaintenance": {
+    "enabled": true
+  },
   "packageRules": [
     {
       "description": "Astro and its integrations move together",
@@ -36,6 +38,13 @@
       "description": "TypeScript stays on 6.x until astro check supports 7 (docs/ROADMAP.md)",
       "matchPackageNames": ["typescript"],
       "allowedVersions": "<7"
+    },
+    {
+      "description": "Minor, patch and lockfile updates merge on their own (Monday mornings) once every check passes (tests, build, Lighthouse, the Keystatic patch); majors, and any update of a 0.x package (where minor versions may break), wait for review.",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest", "lockFileMaintenance"],
+      "automerge": true,
+      "matchCurrentVersion": "!/^v?0\\./"
     }
-  ]
+  ],
+  "automergeSchedule": ["before 9am on monday"]
 }
