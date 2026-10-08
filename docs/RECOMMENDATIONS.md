@@ -200,10 +200,6 @@ security.txt, required checks before any merge, dependency updates with tests.
 - **M/S Clean-up after the cutover:** the old `mikraot-api` Worker, `worker/`, `/staging/` on
   Bluehost, the Supabase project (after a final export). In `docs/CUTOVER.md` step 5. Needs: Arye's
   approval (deletions).
-- **M/S Consistent Hebrew encoding:** the same word can be stored with its marks in different orders
-  (12 of 39 pages are not in Unicode's standard order). A check that flags mixed orderings would
-  keep search reliable; automatic normalizing is risky (it can reorder marks in ways fonts render
-  badly). Needs: nothing.
 - **M/S Better Hebrew in Keystatic upstream:** contribute the corrected strings
   (`patches/@keystatic+core+0.6.9.patch`) and the hard-coded English labels to Keystatic, so the
   patch can go and every Hebrew user benefits. Needs: decision (a public contribution).
