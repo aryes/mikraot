@@ -2,7 +2,8 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   // One Worker serves the static pages (assets) and the /api routes.
   "name": "mikraot",
-  "main": "@astrojs/cloudflare/entrypoints/server",
+  // Astro's handler plus the daily backup (src/worker.ts).
+  "main": "./src/worker.ts",
   "compatibility_date": "2026-09-30",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
@@ -40,6 +41,9 @@
   ],
   // Searches that found nothing (src/server/search-misses.ts): Analytics Engine keeps 3 months.
   "analytics_engine_datasets": [{ "binding": "SEARCH_MISSES", "dataset": "mikraot_search_misses" }],
+  // Daily database backup (src/server/backup.ts), at 02:17 UTC, a quiet hour.
+  "triggers": { "crons": ["17 2 * * *"] },
+  "kv_namespaces": [{ "binding": "BACKUPS", "id": "74ecb19e9d864308bd5f9b0add3e2c11" }],
   "observability": { "enabled": true },
   // Worker Previews (one per git branch, `wrangler preview`): their own database and rate-limit
   // counter, so test comments never reach production. Previews are built with Turnstile's test
@@ -57,6 +61,7 @@
     "analytics_engine_datasets": [
       { "binding": "SEARCH_MISSES", "dataset": "mikraot_search_misses_preview" },
     ],
+    "kv_namespaces": [{ "binding": "BACKUPS", "id": "e39f0a30655c44d9881659e82e0b9ee6" }],
     "ratelimits": [
       {
         "name": "COMMENT_RATE_LIMIT",

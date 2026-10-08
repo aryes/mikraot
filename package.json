@@ -31,6 +31,7 @@
     "prepare": "git config core.hooksPath .githooks",
     "test:deployed": "tsx scripts/test-deployed.ts",
     "search:misses": "tsx scripts/search-misses.ts",
+    "backup:restore": "tsx scripts/backup-to-sql.ts",
     "lighthouse": "lhci autorun",
     "db:dev:reset": "wrangler d1 migrations apply mikraot-db --local --persist-to .wrangler/state-dev && wrangler d1 execute mikraot-db --local --persist-to .wrangler/state-dev --file e2e/fixtures/comments.sql",
     "patches": "patch-package --error-on-fail --error-on-warn"

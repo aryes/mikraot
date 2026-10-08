@@ -7,7 +7,7 @@ declare module 'cloudflare:workers' {
   // An ambient module can't use a relative `import` statement, so the type is imported inline.
   export const env: {
     // oxlint-disable-next-line typescript/consistent-type-imports
-    DB: import('./server/comments').CommentsDb;
+    DB: import('./server/comments').CommentsDb & import('./server/backup').BackupDb;
     /** The static files (dist/client). */
     ASSETS: { fetch(input: string | URL): Promise<Response> };
     /** Turnstile secret key (wrangler secret; locally in .dev.vars). */
@@ -23,6 +23,9 @@ declare module 'cloudflare:workers' {
     SEARCH_MISSES: import('./server/search-misses').SearchMissesDataset;
     /** Per-visitor limit on reports of searches with no results (src/pages/api/search-misses.ts). */
     SEARCH_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
+    /** Daily database backups (Workers KV; src/server/backup.ts). */
+    // oxlint-disable-next-line typescript/consistent-type-imports
+    BACKUPS: import('./server/backup').BackupStore;
   };
 }
 
