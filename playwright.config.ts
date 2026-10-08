@@ -11,9 +11,10 @@ const readOnly = skipped ? { grepInvert: skipped } : {};
 
 export default defineConfig({
   testDir: 'e2e',
-  // One worker: the local D1 emulation can stall when a write overlaps other requests
-  // (seen as comments hanging on "loading"); serial runs are stable and barely slower.
-  workers: 1,
+  // Two workers: about a third faster than one. The tests that write data are few and touch
+  // separate pages; the cold-start stall is avoided by warming the server up first.
+  workers: 2,
+  globalSetup: './e2e/warm-up.ts',
   forbidOnly: Boolean(process.env['CI']),
   // One retry (in every run, CI and deployed ones too) absorbs a rare page load that aborts after
   // 30 s, in a different test each time: likely a stall of the local server on Windows
