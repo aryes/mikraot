@@ -35,16 +35,24 @@ const LOGS = 'Cloudflare → Workers → mikraot → Observability → Logs';
 export async function alertOwner(options: {
   apiKey: string | undefined;
   store: AlertStore;
+  /**
+   * Turns away most of a burst before it reaches KV: KV is eventually consistent, so many
+   * locations failing at once could each find no recent email, and each KV write counts toward
+   * the account's free 1,000 a day (which the daily backup needs too). It counts per location and
+   * roughly, so it thins a burst rather than capping it exactly.
+   */
+  limiter: { limit(options: { key: string }): Promise<{ success: boolean }> };
   kind: AlertKind;
   /** What failed, for the email: a path and status, or an error message. */
   detail: string;
   now: Date;
   fetchFn?: typeof fetch;
 }): Promise<void> {
-  const { apiKey, store, kind, detail, now, fetchFn } = options;
+  const { apiKey, store, limiter, kind, detail, now, fetchFn } = options;
   if (!apiKey) return;
   try {
     const key = `alert/${kind}`;
+    if (!(await limiter.limit({ key })).success) return;
     if (await store.get(key)) return;
     await store.put(key, now.toISOString(), { expirationTtl: ALERT_INTERVAL_SECONDS });
     const title = TITLES[kind];

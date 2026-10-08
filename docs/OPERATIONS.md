@@ -116,7 +116,16 @@ Assumptions to watch:
   learners), check the scheduled run's CPU time in the logs, and split the backup per table.
 - **Comments are rare** (the last one on WordPress was in 2023), so an hour between error emails
   and a daily backup are enough. Revisit if comments become daily.
-- **A scheduled run that never starts sends no email** (there is no error to report). A daily
-  check from outside would catch it: `docs/RECOMMENDATIONS.md`, Monitoring.
+- **Some failures can't send an email:** a scheduled run that never starts (there is no error to
+  report), and a Worker stopped by Cloudflare itself (out of CPU time or memory, or the daily
+  request limit reached), which ends before our code can react. UptimeRobot catches the site being
+  down, but not the daily limit: the pages it checks are static and keep working, only comments
+  and other Worker routes fail. A daily check from outside would catch the rest:
+  `docs/RECOMMENDATIONS.md`, Monitoring.
+- **One script can use up the free daily requests:** each comment load, API call and unknown
+  address runs the Worker, and 100,000 a day is about 70 a minute. A per-visitor limit inside the
+  Worker can't prevent it (blocked requests still count), so after the switch a Cloudflare rate
+  limiting rule (one is free) should block floods before the Worker runs: `docs/CUTOVER.md`,
+  section 3.
 - **One Cloudflare account holds the site, its database and its backups.** Losing the account
   loses all three; an off-Cloudflare copy (e.g. a monthly export kept by Arye) would cover that.
