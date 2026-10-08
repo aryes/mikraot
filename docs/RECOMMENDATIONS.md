@@ -189,7 +189,7 @@ security.txt, required checks before any merge, dependency updates with tests.
 
 - **H/M Editing in the browser:** Keystatic in GitHub mode: an edit becomes a pull request with a
   preview; approving publishes, no laptop needed. Needs: decision (a GitHub app for Keystatic).
-- **M/S Monitoring:** an uptime check with email (UptimeRobot, in the cutover plan), plus a daily
+- **M/S Monitoring:** an uptime check with email (UptimeRobot, set up 2026-10-08), plus a daily
   check of the Worker's own numbers. Cloudflare's error-rate alerts are Enterprise-only (checked
   2026-10-08), so the free way is a scheduled GitHub workflow that reads the Worker's requests and
   errors through Cloudflare's analytics API (the existing token can read them since 2026-10-05)

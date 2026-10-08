@@ -83,7 +83,7 @@
   - [ ] Comment moderation page behind Cloudflare Access (approve, delete, edit, reply as admin)
   - [x] Structured data (JSON-LD: WebSite, WebPage, BreadcrumbList, BlogPosting, Person) and Twitter title/description, as All in One SEO output (`src/lib/structured-data.ts`, typed with schema-dts)
   - [x] Previous/next post links and related posts (same category) under posts (`src/components/PostNav.astro`; nothing shows while the site has a single post)
-  - [ ] Uptime monitor with email alerts (replaces Jetpack Monitor)
+  - [x] Uptime monitor with email alerts (replaces Jetpack Monitor): UptimeRobot, 2026-10-08
   - [x] Renovate for dependency updates (replaces WordPress auto-updates): `renovate.json` (weekly pull requests, security fixes at once, 3-day release age, grouped Astro and dev tools, no auto-merge); active once the repo is on GitHub with the Renovate app installed
   - [ ] Preview URL per change (replaces staging): with the GitHub deploy pipeline
   - [ ] 2FA and login alerts on GitHub, Cloudflare and GoDaddy (replaces Wordfence 2FA and login alerts)
