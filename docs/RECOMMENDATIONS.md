@@ -180,8 +180,9 @@ security.txt, required checks before any merge, dependency updates with tests.
 - **S/S Dismiss the 3 security alerts that have no fix** (GitHub's Dependabot alerts, which already
   cover what a weekly `npm audit` would). Of the 7 open on 2026-10-08, 4 had fixed versions and are
   overridden in `package.json` (`overrides`). The other 3 (2 for `extract-zip`, 1 for
-  `sprintf-js`) come from Lighthouse CI (`@lhci/cli`, no release since June 2025), which only we run (the automatic
-  checks, `npm run lighthouse`) and only on our own pages: no outside input reaches them.
+  `sprintf-js`) come from Lighthouse CI (`@lhci/cli`, no release since June 2025), which only we
+  run (the automatic checks, `npm run lighthouse`) and only on our own pages: no outside input
+  reaches them.
   Proposal: dismiss them on GitHub as "risk is tolerable", with that reason, so a new alert stands
   out. Needs: decision.
 
