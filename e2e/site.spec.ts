@@ -122,10 +122,14 @@ test('media is served by the site at the WordPress paths', async ({ page, reques
   });
 });
 
-test('pages keep the live site titles, descriptions and social tags', async ({ page }) => {
+test('pages keep the live site titles, and have descriptions and social tags', async ({ page }) => {
   await page.goto('/שווא-נע/');
   await expect(page).toHaveTitle('שווא נע - מקראות');
-  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /\S{10}/);
+  // "title: description", short enough for Google to show whole (Arye, 2026-10-08).
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    'content',
+    /^שווא נע: .{20,145}$/,
+  );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
     'https://mikraot.net/%D7%A9%D7%95%D7%95%D7%90-%D7%A0%D7%A2/',
