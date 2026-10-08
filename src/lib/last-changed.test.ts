@@ -50,9 +50,14 @@ describe('lastChanged', () => {
     expect(calls).toContain('fetch --unshallow --quiet');
   });
 
-  it('is today while the text has uncommitted edits, or the page is new', () => {
-    expect(lastChanged('page.mdoc', { git: fakeGit(history).git, read: () => v1, now })).toBe(now);
-    expect(lastChanged('page.mdoc', { git: fakeGit([]).git, read: () => v1, now })).toBe(now);
+  // inBuild set explicitly: CI sets CI, which would otherwise make these throw.
+  it('is today while the text has uncommitted edits, or the page is new (local runs)', () => {
+    expect(
+      lastChanged('page.mdoc', { git: fakeGit(history).git, read: () => v1, now, inBuild: false }),
+    ).toBe(now);
+    expect(
+      lastChanged('page.mdoc', { git: fakeGit([]).git, read: () => v1, now, inBuild: false }),
+    ).toBe(now);
   });
 
   it('fails an automatic build with uncommitted edits, rather than show a wrong date', () => {
