@@ -150,10 +150,6 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
   new content stays invisible to returning learners. Needs: content (a habit).
 - **M/M One template for lessons:** goal → rule → examples (with audio) → exceptions → exercises →
   summary. Makes the site feel like a course and gaps visible. Needs: decision.
-- **S/S Internal links:** the lessons already link to each other well (checked 2026-10-08: of
-  every first mention of a term that has its own lesson, only 4 are not links): דגש קל →
-  שווא נע, סמיכות → שווא נע, קמץ קטן → דגש חזק, מש״ה מוציא → אותיות השימוש. Needs: Arye's
-  approval (changes to his lessons).
 - **M/L More נוסחים:** Sephardi-Yerushalmi first (the largest Israeli audience), then Teimani.
   Needs: content (or volunteer readers).
 - **M/M Haftarah and Megillot** trope (same symbols, different melodies). Needs: content.
@@ -276,13 +272,16 @@ Privacy-first, without cookies, so no consent banner:
   minimum scores (it found and we fixed: address-less menu and footer links, the comments heading
   level, the human check loading with every page, labels on the comment form); short addresses for
   pointed page URLs.
-- 2026-10-08: videos load only when played; home page heading levels; keyboard-friendly menus;
-  share pictures per page; content checks; screenshot comparisons (local); Keystatic's Hebrew labels
+- 2026-10-08: videos load only when played; home page heading levels; keyboard-friendly menus; share
+  pictures per page; content checks; screenshot comparisons (local); Keystatic's Hebrew labels
   (patch) and Hebrew page addresses; the editing guide (`docs/GUIDE.md`); pull requests with
   required checks; faster tests (two workers, Lighthouse in parallel); daily database backups to
-  Workers KV, kept a year (D1 alone restores only 7 days back on the free plan); short search
-  descriptions, "title: description", on 33 pages. Dropped: content images as AVIF/WebP (the content has no
-  pictures, and the banner already is; the 52 WordPress images serve only the site icon and old
-  links); lessons marked as lessons for search engines (Google retired its course-info, learning
-  video and practice-problem rich results in 2025-2026; the ones left, course lists and flashcard
-  Q&A, are not offered in Hebrew).
+  Workers KV, kept a year (D1 alone restores only 7 days back on the free plan); the 4 missing links
+  between lessons (the rest were already linked); error emails to Arye (server errors, failed
+  backups); one-command restore (`db:restore`) and switch-day check (`cutover:check`); recovery
+  procedures and limits in `docs/OPERATIONS.md`; a skip link and sound buttons named for what they
+  play; short search descriptions, "title: description", on 33 pages. Dropped: content images as
+  AVIF/WebP (the content has no pictures, and the banner already is; the 52 WordPress images serve
+  only the site icon and old links); lessons marked as lessons for search engines (Google retired
+  its course-info, learning video and practice-problem rich results in 2025-2026; the ones left,
+  course lists and flashcard Q&A, are not offered in Hebrew).
