@@ -4,14 +4,20 @@ interface Props {
   src: string;
 }
 const { src } = Astro.props;
+// Says what it plays (the recordings are named after it: ב-דגושה.mp3 → "ב דגושה"), so a screen reader
+// can tell the buttons of a table apart.
+const sound = decodeURIComponent(src.split('/').at(-1) ?? '')
+  .replace(/\.mp3$/i, '')
+  .replaceAll('-', ' ');
+const label = sound ? `השמע: ${sound}` : 'השמע צליל';
 ---
 
 <button
   type="button"
   class="inline-audio-btn mx-1 inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-brand-strong align-middle text-white shadow-xs transition-transform hover:bg-brand-deep active:scale-95"
   data-audio-src={src}
-  title="השמע צליל"
-  aria-label="השמע צליל"
+  title={label}
+  aria-label={label}
 >
   <svg
     class="play-icon pointer-events-none h-4 w-4"
