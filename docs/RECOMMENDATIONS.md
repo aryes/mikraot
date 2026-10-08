@@ -46,12 +46,19 @@ After the cutover (`docs/CUTOVER.md`), in this order:
 2. **H/M Learning paths:** a "where to start" page per door (see Direction 2), previous/next links
    between lessons in menu order (posts have them; lessons don't), a table of contents on long
    pages (שווא נע is ~1,950 words). Needs: decision (the orders), a little content.
-3. **H/M Self-check exercises** at the end of lessons, built from the existing hidden answers (83 on
-   שווא נע alone), with progress kept in the browser. Needs: decision.
+3. **H/M Self-check exercises** at the end of lessons, generated from the hidden answers already
+   written: 189 of them (שווא נע 40, אותיות נחות 40, ו׳ החיבור 28, קמץ קטן 24, מדרג הטעמים 13, and
+   22 on each trope-song page). Each is a word plus "the answer – the reason" (השמטה → "הש׳ בשווא נע
+   בגלל הדגש"; ויאמר → "זרקא"), so the site can ask "in השמטה, is the shva under ש נע or נח?" with
+   the choices taken from that page's answers, then show the full explanation. Progress kept in the
+   browser. Needs: decision; then Arye only reviews the generated questions.
 4. **H/M A trope chart page:** every טעם with symbol, name, example and audio per נוסח; probably the
    most searched topic. Needs: content (recordings).
-5. **H/M Audio for the grammar pages** (שווא נע, קמץ קטן, אותיות נחות, מפיק, דגש חזק): only מבטא and
-   דגש קל have recordings. Needs: content.
+5. **H/M Recordings where they're missing:** 45 recordings sit on just three pages (מבטא 28, דגש קל
+   12, תנועות 5). None on the grammar lessons (שווא נע, קמץ קטן, אותיות נחות, מפיק, דגש חזק) or on
+   the trope practice pages (אתנחתא וסוף פסוק, פשטא זקף קטן, רביעי דרגא תביר, מגוון טעמים, טעמים
+   נדירים), where a learner most needs to hear the verse. One page a week (Direction 6) covers them
+   in two to three months. Needs: content.
 6. **H/M An audio recording workflow for Arye:** record on the phone, send, and the recording lands
    on the right page (Claude converts, names and places it). Recording is most of the content time
    (Direction 1 and 6), so making it easy multiplies the rest. Needs: decision.
@@ -97,8 +104,11 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
   writes its own unpointed transcript instead of following our text; (c) a tap-along tool: Arye
   plays a recording and taps once per word, about 1.5–2× the recording's length with corrections.
   Start with a one-day test of (a) on one recording, then decide. Needs: decision.
-- **M/M Glossary** (שווא נע, מפיק, מתג, דבקים…) with tap/hover definitions wherever a term appears;
-  also a glossary page. Needs: content (short definitions; Claude can draft from the lessons).
+- **M/M Glossary** with tap/hover definitions wherever a term appears, and a glossary page. Counted
+  2026-10-08: terms like אתנחתא (8 pages), שווא נע, חטף, מקף (6 each), שווא נח (5), מפיק, מחבר (4)
+  and מלעיל/מלרע recur across lessons; some have a lesson of their own, others only a passing line
+  (חטף, מלעיל/מלרע) or nothing at all (הברה פתוחה). About 15 entries would cover them. Needs: content (short
+  definitions; Claude can draft from the lessons).
 - **M/M Text view of any verse or chapter** with toggles: letters only / + niqqud / + טעמים
   (tikkun-style practice), text from public-domain sources (Westminster Leningrad Codex or
   Sefaria's API). Needs: decision.
@@ -121,8 +131,9 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
   new content stays invisible to returning learners. Needs: content (a habit).
 - **M/M One template for lessons:** goal → rule → examples (with audio) → exceptions → exercises →
   summary. Makes the site feel like a course and gaps visible. Needs: decision.
-- **M/S Internal links:** each lesson links to the related ones (דגש קל ↔ שווא נע ↔ בג״ד כפ״ת).
-  Needs: review (Claude proposes the links, Arye approves the changes to his lessons).
+- **M/S Internal links:** each lesson links to the related ones: the first mention of a term that
+  has its own lesson (שווא נע, מפיק, דגש קל, קמץ קטן, מתג…) links to it. A cheap first step before
+  the glossary. Needs: review (Claude proposes the links, Arye approves the changes to his lessons).
 - **M/L More נוסחים:** Sephardi-Yerushalmi first (the largest Israeli audience), then Teimani.
   Needs: content (or volunteer readers).
 - **M/M Haftarah and Megillot** trope (same symbols, different melodies). Needs: content.
