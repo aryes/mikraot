@@ -1,14 +1,6 @@
 /**
- * Restores the production database, with the safety steps built in (docs/OPERATIONS.md):
- *
- *   npm run db:restore -- 2026-10-01             from the daily backup of that date (Workers KV)
- *   npm run db:restore -- 2026-10-07T09:30:00Z   to that moment (D1 Time Travel, last 7 days)
- *   npm run db:restore -- latest                 from the newest daily backup
- *
- * Without --yes it only shows the plan: the rows now and in the restored state. With --yes it
- * first exports the current database to .backups/, then restores, then shows the rows again.
- * Restoring production needs Arye's approval (CLAUDE.md): show him the plan, then run with --yes.
- * --local works on the local database (daily backups only), for testing this script.
+ * Restores the production database, with the safety steps built in. The instructions are in HELP
+ * below (`npm run db:restore` prints them); background in docs/OPERATIONS.md.
  */
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -22,22 +14,54 @@ const confirmed = args.includes('--yes');
 const local = args.includes('--local');
 const where = local ? '--local' : '--remote';
 
-const usage = () => {
-  console.error(
-    'Usage: npm run db:restore -- <YYYY-MM-DD | time with zone, e.g. 2026-10-07T09:30:00Z | latest> [--yes] [--local]',
-  );
-  process.exit(2);
+const HELP = `Restore the site's database (comments) to an earlier state.
+
+  npm run db:restore -- <target> [--yes] [--local]
+
+<target> is one of:
+  2026-10-01            that day's daily backup (taken at 02:17 UTC, kept about 13 months)
+  latest                the newest daily backup
+  2026-10-07T09:30:00Z  that exact moment, from the database's own history (last 7 days only).
+                        The time must end with its zone: Z for UTC, or +03:00 for Israel in
+                        summer (+02:00 in winter).
+
+Steps:
+  1. Run without --yes. Nothing changes: it shows the rows now and after the restore.
+  2. Show that plan to Arye; restoring the live site needs his approval.
+  3. Run the same command with --yes. It first saves the current database to .backups/,
+     then restores, then shows the rows again.
+  4. Open a page with comments to check, then delete the files in .backups/
+     (they hold commenters' emails; the folder is never committed).
+
+Options:
+  --yes     really restore (without it: only the plan)
+  --local   use the local test database instead of the live one (daily backups only)
+  --help    this text
+
+Undo: before restoring, --yes prints the command that returns the live database to a minute
+before the restore (from the database's history, within 7 days), with --yes included; it too
+needs Arye's approval. The copy in .backups/before-restore-<time>.sql is a second safety net
+(see docs/OPERATIONS.md).`;
+
+const usage = (problem?: string) => {
+  if (problem) console.error(`${problem}\n`);
+  console.error(HELP);
+  process.exit(problem ? 2 : 0);
 };
-if (!target) usage();
+if (!target || args.includes('--help')) usage();
 const isDate = /^\d{4}-\d{2}-\d{2}$/.test(target ?? '');
 // A time must name its zone (wrangler requires it): 2026-10-07T09:30:00Z or …+03:00.
 const isTime = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/.test(
   target ?? '',
 );
-if (!isDate && !isTime && target !== 'latest') usage();
+if (!isDate && !isTime && target !== 'latest')
+  usage(`Not a date, a time with its zone, or latest: ${target ?? ''}`);
+const unknown = args.filter(
+  (arg) => arg.startsWith('--') && !['--yes', '--local', '--help'].includes(arg),
+);
+if (unknown.length > 0) usage(`Unknown option: ${unknown.join(' ')}`);
 if (isTime && local) {
-  console.error('Time Travel exists only for the remote database.');
-  process.exit(2);
+  usage('A moment in time works only on the live database (--local has daily backups only).');
 }
 
 // Wrangler's own script run by Node, without a shell: SQL passed as an argument keeps its spaces
@@ -129,11 +153,18 @@ if (!confirmed) {
   process.exit(0);
 }
 
-const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+// The moment to return to if this restore was a mistake: a minute back, in case this computer's
+// clock runs ahead of Cloudflare's; whole seconds, with its zone.
+const before = `${new Date(Date.now() - 60_000).toISOString().slice(0, 19)}Z`;
+const stamp = before.replace(/:/g, '-');
 const exportFile = `.backups/before-restore-${stamp}.sql`;
 mkdirSync('.backups', { recursive: true });
 wrangler('d1', 'export', DATABASE, where, '--output', exportFile);
 console.log(`\nExported the current database to ${exportFile}`);
+// Printed before restoring, so it is on screen even if the restore fails halfway.
+if (!local) {
+  console.log(`To undo (with Arye's approval): npm run db:restore -- ${before} --yes`);
+}
 
 if (plan) {
   wrangler('d1', 'execute', DATABASE, where, '--file', plan.file);
@@ -147,9 +178,6 @@ if (plan) {
     '--json',
   );
   console.log(`Time Travel: ${result.trim()}`);
-  console.log(
-    'To undo: npx wrangler d1 time-travel restore mikraot-db --bookmark=<previous bookmark above> --config wrangler.jsonc',
-  );
 }
 show('After', rowCounts());
 console.log('Check the comments on a page, then delete the files in .backups/.');
