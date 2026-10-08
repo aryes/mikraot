@@ -40,27 +40,25 @@ UptimeRobot (Arye's account) checks `https://mikraot.net/` every 5 minutes and e
 
 ### Restore the database
 
-Two ways back, depending on how old the good state is:
+`npm run db:restore -- <target>` does it with the safety steps built in. Without `--yes` it only
+shows the plan (rows now, rows after); with `--yes` it exports the current database to `.backups/`
+(git-ignored: it holds commenters' emails), restores, and shows the rows after. It changes
+production data, so: show Arye the plan, and add `--yes` only with his approval.
 
-Either way it changes production data, so only with Arye's approval, after an export
-(`npx wrangler d1 export mikraot-db --remote --output <file> --config wrangler.jsonc`).
+- **A time within the last 7 days**, with its zone (e.g. `2026-10-07T09:30:00Z` in UTC, or
+  `…+03:00` in Israel summer time): D1's own history (Time Travel), to the minute. An older time
+  fails already in the plan (the free plan keeps 7 days). The whole database returns to that moment, so comments posted since are
+  lost (they are in the export). The output names the previous bookmark; to undo:
+  `npx wrangler d1 time-travel restore mikraot-db --bookmark=<it> --config wrangler.jsonc`.
+- **A date, or `latest`:** that day's backup in Workers KV (`d1/<date>.json`, written at 02:17
+  UTC, kept ~13 months). The tables in the backup get its rows; other tables are left alone. If a
+  migration changed the tables after the backup was taken, edit the generated
+  `.backups/restore-<date>.sql` to fit, and load it with
+  `npx wrangler d1 execute mikraot-db --remote --config wrangler.jsonc --file <it>`.
 
-- **Within the last 7 days:** D1's own history (Time Travel), to the minute:
-  `npx wrangler d1 time-travel restore mikraot-db --timestamp=<ISO time> --config wrangler.jsonc`.
-  It replaces the whole database, so comments posted after that time are lost. It prints the
-  bookmark of the state it replaced: `--bookmark <that>` undoes the restore.
-- **Older:** the daily backup in Workers KV (`d1/<date>.json`, written at 02:17 UTC, kept ~13
-  months). If a migration changed the tables after the backup was taken, adjust the SQL to the
-  current tables first; tables that are not in the backup are left alone.
-  1. `npm run backup:restore -- <YYYY-MM-DD>` (no date: the newest) writes
-     `.backups/restore-<date>.sql` (git-ignored: it holds commenters' emails) and prints the row
-     counts.
-  2. Export the current database (above).
-  3. `npx wrangler d1 execute mikraot-db --remote --config wrangler.jsonc
---file .backups/restore-<date>.sql`. It replaces the rows of the tables in the backup.
-  4. Check the comments on a page; delete the `.backups/` file.
-
-Tested locally 2026-10-08: comments wiped, restored with the same rows and reply links.
+Afterwards: check the comments on a page, then delete the files in `.backups/`. Tested 2026-10-08:
+locally (`--local`), comments wiped and restored with the same rows and reply links; the Time
+Travel plan against production (read-only).
 
 ### Before they expire
 
