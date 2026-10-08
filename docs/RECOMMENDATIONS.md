@@ -193,8 +193,6 @@ security.txt, required checks before any merge, dependency updates with tests.
   searches counted, error reports), the comments feed and every address with no page (404s,
   including bots probing old WordPress paths) do, so a bot wave is the likely way to reach it.
   Needs: decision (the token would be stored as a GitHub secret).
-- **M/S Content images as AVIF/WebP** like the banner and video pictures (52 images, in
-  `public/wp-content/uploads/`; the WordPress URLs must keep working too). Needs: nothing.
 - **M/S Faster automatic checks:** a run takes about 4 minutes (Lighthouse is the longest part);
   caching the test browser would save another ~30 s. Needs: nothing.
 - **M/S Clean-up after the cutover:** the old `mikraot-api` Worker, `worker/`, `/staging/` on
@@ -263,4 +261,6 @@ Privacy-first, without cookies, so no consent banner:
 - 2026-10-08: videos load only when played; home page heading levels; keyboard-friendly menus;
   share pictures per page; content checks; screenshot comparisons (local); Keystatic's Hebrew labels
   (patch) and Hebrew page addresses; the editing guide (`docs/GUIDE.md`); pull requests with
-  required checks; faster tests (two workers, Lighthouse in parallel).
+  required checks; faster tests (two workers, Lighthouse in parallel). Dropped: content images as
+  AVIF/WebP (the content has no pictures, and the banner already is; the 52 WordPress images
+  serve only the site icon and old links).
