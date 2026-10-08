@@ -170,10 +170,6 @@ security.txt, required checks before any merge, dependency updates with tests.
 - **H/S Email authentication** when email moves off Bluehost: SPF, DKIM, DMARC tightened from
   `p=none` to `quarantine`, then `reject`, so nobody can send mail as @mikraot.net. Needs: decision
   (part of the email move).
-- **H/S Backups of comments:** the database can be restored only 7 days back on the free plan
-  (30 on paid; checked 2026-10-08), so a mistake noticed later is lost. Add a weekly export to
-  Cloudflare's private file storage (R2, free at this size), the way Cloudflare suggests.
-  Needs: decision.
 - **M/S Privacy (amendment 13 of the Privacy Protection Law):** collect less: make the commenter's
   email clearly optional, or drop it unless reply emails are built. Needs: decision.
 - **L/S** Browsers' built-in "HTTPS only" list (HSTS preload) once the site is stable; Cloudflare's
@@ -267,8 +263,9 @@ Privacy-first, without cookies, so no consent banner:
 - 2026-10-08: videos load only when played; home page heading levels; keyboard-friendly menus;
   share pictures per page; content checks; screenshot comparisons (local); Keystatic's Hebrew labels
   (patch) and Hebrew page addresses; the editing guide (`docs/GUIDE.md`); pull requests with
-  required checks; faster tests (two workers, Lighthouse in parallel); short search descriptions,
-  "title: description", on 33 pages. Dropped: content images as AVIF/WebP (the content has no
+  required checks; faster tests (two workers, Lighthouse in parallel); daily database backups to
+  Workers KV, kept a year (D1 alone restores only 7 days back on the free plan); short search
+  descriptions, "title: description", on 33 pages. Dropped: content images as AVIF/WebP (the content has no
   pictures, and the banner already is; the 52 WordPress images serve only the site icon and old
   links); lessons marked as lessons for search engines (Google retired its course-info, learning
   video and practice-problem rich results in 2025-2026; the ones left, course lists and flashcard

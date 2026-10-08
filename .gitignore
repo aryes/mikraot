@@ -16,3 +16,6 @@ playwright-report
 
 # Lighthouse CI reports (npm run lighthouse)
 .lighthouseci/
+
+# Database backups turned into SQL (npm run backup:restore): commenters' emails
+.backups/
