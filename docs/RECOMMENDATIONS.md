@@ -1,10 +1,13 @@
 # Recommendations
 
 Ideas on top of the migrated site, by Claude. Nothing here is decided or scheduled: items move to
-`docs/ROADMAP.md` once Arye picks them. Updated in spare time between tasks.
+`docs/ROADMAP.md` (or straight into work) once Arye picks them. Updated in spare time between tasks;
+last full review 2026-10-08.
 
 Priority: **H** high value for the effort, **M** worth doing, **L** nice to have.
 Effort: S (hours), M (days), L (weeks).
+Each open item says what it needs from Arye: **decision** (a yes/no or a choice), **content** (his
+writing or recordings), or **nothing** (Claude can do it once picked).
 
 ## Direction (Arye, 2026-10-03)
 
@@ -16,241 +19,203 @@ What follows from that:
 
 1. **Spend development time on things that multiply Arye's 4 hours**, not on things that consume
    them. Building is cheap (Claude); Arye's content time is the scarce resource. Favour tools that
-   turn one recording or one rule into many uses (exercises generated from marked-up examples, a
-   trope chart fed by the same audio files, read-along from existing recordings).
-2. **One site, several doors.** Rather than separate sections per audience, a "what do you want to
-   do?" entry on the home page: learn to read pointed text / learn the טעמים / prepare a portion /
-   teach. Each door is a short ordered path through the existing lessons (no new content needed).
-3. **Impact needs measurement.** Without accounts, measure learning signals: lessons completed
-   (browser-side progress), exercises solved, audio played, searches without results, returning
-   visitors. Pick 3–4 numbers and review them monthly.
-4. **Impact grows through others:** an open licence for the texts, printable material and a
-   "for teachers" page let teachers and synagogues multiply the reach. No income goal means no
-   paywalls, no ads, no tracking: the site can promise that publicly.
+   turn one recording or one rule into many uses (exercises from marked-up examples, a trope chart
+   fed by the same audio files, read-along from existing recordings).
+2. **One site, several doors.** A "what do you want to do?" entry on the home page: learn to read
+   pointed text / learn the טעמים / prepare a portion / teach. Each door is a short ordered path
+   through the existing lessons (no new content needed).
+3. **Impact needs measurement.** Without accounts: lessons completed (browser-side progress),
+   exercises solved, audio played, searches without results, returning visitors. Pick 3–4 numbers
+   and review them monthly.
+4. **Impact grows through others:** an open licence, printable material and a "for teachers" page
+   let teachers and synagogues multiply the reach. No income goal means no paywalls, no ads, no
+   tracking: the site can promise that publicly.
 5. **Large content projects** (a new נוסח, Haftarah, Megillot) don't fit 4 hours a week alone:
-   either spread them over months as a visible "in progress" series, or invite volunteer readers to
-   record (with a simple upload flow and Arye's review).
-6. **Suggested order of work:** measurement (S) → learning paths and prev/next (S/M) → reading
-   typography (S) → exercises from existing hidden answers (M) → trope chart with audio (M) → audio
-   recording workflow for Arye (M) → read-along (L).
-7. **Content time, a suggested weekly rhythm:** ~2 h recording audio for one existing page, ~1 h
-   writing or finishing one lesson section, ~1 h answering comments and reviewing the monthly
-   numbers.
+   spread them over months as a visible "in progress" series, or invite volunteer readers to
+   record (a simple upload flow, Arye reviews).
+6. **Content time, a suggested weekly rhythm:** ~2 h recording audio for one existing page, ~1 h
+   writing or finishing one lesson section, ~1 h answering comments and reviewing the numbers.
 
-## Quick summary: top picks
+## What's next (suggested order)
 
-1. **H/S** Search Console + Cloudflare Web Analytics, and log searches that found nothing: learn
-   what visitors look for before building more.
-2. **H/M** Audio wherever a reader must _hear_ something: grammar pages (שווא נע, קמץ קטן, אותיות
-   נחות) have none today; a trope chart with every טעם sounded in each נוסח.
-3. **H/M** Self-check exercises at the end of lessons (the "hidden answer" pattern already exists:
-   83 collapsibles on שווא נע), with progress kept in the browser, no accounts.
-4. **H/M** A clear learning path: "where to start" page, previous/next links on every lesson, table
-   of contents on long pages.
-5. **H/S** Rewrite the privacy policy before launch: it describes the WordPress plugins and cookies
-   that are going away.
-6. **M/L** A Sephardi (ירושלמי-ספרדי) נוסח: today only אשכנז and בבלי/עירקי, while a large share of
-   Israeli readers read Sephardi.
+After the cutover (`docs/CUTOVER.md`), in this order:
 
-## 1. UX, styling and design
+1. **H/S Read the numbers for a month:** visits (Cloudflare Web Analytics, from the switch), Google
+   searches (Search Console), and the site searches that found nothing (Claude lists them with
+   `npm run search:misses`). Then decide what to build. Needs: nothing until then.
+2. **H/M Learning paths:** a "where to start" page per door (see Direction 2), previous/next links
+   between lessons in menu order (posts have them; lessons don't), a table of contents on long
+   pages (שווא נע is ~1,950 words). Needs: decision (the orders), a little content.
+3. **H/M Self-check exercises** at the end of lessons, built from the existing hidden answers (83 on
+   שווא נע alone), with progress kept in the browser. Needs: decision.
+4. **H/M A trope chart page:** every טעם with symbol, name, example and audio per נוסח; probably the
+   most searched topic. Needs: content (recordings).
+5. **H/M Audio for the grammar pages** (שווא נע, קמץ קטן, אותיות נחות, מפיק, דגש חזק): only מבטא and
+   דגש קל have recordings. Needs: content.
+6. **H/M An audio recording workflow for Arye:** record on the phone, send, and the recording lands
+   on the right page (Claude converts, names and places it). Recording is most of the content time
+   (Direction 1 and 6), so making it easy multiplies the rest. Needs: decision.
+7. **H/M Comment moderation page** behind Cloudflare Access (free; login by Arye's email): hide,
+   delete, reply as admin. Once the site is live, comments arrive weekly and today moderating means
+   asking Claude. Needs: decision.
 
-Rating today: **6.5/10.** Clean, readable, accessible (WCAG AA audit passes), fast. But it looks
-like a generic template, and the reading experience of pointed text (the heart of the site) is not
-yet tuned.
+Waiting on Arye already: the search descriptions (`docs/SEO-DESCRIPTIONS.md`), reply emails to
+commenters, the newsletter sign-up form.
 
-- ✅ **H/S Reading typography for pointed text.** Biblical examples need a larger size than body text _(done 2026-10-03: Taamey D for pointed text, Noto Hebrew for the rest)_
-  (about 1.35–1.5×), generous line height (≥ 1.9, so niqqud and טעמים don't collide), and a font
-  that renders every טעם correctly. Test the current fonts against all cantillation marks
-  (including rare ones: קרני פרה, ירח בן יומו, שלשלת); if any is missing, use a font made for it,
-  e.g. Taamey Frank CLM or Ezra SIL, for biblical text only.
-- **H/S Don't rely on colour alone** for the taught letter (WCAG 1.4.1): add a second cue (bold or
-  underline) to the orange mark; this also softens the pending contrast decision.
-- **H/M Learning flow:** previous/next lesson links at the bottom of each page (in menu order), a
-  table of contents on long pages (שווא נע is ~1,950 words), "you are here" in the menu.
+## 1. UX and design
+
+Rating today: **7.5/10** (was 6.5 on 2026-10-03): fast (Lighthouse 82–95), accessible (axe and
+Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a template.
+
+- **H/M Learning flow:** see "What's next" 2. Also "you are here" in the menu. Needs: decision.
 - **M/S Smaller banner on inner pages** (≈120 px): on a phone the 250 px photo pushes the lesson
-  below the fold. Keep the full banner on the home page.
-- **M/M Home page as a landing page:** four cards (הגיה, דקדוק, טעמים, קריאות) with one line each,
-  a "start here" button, then the latest posts; today it is a text page.
-- **M/M Brand:** a real logo (the book icon is a placeholder), a small consistent palette built from
-  the brand green, one distinctive Hebrew display font for headings.
-- **M/S Print stylesheet:** teachers print lessons; hide navigation, comments and sidebar, keep
-  colours, show link URLs.
-- **Done (approved 2026-10-08): keyboard-friendly dropdown menus.** The WAI "disclosure
-  navigation" pattern (`src/scripts/menu.ts`): Enter/Space opens a group, `aria-expanded` tells
-  screen readers its state, Escape closes it; hover still works.
-- **L/M Dark mode** (respecting the system setting); check the teaching colours in both.
+  below the fold; keep the full banner on the home page. Needs: decision.
+- **M/M Home page as a landing page:** four cards (הגיה, דקדוק, טעמים, קריאות), a "start here"
+  button, then the latest posts; today it is a text page. Needs: decision.
+- **M/M Brand:** a real logo (the book icon is a placeholder), a small palette from the brand green,
+  one distinctive Hebrew display font for headings. Needs: decision (a designer, or Claude drafts).
+- **L/M Dark mode** (following the system setting); check the teaching colours in both. Needs:
+  decision.
+- **L/S** A one-page "how the marks look" reference (every טעם and vowel, enlarged; the rarest, like
+  ירח בן יומו, render correctly in Taamey D). Doubles as a visual test. Needs: decision (a new
+  public page).
 
-## 2. Features
+## 2. Learning features
 
-- **Done (approved 2026-10-07): videos load only when played.** Embedded videos show their picture
-  (served by the site) and a play button; the YouTube player loads on click. The video page went
-  from about 60 to 93 for speed, and pages contact YouTube only when a video is played.
-- **Done (2026-10-08): heading levels in content.** The home page topics are level 2 now, drawn
-  small as before (Keystatic: a heading's "גודל" setting); Lighthouse accessibility 100.
+- **H/M Exercises:** see "What's next" 3: 5–10 short questions per lesson (שווא נע or נח? which
+  טעם?), instant feedback, browser-side progress. Replaces LearnPress quizzes for most needs.
 - **H/M Audio player that teaches:** speed control (0.75×), loop a phrase, a sound for every trope
-  name (click "פשטא" → hear it), consistent player on every page.
+  name (click "פשטא" → hear it), the same player on every page. Needs: decision; recordings for the
+  trope names.
 - **H/L Read-along ("karaoke") for recorded readings:** highlight each word while the recording
-  plays. The single most useful tool for trope practice (what paid trope trainers sell). Needs word
-  timings per recording: start with a few readings, timed by hand or semi-automatically.
-- **H/M Exercises:** per lesson, 5–10 short questions (is this שווא נע or נח? which טעם is this?)
-  with instant feedback and explanations. Progress and scores in the browser (no accounts, no
-  personal data). Replaces LearnPress quizzes for most needs.
-- **M/M Glossary** of terms (שווא נע, מפיק, מתג, דבקים…) with hover/tap definitions wherever a term
-  appears.
+  plays; what paid trope trainers sell. Needs word timings per recording: start with a few,
+  semi-automatic. Needs: decision.
+- **M/M Glossary** (שווא נע, מפיק, מתג, דבקים…) with tap/hover definitions wherever a term appears;
+  also a glossary page. Needs: content (short definitions; Claude can draft from the lessons).
 - **M/M Text view of any verse or chapter** with toggles: letters only / + niqqud / + טעמים
-  (tikkun-style practice). Text from public-domain sources (Westminster Leningrad Codex, or
-  Sefaria's API).
-- **M/S Reply notifications:** email a commenter when the admin answers (they already leave an
-  email; today it is used only as the Reply-To of the owner's new-comment notice).
+  (tikkun-style practice), text from public-domain sources (Westminster Leningrad Codex or
+  Sefaria's API). Needs: decision.
 - **M/S Weekly parasha shortcut** (Hebcal API, free): "this week's reading" linking to recordings.
-- **L/M Printable worksheets** (PDF) for teachers.
-- **Decide later:** accounts (only if progress must follow a learner between devices), an English
-  edition (the bar/bat-mitzvah market abroad is large; a strategic choice for Arye).
+  Needs: decision.
+- **M/S Reply emails to commenters** (opt-in checkbox, unsubscribe link; reuses
+  `src/server/notify.ts`). Needs: decision.
+- **L/M Printable worksheets** (PDF) for teachers; the print layout already prints any lesson
+  cleanly, closed answers making a worksheet. Needs: decision.
+- **Decide later:** accounts (only if progress must follow a learner between devices); an English
+  edition (the bar/bat-mitzvah audience abroad is large).
 
-## 3. Security
+## 3. Content
 
-Done: CSP and security headers, Turnstile, rate limit, honeypot, secret scanning, history scrub.
+- **H/S Finish the drafts:** משמעות הטעמים, ניגון סוף עליה, טעמי אמ״ת, אתרים וכלים ללימוד. Needs:
+  content.
+- **H/S "Where to start"** page(s): see "What's next" 2.
+- **H/S Weekly habit, two minutes:** when adding or improving content, add an "update" line in the
+  editor. It appears in "מה חדש" and, once the newsletter is set up, goes to subscribers; without it
+  new content stays invisible to returning learners. Needs: content (a habit).
+- **M/M One template for lessons:** goal → rule → examples (with audio) → exceptions → exercises →
+  summary. Makes the site feel like a course and gaps visible. Needs: decision.
+- **M/S Internal links:** each lesson links to the related ones (דגש קל ↔ שווא נע ↔ בג״ד כפ״ת).
+  Needs: review (Claude proposes the links, Arye approves the changes to his lessons).
+- **M/L More נוסחים:** Sephardi-Yerushalmi first (the largest Israeli audience), then Teimani.
+  Needs: content (or volunteer readers).
+- **M/M Haftarah and Megillot** trope (same symbols, different melodies). Needs: content.
 
-- **H/S Account protection:** two-factor authentication on Cloudflare, Bluehost, GitHub and the
-  domain registrar; GitHub push protection and branch protection on `main`.
-- **H/S DNS:** DNSSEC and CAA records (only Cloudflare's certificate authorities may issue for
-  mikraot.net).
-- **H/S Email authentication** when email moves off Bluehost: SPF, DKIM, DMARC (`p=quarantine`, then
-  `reject`), so nobody can send mail as @mikraot.net.
-- **H/M Comment moderation page** behind Cloudflare Access (free; login by Arye's email only): delete,
-  hide, reply as admin. Today moderation means a database command.
-- ✅ **M/S Dependency updates:** Renovate (or Dependabot) with CI, plus `npm audit` in CI. _(done 2026-10-04: renovate.json, active once on GitHub)_
-- **M/S Backups:** D1 Time Travel keeps 30 days; add a weekly export of the comments table
-  (scheduled Worker → R2 or a private repo).
-- **M/S Privacy (חוק הגנת הפרטיות, amendment 13):** collect less: stop asking for an email unless
-  reply notifications are built; state retention and deletion in the privacy policy.
-- **L/S** HSTS preload once stable, Cloudflare WAF managed rules (free set). (Done:
-  `/.well-known/security.txt`, rebuilt with each deploy so its expiry date (330 days ahead) stays current.)
+## 4. Security and privacy
 
-## 4. Technical and management
+In place: CSP and security headers, Turnstile (loaded only when commenting), rate limits per
+visitor network, honeypot, secret scanning (gitleaks, GitHub push protection), CAA records,
+security.txt, required checks before any merge, dependency updates with tests.
 
-- **H/M Publishing pipeline:** GitHub → CI → Cloudflare deploy, with a **preview URL for every
-  change** (Workers preview versions), so Arye sees a change live before approving it.
-- **H/M Editing in the browser:** Keystatic in GitHub mode: an edit becomes a pull request with its
-  preview; approving publishes. No terminal needed for content.
-- **M/S Monitoring:** Workers observability is on; add alerts on error rate and a free uptime check
-  (Cloudflare health check or UptimeRobot) that notifies by email.
-- **M/S Images:** the banner is done (AVIF/WebP via Astro's image pipeline, 92 KB instead of 375 KB
-  on wide screens). Content images (52, in `public/wp-content/uploads/`) could follow, but their
-  WordPress URLs are linked from outside, so they would need to stay as well.
-- **M/S Clean-up at cutover:** remove the old `mikraot-api` Worker, `/staging/` on Bluehost, Supabase
-  (if unused), the `worker/` folder.
-- **Done: a short "how to" for Arye** (`docs/GUIDE.md`): open the editor, change and add pages,
-  recordings, videos, "מה חדש" lines, headings, publishing, comments.
+- **H/S Two-factor login** on GitHub, Cloudflare and GoDaddy, plus login alerts (replaces
+  Wordfence). Needs: Arye (his accounts).
+- **H/S DNSSEC:** with the domain's move to Cloudflare Registrar after the cutover. Needs: Arye (the
+  transfer is a purchase).
+- **H/S Email authentication** when email moves off Bluehost: SPF, DKIM, DMARC tightened from
+  `p=none` to `quarantine`, then `reject`, so nobody can send mail as @mikraot.net. Needs: decision
+  (part of the email move).
+- **M/S Backups of comments:** the database keeps 30 days of history; add a weekly export to
+  Cloudflare's private file storage (R2, free at this size). Needs: decision.
+- **M/S Privacy (amendment 13 of the Privacy Protection Law):** collect less: make the commenter's
+  email clearly optional, or drop it unless reply emails are built. Needs: decision.
+- **L/S** Browsers' built-in "HTTPS only" list (HSTS preload) once the site is stable; Cloudflare's
+  free firewall rules against common attacks. Needs: decision.
+- **L/S** A weekly `npm audit` in the automatic checks, besides Renovate's security alerts (which
+  already open a PR for a vulnerable dependency at any time). Needs: nothing.
 
-## 5. Tools that prevent bugs
+## 5. Running the site
 
-Already in place: strict TypeScript, oxlint, Prettier, Vitest, Playwright (desktop + phone), axe,
-gitleaks, `compare:live`, CI workflow.
-
-- ✅ **H/S Link checker in CI** (replaces the Broken Link Checker plugin): every internal link and _(done 2026-10-04: linkinator, every test run + weekly outside links)_
-  `#anchor` must resolve at build; external links checked weekly, report only.
-- **Done: content checks** (`src/content.test.ts`, in `npm run check` and CI): every recording,
-  image and file exists, every YouTube id is well formed, no old WordPress link forms, no empty
-  headings.
+- **H/M Editing in the browser:** Keystatic in GitHub mode: an edit becomes a pull request with a
+  preview; approving publishes, no laptop needed. Needs: decision (a GitHub app for Keystatic).
+- **M/S Monitoring:** uptime check with email (UptimeRobot, in the cutover plan) and Cloudflare
+  notifications on Worker error rates. Needs: Arye (accounts, notification email).
+- **M/S Content images as AVIF/WebP** like the banner and video pictures (52 images, in
+  `public/wp-content/uploads/`; the WordPress URLs must keep working too). Needs: nothing.
+- **M/S Faster automatic checks:** a run takes about 4 minutes (Lighthouse is the longest part);
+  caching the test browser would save another ~30 s. Needs: nothing.
+- **M/S Clean-up after the cutover:** the old `mikraot-api` Worker, `worker/`, `/staging/` on
+  Bluehost, the Supabase project (after a final export). In `docs/CUTOVER.md` step 5. Needs: Arye's
+  approval (deletions).
 - **M/S Consistent Hebrew encoding:** the same word can be stored with its marks in different orders
-  (seen in tests: two spellings of בראשית that look identical). A check that flags mixed orderings
-  keeps search and links reliable. (Don't auto-normalize: Unicode normalization can reorder marks in
-  ways that render badly.) Measured 2026-10-08: 12 of 39 pages are not in the standard (NFC) order;
-  left as they are for that reason.
-- **Done: visual regression** (`e2e/visual.spec.ts`): full-page screenshots of five page types,
-  desktop and phone, compared in every local test run (not in CI: fonts render differently on
-  Linux).
-- **Done: Lighthouse CI** (`npm run lighthouse`, `lighthouserc.cjs`; in CI after the browser tests):
-  minimum scores on four page types. It found the address-less menu and footer links, the comments
-  heading level and the human check loading with every page (all fixed), and the two items in
-  section 2 (videos and heading levels, both done).
-- **Done: client error reporting:** `src/scripts/error-reporting.ts` sends JavaScript errors and
-  CSP blocks from visitors' browsers to the Worker logs ("Browser error:"), no third-party service.
-- **Done: HTML validation** (`html-validate`, config `.htmlvalidate.mjs`) of every built page, inside
-  `npm run build:site`, so invalid markup stops a deploy.
+  (12 of 39 pages are not in Unicode's standard order). A check that flags mixed orderings would
+  keep search reliable; automatic normalizing is risky (it can reorder marks in ways fonts render
+  badly). Needs: nothing.
+- **M/S Better Hebrew in Keystatic upstream:** contribute the corrected strings
+  (`patches/@keystatic+core+0.6.9.patch`) and the hard-coded English labels to Keystatic, so the
+  patch can go and every Hebrew user benefits. Needs: decision (a public contribution).
 
-## 6. Tracking the user experience
+## 6. Learning what visitors need
 
-Yes, but privacy-first, with no cookies, so no consent banner is needed:
+Privacy-first, without cookies, so no consent banner:
 
-- **H/S Cloudflare Web Analytics:** page views, referrers, countries, devices, Core Web Vitals.
-- **H/S Google Search Console** (and Bing Webmaster Tools): the queries that bring people, pages
-  with indexing problems.
-- **Done: searches with no results** are counted anonymously in Workers Analytics Engine
-  (`src/server/search-misses.ts`, kept 3 months) → a ready-made list of missing content. Searches
-  that find results, but not the right ones, are not measured.
-- **M/S Content events** via Workers Analytics Engine (free tier): audio plays, video plays, hidden
-  answers opened, 404 URLs.
-- **M/S "Was this page helpful?"** 👍/👎 with an optional comment, stored in D1.
+- **H/S Cloudflare Web Analytics** at the switch (in the cutover plan): page views, referrers,
+  devices, page speed as visitors experience it. Needs: Arye (switched on in the dashboard).
+- **M/S Bing Webmaster Tools** besides Google Search Console (a few minutes; Bing also feeds
+  DuckDuckGo). Needs: Arye (account).
+- **M/S Content events** via Workers Analytics Engine (already used for searches): audio plays,
+  video plays, hidden answers opened, 404s. Needs: decision.
+- **M/S "Was this page helpful?"** 👍/👎 with an optional comment. Needs: decision.
 - **Avoid** session recording (Hotjar, Clarity): needs a consent banner and records personal
   behaviour; not worth it at this size.
-- Define a few numbers to watch: returning visitors, audio plays per visit, searches without
-  results, most common exit pages.
 
 ## 7. What comparable sites do
 
 (From general knowledge; not a traffic study.)
 
-- **Sefaria:** free, open-source library of Jewish texts with an open API and open licences; very
-  successful. Lesson: openness and linking (every source is a link) bring reach and partners.
-- **AlHatorah.org:** Mikraot Gedolot and study tools; deep, scholarly, well respected.
-- **Mechon Mamre:** plain HTML, decades old, still heavily used. Lesson: reliable text beats
-  design.
-- **Tikkun apps and sites (e.g. Tikkun.io):** side-by-side text with/without vowels and trope for
-  practice; popular with Torah readers.
-- **Trope Trainer and similar paid software:** long-lived commercial products for bar/bat-mitzvah
-  preparation: audio for every verse, word highlighting, nusach choice. Shows the demand for
-  read-along practice.
-- **YouTube parasha readings:** very popular; audio/video is how many people actually learn trope.
+- **Sefaria:** free, open-source library with an open API and licences; openness and linking bring
+  reach and partners.
+- **AlHatorah.org:** Mikraot Gedolot and study tools; deep and scholarly.
+- **Mechon Mamre:** plain HTML, decades old, still heavily used: reliable text beats design.
+- **Tikkun sites and apps (e.g. Tikkun.io):** text with and without vowels and trope side by side.
+- **Trope Trainer and similar paid software:** audio for every verse, word highlighting, nusach
+  choice: the demand for read-along practice.
+- **YouTube parasha readings:** audio and video are how many people actually learn trope.
 - **What the successful ones share:** audio for everything, a practice loop (hear → try → check),
-  a clear goal (read my portion), free access, works on a phone.
-- **Mikraot's niche:** no other free Hebrew site explains _why_ (grammar rules, hierarchy of
+  a clear goal (read my portion), free, works on a phone.
+- **Mikraot's niche:** no other free Hebrew site explains _why_ (grammar rules, the hierarchy of
   טעמים) as clearly. Keep that, and add the practice loop around it.
 
-## 8. Content
+## Also worth considering
 
-- **H/M Audio for the pronunciation and grammar pages** (שווא נע, קמץ קטן, אותיות נחות, מפיק, דגש
-  חזק): today only מבטא and דגש קל have recordings.
-- **H/M A trope chart page:** every טעם with its symbol, name, a short example and audio in each
-  נוסח. Probably the most searched topic.
-- **H/S Finish the drafts:** משמעות הטעמים, ניגון סוף עליה, טעמי אמ״ת, אתרים וכלים ללימוד.
-- **H/S "Where to start"** page: a suggested order for beginners, and for someone preparing to read
-  in synagogue.
-- **M/M One template for lessons:** goal → rule → examples (with audio) → exceptions → exercises →
-  summary. Makes the site feel like a course and makes gaps visible.
-- **M/L More נוסחים:** Sephardi-Yerushalmi first (largest Israeli audience), then Teimani.
-- **M/M Haftarah and Megillot** trope (different melodies, same symbols): a natural next section.
-- **M/S Glossary page** (also feeds the hover definitions).
-- **M/S Internal links:** each lesson links to the related ones (דגש קל ↔ שווא נע ↔ בג״ד כפ״ת).
-- **M/S SEO texts:** some pages have no meta description; add short ones in Keystatic.
+- **Licence the content** (e.g. CC BY-NC-SA) so teachers can share it legally; state the rights in
+  the recordings. Needs: decision.
+- **Community:** reach teachers and synagogue gabbaim (they send learners); a WhatsApp channel or the
+  newsletter for new lessons. Needs: decision.
+- **Lessons marked as lessons for search engines** (structured data; breadcrumbs and posts already
+  have it), which may earn richer search results. Needs: nothing.
 
-## 9. Also worth considering
+## Done (from these recommendations)
 
-- **Done (approved 2026-10-08): share previews.** Every content page gets a 1200×630 picture at
-  build (its title over the darkened banner photo; `src/pages/og/`, astro-og-canvas), shown when
-  the page is shared on WhatsApp, Facebook and the like.
-- **Structured data:** BreadcrumbList and LearningResource JSON-LD for richer search results.
-- **Licence the content** (e.g. CC BY-NC-SA) so teachers can share it legally; state rights for the
-  recordings.
-- **Community:** reach teachers and synagogue gabbaim (they send learners); a WhatsApp channel or
-  the newsletter for new lessons.
-- **Questions for Arye** (answered 2026-10-03, see Direction): who is the main audience (adult beginners,
-  bar/bat-mitzvah, synagogue readers, teachers)? What is success (reach, impact, income)? How many
-  hours a month go to new content?
-
-## 10. Found while building (2026-10-04)
-
-- **H/S Weekly habit, two minutes:** when adding or improving content, add an "update" line in the
-  editor (date + one sentence). It appears in "מה חדש" and goes to newsletter subscribers
-  automatically; without it, new content stays invisible to returning learners.
-- **Done: plain-letter aliases for URLs with niqqud:** the two pages with marks in their address
-  also answer at the same words without marks (e.g. `/פשטא-זקף-קטן`), via `public/_redirects`; a
-  test makes sure any new marked page gets one.
-- **Done: check production after a deploy:** `npm run test:deployed -- <URL>` runs the read-only
-  browser tests (link crawl included) against a deployed site, automatically after each deploy
-  (`.github/workflows/deployed.yml`).
-- **M/S Better Hebrew in the editor:** Keystatic is open source; contributing proper Hebrew
-  interface strings (today "Save" = "להציל") fixes it for us and every Hebrew user.
-- **L/S** The rarest טעמים (e.g. ירח בן יומו) now render correctly in Taamey D; a one-page
-  "how the marks look" reference (all marks, enlarged) would double as a visual test.
+- 2026-10-03: reading typography (Taamey D for pointed text).
+- 2026-10-04: the taught letter bold as well as orange (not colour alone); link checks (every internal link on each test run, outside links weekly); Renovate;
+  privacy policy rewritten (publication date pending).
+- 2026-10-05: a preview for every branch (Cloudflare builds each one; required before merging since
+  2026-10-08); security.txt; print layout; HTML validation in the build; browser error reports; IPv6
+  rate limits; counting searches that found nothing; Search Console; CAA records.
+- 2026-10-07: testing the deployed site after each deploy; banner as AVIF/WebP; Lighthouse with
+  minimum scores (it found and we fixed: address-less menu and footer links, the comments heading
+  level, the human check loading with every page, labels on the comment form); short addresses for
+  pointed page URLs.
+- 2026-10-08: videos load only when played; home page heading levels; keyboard-friendly menus;
+  share pictures per page; content checks; screenshot comparisons (local); Keystatic's Hebrew labels
+  (patch) and Hebrew page addresses; the editing guide (`docs/GUIDE.md`); pull requests with
+  required checks; faster tests (two workers, Lighthouse in parallel).
