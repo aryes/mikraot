@@ -248,8 +248,6 @@ Privacy-first, without cookies, so no consent banner:
   the recordings. Needs: decision.
 - **Community:** reach teachers and synagogue gabbaim (they send learners); a WhatsApp channel or the
   newsletter for new lessons. Needs: decision.
-- **Lessons marked as lessons for search engines** (structured data; breadcrumbs and posts already
-  have it), which may earn richer search results. Needs: nothing.
 
 ## Done (from these recommendations)
 
@@ -267,6 +265,8 @@ Privacy-first, without cookies, so no consent banner:
   share pictures per page; content checks; screenshot comparisons (local); Keystatic's Hebrew labels
   (patch) and Hebrew page addresses; the editing guide (`docs/GUIDE.md`); pull requests with
   required checks; faster tests (two workers, Lighthouse in parallel); short search descriptions,
-  "title: description", on 33 pages. Dropped: content images as
-  AVIF/WebP (the content has no pictures, and the banner already is; the 52 WordPress images
-  serve only the site icon and old links).
+  "title: description", on 33 pages. Dropped: content images as AVIF/WebP (the content has no
+  pictures, and the banner already is; the 52 WordPress images serve only the site icon and old
+  links); lessons marked as lessons for search engines (Google retired its course-info, learning
+  video and practice-problem rich results in 2025-2026; the ones left, course lists and flashcard
+  Q&A, are not offered in Hebrew).
