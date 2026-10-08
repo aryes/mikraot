@@ -2,7 +2,10 @@
 name: CI
 
 on:
+  # Pull requests are tested before merging; main again after each merge. (Pushes to PR
+  # branches would run everything twice: once as a push, once as the pull request.)
   push:
+    branches: [main]
   pull_request:
 
 permissions:
