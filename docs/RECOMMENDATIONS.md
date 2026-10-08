@@ -177,8 +177,13 @@ security.txt, required checks before any merge, dependency updates with tests.
   email clearly optional, or drop it unless reply emails are built. Needs: decision.
 - **L/S** Browsers' built-in "HTTPS only" list (HSTS preload) once the site is stable; Cloudflare's
   free firewall rules against common attacks. Needs: decision.
-- **L/S** A weekly `npm audit` in the automatic checks, besides Renovate's security alerts (which
-  already open a PR for a vulnerable dependency at any time). Needs: nothing.
+- **S/S Dismiss the 3 security alerts that have no fix** (GitHub's Dependabot alerts, which already
+  cover what a weekly `npm audit` would). Of the 7 open on 2026-10-08, 4 had fixed versions and are
+  overridden in `package.json` (`overrides`). The other 3 (2 for `extract-zip`, 1 for
+  `sprintf-js`) come from Lighthouse CI (`@lhci/cli`, no release since June 2025), which only we run (the automatic
+  checks, `npm run lighthouse`) and only on our own pages: no outside input reaches them.
+  Proposal: dismiss them on GitHub as "risk is tolerable", with that reason, so a new alert stands
+  out. Needs: decision.
 
 ## 5. Running the site
 
