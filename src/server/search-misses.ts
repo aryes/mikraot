@@ -5,7 +5,7 @@
  * need) and data deleted after three months. List it with `npm run search:misses`.
  */
 
-export const MAX_QUERY_LENGTH = 100;
+const MAX_QUERY_LENGTH = 100;
 export const MAX_REPORT_BYTES = 1024;
 
 /** The part of the Analytics Engine binding this module uses. */
