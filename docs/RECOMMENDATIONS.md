@@ -150,9 +150,10 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
   new content stays invisible to returning learners. Needs: content (a habit).
 - **M/M One template for lessons:** goal → rule → examples (with audio) → exceptions → exercises →
   summary. Makes the site feel like a course and gaps visible. Needs: decision.
-- **M/S Internal links:** each lesson links to the related ones: the first mention of a term that
-  has its own lesson (שווא נע, מפיק, דגש קל, קמץ קטן, מתג…) links to it. A cheap first step before
-  the glossary. Needs: review (Claude proposes the links, Arye approves the changes to his lessons).
+- **S/S Internal links:** the lessons already link to each other well (checked 2026-10-08: of
+  every first mention of a term that has its own lesson, only 4 are not links): דגש קל →
+  שווא נע, סמיכות → שווא נע, קמץ קטן → דגש חזק, מש״ה מוציא → אותיות השימוש. Needs: Arye's
+  approval (changes to his lessons).
 - **M/L More נוסחים:** Sephardi-Yerushalmi first (the largest Israeli audience), then Teimani.
   Needs: content (or volunteer readers).
 - **M/M Haftarah and Megillot** trope (same symbols, different melodies). Needs: content.
@@ -189,11 +190,17 @@ security.txt, required checks before any merge, dependency updates with tests.
 
 ## 5. Running the site
 
-- **H/M Editing in the browser:** Keystatic in GitHub mode: an edit becomes a pull request with a
-  preview; approving publishes, no laptop needed. Keystatic has the mode (checked in the installed
-  version, 2026-10-08), but its server part would then run online, on the Worker, where it is
-  untested (today it runs on Node, locally); a one-hour test on a branch preview settles it.
-  Needs: decision (a GitHub app for Keystatic).
+- **H/M Editing in the browser:** Keystatic in GitHub mode, from any computer or phone: edits are
+  saved as commits to a branch chosen in the editor (`main` only accepts pull requests), every
+  branch gets its own preview site automatically, and opening and merging the pull request on
+  GitHub publishes. Tested 2026-10-08 (a local build in Cloudflare's runtime, not deployed): the
+  editor page loads, its sign-in route sends the browser to GitHub's sign-in, the callback checks
+  its input, and the Worker grows to 415 KB compressed (far under Cloudflare's 64 MB limit).
+  Untested until the app exists: the final exchange with GitHub (an ordinary request). To set up:
+  a GitHub app (Keystatic's setup page creates it from Arye's account), its client ID, client
+  secret and a session secret as Worker secrets plus its name at build time, and `/keystatic` kept
+  out of search, the sitemap and the site search; only GitHub users who can write to the
+  repository can edit. Needs: decision.
 - **M/S Monitoring, the rest:** the site is watched from outside (UptimeRobot) and server errors and
   failed backups email Arye at once (2026-10-08). Still unseen: a backup run that never starts, and
   traffic nearing the free plan's limit. A daily scheduled GitHub workflow could check both: that
