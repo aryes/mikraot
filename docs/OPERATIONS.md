@@ -40,16 +40,17 @@ UptimeRobot (Arye's account) checks `https://mikraot.net/` every 5 minutes and e
 
 ### Restore the database
 
-`npm run db:restore -- <target>` does it with the safety steps built in. Without `--yes` it only
-shows the plan (rows now, rows after); with `--yes` it exports the current database to `.backups/`
-(git-ignored: it holds commenters' emails), restores, and shows the rows after. It changes
-production data, so: show Arye the plan, and add `--yes` only with his approval.
+`npm run db:restore` prints the instructions (targets, steps, options). In short: without `--yes`
+it only shows the plan (rows now, rows after); with `--yes` it exports the current database to
+`.backups/` (git-ignored: it holds commenters' emails), prints the command that undoes it (a
+return to a minute before, from the database's history; printed first, so it's there even if the
+restore fails), restores, and shows the rows after. It
+changes production data, so: show Arye the plan, and add `--yes` only with his approval.
 
 - **A time within the last 7 days**, with its zone (e.g. `2026-10-07T09:30:00Z` in UTC, or
   `…+03:00` in Israel summer time): D1's own history (Time Travel), to the minute. An older time
-  fails already in the plan (the free plan keeps 7 days). The whole database returns to that moment, so comments posted since are
-  lost (they are in the export). The output names the previous bookmark; to undo:
-  `npx wrangler d1 time-travel restore mikraot-db --bookmark=<it> --config wrangler.jsonc`.
+  fails already in the plan (the free plan keeps 7 days). The whole database returns to that
+  moment, so comments posted since are lost (they are in the export).
 - **A date, or `latest`:** that day's backup in Workers KV (`d1/<date>.json`, written at 02:17
   UTC, kept ~13 months). The tables in the backup get its rows; other tables are left alone. If a
   migration changed the tables after the backup was taken, edit the generated
