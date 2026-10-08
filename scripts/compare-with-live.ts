@@ -87,7 +87,11 @@ function metrics(root: Root, side: keyof typeof WIDGETS) {
     collapses,
     audio,
     links: count('a[href]'),
-    images: count('img'),
+    // Not the video posters: the new site shows a picture until a video is played, where WordPress
+    // embedded the player at once.
+    images: [...root.querySelectorAll('img')].filter(
+      (img) => !img.closest('picture')?.parentElement?.querySelector('[data-video-id]'),
+    ).length,
     headings: count('h1, h2, h3, h4, h5, h6'),
     listItems: count('li'),
     tables: count('table'),
@@ -99,7 +103,8 @@ function textDifference(live: string, ours: string): string | null {
   if (live === ours) return null;
   const [x, y] = [plainTypography(live), plainTypography(ours)];
   if (x === y) return 'text: typography only (’ ” – ׳ ״)';
-  if (x.replace(/\s/g, '') === y.replace(/\s/g, '')) return 'text: whitespace only';
+  // Spacing that differs, but no words joined or split.
+  if (x.replace(/\s+/g, ' ') === y.replace(/\s+/g, ' ')) return 'text: whitespace only';
   let i = 0;
   while (i < x.length && x[i] === y[i]) i++;
   return `TEXT differs at ${i}: live "…${x.slice(i, i + 50)}" vs ours "…${y.slice(i, i + 50)}"`;
@@ -135,7 +140,9 @@ for (const url of pageUrls) {
     .map((k) => `${k} ${a[k] ?? 0}→${b[k] ?? 0}`);
   const text = textDifference(String(a['text']), String(b['text']));
   if (text) diffs.push(text);
-  if (diffs.length > 0) differing++;
+  // Typography and whitespace differences are deliberate (Hebrew geresh and gershayim): reported,
+  // not counted.
+  if (diffs.some((diff) => !diff.startsWith('text: '))) differing++;
   rows.push(`| ${url} | ${diffs.length === 0 ? 'same' : diffs.join('; ')} |`);
 }
 
