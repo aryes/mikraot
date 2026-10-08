@@ -45,7 +45,22 @@ After the cutover (`docs/CUTOVER.md`), in this order:
    `npm run search:misses`). Then decide what to build. Needs: nothing until then.
 2. **H/M Learning paths:** a "where to start" page per door (see Direction 2), previous/next links
    between lessons in menu order (posts have them; lessons don't), a table of contents on long
-   pages (שווא נע is ~1,950 words). Needs: decision (the orders), a little content.
+   pages (שווא נע: about 1,000 words and 40 hidden answers). Needs: decision (the orders), a little
+   content.
+   A draft of the doors, using only existing lessons (for Arye to change):
+   - **לקרוא טקסט מנוקד:** מבטא → תנועות, עיצורים וניקוד → דגש קל → מפיק → דגש חזק → שווא נע →
+     מתג → קמץ קטן → אותיות נחות → דבקים → הגיית שם יהוה; then the grammar lessons (אותיות השימוש
+     and its three sub-lessons, סמיכות). The menu's order, with מתג moved in before קמץ קטן, whose
+     rules use it. (דגש קל and שווא נע each rely on the other, so either may come first.)
+   - **ללמוד את הטעמים:** תפקידי הטעמים → מיקום הטעמים → שיר הטעמים (in one's נוסח) → שיטת "גלגלי
+     עזר" → the four "פסוקים לפי טעם" pages → טעמים ומילים → טעמים דומים → מדרג הטעמים → טעמים
+     נדירים.
+   - **להתכונן לקריאה בציבור** (for someone who already reads pointed text): שיר הטעמים → שיטת
+     "גלגלי עזר" → פסוקים לפי טעם → the recorded readings in one's נוסח → the points that change
+     how a word is read: דגש קל, דגש חזק, שווא נע, קמץ קטן, דבקים, הגיית שם יהוה, מש״ה מוציא
+     וכל״ב מכניס, ה׳ הידיעה וה׳ השאלה.
+   - **ללמד:** a short page on the print layout (closed answers make a worksheet), the three paths
+     above as a syllabus, and an invitation to write in with questions.
 3. **H/M Self-check exercises** at the end of lessons, generated from the hidden answers already
    written: 189 of them (שווא נע 40, אותיות נחות 40, ו׳ החיבור 28, קמץ קטן 24, מדרג הטעמים 13, and
    22 on each trope-song page). Each is a word plus "the answer – the reason" (השמטה → "הש׳ בשווא נע
