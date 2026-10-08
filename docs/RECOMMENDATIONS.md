@@ -170,10 +170,14 @@ security.txt, required checks before any merge, dependency updates with tests.
 - **H/S Email authentication** when email moves off Bluehost: SPF, DKIM, DMARC tightened from
   `p=none` to `quarantine`, then `reject`, so nobody can send mail as @mikraot.net. Needs: decision
   (part of the email move).
-- **M/S Privacy (amendment 13 of the Privacy Protection Law):** collect less: make the commenter's
+- **M/S Privacy (amendment 13 of the Privacy Protection Law, in force since 14 August 2025; it
+  counts IP addresses as personal data; checked 2026-10-08):** collect less: make the commenter's
   email clearly optional, or drop it unless reply emails are built. Needs: decision.
-- **L/S** Browsers' built-in "HTTPS only" list (HSTS preload) once the site is stable; Cloudflare's
-  free firewall rules against common attacks. Needs: decision.
+- **L/S** Browsers' built-in "HTTPS only" list (HSTS preload). It needs the rule to cover every
+  subdomain (`includeSubDomains`) and a `preload` directive, and leaving the list takes months, so
+  only after email has left Bluehost and every subdomain answers over HTTPS; today the header is a
+  one-year HSTS without subdomains (checked 2026-10-08). Needs: decision. (Cloudflare's free managed
+  firewall rules are already on: the zone audit found them, 2026-10-08.)
 - **S/S Dismiss the 3 security alerts that have no fix** (GitHub's Dependabot alerts, which already
   cover what a weekly `npm audit` would). Of the 7 open on 2026-10-08, 4 had fixed versions and are
   overridden in `package.json` (`overrides`). The other 3 (2 for `extract-zip`, 1 for
@@ -186,16 +190,20 @@ security.txt, required checks before any merge, dependency updates with tests.
 ## 5. Running the site
 
 - **H/M Editing in the browser:** Keystatic in GitHub mode: an edit becomes a pull request with a
-  preview; approving publishes, no laptop needed. Needs: decision (a GitHub app for Keystatic).
-- **M/S Monitoring:** an uptime check with email (UptimeRobot, set up 2026-10-08), plus a daily
-  check of the Worker's own numbers. Cloudflare's error-rate alerts are Enterprise-only (checked
-  2026-10-08), so the free way is a scheduled GitHub workflow that reads the Worker's requests and
-  errors through Cloudflare's analytics API (the existing token can read them since 2026-10-05)
-  and fails, emailing Arye, when errors exceed about 1% or requests near the free plan's 100,000 a
-  day. Static pages don't count toward that limit (Cloudflare serves them free); the API (comments,
-  searches counted, error reports), the comments feed and every address with no page (404s,
-  including bots probing old WordPress paths) do, so a bot wave is the likely way to reach it.
-  Needs: decision (the token would be stored as a GitHub secret).
+  preview; approving publishes, no laptop needed. Keystatic has the mode (checked in the installed
+  version, 2026-10-08), but its server part would then run online, on the Worker, where it is
+  untested (today it runs on Node, locally); a one-hour test on a branch preview settles it.
+  Needs: decision (a GitHub app for Keystatic).
+- **M/S Monitoring, the rest:** the site is watched from outside (UptimeRobot) and server errors and
+  failed backups email Arye at once (2026-10-08). Still unseen: a backup run that never starts, and
+  traffic nearing the free plan's limit. A daily scheduled GitHub workflow could check both: that
+  yesterday's backup key exists, and the Worker's requests through Cloudflare's analytics API (the
+  existing token can read them since 2026-10-05), failing, which emails Arye, when requests near the
+  free plan's 100,000 a day. Static pages don't count toward that limit (Cloudflare serves them
+  free); the API (comments, searches counted, error reports), the comments feed and every address
+  with no page (404s, including bots probing old WordPress paths) do, so a bot wave is the likely
+  way to reach it. Needs: decision (the token would be stored as a GitHub secret, with KV read
+  access added).
 - **M/S Faster automatic checks:** a run takes about 4 minutes, and Lighthouse sets the pace (about
   2.7 minutes: four pages, three runs each). Two runs per page instead of three would save about
   50 s (the browser tests, about 3.2 minutes, would then set the pace), but the score would be the
@@ -213,8 +221,9 @@ security.txt, required checks before any merge, dependency updates with tests.
 
 Privacy-first, without cookies, so no consent banner:
 
-- **H/S Cloudflare Web Analytics** at the switch (in the cutover plan): page views, referrers,
-  devices, page speed as visitors experience it. Needs: Arye (switched on in the dashboard).
+- **H/S Cloudflare Web Analytics** at the switch (in the cutover plan; free and cookieless, checked
+  2026-10-08): page views, referrers, devices, page speed as visitors experience it. Needs: Arye
+  (switched on in the dashboard).
 - **M/S Bing Webmaster Tools** besides Google Search Console (a few minutes; DuckDuckGo and
   Copilot draw mainly on Bing's index, checked 2026-10-08; ChatGPT's web search partly).
   Needs: Arye (account).
