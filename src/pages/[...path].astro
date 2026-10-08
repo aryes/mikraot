@@ -5,6 +5,7 @@ import { Comments } from '../components/Comments';
 import PostMeta from '../components/PostMeta.astro';
 import PostNav from '../components/PostNav.astro';
 import ContentLayout from '../layouts/ContentLayout.astro';
+import { ogImagePath } from '../lib/og';
 import { categoryUrl } from '../lib/archive';
 import {
   categoryName,
@@ -44,7 +45,7 @@ const crumbs = isPost
 <ContentLayout
   documentTitle={seo?.title || `${title} - ${site.title}`}
   description={seo?.description || undefined}
-  ogImage={seo?.ogImage || undefined}
+  ogImage={seo?.ogImage || ogImagePath(path)}
   title={isFrontPage ? site.title : title}
   subtitle={isFrontPage ? site.tagline : undefined}
   crumbs={isFrontPage ? undefined : crumbs}

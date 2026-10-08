@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import sharp from 'sharp';
 import { LOCAL_ONLY } from './tags';
 
 // Comments load lazily (island script on scroll) and then call a Worker endpoint that may start
@@ -535,4 +536,27 @@ test('home page outline: topic headings at level 2, drawn small as on WordPress'
   const topic = headings.first();
   await expect(topic).toHaveCSS('font-size', '17.6px'); // 1.1rem, the former h4 size
   await expect(topic).toHaveCSS('border-bottom-width', '0px');
+});
+
+test('every content page has its own share picture, a 1200×630 JPEG', async ({ request }) => {
+  const sitemap = await (await request.get('/sitemap-0.xml')).text();
+  const pages = [...sitemap.matchAll(/<loc>https:\/\/mikraot\.net([^<]*)<\/loc>/g)].map(
+    (match) => match[1] ?? '/',
+  );
+  expect(pages.length).toBeGreaterThan(30);
+  const pictures = await Promise.all(
+    pages.map(async (path) => {
+      const html = await (await request.get(path)).text();
+      // Archive pages (months, categories) have no picture of their own.
+      const url = /<meta property="og:image" content="([^"]+)"/.exec(html)?.[1];
+      if (!url) return { path: decodeURI(path), url: '', size: 'none' };
+      const picture = await request.get(new URL(url).pathname);
+      const meta = picture.ok() ? await sharp(await picture.body()).metadata() : undefined;
+      const size = meta ? `${meta.format} ${meta.width}x${meta.height}` : 'missing';
+      return { path: decodeURI(path), url: decodeURI(url), size };
+    }),
+  );
+  const generated = pictures.filter(({ url }) => url.includes('/og/'));
+  expect(generated.length).toBeGreaterThan(30);
+  expect(generated.filter(({ size }) => size !== 'jpeg 1200x630')).toEqual([]);
 });

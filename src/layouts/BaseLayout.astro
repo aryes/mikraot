@@ -4,6 +4,7 @@ import SearchDialog from '../components/SearchDialog.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import { site } from '../lib/site';
+import { isGeneratedOgImage } from '../lib/og';
 
 interface Props {
   /** Full document title, as the live site renders it (see src/data/seo.json). */
@@ -53,7 +54,19 @@ const icon = (size: number) =>
     {description && <meta property="og:description" content={description} />}
     <meta property="og:url" content={canonical} />
     {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
-    <meta name="twitter:card" content="summary" />
+    {ogImage && <meta property="og:image:alt" content={title} />}
+    {
+      // Declared size: without it Facebook often shows no picture the first time a page is shared.
+      ogImage && isGeneratedOgImage(ogImage) && (
+        <>
+          <meta property="og:image:type" content="image/jpeg" />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+        </>
+      )
+    }
+    <!-- A large preview when the page has a picture (pages get one generated: src/pages/og/). -->
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
     <meta name="twitter:title" content={title} />
     {description && <meta name="twitter:description" content={description} />}
     <slot name="head" />

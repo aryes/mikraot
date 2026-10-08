@@ -227,8 +227,9 @@ Yes, but privacy-first, with no cookies, so no consent banner is needed:
 
 ## 9. Also worth considering
 
-- **Share previews:** generate a social image per page at build (title over the banner photo); few
-  pages have one now.
+- **Done (approved 2026-10-08): share previews.** Every content page gets a 1200×630 picture at
+  build (its title over the darkened banner photo; `src/pages/og/`, astro-og-canvas), shown when
+  the page is shared on WhatsApp, Facebook and the like.
 - **Structured data:** BreadcrumbList and LearningResource JSON-LD for richer search results.
 - **Licence the content** (e.g. CC BY-NC-SA) so teachers can share it legally; state rights for the
   recordings.

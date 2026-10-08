@@ -25,6 +25,9 @@ export default defineConfig({
   // Optimize images at build time (no Cloudflare Images binding); the site uses no sessions.
   adapter: cloudflare({
     imageService: 'compile',
+    // Static pages are built in Node: the share pictures (src/pages/og/) are drawn with Node APIs
+    // (files, WebAssembly fonts). The on-demand API routes still run in workerd.
+    prerenderEnvironment: 'node',
     ...(isDevServer && { persistState: { path: '.wrangler/state-dev' } }),
   }),
   // Video pictures are downloaded from YouTube at build time and served by the site
