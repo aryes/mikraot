@@ -1,4 +1,4 @@
-# Checks every push and pull request. Nothing here deploys or needs secrets.
+# Checks every pull request, and main after each merge. Nothing here deploys or needs secrets.
 name: CI
 
 on:
@@ -63,16 +63,38 @@ jobs:
       - run: echo 'TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA' > .dev.vars
       # Builds the site, resets the local D1 to the fixture data, and serves it in workerd.
       - run: npm run test:e2e
-      # Speed, accessibility, best-practice and SEO scores of the build the tests just made
-      # (lighthouserc.cjs).
-      - run: npm run lighthouse
       - name: Deploy dry run (bundles the Worker, uploads nothing)
         run: npm run deploy:dry
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: failure()
         with:
           name: playwright-traces
-          path: |
-            test-results/
-            .lighthouseci/
+          path: test-results/
+          retention-days: 7
+
+  # Speed, accessibility, best-practice and SEO scores (lighthouserc.cjs). Its own job, so it runs
+  # alongside the browser tests instead of after them (about 2.5 minutes saved per run).
+  lighthouse:
+    name: Lighthouse
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+        timeout-minutes: 10 # normally under 4
+      - run: echo 'TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA' > .dev.vars
+      # The site in workerd as in production, with the local D1 (fixtures) for the comments API.
+      - run: npm run db:local:reset
+      - run: npm run build:site
+      - run: npm run lighthouse
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: failure()
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
           retention-days: 7
