@@ -36,7 +36,10 @@ What follows from that:
 6. **Content time, a suggested weekly rhythm:** ~2 h recording audio for one existing page, ~1 h
    writing or finishing one lesson section, ~1 h answering comments and reviewing the numbers.
 
-## Decisions of 2026-10-09 (Arye went through most open items one by one; the few still marked "Needs: decision" weren't on the list)
+## Decisions of 2026-10-09
+
+Arye went through most open items one by one; the few still marked "Needs: decision" weren't on
+the list.
 
 Approved (to build):
 
