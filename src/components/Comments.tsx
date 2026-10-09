@@ -39,6 +39,8 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
   const [checkStarted, setCheckStarted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [remember, setRemember] = useState(false);
+  /** "Email me when someone replies": offered once an email is filled in. */
+  const [notifyReplies, setNotifyReplies] = useState(false);
   /** The comment being answered, if the visitor clicked "reply". */
   const [replyTo, setReplyTo] = useState<CommentItem | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -90,6 +92,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
         website: typeof website === 'string' ? website : '',
         turnstile_token: turnstileToken,
         parent_id: replyTo?.id,
+        notify_replies: notifyReplies && authorEmail.trim() !== '',
       });
 
       if (saved.id) {
@@ -330,6 +333,18 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
             />
             שמרו את השם והאימייל שלי בדפדפן הזה לתגובה הבאה
           </label>
+
+          {authorEmail.trim() !== '' && (
+            <label className="flex items-center gap-2 text-xs text-slate-600">
+              <input
+                type="checkbox"
+                checked={notifyReplies}
+                onChange={(e) => setNotifyReplies(e.target.checked)}
+                className="accent-brand-strong h-4 w-4"
+              />
+              שלחו לי אימייל כשמשיבים לתגובה שלי (אפשר להפסיק בכל עת)
+            </label>
+          )}
 
           <div className="flex flex-wrap items-center justify-between gap-4">
             {checkStarted ? (

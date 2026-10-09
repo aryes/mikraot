@@ -27,9 +27,11 @@ export interface BrevoEmail {
   subject: string;
   htmlContent: string;
   textContent: string;
+  /** Extra headers, e.g. List-Unsubscribe (Brevo passes them through). */
+  headers?: Record<string, string>;
 }
 
-const escapeHtml = (text: string) =>
+export const escapeHtml = (text: string) =>
   text.replace(
     /[&<>"']/g,
     (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch] ?? ch,

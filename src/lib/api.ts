@@ -33,6 +33,8 @@ export async function postComment(comment: {
   turnstile_token: string;
   /** The comment this one replies to, if any. */
   parent_id?: number | undefined;
+  /** Email the author when someone replies (only with an email). */
+  notify_replies?: boolean | undefined;
 }): Promise<CommentItem> {
   const res = await fetch('/api/comments/', {
     method: 'POST',

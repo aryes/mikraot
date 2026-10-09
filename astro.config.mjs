@@ -73,7 +73,8 @@ export default defineConfig({
     react(),
     markdoc(),
     // The author archive is noindex, as on the live site.
-    sitemap({ filter: (page) => !page.includes('/author/') }),
+    // Not the author archive (noindex) or the unsubscribe page (for email links only).
+    sitemap({ filter: (page) => !page.includes('/author/') && !page.includes('/unsubscribe/') }),
   ],
   vite: {
     plugins: [tailwindcss()],

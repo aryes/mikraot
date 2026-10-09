@@ -1,0 +1,49 @@
+---
+/**
+ * Stops reply emails (src/server/reply-notice.ts). The link in the email opens this page, which
+ * asks for one click: a link alone would be followed by mail scanners that open every link. The
+ * mail apps' own one-click unsubscribe (a POST from elsewhere) is handled in src/worker.ts.
+ */
+import { env } from 'cloudflare:workers';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { unsubscribeReplies } from '../server/comments';
+
+// Runs in the Worker on each request.
+export const prerender = false;
+
+const token = Astro.url.searchParams.get('token') ?? '';
+let state: 'ask' | 'done' | 'unknown' = token ? 'ask' : 'unknown';
+if (Astro.request.method === 'POST' && token) {
+  state = (await unsubscribeReplies(env.DB, token)) ? 'done' : 'unknown';
+}
+---
+
+<BaseLayout title="הפסקת הודעות על תשובות – מקראות" noindex>
+  <div class="mx-auto max-w-3xl px-4 py-20 text-center">
+    <h1 class="mb-3 text-3xl font-bold text-slate-800">הפסקת הודעות על תשובות</h1>
+    {state === 'ask' && (
+      <form method="post">
+        <p class="mb-6 text-slate-600">לא לשלוח לכתובת שלך עוד אימיילים על תשובות לתגובות שכתבת?</p>
+        <button
+          type="submit"
+          class="cursor-pointer rounded-xl bg-brand-strong px-6 py-2.5 font-bold text-white shadow-xs transition-all hover:bg-brand-deep"
+        >
+          כן, להפסיק
+        </button>
+      </form>
+    )}
+    {state === 'done' && (
+      <p class="mb-6 text-slate-600">
+        בוצע. לא יישלחו לך עוד אימיילים על תשובות. התגובות שלך נשארות באתר.
+      </p>
+    )}
+    {state === 'unknown' && (
+      <p class="mb-6 text-slate-600">
+        הקישור אינו תקין או שכבר אינו בתוקף. אפשר לכתוב אלינו ל־admin@mikraot.net.
+      </p>
+    )}
+    <a href="/" class="text-brand-strong underline">
+      חזרה לדף הבית
+    </a>
+  </div>
+</BaseLayout>

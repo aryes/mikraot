@@ -1,12 +1,15 @@
 /**
  * The Worker's entry point: Astro's request handler, plus the daily database backup
  * (wrangler.jsonc `triggers.crons`). Server errors and a failed backup email the owner
- * (src/server/alerts.ts).
+ * (src/server/alerts.ts). Mail apps' one-click unsubscribe is answered here, before Astro
+ * (src/server/one-click-unsubscribe.ts).
  */
 import { handle } from '@astrojs/cloudflare/handler';
 import { env } from 'cloudflare:workers';
 import { alertOwner, type AlertKind } from './server/alerts';
 import { backupDatabase } from './server/backup';
+import { unsubscribeReplies } from './server/comments';
+import { oneClickUnsubscribeToken } from './server/one-click-unsubscribe';
 
 interface Context {
   waitUntil(promise: Promise<unknown>): void;
@@ -30,6 +33,12 @@ export default {
     const [request, , context] = args;
     const where = `${request.method} ${new URL(request.url).pathname}`;
     try {
+      const unsubscribe = await oneClickUnsubscribeToken(request);
+      if (unsubscribe !== null) {
+        await unsubscribeReplies(env.DB, unsubscribe);
+        // The same answer for any token: nothing to learn about which tokens exist.
+        return new Response('Unsubscribed', { headers: { 'Cache-Control': 'no-store' } });
+      }
       const response = await handle(...args);
       if (response.status >= 500) alert(context, 'request', `${where}: ${response.status}`);
       return response;

@@ -7,8 +7,10 @@ import {
   listComments,
   parseNewComment,
   parsePageKeys,
+  replyRecipient,
 } from '../../server/comments';
 import { notifyOwner } from '../../server/notify';
+import { notifyReplyAuthor } from '../../server/reply-notice';
 import { findPage, getPageIndex } from '../../server/page-index';
 import { rateLimitKey } from '../../server/rate-limit-key';
 import { tokenFrom, verifyTurnstile } from '../../server/turnstile';
@@ -80,6 +82,34 @@ export const POST: APIRoute = async ({ request, url, clientAddress, locals }) =>
         content: comment.content,
       }),
     });
+    // A reply: tell the author of the comment replied to, if they asked (in the background, so a
+    // failure here can't turn the saved reply into an error).
+    const parentId = comment.parent_id;
+    if (parentId !== null) {
+      locals.cfContext.waitUntil(
+        replyRecipient(env.DB, parentId)
+          // Returned, so this one waitUntil covers the lookup and the send.
+          .then((recipient) =>
+            recipient
+              ? notifyReplyAuthor({
+                  apiKey: env.BREVO_API_KEY,
+                  replierEmail: comment.author_email,
+                  notice: {
+                    recipient,
+                    replyId: saved.id,
+                    replierName: comment.author_name,
+                    pageTitle: page.title,
+                    pageUrl: new URL(page.url, url.origin).href,
+                    origin: url.origin,
+                  },
+                })
+              : undefined,
+          )
+          .catch((error: unknown) => {
+            console.error('Reply notification lookup failed:', error);
+          }),
+      );
+    }
     return json(saved, 201);
   } catch (error) {
     console.error('POST /api/comments failed:', error);
