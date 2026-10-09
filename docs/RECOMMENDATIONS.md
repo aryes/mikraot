@@ -36,6 +36,45 @@ What follows from that:
 6. **Content time, a suggested weekly rhythm:** ~2 h recording audio for one existing page, ~1 h
    writing or finishing one lesson section, ~1 h answering comments and reviewing the numbers.
 
+## Decisions of 2026-10-09 (Arye went through most open items one by one; the few still marked "Needs: decision" weren't on the list)
+
+Approved (to build):
+
+- **Comment moderation page** (behind Cloudflare Access) and **reply emails to commenters**: we
+  keep our own comment system (see "Open questions").
+- **Newsletter sign-up form**, made by Brevo and fitted to the site.
+- **Banner and brand:** a smaller banner on inner pages, with the banner's design rethought; a
+  real logo and palette. Claude prepares 2–3 options for each.
+- **Dark mode.**
+- **A daily outside check** (a backup that never ran, traffic near the free limit): the token
+  gets KV read and is stored as a GitHub secret.
+- **Hebrew fixes contributed to Keystatic** (a public pull request), so the local patch can go.
+- **Umami Cloud** (free up to 100,000 events a month; company-backed, ~39,000 GitHub stars,
+  checked 2026-10-09) to count audio and video plays, hidden answers opened and 404s, instead of
+  building our own counter.
+- **Faster automatic checks without lowering coverage** (Lighthouse stays at 3 runs a page).
+- Done: the 3 security alerts with no fix were dismissed on GitHub as tolerable risk.
+
+Open questions, for later:
+
+- **Knowledge base or course?** Today the site is a knowledge base; a course will come "for sure".
+  Several skipped ideas (learning paths, a landing home page, exercises, a lesson template) may
+  come back with it.
+- **Our own comment system vs. a ready-made one** (Hyvor Talk, about €12 a month, the only fit):
+  kept ours while comments are rare; revisit if they become frequent.
+- **The email field's wording** in the comment form: it is optional already; Arye will phrase it.
+- **Worksheets:** Arye has Google Docs for many lessons; how to link them (e.g. a "דף עבודה"
+  button per lesson).
+- **Recording helper:** Arye records (Audacity, a good microphone); Claude trims, evens the volume,
+  reduces noise, converts and places the files. Agreed in principle, later.
+- **Read-along** (skipped for now): <https://www.ben13.co.il/> has it; look at how before building.
+- **Content licence** (e.g. CC BY-NC-SA): to discuss.
+
+Skipped for now: previous/next links, self-check exercises, the landing home page, the teaching
+audio player and read-along (good ideas), the verse practice view, the weekly parasha box (not
+enough recordings yet), "was this helpful?", community outreach (more involvement than there is
+time for).
+
 ## What's next (suggested order)
 
 After the cutover (`docs/CUTOVER.md`), in this order:
@@ -45,8 +84,7 @@ After the cutover (`docs/CUTOVER.md`), in this order:
    `npm run search:misses`). Then decide what to build. Needs: nothing until then.
 2. **H/M Learning paths:** a "where to start" page per door (see Direction 2), previous/next links
    between lessons in menu order (posts have them; lessons don't), a table of contents on long
-   pages (שווא נע: about 1,000 words and 40 hidden answers). Needs: decision (the orders), a little
-   content.
+   pages (שווא נע: about 1,000 words and 40 hidden answers). Skipped for now (2026-10-09).
    A draft of the doors, using only existing lessons (for Arye to change):
    - **לקרוא טקסט מנוקד:** מבטא → תנועות, עיצורים וניקוד → דגש קל → מפיק → דגש חזק → שווא נע →
      מתג → קמץ קטן → אותיות נחות → דבקים → הגיית שם יהוה; then the grammar lessons (אותיות השימוש
@@ -66,7 +104,7 @@ After the cutover (`docs/CUTOVER.md`), in this order:
    22 on each trope-song page). Each is a word plus "the answer – the reason" (השמטה → "הש׳ בשווא נע
    בגלל הדגש"; ויאמר → "זרקא"), so the site can ask "in השמטה, is the shva under ש נע or נח?" with
    the choices taken from that page's answers, then show the full explanation. Progress kept in the
-   browser. Needs: decision; then Arye only reviews the generated questions.
+   browser. Skipped for now (2026-10-09).
 4. **H/M A trope chart page:** every טעם with symbol, name, example and audio per נוסח; probably the
    most searched topic. Needs: content (recordings).
 5. **H/M Recordings where they're missing:** 45 recordings sit on just three pages (מבטא 28, דגש קל
@@ -74,29 +112,32 @@ After the cutover (`docs/CUTOVER.md`), in this order:
    the trope practice pages (אתנחתא וסוף פסוק, פשטא זקף קטן, רביעי דרגא תביר, מגוון טעמים, טעמים
    נדירים), where a learner most needs to hear the verse. One page a week (Direction 6) covers them
    in two to three months. Needs: content.
-6. **H/M An audio recording workflow for Arye:** record on the phone, send, and the recording lands
-   on the right page (Claude converts, names and places it). Recording is most of the content time
-   (Direction 1 and 6), so making it easy multiplies the rest. Needs: decision.
+6. **H/M An audio recording workflow for Arye:** record (Audacity, a good microphone), save, and the
+   recording lands on the right page (Claude converts, names and places it). Recording is most of
+   the content time (Direction 1 and 6), so making it easy multiplies the rest. Agreed in principle
+   2026-10-09 (Audacity, Claude processes), later.
 7. **H/M Comment moderation page** behind Cloudflare Access (free; login by Arye's email): hide,
    delete, reply as admin. Once the site is live, comments arrive weekly and today moderating means
-   asking Claude. Needs: decision.
+   asking Claude. Approved 2026-10-09.
 
-Waiting on Arye already: reply emails to commenters, the newsletter sign-up form.
+Approved 2026-10-09: reply emails to commenters, the newsletter sign-up form.
 
 ## 1. UX and design
 
 Rating today: **7.5/10** (was 6.5 on 2026-10-03): fast (Lighthouse 82–95), accessible (axe and
 Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a template.
 
-- **H/M Learning flow:** see "What's next" 2. Also "you are here" in the menu. Needs: decision.
+- **H/M Learning flow:** see "What's next" 2. Also "you are here" in the menu. Skipped for now
+  (2026-10-09).
 - **M/S Smaller banner on inner pages** (≈120 px): on a phone the 250 px photo pushes the lesson
-  below the fold; keep the full banner on the home page. Needs: decision.
+  below the fold; keep the full banner on the home page. Approved 2026-10-09, with the banner design
+  rethought.
 - **M/M Home page as a landing page:** four cards (הגיה, דקדוק, טעמים, קריאות), a "start here"
-  button, then the latest posts; today it is a text page. Needs: decision.
+  button, then the latest posts; today it is a text page. Skipped for now (2026-10-09).
 - **M/M Brand:** a real logo (the book icon is a placeholder), a small palette from the brand green,
-  one distinctive Hebrew display font for headings. Needs: decision (a designer, or Claude drafts).
-- **L/M Dark mode** (following the system setting); check the teaching colours in both. Needs:
-  decision.
+  one distinctive Hebrew display font for headings. Approved 2026-10-09.
+- **L/M Dark mode** (following the system setting); check the teaching colours in both. Approved
+  2026-10-09.
 - **L/S** A one-page "how the marks look" reference (every טעם and vowel, enlarged; the rarest, like
   ירח בן יומו, render correctly in Taamey D). Doubles as a visual test. Needs: decision (a new
   public page).
@@ -106,8 +147,7 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
 - **H/M Exercises:** see "What's next" 3: 5–10 short questions per lesson (שווא נע or נח? which
   טעם?), instant feedback, browser-side progress. Replaces LearnPress quizzes for most needs.
 - **H/M Audio player that teaches:** speed control (0.75×), loop a phrase, a sound for every trope
-  name (click "פשטא" → hear it), the same player on every page. Needs: decision; recordings for the
-  trope names.
+  name (click "פשטא" → hear it), the same player on every page. Skipped for now (2026-10-09).
 - **H/L Read-along ("karaoke") for recorded readings:** highlight each word while the recording
   plays; what paid trope trainers (and the free PocketTorah app) offer. The hard part is word
   timings per recording. Researched 2026-10-08: no ready-made tool for chanted Hebrew, so three
@@ -117,7 +157,8 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
   it, so test first; (b) a speech-recognition tool with word times (WhisperX): weaker, since it
   writes its own unpointed transcript instead of following our text; (c) a tap-along tool: Arye
   plays a recording and taps once per word, about 1.5–2× the recording's length with corrections.
-  Start with a one-day test of (a) on one recording, then decide. Needs: decision.
+  Start with a one-day test of (a) on one recording, then decide. Skipped for now (2026-10-09);
+  ben13.co.il has it, look there first.
 - **M/M Glossary** with tap/hover definitions wherever a term appears, and a glossary page. Counted
   2026-10-08: terms like אתנחתא (8 pages), שווא נע, חטף, מקף (6 each), שווא נח (5), מפיק, מחבר (4)
   and מלעיל/מלרע recur across lessons; some have a lesson of their own, others only a passing line
@@ -128,15 +169,16 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
   Westminster Leningrad Codex is licensed "no derivatives" (CC BY-NC-ND; older copies circulated
   as public domain), which leaves its use for a practice view unclear; _Miqra according to the
   Masorah_ (Aleppo Codex tradition, made for Jewish use, with documented טעמים, CC BY-SA, available
-  through Sefaria) fits without that doubt, with attribution. Needs: decision.
+  through Sefaria) fits without that doubt, with attribution. Skipped for now (2026-10-09).
 - **M/S Weekly parasha shortcut:** "this week's reading" linking to its recordings. Hebcal's
   reading-schedule library is free (BSD) but depends on a GPL-licensed core, so the clean way is to
   compute a year of weekly readings at build time into a small data file: no requests from
-  visitors' browsers, no GPL code shipped. Needs: decision.
+  visitors' browsers, no GPL code shipped. Skipped for now (2026-10-09): not enough recordings yet.
 - **M/S Reply emails to commenters** (opt-in checkbox, unsubscribe link; reuses
-  `src/server/notify.ts`). Needs: decision.
+  `src/server/notify.ts`). Approved 2026-10-09.
 - **L/M Printable worksheets** (PDF) for teachers; the print layout already prints any lesson
-  cleanly, closed answers making a worksheet. Needs: decision.
+  cleanly, closed answers making a worksheet. Open (2026-10-09): Arye has Google Docs worksheets to
+  link.
 - **Decide later:** accounts (only if progress must follow a learner between devices); an English
   edition (the bar/bat-mitzvah audience abroad is large).
 
@@ -149,7 +191,8 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
   editor. It appears in "מה חדש" and, once the newsletter is set up, goes to subscribers; without it
   new content stays invisible to returning learners. Needs: content (a habit).
 - **M/M One template for lessons:** goal → rule → examples (with audio) → exceptions → exercises →
-  summary. Makes the site feel like a course and gaps visible. Needs: decision.
+  summary. Makes the site feel like a course and gaps visible. Waits on "knowledge base or course?"
+  (2026-10-09).
 - **M/L More נוסחים:** Sephardi-Yerushalmi first (the largest Israeli audience), then Teimani.
   Needs: content (or volunteer readers).
 - **M/M Haftarah and Megillot** trope (same symbols, different melodies). Needs: content.
@@ -169,20 +212,12 @@ security.txt, required checks before any merge, dependency updates with tests.
   (part of the email move).
 - **M/S Privacy (amendment 13 of the Privacy Protection Law, in force since 14 August 2025; it
   counts IP addresses as personal data; checked 2026-10-08):** collect less: make the commenter's
-  email clearly optional, or drop it unless reply emails are built. Needs: decision.
+  email clearly optional (it is; the wording is Arye's, 2026-10-09).
 - **L/S** Browsers' built-in "HTTPS only" list (HSTS preload). It needs the rule to cover every
   subdomain (`includeSubDomains`) and a `preload` directive, and leaving the list takes months, so
   only after email has left Bluehost and every subdomain answers over HTTPS; today the header is a
   one-year HSTS without subdomains (checked 2026-10-08). Needs: decision. (Cloudflare's free managed
   firewall rules are already on: the zone audit found them, 2026-10-08.)
-- **S/S Dismiss the 3 security alerts that have no fix** (GitHub's Dependabot alerts, which already
-  cover what a weekly `npm audit` would). Of the 7 open on 2026-10-08, 4 had fixed versions and are
-  overridden in `package.json` (`overrides`). The other 3 (2 for `extract-zip`, 1 for
-  `sprintf-js`) come from Lighthouse CI (`@lhci/cli`, no release since June 2025), which only we
-  run (the automatic checks, `npm run lighthouse`) and only on our own pages: no outside input
-  reaches them.
-  Proposal: dismiss them on GitHub as "risk is tolerable", with that reason, so a new alert stands
-  out. Needs: decision.
 
 ## 5. Running the site
 
@@ -205,20 +240,21 @@ security.txt, required checks before any merge, dependency updates with tests.
   free plan's 100,000 a day. Static pages don't count toward that limit (Cloudflare serves them
   free); the API (comments, searches counted, error reports), the comments feed and every address
   with no page (404s, including bots probing old WordPress paths) do, so a bot wave is the likely
-  way to reach it. Needs: decision (the token would be stored as a GitHub secret, with KV read
-  access added).
+  way to reach it. Approved 2026-10-09 (the token gets KV read and goes into GitHub secrets).
 - **M/S Faster automatic checks:** a run takes about 4 minutes, and Lighthouse sets the pace (about
-  2.7 minutes: four pages, three runs each). Two runs per page instead of three would save about
-  50 s (the browser tests, about 3.2 minutes, would then set the pace), but the score would be the
+  2.7 minutes: four pages, three runs each). Two runs per page instead of three would save about 50
+  s (the browser tests, about 3.2 minutes, would then set the pace), but the score would be the
   average of two runs instead of the middle of three, so one bad run could fail a change. Caching
   the test browser is not worth it: installing it takes about 23 s, and Playwright advises against
-  caching it, since restoring takes about as long. Needs: decision (two runs or three).
+  caching it, since restoring takes about as long. Decided 2026-10-09: keep three runs, and make the
+  checks faster in other ways without lowering coverage (e.g. build the site once for both test
+  jobs).
 - **M/S Clean-up after the cutover:** the old `mikraot-api` Worker, `worker/`, `/staging/` on
   Bluehost, the Supabase project (after a final export). In `docs/CUTOVER.md` step 5. Needs: Arye's
   approval (deletions).
 - **M/S Better Hebrew in Keystatic upstream:** contribute the corrected strings
   (`patches/@keystatic+core+0.6.9.patch`) and the hard-coded English labels to Keystatic, so the
-  patch can go and every Hebrew user benefits. Needs: decision (a public contribution).
+  patch can go and every Hebrew user benefits. Approved 2026-10-09.
 
 ## 6. Learning what visitors need
 
@@ -231,8 +267,9 @@ Privacy-first, without cookies, so no consent banner:
   Copilot draw mainly on Bing's index, checked 2026-10-08; ChatGPT's web search partly).
   Needs: Arye (account).
 - **M/S Content events** via Workers Analytics Engine (already used for searches): audio plays,
-  video plays, hidden answers opened, 404s. Needs: decision.
-- **M/S "Was this page helpful?"** 👍/👎 with an optional comment. Needs: decision.
+  video plays, hidden answers opened, 404s. Approved 2026-10-09, with Umami Cloud instead of our own
+  counter.
+- **M/S "Was this page helpful?"** 👍/👎 with an optional comment. Skipped for now (2026-10-09).
 - **Avoid** session recording (Hotjar, Clarity): needs a consent banner and records personal
   behaviour; not worth it at this size.
 
@@ -256,9 +293,9 @@ Privacy-first, without cookies, so no consent banner:
 ## Also worth considering
 
 - **Licence the content** (e.g. CC BY-NC-SA) so teachers can share it legally; state the rights in
-  the recordings. Needs: decision.
+  the recordings. To discuss (2026-10-09).
 - **Community:** reach teachers and synagogue gabbaim (they send learners); a WhatsApp channel or the
-  newsletter for new lessons. Needs: decision.
+  newsletter for new lessons. Skipped for now (2026-10-09): more involvement than there is time for.
 
 ## Done (from these recommendations)
 
@@ -278,10 +315,11 @@ Privacy-first, without cookies, so no consent banner:
   required checks; faster tests (two workers, Lighthouse in parallel); daily database backups to
   Workers KV, kept a year (D1 alone restores only 7 days back on the free plan); the 4 missing links
   between lessons (the rest were already linked); error emails to Arye (server errors, failed
-  backups); one-command restore (`db:restore`) and switch-day check (`cutover:check`); recovery
-  procedures and limits in `docs/OPERATIONS.md`; a skip link and sound buttons named for what they
-  play; short search descriptions, "title: description", on 33 pages. Dropped: content images as
-  AVIF/WebP (the content has no pictures, and the banner already is; the 52 WordPress images serve
-  only the site icon and old links); lessons marked as lessons for search engines (Google retired
-  its course-info, learning video and practice-problem rich results in 2025-2026; the ones left,
-  course lists and flashcard Q&A, are not offered in Hebrew).
+  backups); the 3 security alerts with no fix dismissed (tolerable risk, 2026-10-09); one-command
+  restore (`db:restore`) and switch-day check (`cutover:check`); recovery procedures and limits in
+  `docs/OPERATIONS.md`; a skip link and sound buttons named for what they play; short search
+  descriptions, "title: description", on 33 pages. Dropped: content images as AVIF/WebP (the content
+  has no pictures, and the banner already is; the 52 WordPress images serve only the site icon and
+  old links); lessons marked as lessons for search engines (Google retired its course-info, learning
+  video and practice-problem rich results in 2025-2026; the ones left, course lists and flashcard
+  Q&A, are not offered in Hebrew).
