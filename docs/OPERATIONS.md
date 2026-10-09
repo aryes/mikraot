@@ -69,9 +69,9 @@ bring the data back. So:
 
 1. Delete the row (with Arye's approval):
    `npx wrangler d1 execute mikraot-db --remote --config wrangler.jsonc --command "DELETE FROM comments WHERE id = <id>"`
-   (only the email: `UPDATE comments SET author_email = NULL WHERE id = <id>`). If the comment has
+   (only the email: `UPDATE comments SET author_email = NULL, notify_replies = 0, unsubscribe_token = NULL WHERE id = <id>`). If the comment has
    replies, the database refuses the `DELETE` (each reply points to it); erase it instead:
-   `UPDATE comments SET author_name = '', author_email = NULL, content = '', approved = 0 WHERE id = <id>`.
+   `UPDATE comments SET author_name = '', author_email = NULL, content = '', approved = 0, notify_replies = 0, unsubscribe_token = NULL WHERE id = <id>`.
    Hiding a comment (`SET approved = 0` alone) is not deletion: its text and email stay.
 2. Add a line to the list below: date, comment number, and what was deleted. Numbers only, never
    names or emails (this file is public).

@@ -36,6 +36,8 @@ export interface NewComment {
   author_email: string | null;
   content: string;
   parent_id: number | null;
+  /** Email the author when someone replies (only with an email). */
+  notify_replies: boolean;
 }
 
 const PUBLIC_COLUMNS = 'id, page_slug, author_name, content, is_admin_reply, parent_id, created_at';
@@ -88,10 +90,12 @@ export function parseNewComment(body: unknown): NewComment | { error: string } {
   ) {
     return { error: 'Invalid parent' };
   }
+  const notify = body && typeof body === 'object' ? Reflect.get(body, 'notify_replies') : undefined;
   return {
     ...comment,
     author_email: comment.author_email || null,
     parent_id: typeof parent === 'number' ? parent : null,
+    notify_replies: notify === true && comment.author_email !== '',
   };
 }
 
@@ -132,13 +136,17 @@ export async function approvedCommentPage(db: CommentsDb, id: number): Promise<s
   return row?.page_slug ?? null;
 }
 
-/** Stores a comment. New comments are approved immediately, as on the current site. */
+/**
+ * Stores a comment. New comments are approved immediately, as on the current site. A comment whose
+ * author asked for reply emails gets a random unsubscribe token for the links in them.
+ */
 export async function addComment(db: CommentsDb, comment: NewComment): Promise<PublicComment> {
   const saved = await db
     .prepare(
       `INSERT INTO comments
-         (page_slug, author_name, author_email, content, parent_id, is_admin_reply, approved)
-       VALUES (?, ?, ?, ?, ?, 0, 1)
+         (page_slug, author_name, author_email, content, parent_id, is_admin_reply, approved,
+          notify_replies, unsubscribe_token)
+       VALUES (?, ?, ?, ?, ?, 0, 1, ?, ?)
        RETURNING ${PUBLIC_COLUMNS}`,
     )
     .bind(
@@ -147,8 +155,51 @@ export async function addComment(db: CommentsDb, comment: NewComment): Promise<P
       comment.author_email,
       comment.content,
       comment.parent_id,
+      comment.notify_replies ? 1 : 0,
+      comment.notify_replies ? crypto.randomUUID() : null,
     )
     .first<PublicComment>();
   if (!saved) throw new Error('Insert returned no row');
   return saved;
+}
+
+/** Who to tell about a reply: the author of the comment replied to, if they asked to be told. */
+export interface ReplyRecipient {
+  name: string;
+  email: string;
+  unsubscribeToken: string;
+}
+
+export async function replyRecipient(
+  db: CommentsDb,
+  parentId: number,
+): Promise<ReplyRecipient | null> {
+  const row = await db
+    .prepare(
+      `SELECT author_name, author_email, unsubscribe_token FROM comments
+       WHERE id = ? AND approved = 1 AND notify_replies = 1
+         AND author_email IS NOT NULL AND unsubscribe_token IS NOT NULL`,
+    )
+    .bind(parentId)
+    .first<{ author_name: string; author_email: string; unsubscribe_token: string }>();
+  return row
+    ? { name: row.author_name, email: row.author_email, unsubscribeToken: row.unsubscribe_token }
+    : null;
+}
+
+/**
+ * Stops reply emails to the address behind an unsubscribe token: for all of that address's
+ * comments, since one click should mean "no more of these". Returns false for an unknown token.
+ */
+export async function unsubscribeReplies(db: CommentsDb, token: string): Promise<boolean> {
+  const row = await db
+    .prepare('SELECT author_email FROM comments WHERE unsubscribe_token = ?')
+    .bind(token)
+    .first<{ author_email: string | null }>();
+  if (!row?.author_email) return false;
+  await db
+    .prepare('UPDATE comments SET notify_replies = 0 WHERE lower(author_email) = lower(?)')
+    .bind(row.author_email)
+    .all();
+  return true;
 }

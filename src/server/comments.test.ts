@@ -6,12 +6,14 @@ import {
   listRecentComments,
   parseNewComment,
   parsePageKeys,
+  replyRecipient,
+  unsubscribeReplies,
   type CommentsDb,
   type PublicComment,
 } from './comments';
 
 /** Records the query and bound values; returns the given rows. */
-function fakeDb(rows: PublicComment[] = []) {
+function fakeDb(rows: object[] = []) {
   const calls: { query: string; values: unknown[] }[] = [];
   const db: CommentsDb = {
     prepare: (query) => ({
@@ -67,6 +69,7 @@ describe('parseNewComment', () => {
       author_email: null,
       content: 'Text',
       parent_id: null,
+      notify_replies: false,
     });
     expect(parseNewComment({ ...valid, author_email: 'a@b.co' })).toMatchObject({
       author_email: 'a@b.co',
@@ -157,9 +160,10 @@ describe('addComment', () => {
       author_email: 'a@b.co',
       content: 'b',
       parent_id: 3,
+      notify_replies: false,
     });
     expect(saved).toEqual(comment);
-    expect(calls[0]?.values).toEqual(['about', 'a', 'a@b.co', 'b', 3]);
+    expect(calls[0]?.values).toEqual(['about', 'a', 'a@b.co', 'b', 3, 0, null]);
     expect(calls[0]?.query).toMatch(/RETURNING id, page_slug, author_name, content/);
   });
 
@@ -172,7 +176,63 @@ describe('addComment', () => {
         author_email: null,
         content: 'c',
         parent_id: null,
+        notify_replies: false,
       }),
     ).rejects.toThrow('Insert returned no row');
+  });
+
+  it('gives a comment that asked for reply emails a random unsubscribe token', async () => {
+    const { db, calls } = fakeDb([comment]);
+    const asking = {
+      page_slug: 'a',
+      author_name: 'b',
+      author_email: 'b@c.co',
+      content: 'c',
+      parent_id: null,
+    };
+    await addComment(db, { ...asking, notify_replies: true });
+    await addComment(db, { ...asking, notify_replies: true });
+    const [first, second] = calls.map((call) => call.values);
+    expect(first?.[5]).toBe(1);
+    expect(first?.[6]).toMatch(/^[0-9a-f-]{36}$/);
+    expect(second?.[6]).not.toBe(first?.[6]);
+  });
+});
+
+describe('reply emails', () => {
+  it('accepts "email me on replies" only together with an email', () => {
+    const base = { page_slug: 'a', author_name: 'b', content: 'c', notify_replies: true };
+    expect(parseNewComment({ ...base, author_email: 'b@c.co' })).toMatchObject({
+      notify_replies: true,
+    });
+    expect(parseNewComment(base)).toMatchObject({ notify_replies: false });
+    expect(
+      parseNewComment({ ...base, author_email: 'b@c.co', notify_replies: 'yes' }),
+    ).toMatchObject({
+      notify_replies: false,
+    });
+  });
+
+  it('finds the author to tell only if they asked and the comment is approved', async () => {
+    const row = { author_name: 'דנה', author_email: 'd@e.co', unsubscribe_token: 't' };
+    const { db, calls } = fakeDb([row]);
+    expect(await replyRecipient(db, 7)).toEqual({
+      name: 'דנה',
+      email: 'd@e.co',
+      unsubscribeToken: 't',
+    });
+    expect(calls[0]?.query).toMatch(/approved = 1 AND notify_replies = 1/);
+    expect(calls[0]?.values).toEqual([7]);
+    expect(await replyRecipient(fakeDb([]).db, 7)).toBeNull();
+  });
+
+  it('unsubscribes every comment of the address behind a token', async () => {
+    const { db, calls } = fakeDb([{ author_email: 'd@e.co' }]);
+    expect(await unsubscribeReplies(db, 'token')).toBe(true);
+    expect(calls[1]?.query).toMatch(
+      /SET notify_replies = 0 WHERE lower\(author_email\) = lower\(\?\)/,
+    );
+    expect(calls[1]?.values).toEqual(['d@e.co']);
+    expect(await unsubscribeReplies(fakeDb([]).db, 'unknown')).toBe(false);
   });
 });
