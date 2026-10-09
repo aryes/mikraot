@@ -72,12 +72,19 @@ jobs:
           path: test-results/
           retention-days: 7
 
-  # Speed, accessibility, best-practice and SEO scores (lighthouserc.cjs). Its own job, so it runs
-  # alongside the browser tests instead of after them (about 2.5 minutes saved per run).
-  lighthouse:
-    name: Lighthouse
+  # Speed, accessibility, best-practice and SEO scores (lighthouserc.cjs). Its own jobs, alongside
+  # the browser tests; the pages are split over two of them (same pages, runs and limits), since
+  # Lighthouse was the slowest part of a run.
+  lighthouse-shard:
+    name: Lighthouse ${{ matrix.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ['1/2', '2/2']
+    env:
+      LH_SHARD: ${{ matrix.shard }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -95,6 +102,17 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: failure()
         with:
-          name: lighthouse-reports
+          name: lighthouse-reports-${{ strategy.job-index }}
           path: .lighthouseci/
           retention-days: 7
+
+  # The check that merging requires ("Lighthouse", in the ruleset): passes only if every shard
+  # passed. `always()`, because a skipped required check would count as passed.
+  lighthouse:
+    name: Lighthouse
+    needs: lighthouse-shard
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: test "${{ needs.lighthouse-shard.result }}" = success
