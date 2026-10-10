@@ -43,6 +43,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       href="/comments/feed/"
     />
     <!-- The yad logo (src/components/YadMark.astro) on the brand green; PNGs for browsers without SVG icons. -->
+    <!-- Dark mode (src/styles/global.css): native controls and the first paint follow the system. -->
+    <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/icon-32.png" sizes="32x32" />
     <link rel="icon" href="/icon-192.png" sizes="192x192" />
@@ -73,7 +75,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body
     id="top"
-    class="flex min-h-screen flex-col bg-[#F3F7F5] font-sans text-[#444444] antialiased selection:bg-brand-strong selection:text-white print:bg-white print:text-black"
+    class="flex min-h-screen flex-col bg-(--page) font-sans text-[#444444] dark:text-slate-300 antialiased selection:bg-brand-strong selection:text-white print:bg-white print:text-black"
   >
     <!-- The first Tab stop: past the header and menu, straight to the page (hidden until focused;
          above the sticky header, z-50). -->

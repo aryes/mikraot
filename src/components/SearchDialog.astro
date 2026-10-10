@@ -5,26 +5,33 @@ import { Search, X } from 'lucide-react';
 <dialog
   data-search
   aria-label="חיפוש באתר"
-  class="mx-auto mt-[10vh] w-[calc(100%-2rem)] max-w-xl overflow-hidden rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/60"
+  class="mx-auto mt-[10vh] w-[calc(100%-2rem)] max-w-xl overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-0 shadow-2xl backdrop:bg-slate-900/60"
 >
-  <form method="dialog" class="flex items-center gap-2 border-b border-slate-100 px-4 py-3">
+  <form
+    method="dialog"
+    class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 px-4 py-3"
+  >
     <Search size={18} className="shrink-0 text-slate-400" aria-hidden="true" />
     <input
       type="search"
       placeholder="חיפוש באתר…"
       aria-label="חיפוש באתר"
       autocomplete="off"
-      class="flex-1 bg-transparent py-1 text-base text-slate-800 outline-none placeholder:text-slate-400"
+      class="flex-1 bg-transparent py-1 text-base text-slate-800 dark:text-slate-100 outline-none placeholder:text-slate-400"
     />
     <button
       type="submit"
       aria-label="סגירה"
-      class="cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+      class="cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200"
     >
       <X size={18} />
     </button>
   </form>
-  <p data-search-status class="px-4 pt-2 text-xs text-slate-500" aria-live="polite"></p>
+  <p
+    data-search-status
+    class="px-4 pt-2 text-xs text-slate-500 dark:text-slate-400"
+    aria-live="polite"
+  ></p>
   <ul data-search-results class="max-h-[60vh] overflow-y-auto p-2"></ul>
 </dialog>
 

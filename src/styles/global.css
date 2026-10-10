@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+
+/* Dark mode follows the system setting, on screens only: printed pages stay black on white. */
+@custom-variant dark (@media screen and (prefers-color-scheme: dark));
 /* Self-hosted fonts (Hebrew + Latin subsets; browsers fetch only what a page uses). Noto Hebrew
    covers every niqqud and cantillation mark (טעמים) in the content, with mark positioning;
    fonts without them make the browser switch fonts inside words. */
@@ -20,9 +23,65 @@
   --color-brand: #8cb65f;
   --color-brand-strong: #5b763e;
   --color-brand-deep: #4d6434;
+  /* Brand text and link hover on dark backgrounds (dark mode). */
+  --color-brand-light: #a9cc84;
   --font-sans: 'Noto Sans Hebrew Variable', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-hebrew: 'Noto Serif Hebrew Variable', serif;
   --font-bible: 'Taamey D', 'Noto Serif Hebrew Variable', serif;
+}
+
+/* Colours of the page and the lesson content, light and dark. Components use Tailwind classes
+   with `dark:` variants; these cover the content rules below. Every text colour meets WCAG AA
+   (4.5:1) on its background in both modes (checked by e2e/accessibility.spec.ts in both). */
+:root {
+  color-scheme: light dark;
+  --page: #f3f7f5;
+  --content-text: #1e293b;
+  --content-heading: #334155;
+  --content-subheading: #44505b;
+  --content-link: var(--color-brand-strong);
+  --content-link-hover: var(--color-brand-deep);
+  --table-bg: #ffffff;
+  --table-head: #44505b;
+  --table-head-border: #334155;
+  --table-border: #e2e8f0;
+  --table-stripe: #f8fafc;
+  --table-hover: #f1f5f9;
+  --mark-highlight: #c2410c;
+  --mark-muted: #475569;
+  --mark-silent: #707070;
+  --text-faint: #64748b;
+  --scrollbar-track: #f1f5f9;
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-thumb-hover: #94a3b8;
+}
+@media screen and (prefers-color-scheme: dark) {
+  :root {
+    --page: #020617;
+    --content-text: #e2e8f0;
+    --content-heading: #f1f5f9;
+    --content-subheading: #cbd5e1;
+    --content-link: var(--color-brand);
+    --content-link-hover: var(--color-brand-light);
+    --table-bg: #0f172a;
+    --table-head: #334155;
+    --table-head-border: #475569;
+    --table-border: #334155;
+    --table-stripe: #131d33;
+    --table-hover: #1e293b;
+    --mark-highlight: #fb923c;
+    --mark-muted: #a3b1c2;
+    --mark-silent: #8b95a1;
+    --text-faint: #94a3b8;
+    --scrollbar-track: #0f172a;
+    --scrollbar-thumb: #334155;
+    --scrollbar-thumb-hover: #475569;
+  }
+}
+@media print {
+  :root {
+    color-scheme: light;
+  }
 }
 
 /* Pointed (vocalised) Hebrew, i.e. the biblical text, in the biblical-text font; plain
@@ -42,14 +101,14 @@
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--scrollbar-track);
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Content typography overrides */
@@ -57,7 +116,7 @@
 .wp-content-rendered h2,
 .wp-content-rendered h3,
 .wp-content-rendered h4 {
-  color: #334155;
+  color: var(--content-heading);
   font-weight: 700;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
@@ -69,7 +128,7 @@
 }
 .wp-content-rendered h3 {
   font-size: 1.25rem;
-  color: #44505b;
+  color: var(--content-subheading);
 }
 .wp-content-rendered h4 {
   font-size: 1.1rem;
@@ -77,7 +136,7 @@
 /* A heading drawn smaller than its level (markdoc.config.mjs, size="small"). */
 .wp-content-rendered .heading-small {
   font-size: 1.1rem;
-  color: #334155;
+  color: var(--content-heading);
   border-bottom: 0;
   padding-bottom: 0;
 }
@@ -85,17 +144,17 @@
   margin-bottom: 1rem;
   /* Room above and below the letters for stacked niqqud and cantillation marks. */
   line-height: 2.1;
-  color: #1e293b;
+  color: var(--content-text);
   font-size: 1.1rem;
 }
 .wp-content-rendered a {
-  color: var(--color-brand-strong);
+  color: var(--content-link);
   font-weight: 600;
   text-decoration: none;
   transition: color 0.15s;
 }
 .wp-content-rendered a:hover {
-  color: var(--color-brand-deep);
+  color: var(--content-link-hover);
   text-decoration: underline;
 }
 
@@ -120,7 +179,7 @@
 .wp-content-rendered li {
   margin-bottom: 0.4rem;
   line-height: 2;
-  color: #1e293b;
+  color: var(--content-text);
   font-size: 1.1rem;
 }
 .wp-content-rendered li > a {
@@ -133,7 +192,7 @@
 }
 .wp-content-rendered li > a:hover {
   background-color: #8cb65f15;
-  color: var(--color-brand-deep);
+  color: var(--content-link-hover);
 }
 
 /* Table styling matching Kahuna clean table */
@@ -144,31 +203,31 @@
 .wp-content-rendered table {
   width: 100%;
   border-collapse: collapse;
-  background: #ffffff;
+  background: var(--table-bg);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 .wp-content-rendered th {
-  background: #44505b;
+  background: var(--table-head);
   color: #ffffff;
   font-weight: 700;
   padding: 12px 16px;
   text-align: center;
-  border: 1px solid #334155;
+  border: 1px solid var(--table-head-border);
 }
 .wp-content-rendered td {
   padding: 12px 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--table-border);
   text-align: center;
-  color: #1e293b;
+  color: var(--content-text);
   font-size: 1.1rem;
 }
 .wp-content-rendered tr:nth-child(even) td {
-  background: #f8fafc;
+  background: var(--table-stripe);
 }
 .wp-content-rendered tr:hover td {
-  background: #f1f5f9;
+  background: var(--table-hover);
 }
 
 /* Content tags (markdoc.config.mjs). The colours carry meaning in the lessons. */
@@ -176,14 +235,14 @@
    WCAG AA contrast. These meet 4.5:1 on every content background (white, table rows), and each
    mark has a cue besides colour (WCAG 1.4.1). */
 .wp-content-rendered .mark-highlight {
-  color: #c2410c; /* the letter or vowel being taught */
+  color: var(--mark-highlight); /* the letter or vowel being taught */
   font-weight: 700;
 }
 .wp-content-rendered .mark-muted {
-  color: #475569; /* context, e.g. the surrounding words of a trope chain */
+  color: var(--mark-muted); /* context, e.g. the surrounding words of a trope chain */
 }
 .wp-content-rendered .mark-silent {
-  color: #707070; /* silent letters: lighter than context, and dotted underneath */
+  color: var(--mark-silent); /* silent letters: lighter than context, and dotted underneath */
   text-decoration: underline dotted 1px;
   text-underline-offset: 0.45em;
 }
@@ -204,7 +263,7 @@
 .wp-content-rendered .latest-posts time {
   display: block;
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--text-faint);
 }
 
 /* Printing (teachers print lessons): the layout parts are hidden with Tailwind `print:` classes in

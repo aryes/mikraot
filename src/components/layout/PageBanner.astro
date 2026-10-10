@@ -26,8 +26,11 @@ import Pointed from '../Pointed.astro';
 
 {crumbs ? (
   <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8 print:max-w-none print:p-0">
-    <div class="rounded-2xl border border-slate-200/80 bg-white px-4 py-3 shadow-xs sm:px-5 print:border-0 print:p-0 print:shadow-none">
-      <nav aria-label="פירורי לחם" class="mb-2 text-sm text-brand-strong print:hidden">
+    <div class="rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900 px-4 py-3 shadow-xs sm:px-5 print:border-0 print:p-0 print:shadow-none">
+      <nav
+        aria-label="פירורי לחם"
+        class="mb-2 text-sm text-brand-strong dark:text-brand print:hidden"
+      >
         <ol class="flex flex-wrap items-center gap-2">
           <li>
             <a href="/" class="underline-offset-2 hover:underline">
@@ -44,7 +47,7 @@ import Pointed from '../Pointed.astro';
           ))}
           <li class="flex items-center gap-2">
             <span aria-hidden="true">/</span>
-            <span aria-current="page" class="font-semibold text-brand-deep">
+            <span aria-current="page" class="font-semibold text-brand-deep dark:text-brand-light">
               <Pointed text={title} />
             </span>
           </li>
@@ -60,7 +63,7 @@ import Pointed from '../Pointed.astro';
           loading="eager"
           class="banner-photo h-16 w-[120px] flex-none rounded-lg object-cover print:hidden"
         />
-        <h1 class="font-bible text-[1.75rem] leading-tight font-bold text-brand-deep sm:text-3xl print:text-black">
+        <h1 class="font-bible text-[1.75rem] leading-tight font-bold text-brand-deep dark:text-brand-light sm:text-3xl print:text-black">
           <Pointed text={title} />
         </h1>
       </div>

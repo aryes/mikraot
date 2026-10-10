@@ -20,10 +20,14 @@ if (Astro.request.method === 'POST' && token) {
 
 <BaseLayout title="הפסקת הודעות על תשובות – מקראות" noindex>
   <div class="mx-auto max-w-3xl px-4 py-20 text-center">
-    <h1 class="mb-3 text-3xl font-bold text-slate-800">הפסקת הודעות על תשובות</h1>
+    <h1 class="mb-3 text-3xl font-bold text-slate-800 dark:text-slate-100">
+      הפסקת הודעות על תשובות
+    </h1>
     {state === 'ask' && (
       <form method="post">
-        <p class="mb-6 text-slate-600">לא לשלוח לכתובת שלך עוד אימיילים על תשובות לתגובות שכתבת?</p>
+        <p class="mb-6 text-slate-600 dark:text-slate-300">
+          לא לשלוח לכתובת שלך עוד אימיילים על תשובות לתגובות שכתבת?
+        </p>
         <button
           type="submit"
           class="cursor-pointer rounded-xl bg-brand-strong px-6 py-2.5 font-bold text-white shadow-xs transition-all hover:bg-brand-deep"
@@ -33,16 +37,16 @@ if (Astro.request.method === 'POST' && token) {
       </form>
     )}
     {state === 'done' && (
-      <p class="mb-6 text-slate-600">
+      <p class="mb-6 text-slate-600 dark:text-slate-300">
         בוצע. לא יישלחו לך עוד אימיילים על תשובות. התגובות שלך נשארות באתר.
       </p>
     )}
     {state === 'unknown' && (
-      <p class="mb-6 text-slate-600">
+      <p class="mb-6 text-slate-600 dark:text-slate-300">
         הקישור אינו תקין או שכבר אינו בתוקף. אפשר לכתוב אלינו ל־admin@mikraot.net.
       </p>
     )}
-    <a href="/" class="text-brand-strong underline">
+    <a href="/" class="text-brand-strong dark:text-brand underline">
       חזרה לדף הבית
     </a>
   </div>

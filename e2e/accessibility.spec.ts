@@ -88,3 +88,34 @@ test('the first Tab offers a skip to the content; sound buttons say what they pl
   await expect(page.locator('main :focus')).toHaveCount(1);
   await expect(page.getByRole('button', { name: 'השמע: ב דגושה' })).toBeVisible();
 });
+
+// Dark mode (the system setting): the same scan on every page, desktop only (the colours are the
+// same on a phone), plus loaded comments and the search dialog, whose colours come from scripts.
+test.describe('dark mode', () => {
+  test.use({ colorScheme: 'dark' });
+  test.skip(({ isMobile }) => isMobile, 'same colours as desktop');
+
+  for (const path of paths) {
+    test(`no accessibility violations in dark mode: ${path}`, async ({ page }) => {
+      await page.goto(path);
+      expect(await scan(page)).toEqual([]);
+    });
+  }
+
+  test('no accessibility violations in dark mode: comments, an opened explanation, search', async ({
+    page,
+  }) => {
+    await page.goto('/טעמים/נוסח-אשכנז/');
+    // An opened explanation (its content and its button are hidden until then).
+    await page.locator('.collapse-toggle-btn').first().click();
+    const loaded = page.waitForResponse((r) => r.url().includes('/api/comments/') && r.ok());
+    await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
+    await loaded;
+    await expect(page.getByText('טוען תגובות...')).toHaveCount(0);
+    expect(await scan(page)).toEqual([]);
+    await page.keyboard.press('Control+k');
+    await page.getByRole('searchbox').fill('שווא');
+    await page.getByRole('dialog').getByRole('link').first().waitFor();
+    expect(await scan(page)).toEqual([]);
+  });
+});

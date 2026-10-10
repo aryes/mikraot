@@ -37,6 +37,19 @@ test('collapsible explanations open and close', async ({ page }) => {
   await expect(panel).toBeHidden();
 });
 
+test('an explanation button changes its words and colours when open', async ({ page }) => {
+  await page.goto('/דגש-קל/');
+  const toggle = page.locator('.collapse-toggle-btn:has(.collapse-label)').first();
+  const label = toggle.locator('.collapse-label');
+  await expect(label).toHaveText('הראה פתרון');
+  await toggle.click();
+  await expect(label).toHaveText('החבא פתרון');
+  await page.mouse.move(0, 0); // off the button: hover has its own colours
+  await expect(toggle).toHaveCSS('color', 'rgb(255, 255, 255)');
+  await toggle.click();
+  await expect(label).toHaveText('הראה פתרון');
+});
+
 // The fictional comments in e2e/fixtures/comments.sql exist only in the local database.
 test(
   'approved comments load when the comments section scrolls into view',
