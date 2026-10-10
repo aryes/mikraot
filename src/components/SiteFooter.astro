@@ -33,13 +33,13 @@ import Pointed from './Pointed.astro';
         <h2 class="mb-3 border-b border-slate-700 pb-2 text-sm font-bold text-white">ניווט מהיר</h2>
         <ul class="space-y-2 text-xs">
           <li>
-            <a href="/" class="transition-colors hover:text-brand-strong">
+            <a href="/" class="transition-colors hover:text-brand">
               דף הבית
             </a>
           </li>
           {quickLinks.map((item) => (
             <li>
-              <a href={item.url} class="transition-colors hover:text-brand-strong">
+              <a href={item.url} class="transition-colors hover:text-brand">
                 <Pointed text={item.title} />
               </a>
             </li>
