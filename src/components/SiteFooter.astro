@@ -1,6 +1,7 @@
 ---
-import { ArrowUp, BookOpen } from 'lucide-react';
-import { menuTree, site } from '../lib/site';
+import { ArrowUp } from 'lucide-react';
+import YadMark from './YadMark.astro';
+import { menuTree, pointedTitle, site } from '../lib/site';
 
 // Top-level menu items that have a page (groups such as הגיה only open a dropdown in the header).
 const quickLinks = menuTree.filter(
@@ -14,10 +15,13 @@ import Pointed from './Pointed.astro';
     <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
       <div class="space-y-3 md:col-span-2">
         <div class="flex items-center gap-2 text-white">
-          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-strong font-bold text-white">
-            <BookOpen size={18} />
+          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-strong text-white">
+            <YadMark gap="#5b763e" class="h-7 w-7" />
           </div>
-          <span class="text-xl font-bold">{site.title}</span>
+          <span class="font-bible text-2xl">
+            <span aria-hidden="true">{pointedTitle}</span>
+            <span class="sr-only">{site.title}</span>
+          </span>
         </div>
         <p class="max-w-md text-sm leading-relaxed text-slate-400">
           אתר מוקדש ללימוד, שיפור והעמקת הקריאה בתנ״ך, כולל דיוקי הגיה, כללי דקדוק, טעמי המקרא

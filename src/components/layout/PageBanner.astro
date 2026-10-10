@@ -1,7 +1,8 @@
 ---
 /**
- * The photo banner at the top of every page, as on the live site: the page title over the
- * cottonbro photo, with the breadcrumb trail (or, on the front page, the site's tagline).
+ * The title area at the top of every page. Inner pages get a compact card (designed with Arye,
+ * 2026-10-09): the breadcrumb trail on top, then a small crop of the photo, around the yad's tip,
+ * beside the title. The front page keeps the live site's wide photo banner with the tagline.
  */
 import type { Crumb } from '../../lib/site';
 
@@ -18,51 +19,72 @@ import { Picture } from 'astro:assets';
 // The WordPress banner photo (also kept at its old URLs in public/wp-content/uploads/), resized
 // and converted to AVIF/WebP at build time; the banner shows only a strip of it.
 import banner from '../../assets/banner-cottonbro.jpg';
+// The same photo cropped around the yad's tip (aspect 1.9), shown 120 px wide.
+import bannerYad from '../../assets/banner-yad.jpg';
 import Pointed from '../Pointed.astro';
 ---
 
-<div class="relative isolate overflow-hidden bg-slate-700 print:bg-transparent">
-  <Picture
-    src={banner}
-    formats={['avif', 'webp']}
-    widths={[768, 1024, 1536, 2048]}
-    sizes="100vw"
-    alt=""
-    fetchpriority="high"
-    loading="eager"
-    class="banner-photo absolute inset-0 -z-10 h-full w-full object-cover print:hidden"
-  />
-  <div class="mx-auto flex min-h-40 max-w-7xl items-center px-4 py-8 sm:min-h-[250px] sm:px-6 lg:px-8 print:min-h-0 print:p-0">
-    <div class="w-full rounded-lg bg-slate-900/65 px-6 py-5 text-white print:bg-transparent print:p-0 print:text-black">
-      <h1 class="font-hebrew text-3xl leading-tight font-extrabold tracking-tight sm:text-4xl">
-        <Pointed text={title} />
-      </h1>
-      {subtitle && <p class="mt-2 text-lg text-slate-100 print:text-slate-700">{subtitle}</p>}
-      {crumbs && (
-        <nav aria-label="פירורי לחם" class="mt-3 text-sm text-slate-100 print:hidden">
-          <ol class="flex flex-wrap items-center gap-2">
-            <li>
-              <a href="/" class="underline-offset-2 hover:underline">
-                ראשי
-              </a>
-            </li>
-            {crumbs.map((crumb) => (
-              <li class="flex items-center gap-2">
-                <span aria-hidden="true">/</span>
-                <a href={crumb.url} class="underline-offset-2 hover:underline">
-                  <Pointed text={crumb.title} />
-                </a>
-              </li>
-            ))}
+{crumbs ? (
+  <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8 print:max-w-none print:p-0">
+    <div class="rounded-2xl border border-slate-200/80 bg-white px-4 py-3 shadow-xs sm:px-5 print:border-0 print:p-0 print:shadow-none">
+      <nav aria-label="פירורי לחם" class="mb-2 text-sm text-brand-strong print:hidden">
+        <ol class="flex flex-wrap items-center gap-2">
+          <li>
+            <a href="/" class="underline-offset-2 hover:underline">
+              ראשי
+            </a>
+          </li>
+          {crumbs.map((crumb) => (
             <li class="flex items-center gap-2">
               <span aria-hidden="true">/</span>
-              <span aria-current="page" class="font-semibold">
-                <Pointed text={title} />
-              </span>
+              <a href={crumb.url} class="underline-offset-2 hover:underline">
+                <Pointed text={crumb.title} />
+              </a>
             </li>
-          </ol>
-        </nav>
-      )}
+          ))}
+          <li class="flex items-center gap-2">
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" class="font-semibold text-brand-deep">
+              <Pointed text={title} />
+            </span>
+          </li>
+        </ol>
+      </nav>
+      <div class="flex items-center gap-4 sm:gap-5">
+        <Picture
+          src={bannerYad}
+          formats={['avif', 'webp']}
+          widths={[120, 240]}
+          sizes="120px"
+          alt=""
+          loading="eager"
+          class="banner-photo h-16 w-[120px] flex-none rounded-lg object-cover print:hidden"
+        />
+        <h1 class="font-bible text-[1.75rem] leading-tight font-bold text-brand-deep sm:text-3xl print:text-black">
+          <Pointed text={title} />
+        </h1>
+      </div>
     </div>
   </div>
-</div>
+) : (
+  <div class="relative isolate overflow-hidden bg-slate-700 print:bg-transparent">
+    <Picture
+      src={banner}
+      formats={['avif', 'webp']}
+      widths={[768, 1024, 1536, 2048]}
+      sizes="100vw"
+      alt=""
+      fetchpriority="high"
+      loading="eager"
+      class="banner-photo absolute inset-0 -z-10 h-full w-full object-cover print:hidden"
+    />
+    <div class="mx-auto flex min-h-40 max-w-7xl items-center px-4 py-8 sm:min-h-[250px] sm:px-6 lg:px-8 print:min-h-0 print:p-0">
+      <div class="w-full rounded-lg bg-slate-900/65 px-6 py-5 text-white print:bg-transparent print:p-0 print:text-black">
+        <h1 class="font-hebrew text-3xl leading-tight font-extrabold tracking-tight sm:text-4xl">
+          <Pointed text={title} />
+        </h1>
+        {subtitle && <p class="mt-2 text-lg text-slate-100 print:text-slate-700">{subtitle}</p>}
+      </div>
+    </div>
+  </div>
+)}

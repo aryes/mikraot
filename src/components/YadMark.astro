@@ -1,0 +1,70 @@
+---
+/**
+ * The site's mark: a yad (Torah pointer), the hand seen from above pointing at the text, drawn
+ * after the one in the banner photo (designed with Arye, 2026-10-09..11). It takes the text colour
+ * (currentColor); `gap` is the colour of the thin lines between the fingers and the handle's
+ * ornaments, normally the background it sits on (the brand green, #5b763e = --color-brand-strong;
+ * also in public/favicon.svg and the icon PNGs made from it).
+ */
+interface Props {
+  gap: string;
+  class?: string | undefined;
+}
+const { gap, class: className } = Astro.props;
+---
+
+<svg viewBox="10.7 -83.8 151.9 117.2" class={className} aria-hidden="true" focusable="false">
+  <g transform="rotate(-30 40 0)">
+    <path d="M84 -8 L160 -14 Q166 -14 166 -8 L166 8 Q166 14 160 14 L84 8 Z" fill="currentColor" />
+    <path d="M106 0 l4.5 -4.5 4.5 4.5 -4.5 4.5z" fill={gap} />
+    <circle cx="123" cy="0" r="1.8" fill={gap} />
+    <path d="M132 0 l4.5 -4.5 4.5 4.5 -4.5 4.5z" fill={gap} />
+    <circle cx="149" cy="0" r="1.8" fill={gap} />
+    <path
+      d="M65 11.5 L60.5 16 L56 11.5"
+      fill="none"
+      stroke={gap}
+      stroke-width="16"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M65 11.5 L60.5 16 L56 11.5"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="13.4"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path d="M70 12 L65 11.5" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" />
+    <rect x="72" y="-15" width="14" height="30" rx="4" fill="currentColor" />
+    <path
+      d="M74 -13 C62 -16 50 -15 45 -12.5 C42 -6 42 6 44 13 C50 16 62 16 74 13 Z"
+      fill="currentColor"
+    />
+    <path
+      d="M59.2 14.5 L60.5 15.8 L61.8 14.5"
+      fill="none"
+      stroke={gap}
+      stroke-width="1"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M42.8 -6.6 h8.5 M42.6 -0.6 h8.5"
+      stroke={gap}
+      stroke-width="1.3"
+      stroke-linecap="round"
+    />
+    <rect
+      x="22"
+      y="5.5"
+      width="28"
+      height="9"
+      rx="4.5"
+      fill="currentColor"
+      stroke={gap}
+      stroke-width="1.4"
+    />
+  </g>
+</svg>
