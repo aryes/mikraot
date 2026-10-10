@@ -10,6 +10,8 @@ const UPDATE_SUMMARY_WORDS = 30;
 
 /** Site title, tagline, copyright and front page (src/data/site.json). */
 export const site = siteSettings;
+/** The name as the logo writes it: pointed, with an etnachta under the alef (Arye, 2026-10-09). */
+export const pointedTitle = 'מִקְרָא֑וֹת';
 
 export const menuTree = buildMenuTree(menu satisfies MenuItem[]);
 
