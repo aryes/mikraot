@@ -6,8 +6,10 @@ import YadMark from './YadMark.astro';
 const current = decodeURI(Astro.url.pathname);
 const isActive = (url: string | null) => url !== null && url === current;
 const navLink = 'flex items-center gap-1 rounded-lg px-3 py-2 transition-colors';
-const activeLink = 'bg-white font-bold text-brand-strong shadow-xs';
-const idleLink = 'hover:bg-white/60 hover:text-brand-strong';
+const activeLink =
+  'bg-white dark:bg-slate-900 font-bold text-brand-strong dark:text-brand shadow-xs';
+const idleLink =
+  'hover:bg-white/60 dark:hover:bg-slate-900/60 hover:text-brand-strong dark:hover:text-brand';
 const hasChildren = (item: { children?: unknown[] | undefined }) =>
   item.children !== undefined && item.children.length > 0;
 // Menu groups without a page of their own are text, not links without an address (which
@@ -16,18 +18,18 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
 import Pointed from './Pointed.astro';
 ---
 
-<header class="print:hidden sticky top-0 z-50 border-b border-slate-200 bg-white shadow-xs">
+<header class="print:hidden sticky top-0 z-50 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs">
   <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
     <a href="/" class="group flex items-center gap-3 select-none">
       <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-strong text-white shadow-sm transition-transform group-hover:scale-105">
         <YadMark gap="#5b763e" class="h-9 w-9" />
       </div>
       <div>
-        <p class="font-bible text-[1.7rem] leading-none text-slate-800 transition-colors group-hover:text-brand-strong">
+        <p class="font-bible text-[1.7rem] leading-none text-slate-800 dark:text-slate-100 transition-colors group-hover:text-brand-strong dark:group-hover:text-brand">
           <span aria-hidden="true">{pointedTitle}</span>
           <span class="sr-only">{site.title}</span>
         </p>
-        <p class="mt-0.5 text-xs font-medium text-slate-500">{site.tagline}</p>
+        <p class="mt-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">{site.tagline}</p>
       </div>
     </a>
 
@@ -35,12 +37,12 @@ import Pointed from './Pointed.astro';
       <button
         type="button"
         data-open-search
-        class="flex cursor-pointer items-center gap-2 rounded-xl bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200/80"
+        class="flex cursor-pointer items-center gap-2 rounded-xl bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-200/80 dark:hover:bg-slate-700/80"
         aria-label="חיפוש באתר"
       >
         <Search size={15} />
         <span class="hidden sm:inline">חיפוש...</span>
-        <kbd class="hidden rounded border border-slate-300 bg-white px-1.5 py-0.5 text-[10px] text-slate-600 md:inline">
+        <kbd class="hidden rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-1.5 py-0.5 text-[10px] text-slate-600 dark:text-slate-300 md:inline">
           Ctrl+K
         </kbd>
       </button>
@@ -48,18 +50,18 @@ import Pointed from './Pointed.astro';
       <!-- Mobile menu: a native disclosure, so it works without JavaScript. -->
       <details class="md:hidden">
         <summary
-          class="list-none rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 [&::-webkit-details-marker]:hidden"
+          class="list-none rounded-lg p-2 text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 [&::-webkit-details-marker]:hidden"
           aria-label="תפריט"
         >
           <Menu size={22} />
         </summary>
         <nav
-          class="absolute inset-x-0 top-full max-h-[80vh] space-y-2 overflow-y-auto border-b border-slate-200 bg-white px-4 pt-2 pb-6 shadow-md"
+          class="absolute inset-x-0 top-full max-h-[80vh] space-y-2 overflow-y-auto border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 pt-2 pb-6 shadow-md"
           aria-label="תפריט"
         >
           <a
             href="/"
-            class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50"
+            class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800"
           >
             <Home size={16} /> ראשי
           </a>
@@ -70,14 +72,14 @@ import Pointed from './Pointed.astro';
                 <Item
                   href={item.url ?? undefined}
                   class:list={[
-                    'block rounded-lg px-3 py-2 text-sm font-bold text-slate-800',
-                    item.url && 'hover:bg-slate-50',
+                    'block rounded-lg px-3 py-2 text-sm font-bold text-slate-800 dark:text-slate-100',
+                    item.url && 'hover:bg-slate-50 dark:hover:bg-slate-800',
                   ]}
                 >
                   <Pointed text={item.title} />
                 </Item>
                 {hasChildren(item) && (
-                  <div class="mr-4 space-y-1 border-r-2 border-slate-200 pr-3">
+                  <div class="mr-4 space-y-1 border-r-2 border-slate-200 dark:border-slate-700 pr-3">
                     {item.children?.map((sub) => {
                       const Sub = linkOrText(sub.url);
                       return (
@@ -85,18 +87,19 @@ import Pointed from './Pointed.astro';
                           <Sub
                             href={sub.url ?? undefined}
                             class:list={[
-                              'block rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600',
-                              sub.url && 'hover:bg-slate-50 hover:text-brand-strong',
+                              'block rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300',
+                              sub.url &&
+                                'hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-strong dark:hover:text-brand',
                             ]}
                           >
                             <Pointed text={sub.title} />
                           </Sub>
                           {hasChildren(sub) && (
-                            <div class="mr-3 space-y-0.5 border-r border-slate-200 pr-2">
+                            <div class="mr-3 space-y-0.5 border-r border-slate-200 dark:border-slate-700 pr-2">
                               {sub.children?.map((subSub) => (
                                 <a
                                   href={subSub.url ?? undefined}
-                                  class="block px-2 py-1 text-[11px] text-slate-500 hover:text-brand-strong"
+                                  class="block px-2 py-1 text-[11px] text-slate-500 dark:text-slate-400 hover:text-brand-strong dark:hover:text-brand"
                                 >
                                   <Pointed text={subSub.title} />
                                 </a>
@@ -118,12 +121,12 @@ import Pointed from './Pointed.astro';
 
   <!-- Desktop menu: dropdowns open on hover and keyboard focus via CSS only. -->
   <nav
-    class="hidden border-t border-slate-200/60 bg-slate-50 md:block"
+    class="hidden border-t border-slate-200/60 dark:border-slate-700/60 bg-slate-50 dark:bg-slate-800 md:block"
     aria-label="ניווט ראשי"
     data-desktop-menu
   >
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <ul class="flex items-center gap-1 py-1 text-sm font-semibold text-slate-700">
+      <ul class="flex items-center gap-1 py-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
         <li>
           <a href="/" class:list={[navLink, isActive('/') ? activeLink : idleLink]}>
             <Home size={15} /> ראשי
@@ -162,12 +165,12 @@ import Pointed from './Pointed.astro';
               {hasChildren(item) && (
                 <div
                   id={panelId}
-                  class="invisible absolute top-full right-0 z-50 min-w-[220px] -translate-y-1 rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 peer-aria-expanded:visible peer-aria-expanded:translate-y-0 peer-aria-expanded:opacity-100 noscript:group-focus-within:visible noscript:group-focus-within:translate-y-0 noscript:group-focus-within:opacity-100"
+                  class="invisible absolute top-full right-0 z-50 min-w-[220px] -translate-y-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 py-2 opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 peer-aria-expanded:visible peer-aria-expanded:translate-y-0 peer-aria-expanded:opacity-100 noscript:group-focus-within:visible noscript:group-focus-within:translate-y-0 noscript:group-focus-within:opacity-100"
                 >
                   {item.children?.map((sub, subIndex) => {
                     const subPanelId = `${panelId}-${subIndex}`;
                     const subLink =
-                      'flex w-full items-center justify-between px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-strong';
+                      'flex w-full items-center justify-between px-4 py-2 text-right text-xs font-medium text-slate-700 dark:text-slate-200 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-strong dark:hover:text-brand';
                     return (
                       <div class="group/sub relative flex" data-menu-item>
                         {sub.url && (
@@ -186,7 +189,9 @@ import Pointed from './Pointed.astro';
                             aria-label={sub.url ? `תפריט: ${sub.title}` : undefined}
                             class:list={[
                               'peer/sub cursor-pointer',
-                              sub.url ? 'px-3 text-slate-400 hover:bg-slate-50' : subLink,
+                              sub.url
+                                ? 'px-3 text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                : subLink,
                             ]}
                           >
                             {!sub.url && (
@@ -200,12 +205,12 @@ import Pointed from './Pointed.astro';
                         {hasChildren(sub) && (
                           <div
                             id={subPanelId}
-                            class="absolute top-0 right-full mr-1 hidden min-w-[200px] rounded-xl border border-slate-200 bg-white py-2 shadow-lg group-hover/sub:block peer-aria-expanded/sub:block noscript:group-focus-within/sub:block"
+                            class="absolute top-0 right-full mr-1 hidden min-w-[200px] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 py-2 shadow-lg group-hover/sub:block peer-aria-expanded/sub:block noscript:group-focus-within/sub:block"
                           >
                             {sub.children?.map((subSub) => (
                               <a
                                 href={subSub.url ?? undefined}
-                                class="block w-full px-4 py-2 text-right text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-strong"
+                                class="block w-full px-4 py-2 text-right text-xs font-medium text-slate-700 dark:text-slate-200 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-strong dark:hover:text-brand"
                               >
                                 <Pointed text={subSub.title} />
                               </a>

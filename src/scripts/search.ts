@@ -40,7 +40,7 @@ function renderResults(list: HTMLElement, results: PagefindResult[], query: stri
   list.replaceChildren();
   if (results.length === 0) {
     const empty = document.createElement('li');
-    empty.className = 'px-4 py-6 text-center text-sm text-slate-500';
+    empty.className = 'px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-400';
     empty.textContent = query ? `לא נמצאו תוצאות עבור "${query}"` : '';
     list.append(empty);
     return;
@@ -50,12 +50,13 @@ function renderResults(list: HTMLElement, results: PagefindResult[], query: stri
     const link = document.createElement('a');
     link.href = result.url;
     link.className =
-      'block rounded-xl px-4 py-3 hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none';
+      'block rounded-xl px-4 py-3 hover:bg-emerald-50 dark:hover:bg-emerald-950 focus:bg-emerald-50 dark:focus:bg-emerald-950 focus:outline-none';
     const title = document.createElement('p');
-    title.className = 'font-bold text-slate-800';
+    title.className = 'font-bold text-slate-800 dark:text-slate-100';
     title.textContent = result.meta.title ?? result.url;
     const excerpt = document.createElement('p');
-    excerpt.className = 'mt-1 text-xs leading-relaxed text-slate-600 [&_mark]:bg-brand/25';
+    excerpt.className =
+      'mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-300 [&_mark]:bg-brand/25 [&_mark]:text-inherit';
     excerpt.innerHTML = result.excerpt; // Pagefind escapes content; only <mark> is added.
     link.append(title, excerpt);
     item.append(link);

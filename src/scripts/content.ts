@@ -53,11 +53,18 @@ function toggleCollapse(button: HTMLElement): void {
   if (!target) return;
   const open = !target.classList.toggle('hidden');
   button.setAttribute('aria-expanded', String(open));
-  button.classList.toggle('bg-brand-strong', open);
-  button.classList.toggle('text-white', open);
-  button.classList.toggle('border-brand', open);
-  button.classList.toggle('bg-slate-100', !open);
-  button.classList.toggle('text-slate-700', !open);
+  for (const name of ['bg-brand-strong', 'text-white', 'border-brand']) {
+    button.classList.toggle(name, open);
+  }
+  for (const name of [
+    'bg-slate-100',
+    'dark:bg-slate-800',
+    'text-slate-700',
+    'dark:text-slate-200',
+    'dark:border-slate-700',
+  ]) {
+    button.classList.toggle(name, !open);
+  }
   const label = button.querySelector<HTMLElement>('.collapse-label');
   if (label) {
     label.textContent = (open ? label.dataset['collapseText'] : label.dataset['expandText']) ?? '';
@@ -92,16 +99,17 @@ function playEmbeddedVideo(button: HTMLElement): void {
 function openVideo(id: string, title: string): void {
   const dialog = document.createElement('dialog');
   dialog.className =
-    'w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/70';
+    'w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-0 shadow-2xl backdrop:bg-slate-900/70';
   const header = document.createElement('div');
-  header.className = 'flex items-center justify-between border-b border-slate-100 p-4';
+  header.className =
+    'flex items-center justify-between border-b border-slate-100 dark:border-slate-800 p-4';
   const heading = document.createElement('h3');
-  heading.className = 'text-sm font-bold text-slate-800';
+  heading.className = 'text-sm font-bold text-slate-800 dark:text-slate-100';
   heading.textContent = title;
   const close = document.createElement('button');
   close.type = 'button';
   close.className =
-    'cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700';
+    'cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200';
   close.setAttribute('aria-label', 'סגירה');
   close.textContent = '✕';
   close.addEventListener('click', () => dialog.close());

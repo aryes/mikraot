@@ -23,7 +23,7 @@ const { poster, title } = await videoDetails(videoId);
 const name = title ? `הפעלת הסרטון: ${title}` : 'הפעלת הסרטון';
 ---
 
-<div class="print:hidden relative mx-auto my-6 aspect-video w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-md">
+<div class="print:hidden relative mx-auto my-6 aspect-video w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-black shadow-md">
   <Picture
     src={poster}
     inferSize

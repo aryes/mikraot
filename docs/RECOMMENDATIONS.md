@@ -49,7 +49,7 @@ Approved (to build):
 - **Banner and brand:** a smaller banner on inner pages, with the banner's design rethought; a
   real logo and palette. Claude prepares 2–3 options for each. Banner and logo done (2026-10-11);
   the palette and a display font remain.
-- **Dark mode.**
+- **Dark mode.** Done (2026-10-11).
 - **A daily outside check** (a backup that never ran, traffic near the free limit): the token
   gets KV read and is stored as a GitHub secret.
 - **Hebrew fixes contributed to Keystatic** (a public pull request), so the local patch can go.
@@ -137,8 +137,6 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
   button, then the latest posts; today it is a text page. Skipped for now (2026-10-09).
 - **M/M Brand:** a small palette from the brand green, one distinctive Hebrew display font for
   headings. Approved 2026-10-09 (the logo is done).
-- **L/M Dark mode** (following the system setting); check the teaching colours in both. Approved
-  2026-10-09.
 - **L/S** A one-page "how the marks look" reference (every טעם and vowel, enlarged; the rarest, like
   ירח בן יומו, render correctly in Taamey D). Doubles as a visual test. Needs: decision (a new
   public page).
@@ -326,4 +324,5 @@ Privacy-first, without cookies, so no consent banner:
   Q&A, are not offered in Hebrew).
 - 2026-10-11: the logo (a yad, drawn with Arye) in the header, footer and browser tab, with the
   name pointed (מִקְרָא֑וֹת); inner pages get a compact title card (breadcrumbs, a small crop of the
-  photo, the title) instead of the 250 px photo banner; the home page keeps it.
+  photo, the title) instead of the 250 px photo banner; the home page keeps it. Dark mode,
+  following the system setting (printing stays light), with every page checked for contrast in it.

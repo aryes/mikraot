@@ -139,8 +139,8 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
           id={`comment-${comment.id}`}
           className={`rounded-xl border p-4 transition-all sm:p-5 ${
             comment.is_admin_reply
-              ? `border-emerald-200/80 bg-emerald-50/50 ${comment.parent_id === null ? 'mr-4 sm:mr-8' : ''}`
-              : 'border-slate-200/80 bg-slate-50/80'
+              ? `border-emerald-200/80 bg-emerald-50/50 dark:border-emerald-900 dark:bg-emerald-950/40 ${comment.parent_id === null ? 'mr-4 sm:mr-8' : ''}`
+              : 'border-slate-200/80 bg-slate-50/80 dark:border-slate-700/80 dark:bg-slate-800/80'
           }`}
         >
           <div className="mb-2 flex items-center justify-between">
@@ -149,7 +149,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                 className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
                   comment.is_admin_reply
                     ? 'bg-brand-strong text-white'
-                    : 'bg-slate-200 text-slate-600'
+                    : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
                 }`}
               >
                 {comment.is_admin_reply ? (
@@ -158,22 +158,26 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                   <User className="h-3.5 w-3.5" />
                 )}
               </div>
-              <span className="text-sm font-bold text-slate-800">{comment.author_name}</span>
+              <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                {comment.author_name}
+              </span>
               {comment.is_admin_reply ? (
-                <span className="bg-brand/15 text-brand-deep rounded-full px-2 py-0.5 text-[11px] font-semibold">
+                <span className="bg-brand/15 text-brand-deep dark:text-brand-light rounded-full px-2 py-0.5 text-[11px] font-semibold">
                   מנהל האתר
                 </span>
               ) : null}
             </div>
-            <time className="text-xs text-slate-600">{formatDate(comment.created_at)}</time>
+            <time className="text-xs text-slate-600 dark:text-slate-300">
+              {formatDate(comment.created_at)}
+            </time>
           </div>
-          <p className="pr-9 text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
+          <p className="pr-9 text-sm leading-relaxed whitespace-pre-wrap text-slate-700 dark:text-slate-200">
             {comment.content}
           </p>
           <button
             type="button"
             onClick={() => startReply(comment)}
-            className="text-brand-strong hover:text-brand-deep mt-2 mr-9 inline-flex cursor-pointer items-center gap-1 text-xs font-semibold"
+            className="text-brand-strong dark:text-brand hover:text-brand-deep dark:hover:text-brand-light mt-2 mr-9 inline-flex cursor-pointer items-center gap-1 text-xs font-semibold"
             aria-label={`השיבו ל${comment.author_name}`}
           >
             <Reply className="h-3.5 w-3.5" />
@@ -182,7 +186,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
         </div>
         {replies.length > 0 && (
           <div
-            className={`mt-3 space-y-3 ${depth < 2 ? 'border-r-2 border-slate-200 pr-3 sm:pr-6' : ''}`}
+            className={`mt-3 space-y-3 ${depth < 2 ? 'border-r-2 border-slate-200 pr-3 sm:pr-6 dark:border-slate-700' : ''}`}
           >
             {replies.map((reply) => renderComment(reply, depth + 1))}
           </div>
@@ -192,11 +196,11 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
   };
 
   return (
-    <section className="mt-12 border-t border-slate-200 pt-8">
+    <section className="mt-12 border-t border-slate-200 pt-8 dark:border-slate-700">
       {/* Header */}
       <div className="mb-6 flex items-center gap-2">
-        <MessageSquare className="text-brand-strong h-5 w-5" />
-        <h2 className="font-hebrew text-xl font-bold text-slate-800">
+        <MessageSquare className="text-brand-strong dark:text-brand h-5 w-5" />
+        <h2 className="font-hebrew text-xl font-bold text-slate-800 dark:text-slate-100">
           תגובות ושאלות {comments.length > 0 && `(${comments.length})`}
         </h2>
       </div>
@@ -204,9 +208,9 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
       {/* Comment List */}
       <div className="mb-8 space-y-4">
         {loading ? (
-          <div className="py-4 text-sm text-slate-600">טוען תגובות...</div>
+          <div className="py-4 text-sm text-slate-600 dark:text-slate-300">טוען תגובות...</div>
         ) : comments.length === 0 ? (
-          <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-sm text-slate-600">
+          <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-sm text-slate-600 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-300">
             אין תגובות עדיין. היו הראשונים להגיב או לשאול שאלה!
           </div>
         ) : (
@@ -215,18 +219,20 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
       </div>
 
       {/* Add Comment Form */}
-      <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs sm:p-7">
-        <h3 className="font-hebrew mb-4 text-base font-bold text-slate-800">הוספת תגובה או שאלה</h3>
+      <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs sm:p-7 dark:border-slate-700/90 dark:bg-slate-900">
+        <h3 className="font-hebrew mb-4 text-base font-bold text-slate-800 dark:text-slate-100">
+          הוספת תגובה או שאלה
+        </h3>
 
         {submitted && (
-          <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
-            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
+            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
             <span>התגובה נוספה בהצלחה!</span>
           </div>
         )}
 
         {errorMessage && (
-          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
             {errorMessage}
           </div>
         )}
@@ -238,14 +244,14 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
           className="space-y-4"
         >
           {replyTo && (
-            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
               <span>
                 תגובה ל<strong>{replyTo.author_name}</strong>
               </span>
               <button
                 type="button"
                 onClick={() => setReplyTo(null)}
-                className="cursor-pointer rounded p-1 text-slate-500 hover:bg-slate-200"
+                className="cursor-pointer rounded p-1 text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700"
                 aria-label="ביטול התגובה לתגובה"
               >
                 <X className="h-4 w-4" />
@@ -263,9 +269,9 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
             <div>
               <label
                 htmlFor={`${fieldId}-name`}
-                className="mb-1 block text-xs font-semibold text-slate-600"
+                className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300"
               >
-                שם <span className="text-red-500">*</span>
+                שם <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <input
                 id={`${fieldId}-name`}
@@ -277,10 +283,13 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                 placeholder="השם שלכם"
                 aria-invalid={nameReserved}
                 aria-describedby={nameReserved ? `${fieldId}-name-reserved` : undefined}
-                className="focus:ring-brand-strong w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none"
+                className="focus:ring-brand-strong dark:focus:ring-brand w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none dark:border-slate-600"
               />
               {nameReserved && (
-                <p id={`${fieldId}-name-reserved`} className="mt-1 text-xs text-red-700">
+                <p
+                  id={`${fieldId}-name-reserved`}
+                  className="mt-1 text-xs text-red-700 dark:text-red-400"
+                >
                   השם הזה שמור למנהל האתר. אנא בחרו שם אחר.
                 </p>
               )}
@@ -289,9 +298,12 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
             <div>
               <label
                 htmlFor={`${fieldId}-email`}
-                className="mb-1 block text-xs font-semibold text-slate-600"
+                className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300"
               >
-                אימייל <span className="font-normal text-slate-500">(לא יוצג באתר)</span>
+                אימייל{' '}
+                <span className="font-normal text-slate-500 dark:text-slate-400">
+                  (לא יוצג באתר)
+                </span>
               </label>
               <input
                 id={`${fieldId}-email`}
@@ -300,7 +312,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                 value={authorEmail}
                 onChange={(e) => setAuthorEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="focus:ring-brand-strong w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none"
+                className="focus:ring-brand-strong dark:focus:ring-brand w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none dark:border-slate-600"
               />
             </div>
           </div>
@@ -308,9 +320,9 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
           <div>
             <label
               htmlFor={`${fieldId}-content`}
-              className="mb-1 block text-xs font-semibold text-slate-600"
+              className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300"
             >
-              תוכן התגובה <span className="text-red-500">*</span>
+              תוכן התגובה <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <textarea
               id={`${fieldId}-content`}
@@ -320,11 +332,11 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="כתבו את תגובתכם או שאלתכם כאן..."
-              className="focus:ring-brand-strong w-full resize-y rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none"
+              className="focus:ring-brand-strong dark:focus:ring-brand w-full resize-y rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none dark:border-slate-600"
             />
           </div>
 
-          <label className="flex items-center gap-2 text-xs text-slate-600">
+          <label className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
             <input
               type="checkbox"
               checked={remember}
@@ -335,7 +347,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
           </label>
 
           {authorEmail.trim() !== '' && (
-            <label className="flex items-center gap-2 text-xs text-slate-600">
+            <label className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
               <input
                 type="checkbox"
                 checked={notifyReplies}

@@ -10,9 +10,11 @@ const latest = (await getUpdates()).slice(0, 3);
 const months = archiveMonths(posts.map(({ entry }) => entry.data.date));
 const used = new Set(posts.flatMap(({ entry }) => entry.data.categories));
 const categories = site.categories.filter((c) => used.has(c.slug));
-const box = 'rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs';
-const heading = 'font-hebrew mb-3 text-lg font-bold text-slate-800';
-const link = 'text-brand-strong hover:text-brand-deep hover:underline';
+const box =
+  'rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900 p-5 shadow-xs';
+const heading = 'font-hebrew mb-3 text-lg font-bold text-slate-800 dark:text-slate-100';
+const link =
+  'text-brand-strong dark:text-brand hover:text-brand-deep dark:hover:text-brand-light hover:underline';
 ---
 
 <aside aria-label="סרגל צד" class="space-y-6 print:hidden">
@@ -26,7 +28,9 @@ const link = 'text-brand-strong hover:text-brand-deep hover:underline';
           <a href={update.url} class={link}>
             <Pointed text={update.title} />
           </a>
-          <span class="block text-xs text-slate-600">{formatDate(update.date)}</span>
+          <span class="block text-xs text-slate-600 dark:text-slate-300">
+            {formatDate(update.date)}
+          </span>
         </li>
       ))}
     </ul>
