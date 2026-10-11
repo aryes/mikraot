@@ -35,6 +35,7 @@ import { Search, X } from 'lucide-react';
   <ul data-search-results class="max-h-[60vh] overflow-y-auto p-2"></ul>
 </dialog>
 
-<!-- Pagefind loader: a plain file in public/ (see the comment there). -->
-<script is:inline src="/scripts/pagefind-loader.js"></script>
+<!-- Pagefind loader: a plain file in public/ (see the comment there). Deferred: it is used only
+     when the search opens, so it must not hold up the first paint. -->
+<script is:inline defer src="/scripts/pagefind-loader.js"></script>
 <script src="../scripts/search.ts"></script>
