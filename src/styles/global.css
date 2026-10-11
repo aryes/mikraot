@@ -2,10 +2,9 @@
 
 /* Dark mode follows the system setting, on screens only: printed pages stay black on white. */
 @custom-variant dark (@media screen and (prefers-color-scheme: dark));
-/* Theme fonts: `font-sans` (body text), `font-hebrew` (headings) and `font-logo` (the site
-   name in the logo), used as Tailwind utilities. Pointed Hebrew uses the surrounding font: one
-   font for text with and without marks. The fonts themselves are set up in astro.config.mjs (`fonts`)
-   and loaded by BaseLayout's <Font> tags. */
+/* Theme fonts: `font-sans` (all text, headings included, with or without marks: one font) and
+   `font-logo` (the site name in the logo), used as Tailwind utilities. The fonts themselves are
+   set up in astro.config.mjs (`fonts`) and loaded by BaseLayout's <Font> tags. */
 @theme {
   /* Brand green for accents; the darker shades meet WCAG AA contrast (4.5:1) for text and for
      white text on buttons. */
@@ -15,7 +14,6 @@
   /* Brand text and link hover on dark backgrounds (dark mode). */
   --color-brand-light: #a9cc84;
   --font-sans: var(--font-noto-sans);
-  --font-hebrew: var(--font-noto-serif);
   --font-logo: var(--font-taamey);
 }
 

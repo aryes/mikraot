@@ -33,7 +33,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
          also fetches Noto's small Latin Extended part, which local font files can't be told apart
          from (measured 2026-10-11: still the fastest option, Lighthouse 96-97). -->
     <Font cssVariable="--font-noto-sans" preload />
-    <Font cssVariable="--font-noto-serif" />
     <Font cssVariable="--font-taamey" preload />
     {description && <meta name="description" content={description} />}
     {noindex && <meta name="robots" content="noindex" />}

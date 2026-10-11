@@ -42,7 +42,6 @@
     "@astrojs/preact": "^6.0.6",
     "@astrojs/rss": "^4.0.19",
     "@fontsource-variable/noto-sans-hebrew": "^5.3.0",
-    "@fontsource-variable/noto-serif-hebrew": "^5.3.0",
     "@keystatic/astro": "^6.0.0",
     "@keystatic/core": "^0.6.9",
     "astro": "^7.3.5",

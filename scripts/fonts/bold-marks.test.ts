@@ -10,8 +10,8 @@ const recorded = readJson(
   z.record(z.string(), z.string()),
 );
 
-// Our bold-marks copies of Noto's Hebrew subset (scripts/fonts/bold-marks.py) must come from
-// the installed Fontsource packages: after an update (Renovate), rerun the script.
+// Our bold-marks copy of Noto Sans's Hebrew subset (scripts/fonts/bold-marks.py) must come from
+// the installed Fontsource package: after an update (Renovate), rerun the script.
 describe('Noto with bold marks', () => {
   it.each(Object.entries(recorded))('is built from the installed %s', (name, version) => {
     const installed = readJson(

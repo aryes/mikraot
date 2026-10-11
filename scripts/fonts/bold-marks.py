@@ -1,4 +1,4 @@
-"""Noto Sans/Serif Hebrew with heavier vowel and cantillation marks (Arye, 2026-10-11).
+"""Noto Sans Hebrew with heavier vowel and cantillation marks (Arye, 2026-10-11).
 
 The site uses one font for all Hebrew, with or without marks; Noto's marks were too faint
 next to the letters. This copies each mark glyph (GDEF mark class) from the weight-800 instance
@@ -6,9 +6,9 @@ of the variable font into its default outline and drops the mark's weight variat
 are bold at every text weight while the letters keep their full variable range. Mark positions
 (GPOS anchors) are untouched. Noto is OFL with no reserved font name, so a modified copy is fine.
 
-Input: the Hebrew subsets of the Fontsource packages in node_modules. Output, committed:
-src/assets/fonts/noto-bold-marks/ (the fonts, each package's OFL licence, the versions used).
-Rerun after updating those packages (a unit test compares the recorded versions):
+Input: the Hebrew subset of the Fontsource package in node_modules. Output, committed:
+src/assets/fonts/noto-bold-marks/ (the font, the package's OFL licence, the version used).
+Rerun after updating that package (a unit test compares the recorded versions):
 
     python -m venv .venv && .venv/Scripts/python -m pip install -r scripts/fonts/requirements.txt
     .venv/Scripts/python scripts/fonts/bold-marks.py
@@ -24,7 +24,7 @@ from fontTools.varLib.instancer import instantiateVariableFont
 MARK_WEIGHT = 800
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "src/assets/fonts/noto-bold-marks"
-FAMILIES = ["noto-sans-hebrew", "noto-serif-hebrew"]
+FAMILIES = ["noto-sans-hebrew"]
 
 
 def bold_marks(source: Path, target: Path) -> int:

@@ -11,7 +11,7 @@ const used = new Set(posts.flatMap(({ entry }) => entry.data.categories));
 const categories = site.categories.filter((c) => used.has(c.slug));
 const box =
   'rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900 p-5 shadow-xs';
-const heading = 'font-hebrew mb-3 text-lg font-bold text-slate-800 dark:text-slate-100';
+const heading = 'mb-3 text-lg font-bold text-slate-800 dark:text-slate-100';
 const link =
   'text-brand-strong dark:text-brand hover:text-brand-deep dark:hover:text-brand-light hover:underline';
 ---

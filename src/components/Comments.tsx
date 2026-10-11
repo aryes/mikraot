@@ -200,7 +200,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
       {/* Header */}
       <div className="mb-6 flex items-center gap-2">
         <MessageSquare className="text-brand-strong dark:text-brand h-5 w-5" />
-        <h2 className="font-hebrew text-xl font-bold text-slate-800 dark:text-slate-100">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
           תגובות ושאלות {comments.length > 0 && `(${comments.length})`}
         </h2>
       </div>
@@ -220,7 +220,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
 
       {/* Add Comment Form */}
       <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs sm:p-7 dark:border-slate-700/90 dark:bg-slate-900">
-        <h3 className="font-hebrew mb-4 text-base font-bold text-slate-800 dark:text-slate-100">
+        <h3 className="mb-4 text-base font-bold text-slate-800 dark:text-slate-100">
           הוספת תגובה או שאלה
         </h3>
 
