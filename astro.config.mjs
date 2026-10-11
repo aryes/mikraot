@@ -105,21 +105,14 @@ export default defineConfig({
   // fonts, but Fontsource's online copies were up to 70% larger (measured 2026-10-11).
   fonts: [
     {
-      // Body text, with or without marks: one font for all Hebrew, so pointed and plain words
-      // look alike side by side (Arye, 2026-10-11). Noto covers every niqqud and cantillation mark.
+      // All text, headings included, with or without marks: one font for all Hebrew, so pointed
+      // and plain words look alike side by side (Arye, 2026-10-11); headings differ by size and
+      // weight only. Noto covers every niqqud and cantillation mark.
       provider: fontProviders.local(),
       name: 'Noto Sans Hebrew',
       cssVariable: '--font-noto-sans',
       fallbacks: ['sans-serif'],
       options: { variants: notoSubsets('noto-sans-hebrew') },
-    },
-    {
-      // Headings (pointed words in them too).
-      provider: fontProviders.local(),
-      name: 'Noto Serif Hebrew',
-      cssVariable: '--font-noto-serif',
-      fallbacks: ['serif'],
-      options: { variants: notoSubsets('noto-serif-hebrew') },
     },
     {
       // The site name in the logo (header and footer), as designed. src/assets/fonts/taamey-d/

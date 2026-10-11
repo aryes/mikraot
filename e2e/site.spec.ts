@@ -223,7 +223,7 @@ test('fonts are self-hosted and load (no third-party font requests)', async ({ p
       .filter((face) => face.status === 'loaded' && !face.family.includes('fallback'))
       .map((face) => face.family.replace(/^"|"$/g, '').replace(/-[0-9a-f]+$/, '')),
   );
-  expect(new Set(loaded)).toEqual(new Set(['Noto Sans Hebrew', 'Noto Serif Hebrew', 'Taamey D']));
+  expect(new Set(loaded)).toEqual(new Set(['Noto Sans Hebrew', 'Taamey D']));
   expect(external).toEqual([]);
 });
 
