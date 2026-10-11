@@ -2,7 +2,7 @@
 
 ## Target architecture (decided 2026-09-30)
 
-- **Astro** static site: one HTML page per URL, preserving WordPress URLs; React only for interactive parts (audio, collapsibles, comments, quizzes).
+- **Astro** static site: one HTML page per URL, preserving WordPress URLs; React-style components (run on Preact) only for interactive parts (audio, collapsibles, comments, quizzes).
 - **One Cloudflare Worker** serves the static pages and `/api/*` (D1), replacing Bluehost hosting and the separate `mikraot-api` Worker. Same origin, so no CORS.
 - **Content in git** as Astro content collections, one file per page, with custom blocks (audio, collapsible, YouTube) instead of WordPress shortcodes. Unpublished items excluded at build time.
 - **Editing, both ways:** Arye in the browser via **Keystatic** (saves as git commits, needs GitHub); Claude edits the same files directly.

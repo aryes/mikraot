@@ -1,7 +1,7 @@
 // @ts-check
 import cloudflare from '@astrojs/cloudflare';
 import markdoc from '@astrojs/markdoc';
-import react from '@astrojs/react';
+import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, envField } from 'astro/config';
@@ -70,7 +70,12 @@ export default defineConfig({
     },
   },
   integrations: [
-    react(),
+    // The comment form is written against React's API but runs on Preact (compat): the same
+    // components for about 10 KB instead of React's 60 KB, which on short posts (comments in view
+    // at once) cost ~12 Lighthouse points. The Keystatic editor needs real React:
+    // astro.config.cms.mjs swaps it back. Type checks use React's types (tsconfig), so avoid
+    // React-19-only APIs that Preact lacks (CLAUDE.md).
+    preact({ compat: true }),
     markdoc(),
     // The author archive is noindex, as on the live site.
     // Not the author archive (noindex) or the unsubscribe page (for email links only).
@@ -84,5 +89,8 @@ export default defineConfig({
     // Vite inlines small files as data: URLs; fonts must stay files, since the CSP allows only
     // font-src 'self' (Noto's tiny Cyrillic/Greek subsets were being inlined).
     build: { assetsInlineLimit: (file) => (file.endsWith('.woff2') ? false : undefined) },
+    // The icons are React components. Bundled into the server render (here and in the prerender
+    // step) so that Preact's React alias applies; loaded from node_modules they'd use real React.
+    resolve: { noExternal: ['lucide-react'] },
   },
 });
