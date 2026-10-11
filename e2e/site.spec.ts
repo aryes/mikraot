@@ -556,7 +556,7 @@ test('home page outline: topic headings at level 2, drawn small as on WordPress'
     expect(level).toBe('H2');
   }
   const topic = headings.first();
-  await expect(topic).toHaveCSS('font-size', '17.6px'); // 1.1rem, the former h4 size
+  await expect(topic).toHaveCSS('font-size', '20.8px'); // 1.3rem: just above the lesson text (1.25rem)
   await expect(topic).toHaveCSS('border-bottom-width', '0px');
 });
 
