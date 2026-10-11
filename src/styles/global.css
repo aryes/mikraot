@@ -26,6 +26,8 @@
   /* Lesson text: large enough for vowel and cantillation marks to stay clear (Noto draws them
      small); a little smaller on phones, where wide tables are short of room. */
   --content-size: 1.125rem;
+  /* Table cells: tight on phones, where four columns share ~310 px. */
+  --cell-padding: 10px 6px;
   color-scheme: light dark;
   --page: #f3f7f5;
   --content-text: #1e293b;
@@ -50,6 +52,7 @@
 @media (min-width: 640px) {
   :root {
     --content-size: 1.25rem;
+    --cell-padding: 12px 16px;
   }
 }
 @media screen and (prefers-color-scheme: dark) {
@@ -80,6 +83,7 @@
     color-scheme: light;
     /* Printed worksheets keep their size: paper is read closer than a screen. */
     --content-size: 1.1rem;
+    --cell-padding: 12px 16px;
   }
 }
 
@@ -201,12 +205,12 @@
   color: #ffffff;
   font-weight: 700;
   font-size: calc(var(--content-size) * 0.9);
-  padding: 12px 16px;
+  padding: var(--cell-padding);
   text-align: center;
   border: 1px solid var(--table-head-border);
 }
 .wp-content-rendered td {
-  padding: 12px 16px;
+  padding: var(--cell-padding);
   border: 1px solid var(--table-border);
   text-align: center;
   color: var(--content-text);
