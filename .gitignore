@@ -19,3 +19,6 @@ playwright-report
 
 # Database exports and backups turned into SQL (npm run db:restore): commenters' emails
 .backups/
+
+# Python env for scripts/fonts/ (font builds)
+.venv/

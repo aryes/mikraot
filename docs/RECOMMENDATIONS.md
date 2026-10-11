@@ -138,7 +138,7 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
 - **M/M Brand:** a small palette from the brand green, one distinctive Hebrew display font for
   headings. Approved 2026-10-09 (the logo is done).
 - **L/S** A one-page "how the marks look" reference (every טעם and vowel, enlarged; the rarest, like
-  ירח בן יומו, render correctly in Taamey D). Doubles as a visual test. Needs: decision (a new
+  ירח בן יומו, render correctly in the site font). Doubles as a visual test. Needs: decision (a new
   public page).
 
 ## 2. Learning features
@@ -326,3 +326,5 @@ Privacy-first, without cookies, so no consent banner:
   name pointed (מִקְרָא֑וֹת); inner pages get a compact title card (breadcrumbs, a small crop of the
   photo, the title) instead of the 250 px photo banner; the home page keeps it. Dark mode,
   following the system setting (printing stays light), with every page checked for contrast in it.
+  One font for all Hebrew (Noto, with bold vowel and cantillation marks), instead of switching to
+  Taamey D for pointed words; faster pages (Lighthouse 95-97).
