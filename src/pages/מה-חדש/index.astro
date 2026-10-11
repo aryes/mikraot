@@ -1,6 +1,5 @@
 ---
 /** "What's new": every announced update and post, newest first (src/lib/updates.ts). */
-import Pointed from '../../components/Pointed.astro';
 import ContentLayout from '../../layouts/ContentLayout.astro';
 import { formatDate } from '../../lib/archive';
 import { getUpdates, site, WHATS_NEW_URL } from '../../lib/site';
@@ -20,7 +19,7 @@ const updates = await getUpdates();
         {updates.map((update) => (
           <li>
             <a href={update.url} class="latest-posts-title">
-              <Pointed text={update.title} />
+              {update.title}
             </a>
             <time datetime={update.date.toISOString()}>{formatDate(update.date)}</time>
             <div class="latest-posts-excerpt">{update.note}</div>

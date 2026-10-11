@@ -7,7 +7,6 @@ import { menuTree, pointedTitle, site } from '../lib/site';
 const quickLinks = menuTree.filter(
   (item): item is (typeof menuTree)[number] & { url: string } => item.url !== null,
 );
-import Pointed from './Pointed.astro';
 ---
 
 <footer class="print:hidden mt-20 border-t border-slate-800 bg-[#1E2C35] text-[#BBBBBB]">
@@ -40,7 +39,7 @@ import Pointed from './Pointed.astro';
           {quickLinks.map((item) => (
             <li>
               <a href={item.url} class="transition-colors hover:text-brand">
-                <Pointed text={item.title} />
+                {item.title}
               </a>
             </li>
           ))}
