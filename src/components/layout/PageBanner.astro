@@ -21,7 +21,6 @@ import { Picture } from 'astro:assets';
 import banner from '../../assets/banner-cottonbro.jpg';
 // The same photo cropped around the yad's tip (aspect 1.9), shown 120 px wide.
 import bannerYad from '../../assets/banner-yad.jpg';
-import Pointed from '../Pointed.astro';
 ---
 
 {crumbs ? (
@@ -41,14 +40,14 @@ import Pointed from '../Pointed.astro';
             <li class="flex items-center gap-2">
               <span aria-hidden="true">/</span>
               <a href={crumb.url} class="underline-offset-2 hover:underline">
-                <Pointed text={crumb.title} />
+                {crumb.title}
               </a>
             </li>
           ))}
           <li class="flex items-center gap-2">
             <span aria-hidden="true">/</span>
             <span aria-current="page" class="font-semibold text-brand-deep dark:text-brand-light">
-              <Pointed text={title} />
+              {title}
             </span>
           </li>
         </ol>
@@ -64,7 +63,7 @@ import Pointed from '../Pointed.astro';
           class="banner-photo h-16 w-[120px] flex-none rounded-lg object-cover print:hidden"
         />
         <h1 class="font-hebrew text-[1.75rem] leading-tight font-bold text-brand-deep dark:text-brand-light sm:text-3xl print:text-black">
-          <Pointed text={title} />
+          {title}
         </h1>
       </div>
     </div>
@@ -84,7 +83,7 @@ import Pointed from '../Pointed.astro';
     <div class="mx-auto flex min-h-40 max-w-7xl items-center px-4 py-8 sm:min-h-[250px] sm:px-6 lg:px-8 print:min-h-0 print:p-0">
       <div class="w-full rounded-lg bg-slate-900/65 px-6 py-5 text-white print:bg-transparent print:p-0 print:text-black">
         <h1 class="font-hebrew text-3xl leading-tight font-extrabold tracking-tight sm:text-4xl">
-          <Pointed text={title} />
+          {title}
         </h1>
         {subtitle && <p class="mt-2 text-lg text-slate-100 print:text-slate-700">{subtitle}</p>}
       </div>

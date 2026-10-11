@@ -2,7 +2,6 @@
 /** Under a post: previous/next post and related posts (same category), as on the WordPress site. */
 import { adjacentPosts, relatedPosts, type NavPost } from '../lib/post-nav';
 import { getPosts, type SitePage } from '../lib/site';
-import Pointed from './Pointed.astro';
 
 interface Props {
   page: SitePage;
@@ -37,7 +36,7 @@ const link =
       {related.map((post) => (
         <li>
           <a href={post.url} class={link}>
-            <Pointed text={post.title} />
+            {post.title}
           </a>
         </li>
       ))}
@@ -51,14 +50,14 @@ const link =
   >
     {previous ? (
       <a href={previous.url} rel="prev" class={link}>
-        → הפוסט הקודם: <Pointed text={previous.title} />
+        → הפוסט הקודם: {previous.title}
       </a>
     ) : (
       <span />
     )}
     {next && (
       <a href={next.url} rel="next" class={link}>
-        הפוסט הבא: <Pointed text={next.title} /> ←
+        הפוסט הבא: {next.title} ←
       </a>
     )}
   </nav>

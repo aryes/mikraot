@@ -15,7 +15,6 @@ const hasChildren = (item: { children?: unknown[] | undefined }) =>
 // Menu groups without a page of their own are text, not links without an address (which
 // crawlers and screen readers report as broken).
 const linkOrText = (url: string | null) => (url ? 'a' : 'span');
-import Pointed from './Pointed.astro';
 ---
 
 <header class="print:hidden sticky top-0 z-50 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs">
@@ -76,7 +75,7 @@ import Pointed from './Pointed.astro';
                     item.url && 'hover:bg-slate-50 dark:hover:bg-slate-800',
                   ]}
                 >
-                  <Pointed text={item.title} />
+                  {item.title}
                 </Item>
                 {hasChildren(item) && (
                   <div class="mr-4 space-y-1 border-r-2 border-slate-200 dark:border-slate-700 pr-3">
@@ -92,7 +91,7 @@ import Pointed from './Pointed.astro';
                                 'hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-strong dark:hover:text-brand',
                             ]}
                           >
-                            <Pointed text={sub.title} />
+                            {sub.title}
                           </Sub>
                           {hasChildren(sub) && (
                             <div class="mr-3 space-y-0.5 border-r border-slate-200 dark:border-slate-700 pr-2">
@@ -101,7 +100,7 @@ import Pointed from './Pointed.astro';
                                   href={subSub.url ?? undefined}
                                   class="block px-2 py-1 text-[11px] text-slate-500 dark:text-slate-400 hover:text-brand-strong dark:hover:text-brand"
                                 >
-                                  <Pointed text={subSub.title} />
+                                  {subSub.title}
                                 </a>
                               ))}
                             </div>
@@ -141,7 +140,7 @@ import Pointed from './Pointed.astro';
                   href={item.url}
                   class:list={[navLink, isActive(item.url) ? activeLink : idleLink]}
                 >
-                  <Pointed text={item.title} />
+                  {item.title}
                 </a>
               )}
               {hasChildren(item) && (
@@ -155,7 +154,7 @@ import Pointed from './Pointed.astro';
                   aria-label={item.url ? `תפריט: ${item.title}` : undefined}
                   class:list={['peer cursor-pointer', navLink, idleLink]}
                 >
-                  {!item.url && <Pointed text={item.title} />}
+                  {!item.url && item.title}
                   <ChevronDown
                     size={14}
                     className="text-slate-400 transition-transform group-hover:rotate-180 in-aria-expanded:rotate-180"
@@ -175,7 +174,7 @@ import Pointed from './Pointed.astro';
                       <div class="group/sub relative flex" data-menu-item>
                         {sub.url && (
                           <a href={sub.url} class={subLink}>
-                            <Pointed text={sub.title} />
+                            {sub.title}
                           </a>
                         )}
                         {hasChildren(sub) && (
@@ -194,11 +193,7 @@ import Pointed from './Pointed.astro';
                                 : subLink,
                             ]}
                           >
-                            {!sub.url && (
-                              <span>
-                                <Pointed text={sub.title} />
-                              </span>
-                            )}
+                            {!sub.url && <span>{sub.title}</span>}
                             <ChevronDown size={12} className="-rotate-90 text-slate-400" />
                           </button>
                         )}
@@ -212,7 +207,7 @@ import Pointed from './Pointed.astro';
                                 href={subSub.url ?? undefined}
                                 class="block w-full px-4 py-2 text-right text-xs font-medium text-slate-700 dark:text-slate-200 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-strong dark:hover:text-brand"
                               >
-                                <Pointed text={subSub.title} />
+                                {subSub.title}
                               </a>
                             ))}
                           </div>

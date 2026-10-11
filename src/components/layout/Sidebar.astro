@@ -3,7 +3,6 @@
 import { archiveMonths, categoryUrl } from '../../lib/archive';
 import { formatDate } from '../../lib/archive';
 import { getPosts, getUpdates, site, WHATS_NEW_URL } from '../../lib/site';
-import Pointed from '../Pointed.astro';
 
 const posts = await getPosts();
 const latest = (await getUpdates()).slice(0, 3);
@@ -26,7 +25,7 @@ const link =
       {latest.map((update) => (
         <li>
           <a href={update.url} class={link}>
-            <Pointed text={update.title} />
+            {update.title}
           </a>
           <span class="block text-xs text-slate-600 dark:text-slate-300">
             {formatDate(update.date)}

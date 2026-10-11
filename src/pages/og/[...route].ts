@@ -4,10 +4,9 @@
  * out right-to-left text; files at /og/<page path>.jpeg (src/lib/og.ts).
  *
  * The background is src/assets/og-background.jpg: the banner photo at 1200×630, 45% brightness.
- * Titles with vowel points or cantillation marks use the biblical-text font, as on the site.
+ * Noto Sans Hebrew, as on the site, for titles with and without marks.
  */
 import { OGImageRoute } from 'astro-og-canvas';
-import { pointedRanges } from '../../lib/pointed';
 import { getSitePages, site } from '../../lib/site';
 
 const FONTS = 'node_modules/@fontsource/noto-sans-hebrew/files/noto-sans-hebrew';
@@ -36,11 +35,10 @@ export const { getStaticPaths, GET } = await OGImageRoute({
       `./${FONTS}-hebrew-400-normal.woff2`,
       `./${FONTS}-hebrew-700-normal.woff2`,
       `./${FONTS}-latin-400-normal.woff2`,
-      './src/assets/fonts/taamey-d/Taamey_D.woff2',
     ],
     font: {
       title: {
-        families: pointedRanges(title).length > 0 ? ['Taamey D', NOTO] : [NOTO, 'Taamey D'],
+        families: [NOTO],
         size: 76,
         weight: 'Bold',
         lineHeight: 1.2,
