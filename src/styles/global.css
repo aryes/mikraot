@@ -2,21 +2,9 @@
 
 /* Dark mode follows the system setting, on screens only: printed pages stay black on white. */
 @custom-variant dark (@media screen and (prefers-color-scheme: dark));
-/* Self-hosted fonts (Hebrew + Latin subsets; browsers fetch only what a page uses). Noto Hebrew
-   covers every niqqud and cantillation mark (טעמים) in the content, with mark positioning;
-   fonts without them make the browser switch fonts inside words. */
-@import '@fontsource-variable/noto-sans-hebrew';
-@import '@fontsource-variable/noto-serif-hebrew';
-
-/* Lesson text: Taamey D, made for biblical text; its cantillation marks are much clearer than
-   Noto's (chosen 2026-10-03 from side-by-side comparisons). public/fonts/taamey-d/ */
-@font-face {
-  font-family: 'Taamey D';
-  src: url('/fonts/taamey-d/Taamey_D.woff2') format('woff2');
-  font-display: swap;
-}
-
-/* Theme fonts: `font-sans` (body text) and `font-hebrew` (headings), used as Tailwind utilities. */
+/* Theme fonts: `font-sans` (body text), `font-hebrew` (headings) and `font-bible` (pointed
+   text), used as Tailwind utilities. The fonts themselves are set up in astro.config.mjs (`fonts`)
+   and loaded by BaseLayout's <Font> tags. */
 @theme {
   /* Brand green for accents; the darker shades meet WCAG AA contrast (4.5:1) for text and for
      white text on buttons. */
@@ -25,9 +13,10 @@
   --color-brand-deep: #4d6434;
   /* Brand text and link hover on dark backgrounds (dark mode). */
   --color-brand-light: #a9cc84;
-  --font-sans: 'Noto Sans Hebrew Variable', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-hebrew: 'Noto Serif Hebrew Variable', serif;
-  --font-bible: 'Taamey D', 'Noto Serif Hebrew Variable', serif;
+  --font-sans: var(--font-noto-sans);
+  --font-hebrew: var(--font-noto-serif);
+  /* Marks or letters Taamey D lacks fall back to Noto, which has them all. */
+  --font-bible: var(--font-taamey), var(--font-noto-serif);
 }
 
 /* Colours of the page and the lesson content, light and dark. Components use Tailwind classes

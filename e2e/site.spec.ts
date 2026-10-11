@@ -216,11 +216,14 @@ test('fonts are self-hosted and load (no third-party font requests)', async ({ p
   });
   await page.goto('/שווא-נע/');
   await page.evaluate(() => document.fonts.ready);
-  const loaded = await page.evaluate(() => ({
-    body: document.fonts.check('16px "Noto Sans Hebrew Variable"', 'שווא'),
-    heading: document.fonts.check('16px "Noto Serif Hebrew Variable"', 'שווא'),
-  }));
-  expect(loaded).toEqual({ body: true, heading: true });
+  // Astro names each family with a hash ("Noto Sans Hebrew-79fd…"); its sized fallbacks end in
+  // "fallback: Arial" and load nothing. The page's own fonts must have loaded.
+  const loaded = await page.evaluate(() =>
+    [...document.fonts]
+      .filter((face) => face.status === 'loaded' && !face.family.includes('fallback'))
+      .map((face) => face.family.replace(/^"|"$/g, '').replace(/-[0-9a-f]+$/, '')),
+  );
+  expect(new Set(loaded)).toEqual(new Set(['Noto Sans Hebrew', 'Noto Serif Hebrew', 'Taamey D']));
   expect(external).toEqual([]);
 });
 

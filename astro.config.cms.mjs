@@ -8,7 +8,8 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import site from './astro.config.mjs';
 
-/** @type {import('astro').AstroUserConfig} */
+// The site's own config type, which carries its font providers' types.
+/** @type {typeof site} */
 const config = {
   ...site,
   // Keystatic's API calls have no trailing slash; the site's own URLs are unaffected.

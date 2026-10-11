@@ -36,7 +36,7 @@ export const { getStaticPaths, GET } = await OGImageRoute({
       `./${FONTS}-hebrew-400-normal.woff2`,
       `./${FONTS}-hebrew-700-normal.woff2`,
       `./${FONTS}-latin-400-normal.woff2`,
-      './public/fonts/taamey-d/Taamey_D.woff2',
+      './src/assets/fonts/taamey-d/Taamey_D.woff2',
     ],
     font: {
       title: {

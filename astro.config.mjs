@@ -4,7 +4,34 @@ import markdoc from '@astrojs/markdoc';
 import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig, envField } from 'astro/config';
+import { defineConfig, envField, fontProviders } from 'astro/config';
+
+/**
+ * The self-hosted Noto variable fonts (Fontsource packages), as Astro font variants: the Hebrew,
+ * Latin and Latin Extended subsets, each with its unicode range, so browsers fetch only the
+ * subsets a page uses (as Fontsource's own CSS did). The ranges are Fontsource's.
+ */
+const notoSubsets = (/** @type {string} */ name) => {
+  const variant = (/** @type {string} */ subset, /** @type {string} */ range) => ({
+    src: /** @type {[string]} */ ([
+      `@fontsource-variable/${name}/files/${name}-${subset}-wght-normal.woff2`,
+    ]),
+    weight: /** @type {const} */ ('100 900'),
+    style: /** @type {const} */ ('normal'),
+    unicodeRange: /** @type {[string]} */ ([range]),
+  });
+  return /** @type {[ReturnType<typeof variant>, ...ReturnType<typeof variant>[]]} */ ([
+    variant('hebrew', 'U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F'),
+    variant(
+      'latin',
+      'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD',
+    ),
+    variant(
+      'latin-ext',
+      'U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF',
+    ),
+  ]);
+};
 
 /** Cloudflare's always-pass Turnstile test site key. */
 const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
@@ -69,6 +96,41 @@ export default defineConfig({
       }),
     },
   },
+  // Fonts through Astro's font support: it writes the @font-face rules, preloads the main font and
+  // gives each family a fallback sized to its metrics (Lighthouse measured a layout shift of 0.1
+  // on the home page from the swap). The package files, not fontProviders.fontsource(): the same
+  // fonts, but Fontsource's online copies were up to 70% larger (measured 2026-10-11).
+  fonts: [
+    {
+      // Body text. Noto Hebrew covers every niqqud and cantillation mark (טעמים) in the content.
+      provider: fontProviders.local(),
+      name: 'Noto Sans Hebrew',
+      cssVariable: '--font-noto-sans',
+      fallbacks: ['sans-serif'],
+      options: { variants: notoSubsets('noto-sans-hebrew') },
+    },
+    {
+      // Headings.
+      provider: fontProviders.local(),
+      name: 'Noto Serif Hebrew',
+      cssVariable: '--font-noto-serif',
+      fallbacks: ['serif'],
+      options: { variants: notoSubsets('noto-serif-hebrew') },
+    },
+    {
+      // Pointed (biblical) text and the site name: Taamey D, whose marks are much clearer than
+      // Noto's (chosen 2026-10-03). src/assets/fonts/taamey-d/
+      provider: fontProviders.local(),
+      name: 'Taamey D',
+      cssVariable: '--font-taamey',
+      fallbacks: ['serif'],
+      options: {
+        variants: [
+          { src: ['./src/assets/fonts/taamey-d/Taamey_D.woff2'], weight: '400', style: 'normal' },
+        ],
+      },
+    },
+  ],
   integrations: [
     // The comment form is written against React's API but runs on Preact (compat): the same
     // components for about 10 KB instead of React's 60 KB, which on short posts (comments in view
