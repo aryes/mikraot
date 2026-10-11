@@ -2,8 +2,9 @@
 
 /* Dark mode follows the system setting, on screens only: printed pages stay black on white. */
 @custom-variant dark (@media screen and (prefers-color-scheme: dark));
-/* Theme fonts: `font-sans` (body text), `font-hebrew` (headings) and `font-bible` (pointed
-   text), used as Tailwind utilities. The fonts themselves are set up in astro.config.mjs (`fonts`)
+/* Theme fonts: `font-sans` (body text), `font-hebrew` (headings) and `font-logo` (the site
+   name in the logo), used as Tailwind utilities. Pointed Hebrew uses the surrounding font: one
+   font for text with and without marks. The fonts themselves are set up in astro.config.mjs (`fonts`)
    and loaded by BaseLayout's <Font> tags. */
 @theme {
   /* Brand green for accents; the darker shades meet WCAG AA contrast (4.5:1) for text and for
@@ -15,8 +16,7 @@
   --color-brand-light: #a9cc84;
   --font-sans: var(--font-noto-sans);
   --font-hebrew: var(--font-noto-serif);
-  /* Marks or letters Taamey D lacks fall back to Noto, which has them all. */
-  --font-bible: var(--font-taamey), var(--font-noto-serif);
+  --font-logo: var(--font-taamey);
 }
 
 /* Colours of the page and the lesson content, light and dark. Components use Tailwind classes
@@ -71,17 +71,6 @@
   :root {
     color-scheme: light;
   }
-}
-
-/* Pointed (vocalised) Hebrew, i.e. the biblical text, in the biblical-text font; plain
-   explanatory text stays in the interface font. Marked at build time (src/lib/pointed.ts). */
-.pointed {
-  font-family: var(--font-bible);
-  font-size: 1.15em;
-}
-.wp-content-rendered .pointed {
-  font-size: 1.25em;
-  line-height: 1.7;
 }
 
 /* Custom Scrollbar */

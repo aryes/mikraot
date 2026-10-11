@@ -9,12 +9,15 @@ import { defineConfig, envField, fontProviders } from 'astro/config';
 /**
  * The self-hosted Noto variable fonts (Fontsource packages), as Astro font variants: the Hebrew,
  * Latin and Latin Extended subsets, each with its unicode range, so browsers fetch only the
- * subsets a page uses (as Fontsource's own CSS did). The ranges are Fontsource's.
+ * subsets a page uses (as Fontsource's own CSS did). The ranges are Fontsource's. The Hebrew subset
+ * is our copy with bold vowel and cantillation marks (scripts/fonts/bold-marks.py).
  */
 const notoSubsets = (/** @type {string} */ name) => {
   const variant = (/** @type {string} */ subset, /** @type {string} */ range) => ({
     src: /** @type {[string]} */ ([
-      `@fontsource-variable/${name}/files/${name}-${subset}-wght-normal.woff2`,
+      subset === 'hebrew'
+        ? `./src/assets/fonts/noto-bold-marks/${name}-hebrew-wght-normal.woff2`
+        : `@fontsource-variable/${name}/files/${name}-${subset}-wght-normal.woff2`,
     ]),
     weight: /** @type {const} */ ('100 900'),
     style: /** @type {const} */ ('normal'),
@@ -102,7 +105,8 @@ export default defineConfig({
   // fonts, but Fontsource's online copies were up to 70% larger (measured 2026-10-11).
   fonts: [
     {
-      // Body text. Noto Hebrew covers every niqqud and cantillation mark (טעמים) in the content.
+      // Body text, with or without marks: one font for all Hebrew, so pointed and plain words
+      // look alike side by side (Arye, 2026-10-11). Noto covers every niqqud and cantillation mark.
       provider: fontProviders.local(),
       name: 'Noto Sans Hebrew',
       cssVariable: '--font-noto-sans',
@@ -110,7 +114,7 @@ export default defineConfig({
       options: { variants: notoSubsets('noto-sans-hebrew') },
     },
     {
-      // Headings.
+      // Headings (pointed words in them too).
       provider: fontProviders.local(),
       name: 'Noto Serif Hebrew',
       cssVariable: '--font-noto-serif',
@@ -118,8 +122,7 @@ export default defineConfig({
       options: { variants: notoSubsets('noto-serif-hebrew') },
     },
     {
-      // Pointed (biblical) text and the site name: Taamey D, whose marks are much clearer than
-      // Noto's (chosen 2026-10-03). src/assets/fonts/taamey-d/
+      // The site name in the logo (header and footer), as designed. src/assets/fonts/taamey-d/
       provider: fontProviders.local(),
       name: 'Taamey D',
       cssVariable: '--font-taamey',

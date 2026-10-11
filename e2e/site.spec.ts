@@ -244,20 +244,17 @@ async function renderedFonts(page: Page, path: string, selector: string): Promis
   return [...new Set(perNode.flat().map((font) => font.familyName))];
 }
 
-/** Families other than the site's own fonts (Noto Hebrew for the interface, Taamey D for lessons). */
-const notNoto = (families: string[]) =>
-  families.filter((f) => !f.startsWith('Noto ') && f !== 'Taamey D');
+/** Families other than Noto Hebrew, the one font for all text (Taamey D is only the logo's). */
+const notNoto = (families: string[]) => families.filter((f) => !f.startsWith('Noto '));
 
-test('text with cantillation marks renders in the site fonts only (no system fallback)', async ({
+test('text with cantillation marks renders in the site font only (no other or system font)', async ({
   page,
   browserName,
 }) => {
   test.skip(browserName !== 'chromium', 'uses the Chrome DevTools protocol');
   // The rarest marks in the content (קרני פרה, ירח בן יומו…) are on this page.
   const content = '.wp-content-rendered p, .wp-content-rendered li, h1';
-  const lesson = await renderedFonts(page, '/טעמים-נדירים/', content);
-  expect(lesson).toContain('Taamey D');
-  expect(notNoto(lesson)).toEqual([]);
+  expect(notNoto(await renderedFonts(page, '/טעמים-נדירים/', content))).toEqual([]);
   // A post title with niqqud and a טעם, in an archive list.
   expect(notNoto(await renderedFonts(page, '/2021/08/', '.latest-posts a'))).toEqual([]);
 });
