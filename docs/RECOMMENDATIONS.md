@@ -326,5 +326,5 @@ Privacy-first, without cookies, so no consent banner:
   name pointed (מִקְרָא֑וֹת); inner pages get a compact title card (breadcrumbs, a small crop of the
   photo, the title) instead of the 250 px photo banner; the home page keeps it. Dark mode,
   following the system setting (printing stays light), with every page checked for contrast in it.
-  One font for all Hebrew (Noto, with bold, larger vowel and cantillation marks), instead of switching to
+  One font for all Hebrew (Noto, with bold vowel and cantillation marks), instead of switching to
   Taamey D for pointed words; faster pages (Lighthouse 95-97).
