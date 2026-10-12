@@ -2,14 +2,18 @@
  * The Worker's entry point: Astro's request handler, plus the daily database backup
  * (wrangler.jsonc `triggers.crons`). Server errors and a failed backup email the owner
  * (src/server/alerts.ts). Mail apps' one-click unsubscribe is answered here, before Astro
- * (src/server/one-click-unsubscribe.ts).
+ * (src/server/one-click-unsubscribe.ts). Sentry records the errors with their details
+ * (src/server/sentry.ts).
  */
 import { handle } from '@astrojs/cloudflare/handler';
+import * as Sentry from '@sentry/cloudflare';
+import { PUBLIC_SENTRY_DSN } from 'astro:env/client';
 import { env } from 'cloudflare:workers';
 import { alertOwner, type AlertKind } from './server/alerts';
 import { backupDatabase } from './server/backup';
 import { unsubscribeReplies } from './server/comments';
 import { oneClickUnsubscribeToken } from './server/one-click-unsubscribe';
+import { sentryOptions } from './lib/sentry';
 
 interface Context {
   waitUntil(promise: Promise<unknown>): void;
@@ -28,7 +32,7 @@ const alert = (context: Context, kind: AlertKind, detail: string) => {
   );
 };
 
-export default {
+export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
   async fetch(...args: Parameters<typeof handle>) {
     const [request, , context] = args;
     const where = `${request.method} ${new URL(request.url).pathname}`;
@@ -40,7 +44,12 @@ export default {
         return new Response('Unsubscribed', { headers: { 'Cache-Control': 'no-store' } });
       }
       const response = await handle(...args);
-      if (response.status >= 500) alert(context, 'request', `${where}: ${response.status}`);
+      if (response.status >= 500) {
+        // Astro answers an error thrown in a page or API route with a 500 (logging it), so the
+        // error itself never reaches Sentry's wrapper: record which request failed.
+        Sentry.captureMessage(`${where}: ${response.status}`, 'error');
+        alert(context, 'request', `${where}: ${response.status}`);
+      }
       return response;
     } catch (error) {
       // Thrown before Astro could answer: still reported, then left to Workers (a 500).
@@ -57,4 +66,4 @@ export default {
       throw error;
     }
   },
-};
+});

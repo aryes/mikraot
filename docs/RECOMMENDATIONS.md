@@ -237,7 +237,7 @@ security.txt, required checks before any merge, dependency updates with tests.
   yesterday's backup key exists, and the Worker's requests through Cloudflare's analytics API (the
   existing token can read them since 2026-10-05), failing, which emails Arye, when requests near the
   free plan's 100,000 a day. Static pages don't count toward that limit (Cloudflare serves them
-  free); the API (comments, searches counted, error reports), the comments feed and every address
+  free); the API (comments, searches counted), the comments feed and every address
   with no page (404s, including bots probing old WordPress paths) do, so a bot wave is the likely
   way to reach it. Approved 2026-10-09 (the token gets KV read and goes into GitHub secrets).
 - **M/S Faster automatic checks:** a run takes about 4 minutes, and Lighthouse sets the pace (about

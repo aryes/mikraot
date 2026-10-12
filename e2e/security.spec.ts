@@ -103,41 +103,30 @@ test('the comments API refuses junk: unknown pages, bots, oversized bodies, no h
   expect(response.headers()['x-content-type-options']).toBe('nosniff');
 });
 
+test("other websites can't make their visitors' browsers post reports", async ({ request }) => {
+  // Astro's origin check; a JSON post would need a CORS preflight, which the API doesn't allow.
+  const response = await request.post('/api/search-misses/', {
+    headers: { origin: 'https://other.example', 'content-type': 'text/plain' },
+    data: JSON.stringify({ query: 'x' }),
+  });
+  expect(response.status()).toBe(403);
+});
+
+// Local only: the deployed site does report (and this would send it a probe).
 test(
-  'browser errors reach the Worker log endpoint, which refuses junk',
+  'error tracking (Sentry) sends nothing outside the deployed site',
   LOCAL_ONLY,
-  async ({ page, request }) => {
-    await page.goto('/');
-    const reports: unknown[] = [];
-    page.on('request', (sent) => {
-      if (sent.url().endsWith('/api/client-errors/')) reports.push(sent.postDataJSON());
+  async ({ page }) => {
+    const sent: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().includes('sentry.io')) sent.push(request.url());
     });
-    const delivered = page.waitForResponse((r) => r.url().endsWith('/api/client-errors/'));
+    await page.goto('/');
     await page.evaluate(() => {
-      // Not from the site's scripts (like an extension's): ignored.
-      void Promise.reject(new Error('foreign'));
-      // As if thrown by one of the site's scripts.
       const filename = `${location.origin}/_astro/probe.js`;
       dispatchEvent(new ErrorEvent('error', { message: 'e2e probe', filename, lineno: 1 }));
     });
-    expect((await delivered).status()).toBe(204);
-    expect(reports).toEqual([
-      expect.objectContaining({ kind: 'error', message: 'e2e probe', page: '/' }),
-    ]);
-
-    const post = (data: unknown) => request.post('/api/client-errors/', { data });
-    expect((await post({ kind: 'other', message: 'x' })).status()).toBe(400);
-    // Other websites can't make their visitors' browsers send reports (Astro's origin check;
-    // a JSON post would need a CORS preflight, which the API doesn't allow).
-    const crossSite = await Promise.all(
-      ['/api/client-errors/', '/api/search-misses/'].map((endpoint) =>
-        request.post(endpoint, {
-          headers: { origin: 'https://other.example', 'content-type': 'text/plain' },
-          data: JSON.stringify({ kind: 'error', message: 'x', query: 'x' }),
-        }),
-      ),
-    );
-    expect(crossSite.map((response) => response.status())).toEqual([403, 403]);
-    expect((await post({ kind: 'error', message: 'x'.repeat(5000) })).status()).toBe(413);
+    await page.waitForTimeout(3000); // past the idle moment when Sentry would load
+    expect(sent).toEqual([]);
   },
 );
