@@ -1,5 +1,6 @@
 ---
 import { ArrowUp } from 'lucide-react';
+import { NewsletterSignup } from './NewsletterSignup';
 import YadMark from './YadMark.astro';
 import { archiveMonths, categoryUrl } from '../lib/archive';
 import { getPosts, getSitePages, menuTree, pointedTitle, site, WHATS_NEW_URL } from '../lib/site';
@@ -46,6 +47,9 @@ const footerLink = 'inline-block py-1 transition-colors hover:text-brand';
           אתר מוקדש ללימוד, שיפור והעמקת הקריאה בתנ״ך, כולל דיוקי הגיה, כללי דקדוק, טעמי המקרא
           וקריאות מוקלטות בנוסחים השונים.
         </p>
+        <div class="max-w-md pt-4">
+          <NewsletterSignup client:visible headingClass={footerHeading} />
+        </div>
       </div>
 
       <nav aria-labelledby="footer-nav">

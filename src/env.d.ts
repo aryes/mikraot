@@ -14,6 +14,12 @@ declare module 'cloudflare:workers' {
     TURNSTILE_SECRET_KEY?: string;
     /** Brevo API key for comment notices (wrangler secret); without it nothing is sent. */
     BREVO_API_KEY?: string;
+    /** Shared with Brevo's newsletter webhook (wrangler secret; src/pages/api/newsletter-webhook.ts). */
+    NEWSLETTER_WEBHOOK_SECRET?: string;
+    /** Per-visitor limit on newsletter sign-ups (src/pages/api/newsletter.ts). */
+    NEWSLETTER_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
+    /** Per-address limit on newsletter sign-ups (the same file). */
+    NEWSLETTER_EMAIL_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
     /** Per-visitor limit on posting comments (wrangler.jsonc `ratelimits`). */
     COMMENT_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
     /** At most one owner alert a minute per kind (src/server/alerts.ts). */
@@ -46,6 +52,8 @@ interface Window {
       container: HTMLElement,
       options: {
         sitekey: string;
+        theme: 'auto' | 'dark';
+        appearance: 'always' | 'interaction-only';
         callback: (token: string) => void;
         'expired-callback': () => void;
         'error-callback': () => void;

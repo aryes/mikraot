@@ -1,0 +1,19 @@
+---
+/**
+ * Where the link in Brevo's confirmation email leads, once the address has joined the newsletter
+ * list (src/server/newsletter.ts). Static: Brevo has already done the work.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="ההרשמה אושרה – מקראות" noindex>
+  <div class="mx-auto max-w-3xl px-4 py-20 text-center">
+    <h1 class="mb-3 text-3xl font-bold text-slate-800 dark:text-slate-100">ההרשמה אושרה, תודה!</h1>
+    <p class="mb-6 text-slate-600 dark:text-slate-300">
+      מעכשיו נשלח אליכם אימייל קצר כשמתווסף משהו חדש באתר. בכל אימייל יש קישור לביטול ההרשמה.
+    </p>
+    <a href="/" class="text-brand-strong dark:text-brand underline">
+      חזרה לדף הבית
+    </a>
+  </div>
+</BaseLayout>
