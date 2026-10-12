@@ -75,6 +75,9 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
    `.github/workflows/deployed.yml` becomes `https://mikraot.net` (workers.dev goes away).
    After the go/no-go approval it is reviewed and pushed directly to `main`; its deploy
    (Workers Builds) **is** the switch.
+   Right after that deploy, point the Brevo newsletter webhook at
+   `https://mikraot.net/api/newsletter-webhook/` (`PUT /v3/webhooks/<id>`): it is on the
+   workers.dev address, which the switch turns off, so confirmations would get no welcome email.
 2. www is not routed: WordPress keeps redirecting it to mikraot.net during the fallback period.
 3. WordPress admin is **not** reachable during the fallback period (its scripts, styles and API
    live under paths the new site now serves). It's only needed after a rollback, and content is
@@ -93,6 +96,9 @@ Success means all of these:
 - [ ] The URL parity checks from step 1 pass against `https://mikraot.net`, plus
       `npm run check:links -- https://mikraot.net` and `npm run test:deployed -- https://mikraot.net`.
 - [ ] A real test comment posts, appears, and is hidden again (approval for the D1 change).
+- [ ] A real test sign-up from the footer: confirmation email, `/newsletter/confirmed/`, welcome
+      email and Arye's notice (`docs/OPERATIONS.md`, Newsletter). The form can't be tried before:
+      the human check's key works only on mikraot.net.
 - [ ] Response headers (CSP, HSTS…) present; no console errors or CSP blocks on a few pages.
 - [ ] Web Analytics receives visits; Search Console: submit `/sitemap-index.xml`.
 - [ ] A Cloudflare rate limiting rule (the free plan has one, counted per IP over 10 seconds, action
@@ -121,7 +127,8 @@ header or CSP problem breaking pages.
    is still gone after that deploy.
 
 Comments posted on the new site in between stay in D1 and are not shown by WordPress; they
-reappear when switching forward again.
+reappear when switching forward again. Point the Brevo newsletter webhook back at the workers.dev
+address once it is on again, or people who confirm after the rollback get no welcome email.
 
 ## 5. After a few stable weeks
 
