@@ -33,14 +33,14 @@ import bannerYad from '../../assets/banner-yad.jpg';
       >
         <ol class="flex flex-wrap items-center gap-2">
           <li>
-            <a href="/" class="underline-offset-2 hover:underline">
+            <a href="/" class="inline-block py-1 underline-offset-2 hover:underline">
               ראשי
             </a>
           </li>
           {crumbs.map((crumb) => (
             <li class="flex items-center gap-2">
               <span aria-hidden="true">/</span>
-              <a href={crumb.url} class="underline-offset-2 hover:underline">
+              <a href={crumb.url} class="inline-block py-1 underline-offset-2 hover:underline">
                 {crumb.title}
               </a>
             </li>
