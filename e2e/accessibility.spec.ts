@@ -48,6 +48,11 @@ test('no accessibility violations with comments loaded', async ({ page }) => {
   await loaded;
   await expect(page.getByText('טוען תגובות...')).toHaveCount(0);
   expect(await scan(page)).toEqual([]);
+  // The form, opened and sent empty, with its messages for the missing fields.
+  await page.getByRole('button', { name: 'כתבו תגובה או שאלה' }).click();
+  await page.getByRole('button', { name: 'פרסום תגובה' }).click();
+  await expect(page.getByText('נא לכתוב שם.')).toBeVisible();
+  expect(await scan(page)).toEqual([]);
 });
 
 test('no accessibility violations with the search dialog open', async ({ page }) => {
