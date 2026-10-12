@@ -53,7 +53,7 @@ A mistyped id is caught when the site is built.
 ## Tell readers what's new
 
 In the page's settings, under **הודעות על תוכן חדש בעמוד**, add a line (date and one sentence).
-It appears in "מה חדש" in the sidebar and on its page, and will go to newsletter subscribers once
+It appears on the "מה חדש" page (linked under the front page's latest posts and in the footer), and will go to newsletter subscribers once
 the newsletter is set up. New posts are announced automatically.
 
 ## Headings
