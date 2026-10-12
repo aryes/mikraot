@@ -1,0 +1,144 @@
+/**
+ * Newsletter sign-up through Brevo (the list, the emails and unsubscribing are Brevo's). Our own
+ * form instead of Brevo's: Brevo's form editor has no right-to-left support, and its embed code
+ * needs inline styles that the site's CSP blocks (decided with Arye, 2026-10-12).
+ *
+ * 1. The footer form posts here; Brevo's double opt-in API sends the confirmation email
+ *    (template CONFIRM_TEMPLATE_ID, made through the API) and adds the address to the list only
+ *    once its link is clicked: https://developers.brevo.com/reference/create-doi-contact
+ * 2. Brevo then calls our webhook (event listAddition, src/pages/api/newsletter-webhook.ts),
+ *    which sends the welcome email and tells the owner.
+ */
+import { escapeHtml, OWNER_EMAIL, sendEmail, type BrevoEmail } from './notify';
+
+const BREVO_DOI_URL = 'https://api.brevo.com/v3/contacts/doubleOptinConfirmation';
+/** Brevo list "ניוזלטר מקראות". */
+export const NEWSLETTER_LIST_ID = 4;
+/** Brevo template "מקראות – אישור הרשמה (עברית)" (a double opt-in template: tag "optin"). */
+export const CONFIRM_TEMPLATE_ID = 5;
+/** Where the confirmation link leads (src/pages/newsletter/confirmed.astro). */
+export const CONFIRMED_PATH = '/newsletter/confirmed/';
+export const MAX_BODY_BYTES = 4_000;
+const SENDER = { name: 'מקראות', email: OWNER_EMAIL };
+
+/** Addresses the live site refused too (WordPress' Email Subscribers setting): sign-up spam. */
+const BLOCKED_DOMAINS = ['mail.ru'];
+
+export interface Signup {
+  email: string;
+  /** Optional; stored in Brevo as FIRSTNAME. */
+  name: string;
+}
+
+const text = (body: unknown, key: string) => {
+  const value = body && typeof body === 'object' ? Reflect.get(body, key) : undefined;
+  return typeof value === 'string' ? value.trim() : '';
+};
+
+export function parseSignup(body: unknown): Signup | { error: string } {
+  const email = text(body, 'email').toLowerCase();
+  const name = text(body, 'name');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+    return { error: 'Invalid email' };
+  }
+  if (name.length > 100) return { error: 'Name too long' };
+  return { email, name };
+}
+
+export const isBlocked = (email: string) => {
+  const domain = email.slice(email.lastIndexOf('@') + 1);
+  return BLOCKED_DOMAINS.some((blocked) => domain === blocked || domain.endsWith(`.${blocked}`));
+};
+
+/**
+ * Asks Brevo to send the confirmation email. Brevo refusing an address (4xx: one it won't accept,
+ * or perhaps one already on the list) is logged and reported as 'refused', so the visitor sees the
+ * same answer as for any sign-up and the form can't tell who subscribed. Throws if Brevo is down.
+ */
+export async function requestConfirmation(
+  apiKey: string,
+  signup: Signup,
+  origin: string,
+  fetchFn: typeof fetch = fetch,
+): Promise<'sent' | 'refused'> {
+  const res = await fetchFn(BREVO_DOI_URL, {
+    method: 'POST',
+    headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
+    body: JSON.stringify({
+      email: signup.email,
+      ...(signup.name && { attributes: { FIRSTNAME: signup.name } }),
+      includeListIds: [NEWSLETTER_LIST_ID],
+      templateId: CONFIRM_TEMPLATE_ID,
+      redirectionUrl: new URL(CONFIRMED_PATH, origin).href,
+    }),
+  });
+  if (res.ok) return 'sent';
+  const detail = `Brevo double opt-in failed: ${res.status} ${await res.text()}`;
+  if (res.status >= 500) throw new Error(detail);
+  console.error(detail);
+  return 'refused';
+}
+
+/**
+ * The addresses a Brevo webhook call reports as added to the newsletter list (one event, or a
+ * batch of them). https://developers.brevo.com/docs/marketing-webhooks
+ */
+export function addedToList(body: unknown): string[] {
+  const events = Array.isArray(body) ? body : [body];
+  return events.flatMap((event: unknown) => {
+    if (!event || typeof event !== 'object') return [];
+    const lists: unknown = Reflect.get(event, 'list_id');
+    const ids = (Array.isArray(lists) ? lists : [lists]).map(Number);
+    const email = text(event, 'email').toLowerCase();
+    return text(event, 'event') === 'list_addition' && ids.includes(NEWSLETTER_LIST_ID) && email
+      ? [email]
+      : [];
+  });
+}
+
+export function welcomeEmail(to: string, siteUrl: string): BrevoEmail {
+  const link = escapeHtml(siteUrl);
+  return {
+    sender: SENDER,
+    to: [{ email: to }],
+    subject: 'ברוכים הבאים לעדכונים של מקראות',
+    textContent: `ההרשמה אושרה, תודה!\n\nמעכשיו נשלח אליכם אימייל קצר כשמתווסף משהו חדש באתר: שיעורים, קריאות מוקלטות ועדכונים. בכל אימייל יש קישור לביטול ההרשמה.\n\n${siteUrl}`,
+    htmlContent: `<div dir="rtl" style="font-family: Arial, Helvetica, sans-serif; line-height: 1.7; text-align: right">
+<p style="font-size: 20px; font-weight: bold; color: #3e5a24">ההרשמה אושרה, תודה!</p>
+<p>מעכשיו נשלח אליכם אימייל קצר כשמתווסף משהו חדש באתר: שיעורים, קריאות מוקלטות ועדכונים. בכל אימייל יש קישור לביטול ההרשמה.</p>
+<p><a href="${link}" style="color: #5b763e">למקראות</a></p>
+</div>`,
+  };
+}
+
+export function subscriberNotice(subscriber: string): BrevoEmail {
+  return {
+    sender: SENDER,
+    to: [{ email: OWNER_EMAIL }],
+    subject: 'הרשמה חדשה לעדכונים של מקראות',
+    textContent: `הרשמה חדשה לעדכונים: ${subscriber}`,
+    htmlContent: `<div dir="rtl" style="font-family: sans-serif"><p>הרשמה חדשה לעדכונים: ${escapeHtml(subscriber)}</p></div>`,
+  };
+}
+
+/** The welcome email and the owner's notice for one new subscriber. */
+export async function welcome(
+  apiKey: string,
+  subscriber: string,
+  siteUrl: string,
+  fetchFn: typeof fetch = fetch,
+): Promise<void> {
+  await sendEmail(apiKey, welcomeEmail(subscriber, siteUrl), fetchFn);
+  await sendEmail(apiKey, subscriberNotice(subscriber), fetchFn);
+}
+
+const digest = async (value: string) =>
+  new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value)));
+
+/** Compares secrets without leaking, through timing, how much of a guess was right. */
+export async function sameSecret(given: string, expected: string): Promise<boolean> {
+  const [a, b] = await Promise.all([digest(given), digest(expected)]);
+  let difference = 0;
+  for (let i = 0; i < a.length; i++) difference |= (a[i] ?? 0) ^ (b[i] ?? 0);
+  return difference === 0 && expected !== '';
+}

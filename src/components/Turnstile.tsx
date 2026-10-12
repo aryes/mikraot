@@ -32,13 +32,22 @@ interface TurnstileProps {
   onToken: (token: string) => void;
   /** Called when the check can't run (its script didn't load, or Cloudflare reports an error). */
   onError?: (() => void) | undefined;
+  /** 'dark' on a dark background (the footer); by default it follows the visitor's system. */
+  theme?: 'auto' | 'dark' | undefined;
+  /** 'interaction-only': shown only if Cloudflare needs the visitor to click (it usually doesn't). */
+  appearance?: 'always' | 'interaction-only' | undefined;
 }
 
 /**
  * Cloudflare Turnstile "are you human?" check. Usually passes without any action from the visitor.
  * A token works once: remount the widget (change its React `key`) after each use.
  */
-export const Turnstile: React.FC<TurnstileProps> = ({ onToken, onError }) => {
+export const Turnstile: React.FC<TurnstileProps> = ({
+  onToken,
+  onError,
+  theme = 'auto',
+  appearance = 'always',
+}) => {
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,6 +58,8 @@ export const Turnstile: React.FC<TurnstileProps> = ({ onToken, onError }) => {
         if (!active || !container.current || !window.turnstile) return;
         widgetId = window.turnstile.render(container.current, {
           sitekey: SITE_KEY,
+          theme,
+          appearance,
           callback: (token) => onToken(token),
           'expired-callback': () => onToken(''),
           'error-callback': () => {
@@ -65,7 +76,7 @@ export const Turnstile: React.FC<TurnstileProps> = ({ onToken, onError }) => {
       active = false;
       if (widgetId !== undefined) window.turnstile?.remove(widgetId);
     };
-  }, [onToken, onError]);
+  }, [onToken, onError, theme, appearance]);
 
-  return <div ref={container} className="min-h-[65px]" />;
+  return <div ref={container} className={appearance === 'always' ? 'min-h-[65px]' : ''} />;
 };
