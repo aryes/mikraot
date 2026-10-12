@@ -1,11 +1,11 @@
 ---
 /**
  * Pages with content: the title area (PageBanner: a title card on inner pages, the photo on the
- * front page, whose title and tagline open the content card), then the content card beside the
- * sidebar (below it on narrow screens).
+ * front page, whose title and tagline open the content card), then the content in one centred
+ * column, narrow enough for comfortable lines (no sidebar since 2026-10-12: its archive and
+ * category links are in the footer, "מה חדש" is linked under the front page's latest posts).
  */
 import PageBanner from '../components/layout/PageBanner.astro';
-import Sidebar from '../components/layout/Sidebar.astro';
 import { authorUrl } from '../lib/archive';
 import { site, type Crumb } from '../lib/site';
 import { jsonLd, structuredData } from '../lib/structured-data';
@@ -51,7 +51,7 @@ const structured = structuredData(
 <BaseLayout title={documentTitle} description={description} ogImage={ogImage} noindex={noindex}>
   <script slot="head" type="application/ld+json" set:html={jsonLd(structured)} />
   <PageBanner title={title} crumbs={crumbs} />
-  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:px-8 print:block print:max-w-none print:p-0 print:pt-4">
+  <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 print:max-w-none print:p-0 print:pt-4">
     <div class="min-w-0 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900 p-6 shadow-xs sm:p-10 print:border-0 print:p-0 print:shadow-none">
       {crumbs === undefined && (
         <header class="mb-6 border-b-2 border-[#8cb65f22] pb-4">
@@ -71,6 +71,5 @@ const structured = structuredData(
         {site.title}: <bdi dir="ltr">{decodeURI(absolute(Astro.url.pathname))}</bdi>
       </p>
     </div>
-    <Sidebar />
   </div>
 </BaseLayout>

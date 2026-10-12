@@ -1,18 +1,26 @@
 ---
 import { ArrowUp } from 'lucide-react';
 import YadMark from './YadMark.astro';
-import { menuTree, pointedTitle, site } from '../lib/site';
+import { archiveMonths, categoryUrl } from '../lib/archive';
+import { getPosts, menuTree, pointedTitle, site, WHATS_NEW_URL } from '../lib/site';
 
 // Top-level menu items that have a page (groups such as הגיה only open a dropdown in the header).
 const quickLinks = menuTree.filter(
   (item): item is (typeof menuTree)[number] & { url: string } => item.url !== null,
 );
+// The post archives (by month) and categories, as in the live site's sidebar.
+const posts = await getPosts();
+const months = archiveMonths(posts.map(({ entry }) => entry.data.date));
+const used = new Set(posts.flatMap(({ entry }) => entry.data.categories));
+const categories = site.categories.filter((c) => used.has(c.slug));
+const footerHeading = 'mb-3 border-b border-slate-700 pb-2 text-sm font-bold text-white';
+const footerLink = 'transition-colors hover:text-brand';
 ---
 
 <footer class="print:hidden mt-20 border-t border-slate-800 bg-[#1E2C35] text-[#BBBBBB]">
   <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
-      <div class="space-y-3 md:col-span-2">
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-3 md:grid-cols-5">
+      <div class="space-y-3 sm:col-span-3 md:col-span-2">
         <div class="flex items-center gap-2 text-white">
           <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-strong text-white">
             <YadMark gap="#5b763e" class="h-7 w-7" />
@@ -28,37 +36,73 @@ const quickLinks = menuTree.filter(
         </p>
       </div>
 
-      <div>
-        <h2 class="mb-3 border-b border-slate-700 pb-2 text-sm font-bold text-white">ניווט מהיר</h2>
-        <ul class="space-y-2 text-xs">
+      <nav aria-labelledby="footer-nav">
+        <h2 id="footer-nav" class={footerHeading}>
+          ניווט מהיר
+        </h2>
+        <ul class="space-y-2 text-sm">
           <li>
-            <a href="/" class="transition-colors hover:text-brand">
+            <a href="/" class={footerLink}>
               דף הבית
             </a>
           </li>
           {quickLinks.map((item) => (
             <li>
-              <a href={item.url} class="transition-colors hover:text-brand">
+              <a href={item.url} class={footerLink}>
                 {item.title}
               </a>
             </li>
           ))}
+          <li>
+            <a href={WHATS_NEW_URL} class={footerLink}>
+              מה חדש
+            </a>
+          </li>
         </ul>
-      </div>
-
-      <div class="flex flex-col items-start justify-between md:items-end">
-        <a
-          href="#top"
-          class="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-slate-700"
-        >
-          <ArrowUp size={14} /> לראש העמוד
-        </a>
-      </div>
+      </nav>
+      {months.length > 0 && (
+        <nav aria-labelledby="footer-archives">
+          <h2 id="footer-archives" class={footerHeading}>
+            ארכיון
+          </h2>
+          <ul class="space-y-2 text-sm">
+            {months.map((m) => (
+              <li>
+                <a href={m.url} class={footerLink}>
+                  {m.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
+      {categories.length > 0 && (
+        <nav aria-labelledby="footer-categories">
+          <h2 id="footer-categories" class={footerHeading}>
+            קטגוריות
+          </h2>
+          <ul class="space-y-2 text-sm">
+            {categories.map((c) => (
+              <li>
+                <a href={categoryUrl(c.slug)} class={footerLink}>
+                  {c.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
     </div>
 
     <div class="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-800/80 pt-6 text-xs text-slate-400 sm:flex-row">
       <p>{site.copyright}</p>
       <p>לימוד מקראות וטעמי המקרא</p>
+      <a
+        href="#top"
+        class="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-slate-700"
+      >
+        <ArrowUp size={14} /> לראש העמוד
+      </a>
     </div>
   </div>
 </footer>

@@ -36,14 +36,16 @@ test('a post links to its author, category and month archives, each listing it',
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
 });
 
-test('the sidebar lists the archive months and categories', async ({ page }) => {
+test('the footer lists the archive months and categories', async ({ page }) => {
   await page.goto('/about/');
-  const sidebar = page.getByRole('complementary', { name: 'סרגל צד' });
-  await sidebar.getByRole('link', { name: 'אוגוסט 2021' }).click();
+  await page
+    .getByRole('navigation', { name: 'ארכיון' })
+    .getByRole('link', { name: 'אוגוסט 2021' })
+    .click();
   await expect(page).toHaveURL(/\/2021\/08\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('חודש: אוגוסט 2021');
   await page
-    .getByRole('complementary', { name: 'סרגל צד' })
+    .getByRole('navigation', { name: 'קטגוריות' })
     .getByRole('link', { name: 'חדשות האתר' })
     .click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('קטגוריה: חדשות האתר');
@@ -94,14 +96,12 @@ test('comments keep their WordPress anchors', LOCAL_ONLY, async ({ page }) => {
   await expect(page.locator('[id^="comment-"]').first()).toBeVisible({ timeout: 15_000 });
 });
 
-test('"מה חדש" lists announcements: in the sidebar, on its page and in its feed', async ({
+test('"מה חדש" lists announcements: linked from the front page, on its page and in its feed', async ({
   page,
   request,
 }) => {
-  await page.goto('/about/');
-  const sidebar = page.getByRole('complementary', { name: 'סרגל צד' });
-  await expect(sidebar.locator(`a[href="${POST}"]`)).toBeVisible(); // the post is announced
-  await sidebar.getByRole('link', { name: 'לכל העדכונים' }).click();
+  await page.goto('/');
+  await page.getByRole('link', { name: 'לכל העדכונים' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('מה חדש');
   await expect(postLink(page)).toBeVisible();
 
