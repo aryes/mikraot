@@ -1,7 +1,8 @@
 ---
 /**
- * Pages with content: the photo banner with the title, then the content card beside the sidebar
- * (below it on narrow screens).
+ * Pages with content: the title area (PageBanner: a title card on inner pages, the photo on the
+ * front page, whose title and tagline open the content card), then the content card beside the
+ * sidebar (below it on narrow screens).
  */
 import PageBanner from '../components/layout/PageBanner.astro';
 import Sidebar from '../components/layout/Sidebar.astro';
@@ -15,8 +16,9 @@ interface Props {
   documentTitle: string;
   description?: string | undefined;
   ogImage?: string | undefined;
-  /** The page heading, shown in the banner. */
+  /** The page heading (the h1). */
   title: string;
+  /** The front page's tagline, under its title. */
   subtitle?: string | undefined;
   crumbs?: Crumb[] | undefined;
   noindex?: boolean | undefined;
@@ -48,9 +50,21 @@ const structured = structuredData(
 
 <BaseLayout title={documentTitle} description={description} ogImage={ogImage} noindex={noindex}>
   <script slot="head" type="application/ld+json" set:html={jsonLd(structured)} />
-  <PageBanner title={title} subtitle={subtitle} crumbs={crumbs} />
+  <PageBanner title={title} crumbs={crumbs} />
   <div class="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:px-8 print:block print:max-w-none print:p-0 print:pt-4">
     <div class="min-w-0 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900 p-6 shadow-xs sm:p-10 print:border-0 print:p-0 print:shadow-none">
+      {crumbs === undefined && (
+        <header class="mb-6">
+          <h1 class="text-[2.75rem] leading-none font-black tracking-tight text-brand-deep dark:text-brand-light sm:text-[3.75rem] print:text-black">
+            {title}
+          </h1>
+          {subtitle && (
+            <p class="mt-2 text-lg text-slate-600 dark:text-slate-300 sm:text-[1.3rem] print:text-slate-700">
+              {subtitle}
+            </p>
+          )}
+        </header>
+      )}
       <slot />
       <!-- Printed copies say where they come from. -->
       <p class="mt-8 hidden border-t border-slate-300 pt-2 text-xs print:block">

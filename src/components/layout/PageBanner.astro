@@ -2,19 +2,18 @@
 /**
  * The title area at the top of every page. Inner pages get a compact card (designed with Arye,
  * 2026-10-09): the breadcrumb trail on top, then a small crop of the photo, around the yad's tip,
- * beside the title. The front page keeps the live site's wide photo banner with the tagline.
+ * beside the title. The front page keeps the live site's wide photo, now without the shaded box
+ * over it; its title and tagline open the content card instead (ContentLayout.astro).
  */
 import type { Crumb } from '../../lib/site';
 
 interface Props {
   title: string;
-  /** Under the title instead of a breadcrumb trail (the front page). */
-  subtitle?: string | undefined;
   /** Pages above this one; the trail starts at the home page and ends with the title. */
   crumbs?: Crumb[] | undefined;
 }
 
-const { title, subtitle, crumbs } = Astro.props;
+const { title, crumbs } = Astro.props;
 import { Picture } from 'astro:assets';
 // The WordPress banner photo (also kept at its old URLs in public/wp-content/uploads/), resized
 // and converted to AVIF/WebP at build time; the banner shows only a strip of it.
@@ -80,11 +79,6 @@ import bannerYad from '../../assets/banner-yad.jpg';
       loading="eager"
       class="banner-photo absolute inset-0 -z-10 h-full w-full object-cover print:hidden"
     />
-    <div class="mx-auto flex min-h-40 max-w-7xl items-center px-4 py-8 sm:min-h-[250px] sm:px-6 lg:px-8 print:min-h-0 print:p-0">
-      <div class="w-full rounded-lg bg-slate-900/65 px-6 py-5 text-white print:bg-transparent print:p-0 print:text-black">
-        <h1 class="text-3xl leading-tight font-extrabold tracking-tight sm:text-4xl">{title}</h1>
-        {subtitle && <p class="mt-2 text-lg text-slate-100 print:text-slate-700">{subtitle}</p>}
-      </div>
-    </div>
+    <div class="min-h-40 sm:min-h-[250px] print:hidden"></div>
   </div>
 )}
