@@ -155,7 +155,10 @@ export default config({
       schema: {
         title: fields.text({ label: 'שם האתר' }),
         tagline: fields.text({ label: 'תיאור קצר' }),
-        copyright: fields.text({ label: 'זכויות יוצרים' }),
+        copyright: fields.text({
+          label: 'זכויות יוצרים',
+          description: 'השם בשורה התחתונה, אחרי © והשנים',
+        }),
         frontPage: fields.relationship({ label: 'עמוד הבית', collection: 'pages' }),
         author: fields.object(
           {

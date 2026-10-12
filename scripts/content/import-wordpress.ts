@@ -146,7 +146,7 @@ writeFileSync(
     {
       title: typeset(data.site.title),
       tagline: typeset(data.site.tagline),
-      copyright: '© מקראות, קריאה בתורה – הגיה דקדוק וטעמים.',
+      copyright: 'מקראות',
       frontPage: fileSlug(frontPage),
       // The site has one author; posts show this byline and link to the author's archive.
       author: frontPage.author,

@@ -2,7 +2,7 @@
 import { ArrowUp } from 'lucide-react';
 import YadMark from './YadMark.astro';
 import { archiveMonths, categoryUrl } from '../lib/archive';
-import { getPosts, menuTree, pointedTitle, site, WHATS_NEW_URL } from '../lib/site';
+import { getPosts, getSitePages, menuTree, pointedTitle, site, WHATS_NEW_URL } from '../lib/site';
 
 // Top-level menu items that have a page (groups such as הגיה only open a dropdown in the header).
 const quickLinks = menuTree.filter(
@@ -13,6 +13,17 @@ const posts = await getPosts();
 const months = archiveMonths(posts.map(({ entry }) => entry.data.date));
 const used = new Set(posts.flatMap(({ entry }) => entry.data.categories));
 const categories = site.categories.filter((c) => used.has(c.slug));
+// The bottom line, as sites usually have it (2026-10-12): © with the years the site has existed,
+// and the legal and about pages. No second slogan: the tagline is the header's.
+const thisYear = new Date().getFullYear(); // the build's year: updated by the next deploy
+// The first post's year (the site went up with it); just this year if there are none.
+const firstYear = Math.min(thisYear, ...posts.map(({ entry }) => entry.data.date.getFullYear()));
+const years = firstYear < thisYear ? `${firstYear}–${thisYear}` : String(thisYear);
+const pageUrl = new Map((await getSitePages()).map(({ entry, url }) => [entry.id, url]));
+const legalLinks = [
+  { title: 'מדיניות הפרטיות', url: pageUrl.get('privacy-policy') },
+  { title: 'אודות', url: pageUrl.get('about') },
+].filter((link): link is { title: string; url: string } => link.url !== undefined);
 const footerHeading = 'mb-3 border-b border-slate-700 pb-2 text-sm font-bold text-white';
 const footerLink = 'transition-colors hover:text-brand';
 ---
@@ -95,8 +106,19 @@ const footerLink = 'transition-colors hover:text-brand';
     </div>
 
     <div class="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-800/80 pt-6 text-xs text-slate-400 sm:flex-row">
-      <p>{site.copyright}</p>
-      <p>לימוד מקראות וטעמי המקרא</p>
+      <p>
+        © {years} {site.copyright}
+        {legalLinks.map((link) => (
+          <>
+            <span aria-hidden="true" class="mx-2">
+              ·
+            </span>
+            <a href={link.url} class={`${footerLink} inline-block py-1`}>
+              {link.title}
+            </a>
+          </>
+        ))}
+      </p>
       <a
         href="#top"
         class="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-slate-700"
