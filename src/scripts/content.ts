@@ -2,6 +2,7 @@
  * Browser behaviour for page content (components in src/components/content/): audio buttons,
  * collapsible explanations, and YouTube links in lists opening a popup.
  */
+import { track } from './analytics';
 
 const YOUTUBE_ID =
   /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/;
@@ -41,7 +42,10 @@ function toggleAudio(button: HTMLElement): void {
   next.addEventListener('ended', () => showPlaying(null));
   next
     .play()
-    .then(() => showPlaying(button))
+    .then(() => {
+      showPlaying(button);
+      track('audio-play', { file: decodeURIComponent(src.split('/').pop() ?? src) });
+    })
     .catch((error: unknown) => {
       console.error('Audio playback failed:', error);
       showPlaying(null);
@@ -52,6 +56,7 @@ function toggleCollapse(button: HTMLElement): void {
   const target = button.dataset['target'] && document.getElementById(button.dataset['target']);
   if (!target) return;
   const open = !target.classList.toggle('hidden');
+  if (open) track('answer-open');
   button.setAttribute('aria-expanded', String(open));
   for (const name of ['bg-brand-strong', 'text-white', 'border-brand']) {
     button.classList.toggle(name, open);
@@ -90,6 +95,7 @@ function playEmbeddedVideo(button: HTMLElement): void {
   const id = button.dataset['videoId'];
   const box = button.parentElement;
   if (!id || !box) return;
+  track('video-play', { video: id });
   const frame = youtubePlayer(id, button.dataset['videoTitle'] ?? 'סרטון YouTube');
   frame.className = 'h-full w-full border-0';
   box.replaceChildren(frame);
@@ -97,6 +103,7 @@ function playEmbeddedVideo(button: HTMLElement): void {
 }
 
 function openVideo(id: string, title: string): void {
+  track('video-play', { video: id });
   const dialog = document.createElement('dialog');
   dialog.className =
     'w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-0 shadow-2xl backdrop:bg-slate-900/70';

@@ -603,3 +603,20 @@ test('every content page has its own share picture, a 1200×630 JPEG', async ({ 
   expect(generated.length).toBeGreaterThan(30);
   expect(generated.filter(({ size }) => size !== 'jpeg 1200x630')).toEqual([]);
 });
+
+test('visitor statistics (Umami) count only on mikraot.net, so tests and previews send nothing', async ({
+  page,
+}) => {
+  const sent: string[] = [];
+  page.on('request', (r) => {
+    if (r.url().includes('gateway.umami.is')) sent.push(r.url());
+  });
+  await page.goto('/');
+  await expect(page.locator('script[src="https://cloud.umami.is/script.js"]')).toHaveAttribute(
+    'data-domains',
+    'mikraot.net',
+  );
+  await page.goto('/no-such-page/'); // the "page not found" event
+  await page.waitForLoadState('load');
+  expect(sent).toEqual([]);
+});

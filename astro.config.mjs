@@ -73,16 +73,23 @@ export default defineConfig({
         "img-src 'self' data:",
         "media-src 'self'",
         "font-src 'self'",
-        "connect-src 'self'",
+        // Umami (visitor statistics) sends its counts here.
+        "connect-src 'self' https://gateway.umami.is",
         // YouTube players (embedded videos and the video popup); the Turnstile widget.
         'frame-src https://www.youtube-nocookie.com https://challenges.cloudflare.com',
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
       ],
-      // Pagefind's search index runs as WebAssembly; Turnstile's script guards the comment form.
+      // Pagefind's search index runs as WebAssembly; Turnstile's script guards the comment form;
+      // Umami's script counts visits.
       scriptDirective: {
-        resources: ["'self'", "'wasm-unsafe-eval'", 'https://challenges.cloudflare.com'],
+        resources: [
+          "'self'",
+          "'wasm-unsafe-eval'",
+          'https://challenges.cloudflare.com',
+          'https://cloud.umami.is',
+        ],
       },
     },
   },
