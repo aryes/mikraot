@@ -3,7 +3,9 @@
  * The title area at the top of every page. Inner pages get a compact card (designed with Arye,
  * 2026-10-09): the breadcrumb trail on top, then a small crop of the photo, around the yad's tip,
  * beside the title. The front page keeps the live site's wide photo, now without the shaded box
- * over it; its title and tagline open the content card instead (ContentLayout.astro).
+ * over it; its title and tagline open the content card instead (ContentLayout.astro). The photo is
+ * zoomed (1.2x, 1.6x on phones) toward its upper right, so the yad fills the strip and its handle
+ * leaves just below the top corner instead of leaving an empty area (Arye, 2026-10-12).
  */
 import type { Crumb } from '../../lib/site';
 
@@ -73,11 +75,11 @@ import bannerYad from '../../assets/banner-yad.jpg';
       src={banner}
       formats={['avif', 'webp']}
       widths={[768, 1024, 1536, 2048]}
-      sizes="100vw"
+      sizes="(min-width: 640px) 120vw, 160vw"
       alt=""
       fetchpriority="high"
       loading="eager"
-      class="banner-photo absolute inset-0 -z-10 h-full w-full object-cover print:hidden"
+      class="banner-photo absolute inset-0 -z-10 h-full w-full origin-[45%_10%] scale-160 object-cover sm:scale-120 print:hidden"
     />
     <div class="min-h-40 sm:min-h-[250px] print:hidden"></div>
   </div>
