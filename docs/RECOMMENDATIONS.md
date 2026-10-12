@@ -2,7 +2,7 @@
 
 Ideas on top of the migrated site, by Claude. Nothing here is decided or scheduled: items move to
 `docs/ROADMAP.md` (or straight into work) once Arye picks them. Updated in spare time between tasks;
-last full review 2026-10-08.
+last full review 2026-10-08, brought up to date 2026-10-13.
 
 Priority: **H** high value for the effort, **M** worth doing, **L** nice to have.
 Effort: S (hours), M (days), L (weeks).
@@ -45,7 +45,8 @@ Approved (to build):
 
 - **Comment moderation page** (behind Cloudflare Access) and **reply emails to commenters**: we
   keep our own comment system (see "Open questions").
-- **Newsletter sign-up form**, made by Brevo and fitted to the site.
+- **Newsletter sign-up form.** Done (2026-10-12), as our own footer form on Brevo's double opt-in:
+  Brevo's form editor has no right-to-left support.
 - **Banner and brand:** a smaller banner on inner pages, with the banner's design rethought; a
   real logo and palette. Claude prepares 2–3 options for each. Banner and logo done (2026-10-11);
   the palette and a display font remain.
@@ -55,7 +56,7 @@ Approved (to build):
 - **Hebrew fixes contributed to Keystatic** (a public pull request), so the local patch can go.
 - **Umami Cloud** (free up to 100,000 events a month; company-backed, ~39,000 GitHub stars,
   checked 2026-10-09) to count audio and video plays, hidden answers opened and 404s, instead of
-  building our own counter.
+  building our own counter. Done (2026-10-12): it also replaces Cloudflare Web Analytics.
 - **Faster automatic checks without lowering coverage** (Lighthouse stays at 3 runs a page).
 - Done: the 3 security alerts with no fix were dismissed on GitHub as tolerable risk.
 
@@ -83,7 +84,7 @@ time for).
 
 After the cutover (`docs/CUTOVER.md`), in this order:
 
-1. **H/S Read the numbers for a month:** visits (Cloudflare Web Analytics, from the switch), Google
+1. **H/S Read the numbers for a month:** visits and events (Umami, from the switch), Google
    searches (Search Console), and the site searches that found nothing (Claude lists them with
    `npm run search:misses`). Then decide what to build. Needs: nothing until then.
 2. **H/M Learning paths:** a "where to start" page per door (see Direction 2), previous/next links
@@ -124,12 +125,16 @@ After the cutover (`docs/CUTOVER.md`), in this order:
    delete, reply as admin. Once the site is live, comments arrive weekly and today moderating means
    asking Claude. Approved 2026-10-09.
 
-Approved 2026-10-09: reply emails to commenters, the newsletter sign-up form.
+Approved 2026-10-09: reply emails to commenters (done), the newsletter sign-up form (done
+2026-10-12).
 
 ## 1. UX and design
 
-Rating today: **7.5/10** (was 6.5 on 2026-10-03): fast (Lighthouse 82–95), accessible (axe and
-Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a template.
+Rating today: **8/10** (was 6.5 on 2026-10-03, 7.5 on 2026-10-08): fast (Lighthouse 82–95 on
+2026-10-07, the home page 96–97 after the font change of 2026-10-11),
+accessible (axe and Lighthouse 98–100, contrast checked in dark mode too), prints well,
+keyboard-friendly menus, a logo, one centred column. Every visual change now gets a design review
+(`docs/DESIGN-REVIEW.md`). Less of a template, though the palette and the exercises still are.
 
 - **H/M Learning flow:** see "What's next" 2. Also "you are here" in the menu. Skipped for now
   (2026-10-09).
@@ -198,8 +203,9 @@ Lighthouse 98–100), prints well, keyboard-friendly menus. Still looks like a t
 
 ## 4. Security and privacy
 
-In place: CSP and security headers, Turnstile (loaded only when commenting), rate limits per
-visitor network, honeypot, secret scanning (gitleaks, GitHub push protection), CAA records,
+In place: CSP and security headers, Turnstile (loaded only when commenting or signing up), rate
+limits per visitor network (and per address for newsletter sign-ups), error tracking (Sentry, no
+personal data), honeypot, secret scanning (gitleaks, GitHub push protection), CAA records,
 security.txt, required checks before any merge, dependency updates with tests.
 
 - **H/S Two-factor login** on GitHub, Cloudflare and GoDaddy, plus login alerts (replaces
@@ -212,6 +218,12 @@ security.txt, required checks before any merge, dependency updates with tests.
 - **M/S Privacy (amendment 13 of the Privacy Protection Law, in force since 14 August 2025; it
   counts IP addresses as personal data; checked 2026-10-08):** collect less: make the commenter's
   email clearly optional (it is; the wording is Arye's, 2026-10-09).
+- **M/S Newsletter open and click tracking off** in Brevo's campaign settings: the live site's
+  plugin tracked opens, and the plan was to drop that (`docs/PLUGINS.md`); Brevo records opens and
+  clicks per contact by default. Without it the reports show only deliveries and unsubscribes.
+  The privacy policy draft says today that Brevo records them and only totals are used; turning
+  tracking off means updating that line and `docs/PLUGINS.md`. Needs: decision, when the RSS
+  campaign is set up.
 - **L/S** Browsers' built-in "HTTPS only" list (HSTS preload). It needs the rule to cover every
   subdomain (`includeSubDomains`) and a `preload` directive, and leaving the list takes months, so
   only after email has left Bluehost and every subdomain answers over HTTPS; today the header is a
@@ -231,8 +243,9 @@ security.txt, required checks before any merge, dependency updates with tests.
   secret and a session secret as Worker secrets plus its name at build time, and `/keystatic` kept
   out of search, the sitemap and the site search; only GitHub users who can write to the
   repository can edit. Needs: decision.
-- **M/S Monitoring, the rest:** the site is watched from outside (UptimeRobot) and server errors and
-  failed backups email Arye at once (2026-10-08). Still unseen: a backup run that never starts, and
+- **M/S Monitoring, the rest:** the site is watched from outside (UptimeRobot), server errors and
+  failed backups email Arye at once (2026-10-08), and Sentry collects browser and server errors with
+  their details (2026-10-12). Still unseen: a backup run that never starts, and
   traffic nearing the free plan's limit. A daily scheduled GitHub workflow could check both: that
   yesterday's backup key exists, and the Worker's requests through Cloudflare's analytics API (the
   existing token can read them since 2026-10-05), failing, which emails Arye, when requests near the
@@ -259,15 +272,13 @@ security.txt, required checks before any merge, dependency updates with tests.
 
 Privacy-first, without cookies, so no consent banner:
 
-- **H/S Cloudflare Web Analytics** at the switch (in the cutover plan; free and cookieless, checked
-  2026-10-08): page views, referrers, devices, page speed as visitors experience it. Needs: Arye
-  (switched on in the dashboard).
 - **M/S Bing Webmaster Tools** besides Google Search Console (a few minutes; DuckDuckGo and
   Copilot draw mainly on Bing's index, checked 2026-10-08; ChatGPT's web search partly).
   Needs: Arye (account).
-- **M/S Content events** via Workers Analytics Engine (already used for searches): audio plays,
-  video plays, hidden answers opened, 404s. Approved 2026-10-09, with Umami Cloud instead of our own
-  counter.
+- **Visits and content events** are counted by Umami (done 2026-10-12; cookieless, EU-hosted,
+  counting from the switch): page views, referrers, devices, audio and video plays, hidden answers
+  opened, 404s. Page speed as visitors experience it is the one thing Cloudflare Web Analytics
+  measured that Umami doesn't; Lighthouse covers it in testing.
 - **M/S "Was this page helpful?"** 👍/👎 with an optional comment. Skipped for now (2026-10-09).
 - **Avoid** session recording (Hotjar, Clarity): needs a consent banner and records personal
   behaviour; not worth it at this size.
@@ -328,3 +339,8 @@ Privacy-first, without cookies, so no consent banner:
   following the system setting (printing stays light), with every page checked for contrast in it.
   One font for all Hebrew (Noto, with bold vowel and cantillation marks), instead of switching to
   Taamey D for pointed words; faster pages (Lighthouse 95-97).
+- 2026-10-12: the design review as a standing step (`docs/DESIGN-REVIEW.md`); the sidebar gone
+  (one centred column, archives and categories in the footer); the comment form closed until asked
+  for, saying what is missing; bigger tap areas on phones; visitor statistics and events (Umami);
+  error tracking (Sentry, replacing the browser error reports to the Worker logs); the newsletter
+  sign-up in the footer (Brevo double opt-in, welcome email, a notice to Arye).

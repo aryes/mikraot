@@ -62,11 +62,12 @@ Decided 2026-10-03: **Brevo** (tasks in `docs/ROADMAP.md`). It must cover:
 
 ## Statistics and monitoring (MonsterInsights, Jetpack Stats, Jetpack Monitor)
 
-Decided 2026-10-03: **Cloudflare Web Analytics** (cookie-free; tasks in `docs/ROADMAP.md`).
+Decided 2026-10-03: **Cloudflare Web Analytics** (cookie-free); replaced on 2026-10-12 by **Umami
+Cloud** (also cookie-free, and it counts events; tasks in `docs/ROADMAP.md`).
 
 | Feature                                                   | Live                 | New site                                             |
 | --------------------------------------------------------- | -------------------- | ---------------------------------------------------- |
-| Page views, visitors, referrers, countries                | GA4 + Jetpack Stats  | ⬜ Cloudflare Web Analytics (at cutover)             |
+| Page views, visitors, referrers, countries                | GA4 + Jetpack Stats  | ✅ Umami (counts from the cutover)                   |
 | Demographics (age, gender)                                | on (GA)              | ➖ needs Google's ad tracking and a consent banner   |
 | Outbound-link and file-download clicks                    | on (GA events)       | ⬜ optional: own events via Workers Analytics Engine |
 | Email summaries of statistics                             | on (MonsterInsights) | ⬜ optional: monthly summary email                   |
