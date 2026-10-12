@@ -27,16 +27,18 @@ function loadScript(): Promise<void> {
 interface TurnstileProps {
   /**
    * Called with a fresh token when the check passes, and with '' when it expires or fails.
-   * Must be stable (e.g. a state setter): a new function re-renders the widget.
+   * Must be stable (e.g. a state setter): a new function re-renders the widget. So must onError.
    */
   onToken: (token: string) => void;
+  /** Called when the check can't run (its script didn't load, or Cloudflare reports an error). */
+  onError?: (() => void) | undefined;
 }
 
 /**
  * Cloudflare Turnstile "are you human?" check. Usually passes without any action from the visitor.
  * A token works once: remount the widget (change its React `key`) after each use.
  */
-export const Turnstile: React.FC<TurnstileProps> = ({ onToken }) => {
+export const Turnstile: React.FC<TurnstileProps> = ({ onToken, onError }) => {
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,15 +51,21 @@ export const Turnstile: React.FC<TurnstileProps> = ({ onToken }) => {
           sitekey: SITE_KEY,
           callback: (token) => onToken(token),
           'expired-callback': () => onToken(''),
-          'error-callback': () => onToken(''),
+          'error-callback': () => {
+            onToken('');
+            onError?.();
+          },
         });
       })
-      .catch((error: unknown) => console.error(error));
+      .catch((error: unknown) => {
+        console.error(error);
+        if (active) onError?.();
+      });
     return () => {
       active = false;
       if (widgetId !== undefined) window.turnstile?.remove(widgetId);
     };
-  }, [onToken]);
+  }, [onToken, onError]);
 
   return <div ref={container} className="min-h-[65px]" />;
 };

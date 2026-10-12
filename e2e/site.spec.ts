@@ -88,6 +88,8 @@ test('a visitor can post a comment', LOCAL_ONLY, async ({ page }, testInfo) => {
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
   await expect(page.getByText('אורח לדוגמה')).toBeVisible(COMMENTS_LOADED);
   await expect(page.getByText('אורח לדוגמה 0')).toHaveCount(0); // no stray '0' from is_admin_reply
+  // The form opens from its button.
+  await page.getByRole('button', { name: 'כתבו תגובה או שאלה' }).click();
   // Found by their labels: each field is tied to its visible label (as screen readers read it).
   await page.getByRole('textbox', { name: 'שם *', exact: true }).fill('מבקר בדיקה');
   await page.getByRole('textbox', { name: 'תוכן התגובה *', exact: true }).fill(text);
@@ -104,6 +106,7 @@ test('a visitor can post a comment', LOCAL_ONLY, async ({ page }, testInfo) => {
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
   await expect(page.getByText(text)).toBeVisible(COMMENTS_LOADED); // persisted in D1
   // "Remember me": the name comes back from this browser's storage.
+  await page.getByRole('button', { name: 'כתבו תגובה או שאלה' }).click();
   await expect(page.getByRole('textbox', { name: 'שם *', exact: true })).toHaveValue('מבקר בדיקה');
   await expect(page.getByLabel('שמרו את השם והאימייל שלי')).toBeChecked();
 });
@@ -495,6 +498,24 @@ test('desktop menus open and close from the keyboard (Enter, Escape) and say so'
   await expect(menu.locator('[aria-expanded="true"]')).toHaveCount(0);
 });
 
+test('the comment form says what is missing instead of refusing silently', async ({ page }) => {
+  // Registered before the page loads: the comments may already be in view on a short page.
+  const loaded = page.waitForResponse((r) => r.url().includes('/api/comments/') && r.ok());
+  await page.goto('/about/');
+  await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
+  await loaded; // the form's button works once the comments section is running
+  await page.getByRole('button', { name: 'כתבו תגובה או שאלה' }).click();
+  const name = page.getByRole('textbox', { name: 'שם *', exact: true });
+  await expect(name).toBeFocused(); // the form opens at its first field
+  await page.getByRole('button', { name: 'פרסום תגובה' }).click();
+  await expect(page.getByText('נא לכתוב שם.')).toBeVisible();
+  await expect(page.getByText('נא לכתוב את התגובה או השאלה.')).toBeVisible();
+  await expect(name).toHaveAttribute('aria-invalid', 'true');
+  await expect(name).toBeFocused(); // back to the first field that needs something
+  await name.fill('מבקר');
+  await expect(page.getByText('נא לכתוב שם.')).toHaveCount(0);
+});
+
 test('the human check loads only when a visitor starts on the comment form', async ({ page }) => {
   const checks: string[] = [];
   page.on('request', (sent) => {
@@ -507,7 +528,7 @@ test('the human check loads only when a visitor starts on the comment form', asy
   await loaded;
   expect(checks).toEqual([]);
   const script = page.waitForRequest((r) => r.url().includes('challenges.cloudflare.com'));
-  await page.getByRole('textbox', { name: 'שם *', exact: true }).focus();
+  await page.getByRole('button', { name: 'כתבו תגובה או שאלה' }).click();
   await script;
 });
 
