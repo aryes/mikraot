@@ -94,7 +94,7 @@ Success means all of these:
       `npm run check:links -- https://mikraot.net` and `npm run test:deployed -- https://mikraot.net`.
 - [ ] A real test comment posts, appears, and is hidden again (approval for the D1 change).
 - [ ] Response headers (CSP, HSTS…) present; no console errors or CSP blocks on a few pages.
-- [ ] Web Analytics receives visits; Search Console: submit `/sitemap-index.xml`.
+- [ ] Umami receives visits (it counts only on mikraot.net); Search Console: submit `/sitemap-index.xml`.
 - [ ] A Cloudflare rate limiting rule (the free plan has one, counted per IP over 10 seconds, action
       block; checked 2026-10-08; Security → WAF → Rate limiting rules) on all of `mikraot.net`
       (unknown addresses run the Worker too, not only `/api/*`), with a threshold well above normal
