@@ -26,7 +26,7 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
 - [x] Production D1 backed up and migrated; Worker deployed to workers.dev with its Turnstile
       secret (2026-10-04, approved).
 - [ ] Launch items in `docs/ROADMAP.md` done or consciously deferred: privacy policy published,
-      Web Analytics beacon ready. Email to Arye on new comments: built (Brevo, 2026-10-05).
+      visitor statistics (Umami) ready, which start counting once mikraot.net serves the new site. Email to Arye on new comments: built (Brevo, 2026-10-05).
 - [x] An **uptime monitor** with email alerts set up (replaces Jetpack Monitor): UptimeRobot, free
       plan, `https://mikraot.net/` every 5 minutes, emails Arye (his account, 2026-10-08).
 - [x] **URL parity gate:** every URL in WordPress's sitemaps, Search Console's top pages and the

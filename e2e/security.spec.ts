@@ -24,7 +24,7 @@ test('security headers are sent', async ({ page }) => {
   });
   await expect(page.locator('meta[http-equiv="content-security-policy"]')).toHaveAttribute(
     'content',
-    /script-src 'self' 'wasm-unsafe-eval' https:\/\/challenges\.cloudflare\.com 'sha256-/,
+    /script-src 'self' 'wasm-unsafe-eval' https:\/\/challenges\.cloudflare\.com https:\/\/cloud\.umami\.is 'sha256-/,
   );
 });
 

@@ -99,6 +99,17 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     </main>
     <SiteFooter />
     <SearchDialog />
+    <!-- Visitor statistics: Umami (cloud.umami.is, EU data region), without cookies; it counts only
+         on mikraot.net, and page addresses without their query or #anchor (src/scripts/analytics.ts). -->
+    <script
+      is:inline
+      defer
+      src="https://cloud.umami.is/script.js"
+      data-website-id="86d60730-0c4e-4136-8acc-63eba1339764"
+      data-domains="mikraot.net"
+      data-exclude-search="true"
+      data-exclude-hash="true"
+    ></script>
     <script src="../scripts/error-reporting.ts"></script>
     <script src="../scripts/legacy-links.ts"></script>
   </body>

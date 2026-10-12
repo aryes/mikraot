@@ -13,4 +13,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       חזרה לדף הבית
     </a>
   </div>
+  <script>
+    import { track } from '../scripts/analytics';
+    // Which missing addresses visitors reach (broken links elsewhere, old WordPress URLs): each
+    // Umami event carries the page's address (without its query), so no property is needed.
+    track('page-not-found');
+  </script>
 </BaseLayout>
