@@ -97,7 +97,7 @@ test('a visitor can post a comment', LOCAL_ONLY, async ({ page }, testInfo) => {
   // "Email me on replies" is offered only once there is an email to send to.
   const notify = page.getByLabel('שלחו לי אימייל כשמשיבים לתגובה שלי');
   await expect(notify).toHaveCount(0);
-  await page.getByRole('textbox', { name: /אימייל/ }).fill('visitor@example.com');
+  await page.getByRole('textbox', { name: 'אימייל (לא יוצג באתר)' }).fill('visitor@example.com');
   await notify.check();
   await page.getByRole('button', { name: 'פרסום תגובה' }).click();
   await expect(page.getByText('התגובה נוספה בהצלחה!')).toBeVisible(COMMENTS_LOADED);
