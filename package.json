@@ -44,6 +44,8 @@
     "@fontsource-variable/noto-sans-hebrew": "^5.3.0",
     "@keystatic/astro": "^6.0.0",
     "@keystatic/core": "^0.6.9",
+    "@sentry/browser": "^11.7.0",
+    "@sentry/cloudflare": "^11.7.0",
     "astro": "^7.3.5",
     "ipaddr.js": "^2.5.0",
     "lucide-react": "^1.49.0",

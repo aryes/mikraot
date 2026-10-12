@@ -40,6 +40,9 @@ const notoSubsets = (/** @type {string} */ name) => {
 const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
 const ciBranch = process.env['WORKERS_CI_BRANCH'];
 const isPreviewBuild = ciBranch !== undefined && ciBranch !== 'main';
+/** Sentry project "javascript-astro" (EU; public: it only lets a client send error reports). */
+const SENTRY_DSN =
+  'https://14039a75d2faec81966a64d944a17ef9@o4512244833386496.ingest.de.sentry.io/4512244858945616';
 // `astro dev` keeps its local Cloudflare data (the D1 database…) and its Vite cache apart, so a
 // dev server can stay open while builds, previews and tests run (`npm run dev` sets up its
 // database with the fictional fixtures).
@@ -73,8 +76,8 @@ export default defineConfig({
         "img-src 'self' data:",
         "media-src 'self'",
         "font-src 'self'",
-        // Umami (visitor statistics) sends its counts here.
-        "connect-src 'self' https://gateway.umami.is",
+        // Umami (visitor statistics) sends its counts here; Sentry receives error reports.
+        "connect-src 'self' https://gateway.umami.is https://o4512244833386496.ingest.de.sentry.io",
         // YouTube players (embedded videos and the video popup); the Turnstile widget.
         'frame-src https://www.youtube-nocookie.com https://challenges.cloudflare.com',
         "object-src 'none'",
@@ -103,6 +106,14 @@ export default defineConfig({
         context: 'client',
         access: 'public',
         default: isPreviewBuild ? TURNSTILE_TEST_SITE_KEY : '0x4AAAAAAFL0OyR8bp2yP3s0',
+      }),
+      // Where errors are reported (src/lib/sentry.ts). Only Workers Builds of main (the
+      // deployed site) get it: local runs, tests and previews report nothing, so their errors
+      // (some deliberate) don't fill the free plan's monthly quota.
+      PUBLIC_SENTRY_DSN: envField.string({
+        context: 'client',
+        access: 'public',
+        default: ciBranch === 'main' ? SENTRY_DSN : '',
       }),
     },
   },
