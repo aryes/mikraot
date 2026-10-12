@@ -54,7 +54,7 @@
 ## 4. Parity with original
 
 - [x] Full inventory of mikraot.net (2026-10-02: live sitemaps, WP-CLI on the server, URL probes). All 40 pages and the 1 post exist in the new site; all 4 approved comments are in D1 (the rest of WordPress's comments are spam; Akismet has caught 2,504). Not yet in the new site:
-  - [x] Header banner (cottonbro photo with the page title and breadcrumb trail; site name and tagline on the front page) and sidebar with Archives and Categories (decided 2026-10-02: keep both; headings now in Hebrew). Posts show author, category and date links, as on the live site. The left sidebar (Recent Posts, Recent Comments) is configured but not shown on the live site
+  - [x] Header banner (cottonbro photo with the page title and breadcrumb trail; site name and tagline on the front page; since 2026-10-11/12 a compact title card on inner pages, and on the front page the photo alone with the name and tagline opening the content card) and sidebar with Archives and Categories (decided 2026-10-02: keep both; headings now in Hebrew). Posts show author, category and date links, as on the live site. The left sidebar (Recent Posts, Recent Comments) is configured but not shown on the live site
   - [ ] Sidebar newsletter form: Brevo's sign-up form (see the newsletter tasks below)
   - [x] Archive pages: month `/2021/08/`, category `/category/חדשות-האתר/`, author `/author/arye_s/` (each lists the one post)
   - [x] Feeds: `/feed/`, `/comments/feed/` (built by the Worker per request), `/category/חדשות-האתר/feed/`, `/sitemap.rss`; comments keep WordPress's `#comment-<id>` anchors
