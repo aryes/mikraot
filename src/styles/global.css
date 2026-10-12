@@ -43,6 +43,9 @@
   --mark-muted: #475569;
   --mark-silent: #707070;
   --text-faint: #64748b;
+  /* The line under section headings and the front page title: the logo green, lighter than the
+     text (Arye, 2026-10-12). */
+  --heading-rule: #5b763e66;
   --scrollbar-track: #f1f5f9;
   --scrollbar-thumb: #cbd5e1;
   --scrollbar-thumb-hover: #94a3b8;
@@ -71,6 +74,7 @@
     --mark-muted: #a3b1c2;
     --mark-silent: #8b95a1;
     --text-faint: #94a3b8;
+    --heading-rule: #8cb65f66;
     --scrollbar-track: #0f172a;
     --scrollbar-thumb: #334155;
     --scrollbar-thumb-hover: #475569;
@@ -113,7 +117,7 @@
 }
 .wp-content-rendered h2 {
   font-size: 1.6rem;
-  border-bottom: 2px solid #8cb65f22;
+  border-bottom: 2px solid var(--heading-rule);
   padding-bottom: 0.5rem;
 }
 .wp-content-rendered h3 {
