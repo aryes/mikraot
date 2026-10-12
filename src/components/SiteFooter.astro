@@ -25,7 +25,8 @@ const legalLinks = [
   { title: 'אודות', url: pageUrl.get('about') },
 ].filter((link): link is { title: string; url: string } => link.url !== undefined);
 const footerHeading = 'mb-3 border-b border-slate-700 pb-2 text-sm font-bold text-white';
-const footerLink = 'transition-colors hover:text-brand';
+// Taller tap areas on phones (about 24 px; the design review, 2026-10-12), same look.
+const footerLink = 'inline-block py-1 transition-colors hover:text-brand';
 ---
 
 <footer class="print:hidden mt-20 border-t border-slate-800 bg-[#1E2C35] text-[#BBBBBB]">
@@ -113,7 +114,7 @@ const footerLink = 'transition-colors hover:text-brand';
             <span aria-hidden="true" class="mx-2">
               ·
             </span>
-            <a href={link.url} class={`${footerLink} inline-block py-1`}>
+            <a href={link.url} class={footerLink}>
               {link.title}
             </a>
           </>

@@ -452,23 +452,23 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
               )}
             </div>
 
-            <label className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+            <label className="flex items-center gap-2 py-1 text-xs text-slate-600 dark:text-slate-300">
               <input
                 type="checkbox"
                 checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
-                className="accent-brand-strong h-4 w-4"
+                className="accent-brand-strong h-5 w-5 shrink-0"
               />
               שמרו את השם והאימייל שלי בדפדפן הזה לתגובה הבאה
             </label>
 
             {authorEmail.trim() !== '' && (
-              <label className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+              <label className="flex items-center gap-2 py-1 text-xs text-slate-600 dark:text-slate-300">
                 <input
                   type="checkbox"
                   checked={notifyReplies}
                   onChange={(e) => setNotifyReplies(e.target.checked)}
-                  className="accent-brand-strong h-4 w-4"
+                  className="accent-brand-strong h-5 w-5 shrink-0"
                 />
                 שלחו לי אימייל כשמשיבים לתגובה שלי (אפשר להפסיק בכל עת)
               </label>
