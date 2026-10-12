@@ -17,6 +17,7 @@ The plan and known issues are in `docs/ROADMAP.md`. Recovery procedures (restore
 8. Maintainable, high-quality code: strict TypeScript, lint/format, tests, current stable packages, small focused modules, no dead code.
 9. **Prefer ready-made standard solutions** (hosted services, maintained libraries, platform features) over writing a feature ourselves; custom code only with a stated reason. Prefer free options (for now).
 10. Ask before anything irreversible or public-facing: DNS/cutover, deleting WordPress data or backups, deleting D1 data, billing. Always back up before destructive server/DB operations.
+11. **Design review** (since 2026-10-12): every change that affects how pages look gets a design review (screenshots on desktop, phone and dark mode, checked by a context-free reviewer against `docs/DESIGN-REVIEW.md`), run by Claude without being asked; plus a full review of the main pages every few weeks and before milestones.
 
 ## Secrets policy
 
