@@ -13,7 +13,8 @@
   --color-brand-deep: #4d6434;
   /* Brand text and link hover on dark backgrounds (dark mode). */
   --color-brand-light: #a9cc84;
-  --font-sans: var(--font-noto-sans);
+  /* Arabic first: its font covers only Arabic letters, so everything else falls to Noto Hebrew. */
+  --font-sans: var(--font-noto-arabic), var(--font-noto-sans);
   --font-logo: var(--font-taamey);
 }
 
