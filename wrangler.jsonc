@@ -11,6 +11,15 @@
     "binding": "ASSETS",
     // Serve src/pages/404.astro (with status 404) for unknown URLs.
     "not_found_handling": "404-page",
+    // The addresses the Worker answers (pages and API routes with `prerender = false`): without
+    // this, a browser opening one (a navigation) got the 404 page instead of the Worker's answer.
+    // Keep in step with those routes (e2e/routes.spec.ts checks it).
+    "run_worker_first": [
+      "/api/*",
+      "/unsubscribe/*",
+      "/newsletter/unsubscribe/*",
+      "/comments/feed/*",
+    ],
   },
   "d1_databases": [
     {
