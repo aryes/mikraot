@@ -23,7 +23,11 @@ const result = await new LinkChecker().check({
   userAgent:
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36',
   // Crawl our pages, and check (without crawling) every link they point to elsewhere.
-  linksToSkip: async (link) => /\/(api|cdn-cgi)\//.test(link),
+  // Not outside links: the API, Cloudflare's own paths, and this site under its real address (the
+  // share pictures and canonical links name https://mikraot.net, which serves WordPress until the
+  // switch). The site's own links are checked on every change by e2e/links.spec.ts.
+  linksToSkip: async (link) =>
+    /\/(api|cdn-cgi)\//.test(link) || link.startsWith('https://mikraot.net/'),
 });
 
 const broken = result.links.filter(

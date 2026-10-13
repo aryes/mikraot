@@ -23,6 +23,9 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # The Worker's routes need their local database, or pages the check crawls (the comments
+      # feed) answer with errors: an empty .dev.vars, as CLAUDE.md requires, and the fixture data.
+      - run: touch .dev.vars && npm run db:local:reset
       - run: npm run build:site
       - name: Serve the build and check its outside links
         run: |
