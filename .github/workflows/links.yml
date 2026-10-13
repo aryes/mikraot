@@ -1,6 +1,6 @@
 # Weekly check of every outside link (YouTube, other sites): they can break long after they were
-# added (this replaces WordPress's Broken Link Checker). A failed run is emailed by GitHub to the
-# repository owner. Internal links are checked on every change by e2e/links.spec.ts.
+# added (this replaces WordPress's Broken Link Checker). GitHub emails a failed scheduled run to
+# whoever last changed the schedule (Arye's account), if their Actions notifications are on. Internal links are checked on every change by e2e/links.spec.ts.
 name: Outside links
 
 on:
