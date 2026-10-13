@@ -20,8 +20,8 @@ content markup (tags, tables, headings in `src/content/pages/`).
 3. **Fix** the valid findings; name any finding judged wrong to Arye, with the reason.
 4. **Record** the findings and what was done in the pull request's description.
 
-`e2e/visual.spec.ts` catches _unintended_ visual changes; this review judges the _intended_ ones,
-including the reference images updated with the change.
+Argos (`e2e/visual.spec.ts`, a check on every pull request) catches _unintended_ visual
+changes; this review judges the _intended_ ones, including Argos's differences for the change.
 
 ## Checklist
 

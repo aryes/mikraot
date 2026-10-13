@@ -1,3 +1,4 @@
+import { createArgosReporterOptions } from '@argos-ci/playwright/reporter';
 import { defineConfig, devices } from '@playwright/test';
 
 // Well above 4321: each time the dev server restarts (a config change) it takes the next free port
@@ -5,10 +6,11 @@ import { defineConfig, devices } from '@playwright/test';
 const port = 4380;
 /** A deployed site to check instead of the local build (`npm run test:deployed -- <url>`). */
 const deployed = process.env['E2E_BASE_URL'];
-// Against a deployed site only the read-only tests run, and CI (Linux) skips the screenshot
-// comparisons made on Windows (see e2e/tags.ts). Set on each project, where a --grep-invert on the
-// command line can't replace it.
-const skipped = deployed ? /@local/ : process.env['CI'] ? /@visual/ : undefined;
+const ci = Boolean(process.env['CI']);
+// Against a deployed site only the read-only tests run. The screenshots run in CI only, where
+// Argos compares them (e2e/visual.spec.ts); locally there is nothing to compare them with. Set on
+// each project, where a --grep-invert on the command line can't replace it.
+const skipped = deployed ? /@local/ : ci ? undefined : /@visual/;
 const readOnly = skipped ? { grepInvert: skipped } : {};
 
 export default defineConfig({
@@ -27,9 +29,24 @@ export default defineConfig({
   // 30 s, in a different test each time: likely a stall of the local server on Windows
   // (investigated 2026-10-07; not seen in CI on Linux). Retried tests are still reported as flaky.
   retries: 1,
+  // In CI (pull requests and main, not the deployed-site runs) the screenshots go to Argos, which
+  // compares them with main's and reports the differences on the pull request.
+  reporter: [
+    [ci ? 'dot' : 'list'],
+    [
+      '@argos-ci/playwright/reporter',
+      createArgosReporterOptions({
+        uploadToArgos: ci && !deployed,
+        // Informational: Argos being down, out of quota or refusing a fork must not fail the tests.
+        ignoreUploadFailures: true,
+      }),
+    ],
+  ],
   use: {
     baseURL: deployed ?? `http://localhost:${port}`,
     trace: 'retain-on-failure',
+    // The same text rendering on every machine (Argos's advice for stable screenshots).
+    launchOptions: { args: ['--disable-lcd-text', '--font-render-hinting=none'] },
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] }, ...readOnly },
