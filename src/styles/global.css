@@ -177,11 +177,14 @@
   font-size: var(--content-size);
 }
 .wp-content-rendered li > a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.15rem 0.4rem;
+  /* Inline, without side padding: links inside a sentence ("נראה ש<a>אין זה נכון</a>") must sit
+     in the text like any word; padding pushed them apart, even within a word (Arye, 2026-10-13).
+     The vertical padding only enlarges the tap area. */
+  padding-block: 0.15rem;
   border-radius: 0.375rem;
+  /* A link that wraps onto two lines keeps its rounded hover background on each. */
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
   transition: all 0.15s;
 }
 .wp-content-rendered li > a:hover {
