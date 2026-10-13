@@ -66,4 +66,17 @@ describe('lastChanged', () => {
       /uncommitted/,
     );
   });
+
+  it('matches the committed file although git output loses its final newline', () => {
+    // The real git runner trims what git prints, so `git show` drops the file's last newline.
+    const { git } = fakeGit(history);
+    const trimmed: Git = (args) => git(args).trim();
+    const date = lastChanged('page.mdoc', {
+      git: trimmed,
+      read: () => history[0]!.content,
+      now,
+      inBuild: true,
+    });
+    expect(date.toISOString()).toBe(new Date('2026-10-06T10:00:00+03:00').toISOString());
+  });
 });

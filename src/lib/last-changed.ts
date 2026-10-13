@@ -13,7 +13,8 @@ export interface Sources {
 }
 
 const defaults = (): Sources => ({
-  git: (args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 << 20 }).trim(),
+  // Untrimmed: `git show` prints the file exactly, final newline included.
+  git: (args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 << 20 }),
   read: (file) => readFileSync(file, 'utf8'),
   now: new Date(),
   inBuild: Boolean(process.env['CI'] || process.env['WORKERS_CI']),
@@ -21,8 +22,15 @@ const defaults = (): Sources => ({
 
 let historyChecked = false;
 
-/** A content file's text without its frontmatter (title, SEO and other settings). */
-const bodyOf = (file: string) => file.replace(/\r\n/g, '\n').replace(/^---\n[\s\S]*?\n---\n/, '');
+/**
+ * A content file's text without its frontmatter (title, SEO and other settings) or trailing
+ * whitespace: the git runner trims its output, so `git show` loses the file's final newline.
+ */
+const bodyOf = (file: string) =>
+  file
+    .replace(/\r\n/g, '\n')
+    .replace(/^---\n[\s\S]*?\n---\n/, '')
+    .trimEnd();
 
 /**
  * When a page's text last changed: the date of the newest commit that changed the file's body
@@ -37,7 +45,7 @@ const bodyOf = (file: string) => file.replace(/\r\n/g, '\n').replace(/^---\n[\s\
 export function lastChanged(file: string, sources: Partial<Sources> = {}): Date {
   const { git, read, now, inBuild } = { ...defaults(), ...sources };
   if (!historyChecked) {
-    if (git(['rev-parse', '--is-shallow-repository']) === 'true') {
+    if (git(['rev-parse', '--is-shallow-repository']).trim() === 'true') {
       git(['fetch', '--unshallow', '--quiet']);
     }
     historyChecked = !sources.git;
