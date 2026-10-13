@@ -17,6 +17,10 @@ const PAGES = {
   about: '/about/',
 };
 
+// Argos adds a helper script to the page, which the site's CSP rightly blocks; bypassed for these
+// tests only (e2e/security.spec.ts checks the CSP itself).
+test.use({ bypassCSP: true });
+
 /** Hidden in the screenshots: not this site's doing (comments, YouTube's video pictures). */
 const HIDDEN = '[data-pagefind-ignore], div:has(> .video-play-btn) img { visibility: hidden; }';
 
