@@ -133,6 +133,29 @@ export default defineConfig({
       options: { variants: notoSubsets('noto-sans-hebrew') },
     },
     {
+      // The Arabic letters on the pronunciation pages: without a font of our own they fell back to
+      // a small system font whose dots barely showed (Arye, 2026-10-13). Listed before Noto Sans
+      // Hebrew in --font-sans (src/styles/global.css) but limited to Arabic characters, so it
+      // changes nothing else; not preloaded, so only pages with Arabic text fetch it. No fallback
+      // font of its own: one would claim every other character.
+      provider: fontProviders.local(),
+      name: 'Noto Sans Arabic',
+      cssVariable: '--font-noto-arabic',
+      fallbacks: [],
+      options: {
+        variants: [
+          {
+            src: [
+              '@fontsource-variable/noto-sans-arabic/files/noto-sans-arabic-arabic-wght-normal.woff2',
+            ],
+            weight: '100 900',
+            style: 'normal',
+            unicodeRange: ['U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFC'],
+          },
+        ],
+      },
+    },
+    {
       // The site name in the logo (header and footer), as designed. src/assets/fonts/taamey-d/
       provider: fontProviders.local(),
       name: 'Taamey D',

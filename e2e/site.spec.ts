@@ -262,6 +262,18 @@ test('text with cantillation marks renders in the site font only (no other or sy
   expect(notNoto(await renderedFonts(page, '/2021/08/', '.latest-posts a'))).toEqual([]);
 });
 
+test('Arabic letters render in Noto Sans Arabic (their dots showed poorly in system fonts)', async ({
+  page,
+  browserName,
+}) => {
+  test.skip(browserName !== 'chromium', 'uses the Chrome DevTools protocol');
+  // The pronunciation table's Arabic column. Pages without Arabic don't load the font at all
+  // (the self-hosted fonts test above lists what /שווא-נע/ loads).
+  const families = await renderedFonts(page, '/מבטא/', '.wp-content-rendered td');
+  expect(families).toContain('Noto Sans Arabic');
+  expect(notNoto(families)).toEqual([]); // no system font for any letter in the tables
+});
+
 test('search finds pages by keyword (Ctrl+K), ignoring niqqud', async ({ page }) => {
   await page.goto('/about/');
   await page.keyboard.press('Control+k');

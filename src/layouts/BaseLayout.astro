@@ -34,6 +34,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
          from (measured 2026-10-11: still the fastest option, Lighthouse 96-97). -->
     <Font cssVariable="--font-noto-sans" preload />
     <Font cssVariable="--font-taamey" preload />
+    <!-- Not preloaded: only pages with Arabic letters use it (astro.config.mjs). -->
+    <Font cssVariable="--font-noto-arabic" />
     {description && <meta name="description" content={description} />}
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
