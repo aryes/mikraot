@@ -9,8 +9,8 @@ const { chromium } = require('@playwright/test');
 const port = 4384; // away from the dev server (4321 and up), like the browser tests (4380)
 // One page of each kind: the home page, a lesson, a post, and a page with embedded videos.
 const allPages = ['/', '/דגש-קל/', '/בראשית/', '/טעמים/נוסח-אשכנז/'];
-// CI splits the pages over parallel jobs (LH_SHARD=1/2, 2/2): same pages, runs and limits, about
-// half the time. Unset (locally), all pages.
+// CI splits the pages over parallel jobs (LH_SHARD=1/4 … 4/4, one page each): same pages, runs
+// and limits; the Lighthouse step itself takes a quarter of the time. Unset (locally), all pages.
 const [shard, shards] = (process.env['LH_SHARD'] ?? '1/1').split('/').map(Number);
 const pages = allPages.filter((_, i) => i % shards === shard - 1);
 if (pages.length === 0) throw new Error(`LH_SHARD=${process.env['LH_SHARD']} selects no pages`);

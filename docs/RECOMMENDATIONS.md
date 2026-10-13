@@ -57,7 +57,8 @@ Approved (to build):
 - **Umami Cloud** (free up to 100,000 events a month; company-backed, ~39,000 GitHub stars,
   checked 2026-10-09) to count audio and video plays, hidden answers opened and 404s, instead of
   building our own counter. Done (2026-10-12): it also replaces Cloudflare Web Analytics.
-- **Faster automatic checks without lowering coverage** (Lighthouse stays at 3 runs a page).
+- **Faster automatic checks without lowering coverage** (Lighthouse stays at 3 runs a page). Done
+  (2026-10-13).
 - Done: the 3 security alerts with no fix were dismissed on GitHub as tolerable risk.
 
 Open questions, for later:
@@ -244,14 +245,11 @@ security.txt, required checks before any merge, dependency updates with tests.
   pages don't count toward that limit; the API, the comments feed and every address with no page
   (404s, including bots probing old WordPress paths) do, so a bot wave is the likely way to reach
   it. Done.
-- **M/S Faster automatic checks:** a run takes about 4 minutes, and Lighthouse sets the pace (about
-  2.7 minutes: four pages, three runs each). Two runs per page instead of three would save about 50
-  s (the browser tests, about 3.2 minutes, would then set the pace), but the score would be the
-  average of two runs instead of the middle of three, so one bad run could fail a change. Caching
-  the test browser is not worth it: installing it takes about 23 s, and Playwright advises against
-  caching it, since restoring takes about as long. Decided 2026-10-09: keep three runs, and make the
-  checks faster in other ways without lowering coverage (e.g. build the site once for both test
-  jobs).
+- **M/S Faster automatic checks:** done 2026-10-13: the browser tests run in three parallel jobs
+  and Lighthouse in four (one page each), with the same tests, runs and limits. Building the site
+  once for all jobs wouldn't have helped: the jobs already build at the same time, and waiting for
+  a shared build would only have added a step in front. (Kept from 2026-10-09: three Lighthouse
+  runs per page; no caching of the test browser, which Playwright advises against.)
 - **M/S Clean-up after the cutover:** the old `mikraot-api` Worker, `worker/`, `/staging/` on
   Bluehost, the Supabase project (after a final export). In `docs/CUTOVER.md` step 5. Needs: Arye's
   approval (deletions).
