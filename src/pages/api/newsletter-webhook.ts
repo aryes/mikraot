@@ -9,17 +9,17 @@ const done = (status: number) =>
   new Response(null, { status, headers: { 'Cache-Control': 'no-store' } });
 
 /**
- * Brevo's call when contacts join the newsletter list (a marketing webhook, event listAddition,
- * made through Brevo's API with the header below): the welcome email and the owner's notice.
- * The header's value is a Worker secret, known only to Brevo.
- */
-/**
  * The links in the welcome email (home page, unsubscribe) use the real address, never workers.dev:
  * emails stay in inboxes for years, and the switch turns workers.dev off. Before the switch no one
  * can sign up anyway (the human check works only on mikraot.net).
  */
 const SITE = 'https://mikraot.net/';
 
+/**
+ * Brevo's call when contacts join the newsletter list (a marketing webhook, event listAddition,
+ * made through Brevo's API with the header below): the welcome email and the owner's notice.
+ * The header's value is a Worker secret, known only to Brevo.
+ */
 export const POST: APIRoute = async ({ request, locals }) => {
   const expected = env.NEWSLETTER_WEBHOOK_SECRET;
   if (!expected || !(await sameSecret(request.headers.get('x-webhook-secret') ?? '', expected))) {
