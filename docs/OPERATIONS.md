@@ -94,6 +94,12 @@ webhook, event `listAddition`, with the header `X-Webhook-Secret` holding the Wo
 (list, template, confirmation page) are in `src/server/newsletter.ts`, the webhook in its route
 file; the template and the webhook (with its header) were made through Brevo's API.
 
+- The welcome email has its own unsubscribe link (`/newsletter/unsubscribe/`, and mail apps'
+  one-click unsubscribe): a token signed with the same secret, so changing
+  `NEWSLETTER_WEBHOOK_SECRET` makes the links in welcome emails already sent stop working (they
+  then point to "הקישור אינו תקין", which names admin@mikraot.net). Newsletters carry Brevo's own
+  unsubscribe link. The welcome email's links always point to mikraot.net (not workers.dev,
+  which the switch turns off), so they work from the switch on.
 - **Adding contacts by hand or by import** (Brevo's dashboard or API) fires the same webhook:
   each one gets the welcome email, and Arye a notice. For a bulk import, delete the webhook first
   and create it again after (`POST /v3/webhooks`, `type: marketing`, `events: ["listAddition"]`,

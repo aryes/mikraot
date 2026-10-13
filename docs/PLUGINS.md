@@ -28,18 +28,18 @@ Status: ✅ in the new site · ⬜ to do (task in `docs/ROADMAP.md`) · ❓ need
 
 Decided 2026-10-03: **Brevo** (tasks in `docs/ROADMAP.md`). It must cover:
 
-| Feature                                                                   | Live                        |
-| ------------------------------------------------------------------------- | --------------------------- |
-| Sign-up form "הרשמה" in the sidebar (name, email)                         | yes                         |
-| Double opt-in (confirmation email)                                        | yes                         |
-| Welcome email                                                             | yes                         |
-| Email to Arye on each new subscriber                                      | yes                         |
-| Automatic "new post" email to subscribers                                 | yes (campaign active)       |
-| Newsletters written by hand                                               | 1 sent                      |
-| Unsubscribe link and page                                                 | yes                         |
-| Blocked sign-up domains (`mail.ru`), sender name "מקראות"                 | yes                         |
-| Open tracking                                                             | on (➖ drop: privacy)       |
-| Subscribers: 5 confirmed (2 real), 16 unconfirmed; Jetpack: none by email | ✅ the 2 real ones in Brevo |
+| Feature                                                                   | Live                                            |
+| ------------------------------------------------------------------------- | ----------------------------------------------- |
+| Sign-up form "הרשמה" in the sidebar (name, email)                         | yes                                             |
+| Double opt-in (confirmation email)                                        | yes                                             |
+| Welcome email                                                             | yes                                             |
+| Email to Arye on each new subscriber                                      | yes                                             |
+| Automatic "new post" email to subscribers                                 | yes (campaign active)                           |
+| Newsletters written by hand                                               | 1 sent                                          |
+| Unsubscribe link and page                                                 | yes                                             |
+| Blocked sign-up domains (`mail.ru`), sender name "מקראות"                 | yes                                             |
+| Open tracking                                                             | on (✅ kept, in the privacy policy; 2026-10-13) |
+| Subscribers: 5 confirmed (2 real), 16 unconfirmed; Jetpack: none by email | ✅ the 2 real ones in Brevo                     |
 
 ## SEO (All in One SEO)
 

@@ -8,12 +8,18 @@
  *    once its link is clicked: https://developers.brevo.com/reference/create-doi-contact
  * 2. Brevo then calls our webhook (event listAddition, src/pages/api/newsletter-webhook.ts),
  *    which sends the welcome email and tells the owner.
+ * 3. The welcome email's unsubscribe link (src/pages/newsletter/unsubscribe.astro, and mail apps'
+ *    one-click unsubscribe in src/worker.ts) takes the address off the list. Newsletters sent
+ *    from Brevo carry Brevo's own unsubscribe link.
  */
 import { escapeHtml, OWNER_EMAIL, sendEmail, type BrevoEmail } from './notify';
 
 const BREVO_DOI_URL = 'https://api.brevo.com/v3/contacts/doubleOptinConfirmation';
 /** Brevo list "ניוזלטר מקראות". */
 export const NEWSLETTER_LIST_ID = 4;
+const BREVO_LIST_URL = `https://api.brevo.com/v3/contacts/lists/${NEWSLETTER_LIST_ID}`;
+/** The welcome email's unsubscribe page (src/pages/newsletter/unsubscribe.astro). */
+export const UNSUBSCRIBE_PATH = '/newsletter/unsubscribe/';
 /** Brevo template "מקראות – אישור הרשמה (עברית)" (a double opt-in template: tag "optin"). */
 export const CONFIRM_TEMPLATE_ID = 5;
 /** Where the confirmation link leads (src/pages/newsletter/confirmed.astro). */
@@ -96,18 +102,24 @@ export function addedToList(body: unknown): string[] {
   });
 }
 
-export function welcomeEmail(to: string, siteUrl: string): BrevoEmail {
+export function welcomeEmail(to: string, siteUrl: string, unsubscribe: string): BrevoEmail {
   const link = escapeHtml(siteUrl);
   return {
     sender: SENDER,
     to: [{ email: to }],
     subject: 'ברוכים הבאים לעדכונים של מקראות',
-    textContent: `ההרשמה אושרה, תודה!\n\nמעכשיו נשלח אליכם אימייל קצר כשמתווסף משהו חדש באתר: שיעורים, קריאות מוקלטות ועדכונים. בכל אימייל יש קישור לביטול ההרשמה.\n\n${siteUrl}`,
+    textContent: `ההרשמה אושרה, תודה!\n\nמעכשיו נשלח אליכם מדי פעם אימייל קצר על מה שחדש באתר: שיעורים, קריאות מוקלטות ועדכונים. בכל אימייל עדכונים יש קישור לביטול ההרשמה.\n\n${siteUrl}\n\nלביטול ההרשמה: ${unsubscribe}`,
     htmlContent: `<div dir="rtl" style="font-family: Arial, Helvetica, sans-serif; line-height: 1.7; text-align: right">
 <p style="font-size: 20px; font-weight: bold; color: #3e5a24">ההרשמה אושרה, תודה!</p>
-<p>מעכשיו נשלח אליכם אימייל קצר כשמתווסף משהו חדש באתר: שיעורים, קריאות מוקלטות ועדכונים. בכל אימייל יש קישור לביטול ההרשמה.</p>
+<p>מעכשיו נשלח אליכם מדי פעם אימייל קצר על מה שחדש באתר: שיעורים, קריאות מוקלטות ועדכונים. בכל אימייל עדכונים יש קישור לביטול ההרשמה.</p>
 <p><a href="${link}" style="color: #5b763e">למקראות</a></p>
+<p style="color: #666; font-size: 0.9em"><a href="${escapeHtml(unsubscribe)}">לביטול ההרשמה</a></p>
 </div>`,
+    // One-click unsubscribe from the mail app (RFC 8058): a POST to the same page (src/worker.ts).
+    headers: {
+      'List-Unsubscribe': `<${unsubscribe}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
   };
 }
 
@@ -123,13 +135,86 @@ export function subscriberNotice(subscriber: string): BrevoEmail {
 
 /** The welcome email and the owner's notice for one new subscriber. */
 export async function welcome(
-  apiKey: string,
-  subscriber: string,
-  siteUrl: string,
+  options: {
+    apiKey: string;
+    secret: string;
+    subscriber: string;
+    /** The site's home page, linked in the email. */
+    siteUrl: string;
+    /** The site's address for the unsubscribe link. */
+    origin: string;
+  },
   fetchFn: typeof fetch = fetch,
 ): Promise<void> {
-  await sendEmail(apiKey, welcomeEmail(subscriber, siteUrl), fetchFn);
+  const { apiKey, secret, subscriber, siteUrl, origin } = options;
+  const token = await unsubscribeToken(secret, subscriber);
+  const unsubscribe = new URL(`${UNSUBSCRIBE_PATH}?token=${token}`, origin).href;
+  await sendEmail(apiKey, welcomeEmail(subscriber, siteUrl, unsubscribe), fetchFn);
   await sendEmail(apiKey, subscriberNotice(subscriber), fetchFn);
+}
+
+const base64url = (bytes: Uint8Array) =>
+  btoa(String.fromCharCode(...bytes))
+    .replaceAll('+', '-')
+    .replaceAll('/', '_')
+    .replace(/=+$/, '');
+const fromBase64url = (encoded: string) =>
+  Uint8Array.from(atob(encoded.replaceAll('-', '+').replaceAll('_', '/')), (c) => c.charCodeAt(0));
+const hmacKey = (secret: string) =>
+  crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign', 'verify'],
+  );
+// The webhook's secret signs these links too; the prefix keeps the two uses apart.
+const signedText = (email: string) => new TextEncoder().encode(`newsletter-unsubscribe:${email}`);
+
+/**
+ * The unsubscribe token for an address: the address (encoded) and its signature, so no list of
+ * tokens needs keeping, and no one can unsubscribe an address they didn't receive a link for.
+ */
+export async function unsubscribeToken(secret: string, email: string): Promise<string> {
+  const signature = await crypto.subtle.sign('HMAC', await hmacKey(secret), signedText(email));
+  return `${base64url(new TextEncoder().encode(email))}.${base64url(new Uint8Array(signature))}`;
+}
+
+/** The address a token was made for, or null if the token isn't one of ours. */
+export async function emailFromToken(secret: string, token: string): Promise<string | null> {
+  const [address, signature, rest] = token.split('.');
+  if (!secret || !address || !signature || rest !== undefined) return null;
+  try {
+    const email = new TextDecoder().decode(fromBase64url(address));
+    const key = await hmacKey(secret);
+    const valid = await crypto.subtle.verify(
+      'HMAC',
+      key,
+      fromBase64url(signature),
+      signedText(email),
+    );
+    return valid ? email : null;
+  } catch {
+    return null; // not base64url
+  }
+}
+
+/** Removes an address from the newsletter list; one that is already gone counts as removed. */
+export async function removeFromList(
+  apiKey: string,
+  email: string,
+  fetchFn: typeof fetch = fetch,
+): Promise<void> {
+  const res = await fetchFn(`${BREVO_LIST_URL}/contacts/remove`, {
+    method: 'POST',
+    headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
+    body: JSON.stringify({ emails: [email] }),
+  });
+  if (res.ok) return;
+  const detail = await res.text();
+  // Brevo answers 400 for an address no longer on the list, or no longer a contact at all.
+  if (res.status === 400 && /already removed|does not exist/i.test(detail)) return;
+  throw new Error(`Brevo list removal failed: ${res.status} ${detail}`);
 }
 
 const digest = async (value: string) =>
@@ -141,4 +226,20 @@ export async function sameSecret(given: string, expected: string): Promise<boole
   let difference = 0;
   for (let i = 0; i < a.length; i++) difference |= (a[i] ?? 0) ^ (b[i] ?? 0);
   return difference === 0 && expected !== '';
+}
+
+/**
+ * Unsubscribes the address a token was made for (the unsubscribe page, and one-click from a mail
+ * app). False for a token that isn't ours. Without an API key (previews, local runs) nothing is
+ * removed.
+ */
+export async function unsubscribeNewsletter(
+  options: { apiKey: string | undefined; secret: string | undefined; token: string },
+  fetchFn: typeof fetch = fetch,
+): Promise<boolean> {
+  const email = await emailFromToken(options.secret ?? '', options.token);
+  if (!email) return false;
+  if (options.apiKey) await removeFromList(options.apiKey, email, fetchFn);
+  else console.error('Newsletter unsubscribe: no BREVO_API_KEY, nothing removed');
+  return true;
 }
