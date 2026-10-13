@@ -4,6 +4,7 @@ import { buildThreads } from '../lib/comment-threads';
 import { loadCommenter, rememberCommenter } from '../lib/commenter';
 import { isReservedName } from '../lib/reserved-names';
 import { Turnstile } from './Turnstile';
+import { PRIVACY_POLICY_URL } from '../lib/urls';
 import { MessageSquare, Reply, Send, CheckCircle2, User, ShieldCheck, X } from 'lucide-react';
 
 interface CommentsProps {
@@ -474,6 +475,17 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
               </label>
             )}
 
+            <p className="text-xs text-slate-600 dark:text-slate-300">
+              מה נשמר ולמה:{' '}
+              <a
+                href={PRIVACY_POLICY_URL}
+                target="_blank"
+                rel="noopener"
+                className="inline-block py-1 underline"
+              >
+                מדיניות הפרטיות
+              </a>
+            </p>
             <div className="flex flex-wrap items-center justify-between gap-4">
               {checkStarted ? (
                 <Turnstile key={turnstileKey} onToken={handleToken} onError={handleCheckError} />

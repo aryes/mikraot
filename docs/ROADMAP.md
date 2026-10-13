@@ -114,7 +114,7 @@
 Order (decided 2026-10-03): one change at a time; the site first, email last, Bluehost cancelled only after both.
 Hosting after the move: Cloudflare (one Worker: pages, media, comments API, D1); free plan expected. The domain is registered at GoDaddy (renews by 2027-08-10) with DNS already on Cloudflare.
 
-1. - [ ] Privacy policy: new Hebrew draft written 2026-10-04 (`privacy-policy`, still a draft, unpublished; the WordPress one was never published either). Arye to review (optionally a lawyer), then publish and link it from the footer and the comment/newsletter forms
+1. - [x] Privacy policy: written 2026-10-04, reviewed with Arye section by section and published on the new site 2026-10-13 (`privacy-policy`; the WordPress one was never published). Linked from the footer and from the comment and newsletter forms. No lawyer review (Arye's decision). WordPress keeps its own until the switch
 2. - [x] GitHub: public repo https://github.com/aryes/mikraot (2026-10-04). Before the first push the history was rewritten again: author address → GitHub noreply, the old `MIGRATION_DOCUMENTATION*.md` (hosting account name, database name, Cloudflare account ID) removed, the hosting username masked. Secret scanning + push protection, Dependabot alerts, private vulnerability reporting and a `main` ruleset (no deletion or force-push) are on
    - [ ] Arye: confirm two-factor login on GitHub
    - [x] CAA records (2026-10-05): only Let's Encrypt, Google Trust Services, SSL.com, Sectigo (and the CAs Cloudflare adds itself) may issue certificates for mikraot.net; Bluehost's AutoSSL (Let's Encrypt) keeps working
