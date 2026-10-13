@@ -51,8 +51,8 @@ Approved (to build):
   real logo and palette. Claude prepares 2–3 options for each. Banner and logo done (2026-10-11);
   the palette and a display font remain.
 - **Dark mode.** Done (2026-10-11).
-- **A daily outside check** (a backup that never ran, traffic near the free limit): the token
-  gets KV read and is stored as a GitHub secret.
+- **A daily outside check** (a backup that never ran, traffic near the free limit). Done
+  (2026-10-13), with its own read-only token rather than the configuration token.
 - **Hebrew fixes contributed to Keystatic** (a public pull request), so the local patch can go.
 - **Umami Cloud** (free up to 100,000 events a month; company-backed, ~39,000 GitHub stars,
   checked 2026-10-09) to count audio and video plays, hidden answers opened and 404s, instead of
@@ -123,7 +123,7 @@ After the cutover (`docs/CUTOVER.md`), in this order:
    2026-10-09 (Audacity, Claude processes), later.
 7. **H/M Comment moderation page** behind Cloudflare Access (free; login by Arye's email): hide,
    delete, reply as admin. Once the site is live, comments arrive weekly and today moderating means
-   asking Claude. Approved 2026-10-09.
+   asking Claude. Approved 2026-10-09. Skipped for now (2026-10-13).
 
 Approved 2026-10-09: reply emails to commenters (done), the newsletter sign-up form (done
 2026-10-12).
@@ -239,14 +239,11 @@ security.txt, required checks before any merge, dependency updates with tests.
   repository can edit. Needs: decision.
 - **M/S Monitoring, the rest:** the site is watched from outside (UptimeRobot), server errors and
   failed backups email Arye at once (2026-10-08), and Sentry collects browser and server errors with
-  their details (2026-10-12). Still unseen: a backup run that never starts, and
-  traffic nearing the free plan's limit. A daily scheduled GitHub workflow could check both: that
-  yesterday's backup key exists, and the Worker's requests through Cloudflare's analytics API (the
-  existing token can read them since 2026-10-05), failing, which emails Arye, when requests near the
-  free plan's 100,000 a day. Static pages don't count toward that limit (Cloudflare serves them
-  free); the API (comments, searches counted), the comments feed and every address
-  with no page (404s, including bots probing old WordPress paths) do, so a bot wave is the likely
-  way to reach it. Approved 2026-10-09 (the token gets KV read and goes into GitHub secrets).
+  their details (2026-10-12), and a daily check from outside (GitHub, 2026-10-13) fails when the
+  morning's backup is missing or the Worker's requests near the free plan's 100,000 a day. Static
+  pages don't count toward that limit; the API, the comments feed and every address with no page
+  (404s, including bots probing old WordPress paths) do, so a bot wave is the likely way to reach
+  it. Done.
 - **M/S Faster automatic checks:** a run takes about 4 minutes, and Lighthouse sets the pace (about
   2.7 minutes: four pages, three runs each). Two runs per page instead of three would save about 50
   s (the browser tests, about 3.2 minutes, would then set the pace), but the score would be the

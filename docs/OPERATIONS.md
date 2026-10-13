@@ -152,8 +152,16 @@ Assumptions to watch:
   report), and a Worker stopped by Cloudflare itself (out of CPU time or memory, or the daily
   request limit reached), which ends before our code can react. UptimeRobot catches the site being
   down, but not the daily limit: the pages it checks are static and keep working, only comments
-  and other Worker routes fail. A daily check from outside would catch the rest:
-  `docs/RECOMMENDATIONS.md`, Monitoring.
+  and other Worker routes fail. The daily check from outside catches the rest (since 2026-10-13,
+  `.github/workflows/daily-check.yml`, 06:30 UTC): it fails, and GitHub emails Arye, when the
+  morning's backup is missing from KV, or when all Workers' requests the day before (UTC) reached
+  80% of the free 100,000: a trend warning, since the limit resets daily and today's flood shows
+  only tomorrow. It uses its own read-only token (GitHub secret `CF_MONITOR_API_TOKEN`: Workers KV
+  Storage and Account Analytics, read; with `CF_ACCOUNT_ID`), not the configuration token; if
+  that token expires, the check fails loudly. GitHub emails a failed scheduled run to whoever last
+  changed the schedule (Arye's account), if his Actions notifications are on. GitHub also pauses
+  scheduled workflows after 60 days without activity in a public repository, without an email
+  (Renovate's merges normally prevent that): re-enable it under Actions → Daily check.
 - **One script can use up the free daily requests:** each comment load, API call and unknown
   address runs the Worker, and 100,000 a day is about 70 a minute. A per-visitor limit inside the
   Worker can't prevent it (blocked requests still count), so after the switch a Cloudflare rate
