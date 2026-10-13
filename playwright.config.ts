@@ -17,6 +17,10 @@ export default defineConfig({
   // so CI runs four. The tests that write data are few and touch separate pages; the cold-start
   // stall is avoided by warming the server up first.
   workers: process.env['CI'] ? 4 : 2,
+  // Tests spread individually, not file by file: CI's three shards (--shard) then get about a
+  // third each (by file they got 127, 99 and 60). The tests don't depend on their order in a file
+  // (checked 2026-10-13: the whole suite passes this way).
+  fullyParallel: true,
   globalSetup: './e2e/warm-up.ts',
   forbidOnly: Boolean(process.env['CI']),
   // One retry (in every run, CI and deployed ones too) absorbs a rare page load that aborts after
