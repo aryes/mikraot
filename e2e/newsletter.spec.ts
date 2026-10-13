@@ -62,3 +62,23 @@ test('the confirmation page thanks the subscriber and stays out of search engine
   await expect(page.getByRole('heading', { name: 'ההרשמה אושרה, תודה!' })).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
 });
+
+test('the unsubscribe page refuses a link that is not ours, and stays out of search engines', async ({
+  page,
+}) => {
+  await page.goto('/newsletter/unsubscribe/?token=bm8.c2ln');
+  await expect(page.getByText('הקישור אינו תקין')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'כן, לבטל את ההרשמה' })).toHaveCount(0);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+});
+
+test("a mail app's one-click unsubscribe gets the same answer for any token", async ({
+  request,
+}) => {
+  const response = await request.post('/newsletter/unsubscribe/?token=bm8.c2ln', {
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    data: 'List-Unsubscribe=One-Click',
+  });
+  expect(response.status()).toBe(200);
+  expect(await response.text()).toBe('Unsubscribed');
+});

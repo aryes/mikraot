@@ -13,6 +13,13 @@ const done = (status: number) =>
  * made through Brevo's API with the header below): the welcome email and the owner's notice.
  * The header's value is a Worker secret, known only to Brevo.
  */
+/**
+ * The links in the welcome email (home page, unsubscribe) use the real address, never workers.dev:
+ * emails stay in inboxes for years, and the switch turns workers.dev off. Before the switch no one
+ * can sign up anyway (the human check works only on mikraot.net).
+ */
+const SITE = 'https://mikraot.net/';
+
 export const POST: APIRoute = async ({ request, locals }) => {
   const expected = env.NEWSLETTER_WEBHOOK_SECRET;
   if (!expected || !(await sameSecret(request.headers.get('x-webhook-secret') ?? '', expected))) {
@@ -29,7 +36,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
     for (const subscriber of addedToList(body)) {
       // In the background, so Brevo gets its answer at once (it retries slow webhooks).
       locals.cfContext.waitUntil(
-        welcome(apiKey, subscriber, 'https://mikraot.net/').catch((error: unknown) => {
+        welcome({
+          apiKey,
+          secret: expected,
+          subscriber,
+          siteUrl: SITE,
+          origin: SITE,
+        }).catch((error: unknown) => {
           console.error('Newsletter welcome failed:', error);
         }),
       );

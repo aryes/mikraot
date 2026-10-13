@@ -218,12 +218,6 @@ security.txt, required checks before any merge, dependency updates with tests.
 - **M/S Privacy (amendment 13 of the Privacy Protection Law, in force since 14 August 2025; it
   counts IP addresses as personal data; checked 2026-10-08):** collect less: make the commenter's
   email clearly optional (it is; the wording is Arye's, 2026-10-09).
-- **M/S Newsletter open and click tracking off** in Brevo's campaign settings: the live site's
-  plugin tracked opens, and the plan was to drop that (`docs/PLUGINS.md`); Brevo records opens and
-  clicks per contact by default. Without it the reports show only deliveries and unsubscribes.
-  The privacy policy draft says today that Brevo records them and only totals are used; turning
-  tracking off means updating that line and `docs/PLUGINS.md`. Needs: decision, when the RSS
-  campaign is set up.
 - **L/S** Browsers' built-in "HTTPS only" list (HSTS preload). It needs the rule to cover every
   subdomain (`includeSubDomains`) and a `preload` directive, and leaving the list takes months, so
   only after email has left Bluehost and every subdomain answers over HTTPS; today the header is a
@@ -344,3 +338,6 @@ Privacy-first, without cookies, so no consent banner:
   for, saying what is missing; bigger tap areas on phones; visitor statistics and events (Umami);
   error tracking (Sentry, replacing the browser error reports to the Worker logs); the newsletter
   sign-up in the footer (Brevo double opt-in, welcome email, a notice to Arye).
+- 2026-10-13: newsletter open and click tracking stays on (Brevo's default), stated in the privacy
+  policy only (Arye: a consent line in the form would drive subscribers away; the audience is
+  Israeli, while France's regulator wants consent for open tracking since April 2026).
