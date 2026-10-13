@@ -36,3 +36,6 @@ export function excerptOf(markdoc: string, words: number): string {
     .filter(Boolean);
   return text.length > words ? `${text.slice(0, words).join(' ')} …` : text.join(' ');
 }
+
+/** The privacy policy (src/content/pages/privacy-policy.mdoc), linked from the forms. */
+export const PRIVACY_POLICY_URL = '/privacy-policy/';

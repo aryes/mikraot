@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { PRIVACY_POLICY_URL } from '../lib/urls';
 import { Turnstile } from './Turnstile';
 
 type State = 'idle' | 'sending' | 'sent' | 'error' | 'check-failed';
@@ -185,7 +186,16 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
       </p>
       {!sent && (
         <p className="text-xs text-slate-400">
-          הכתובת נשמרת אצל Brevo, שירות הדיוור שלנו, רק לצורך העדכונים.
+          הכתובת נשמרת אצל Brevo, שירות הדיוור שלנו, רק לצורך העדכונים (
+          <a
+            href={PRIVACY_POLICY_URL}
+            target="_blank"
+            rel="noopener"
+            className="underline hover:text-white"
+          >
+            מדיניות הפרטיות
+          </a>
+          ).
         </p>
       )}
     </form>

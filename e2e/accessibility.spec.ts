@@ -52,6 +52,9 @@ test('no accessibility violations with comments loaded', async ({ page }) => {
   await page.getByRole('button', { name: 'כתבו תגובה או שאלה' }).click();
   await page.getByRole('button', { name: 'פרסום תגובה' }).click();
   await expect(page.getByText('נא לכתוב שם.')).toBeVisible();
+  // Centred: where the browser scrolled to otherwise depends on the form's height, and a button
+  // left under the sticky header counts as too small a target (axe's target-size).
+  await page.getByText('נא לכתוב שם.').evaluate((el) => el.scrollIntoView({ block: 'center' }));
   expect(await scan(page)).toEqual([]);
 });
 

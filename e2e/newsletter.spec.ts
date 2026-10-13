@@ -82,3 +82,19 @@ test("a mail app's one-click unsubscribe gets the same answer for any token", as
   expect(response.status()).toBe(200);
   expect(await response.text()).toBe('Unsubscribed');
 });
+
+test('the privacy policy is published and linked from the footer and both forms', async ({
+  page,
+}) => {
+  const policy = await page.goto('/privacy-policy/');
+  expect(policy?.status()).toBe(200);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('מדיניות הפרטיות');
+  await page.goto('/about/');
+  await expect(page.locator('footer a[href="/privacy-policy/"]')).toHaveCount(2); // line + form
+  const loaded = page.waitForResponse((r) => r.url().includes('/api/comments/') && r.ok());
+  await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
+  await loaded;
+  await page.getByRole('button', { name: 'כתבו תגובה או שאלה' }).click();
+  // The comment form's link (the page's content has none of its own).
+  await expect(page.locator('main').getByRole('link', { name: 'מדיניות הפרטיות' })).toBeVisible();
+});
