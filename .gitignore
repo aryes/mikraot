@@ -13,6 +13,8 @@ dist-ssr
 .migration
 test-results
 playwright-report
+# Argos screenshots before upload (e2e/visual.spec.ts)
+screenshots/
 
 # Lighthouse CI reports (npm run lighthouse)
 .lighthouseci/

@@ -1,12 +1,13 @@
-import { expect, test, type Page } from '@playwright/test';
+import { argosScreenshot } from '@argos-ci/playwright';
+import { test } from '@playwright/test';
 import { VISUAL } from './tags';
 
 /**
- * Screenshot comparisons of one page of each kind: an unintended change to the layout, fonts or
- * colours fails here. On the phone the whole page is compared; on desktop the first screen
- * (header, banner, layout), which keeps the reference images, committed to the public repository,
- * small. After an intended change, update them with
- * `npx playwright test e2e/visual.spec.ts --update-snapshots` and look at them before committing.
+ * Screenshots of one page of each kind, whole pages on desktop and phone. In CI they go to Argos
+ * (argos-ci.com, project mikraot), which compares them with those of main and shows the
+ * differences on the pull request (a check that informs, not one that blocks merging); the design
+ * review (docs/DESIGN-REVIEW.md) looks at them. Argos keeps main's as the reference, so the
+ * repository holds no images. Argos waits for fonts and images itself.
  */
 const PAGES = {
   home: '/',
@@ -16,41 +17,14 @@ const PAGES = {
   about: '/about/',
 };
 
-/** Waits until the fonts and every image (lazy ones included) have loaded or failed. */
-async function settle(page: Page): Promise<void> {
-  await page.evaluate(async () => {
-    window.scrollTo(0, document.body.scrollHeight);
-    await document.fonts.ready;
-    await Promise.all(
-      [...document.images].map(async (img) => {
-        img.loading = 'eager';
-        if (img.complete) return;
-        await new Promise((done) => {
-          img.addEventListener('load', done, { once: true });
-          img.addEventListener('error', done, { once: true });
-        });
-      }),
-    );
-    window.scrollTo(0, 0);
-  });
-}
+/** Hidden in the screenshots: not this site's doing (comments, YouTube's video pictures). */
+const HIDDEN = '[data-pagefind-ignore], div:has(> .video-play-btn) img { visibility: hidden; }';
 
 for (const [name, path] of Object.entries(PAGES)) {
-  test(`looks as before: ${name}`, VISUAL, async ({ page, isMobile }) => {
+  test(`screenshot: ${name}`, VISUAL, async ({ page }, testInfo) => {
     // No comments: tests running alongside post some, which would change the page's length.
     await page.route('**/api/comments/**', (route) => route.fulfill({ json: [] }));
     await page.goto(path);
-    await settle(page);
-    await expect(page).toHaveScreenshot(`${name}.png`, {
-      fullPage: isMobile,
-      animations: 'disabled',
-      // A handful of pixels: a colour change to a few marked letters must still fail.
-      maxDiffPixels: 100,
-      // Not this site's doing: comments (other tests add some) and video pictures (YouTube's).
-      mask: [
-        page.locator('[data-pagefind-ignore]'),
-        page.locator('div:has(> .video-play-btn) img'),
-      ],
-    });
+    await argosScreenshot(page, `${name}-${testInfo.project.name}`, { argosCSS: HIDDEN });
   });
 }
