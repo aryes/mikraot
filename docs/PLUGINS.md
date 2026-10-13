@@ -9,37 +9,37 @@ Status: ✅ in the new site · ⬜ to do (task in `docs/ROADMAP.md`) · ❓ need
 
 ## Comments (WordPress core, Akismet, Jetpack)
 
-| Feature                                                              | Live                       | New site                                                                    |
-| -------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------- |
-| Comment form: name and email required, comment published immediately | yes                        | ✅                                                                          |
-| Website (URL) field                                                  | yes                        | ➖ dropped: mostly used by spammers                                         |
-| Spam filtering (Akismet: 2,504 caught)                               | yes                        | ✅ Turnstile, rate limit, honeypot                                          |
-| **Email to Arye on every new comment** (core `comments_notify`)      | yes                        | ⬜ needs email sending from the Worker                                      |
-| **Replies to a specific comment** (threaded, 5 levels)               | yes (1 admin reply so far) | ✅ "השיבו" button, replies nested                                           |
-| "Remember my name and email" checkbox (cookie)                       | yes                        | ✅ remembered in the browser (localStorage), opt-in                         |
-| "Notify me of follow-up comments by email" (Jetpack)                 | yes, on posts              | ⬜ reply notifications (needs email sending)                                |
-| "Notify me of new posts by email" (Jetpack Subscriptions)            | yes, on posts              | ⬜ Brevo newsletter; check WordPress.com for existing subscribers           |
-| Gravatar avatars                                                     | yes                        | ➖ replaced by plain icons (no third-party requests, better privacy)        |
-| Pingbacks / trackbacks                                               | open, none ever received   | ➖                                                                          |
-| Old comment links `#comment-<id>`                                    | yes                        | ✅                                                                          |
-| Moderation (approve, delete, edit, reply as admin)                   | WordPress admin            | ⬜ moderation page behind Cloudflare Access (today: database commands only) |
+| Feature                                                              | Live                       | New site                                                                                                                    |
+| -------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Comment form: name and email required, comment published immediately | yes                        | ✅                                                                                                                          |
+| Website (URL) field                                                  | yes                        | ➖ dropped: mostly used by spammers                                                                                         |
+| Spam filtering (Akismet: 2,504 caught)                               | yes                        | ✅ Turnstile, rate limit, honeypot                                                                                          |
+| **Email to Arye on every new comment** (core `comments_notify`)      | yes                        | ⬜ needs email sending from the Worker                                                                                      |
+| **Replies to a specific comment** (threaded, 5 levels)               | yes (1 admin reply so far) | ✅ "השיבו" button, replies nested                                                                                           |
+| "Remember my name and email" checkbox (cookie)                       | yes                        | ✅ remembered in the browser (localStorage), opt-in                                                                         |
+| "Notify me of follow-up comments by email" (Jetpack)                 | yes, on posts              | ⬜ reply notifications (needs email sending)                                                                                |
+| "Notify me of new posts by email" (Jetpack Subscriptions)            | yes, on posts              | ⬜ Brevo newsletter: sign-up done; new-post emails wait for the RSS campaign; Jetpack had no email subscribers (2026-10-13) |
+| Gravatar avatars                                                     | yes                        | ➖ replaced by plain icons (no third-party requests, better privacy)                                                        |
+| Pingbacks / trackbacks                                               | open, none ever received   | ➖                                                                                                                          |
+| Old comment links `#comment-<id>`                                    | yes                        | ✅                                                                                                                          |
+| Moderation (approve, delete, edit, reply as admin)                   | WordPress admin            | ⬜ moderation page behind Cloudflare Access (today: database commands only)                                                 |
 
 ## Newsletter (Email Subscribers, Jetpack Subscriptions)
 
 Decided 2026-10-03: **Brevo** (tasks in `docs/ROADMAP.md`). It must cover:
 
-| Feature                                                                               | Live                       |
-| ------------------------------------------------------------------------------------- | -------------------------- |
-| Sign-up form "הרשמה" in the sidebar (name, email)                                     | yes                        |
-| Double opt-in (confirmation email)                                                    | yes                        |
-| Welcome email                                                                         | yes                        |
-| Email to Arye on each new subscriber                                                  | yes                        |
-| Automatic "new post" email to subscribers                                             | yes (campaign active)      |
-| Newsletters written by hand                                                           | 1 sent                     |
-| Unsubscribe link and page                                                             | yes                        |
-| Blocked sign-up domains (`mail.ru`), sender name "מקראות"                             | yes                        |
-| Open tracking                                                                         | on (➖ drop: privacy)      |
-| Subscribers: 6 confirmed, 16 unconfirmed (+ any Jetpack subscribers on WordPress.com) | to import (confirmed only) |
+| Feature                                                                   | Live                        |
+| ------------------------------------------------------------------------- | --------------------------- |
+| Sign-up form "הרשמה" in the sidebar (name, email)                         | yes                         |
+| Double opt-in (confirmation email)                                        | yes                         |
+| Welcome email                                                             | yes                         |
+| Email to Arye on each new subscriber                                      | yes                         |
+| Automatic "new post" email to subscribers                                 | yes (campaign active)       |
+| Newsletters written by hand                                               | 1 sent                      |
+| Unsubscribe link and page                                                 | yes                         |
+| Blocked sign-up domains (`mail.ru`), sender name "מקראות"                 | yes                         |
+| Open tracking                                                             | on (➖ drop: privacy)       |
+| Subscribers: 5 confirmed (2 real), 16 unconfirmed; Jetpack: none by email | ✅ the 2 real ones in Brevo |
 
 ## SEO (All in One SEO)
 
