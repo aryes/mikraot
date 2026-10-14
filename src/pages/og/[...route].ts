@@ -4,7 +4,8 @@
  * out right-to-left text; files at /og/<page path>.jpeg (src/lib/og.ts).
  *
  * The background is src/assets/og-background.jpg: the banner photo at 1200×630, 45% brightness.
- * Noto Sans Hebrew, as on the site, for titles with and without marks.
+ * Noto Sans Hebrew for titles with and without marks (the site itself moved to Taamey David CLM on
+ * 2026-10-14; the share pictures, small and rarely pointed, kept Noto).
  */
 import { OGImageRoute } from 'astro-og-canvas';
 import { getSitePages, site } from '../../lib/site';
