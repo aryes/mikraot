@@ -194,7 +194,7 @@ test('content formatting renders: centred table cells and the meaningful colours
   await page.goto('/silent-letters/');
   const silent = page.locator('.wp-content-rendered .mark-silent').first();
   await expect(silent).toHaveCSS('color', 'rgb(112, 112, 112)');
-  await expect(silent).toHaveCSS('text-decoration-style', 'dotted');
+  await expect(silent).toHaveCSS('text-decoration-line', 'none');
 });
 
 test('heading anchors from WordPress survive (Hebrew ones included)', async ({ page }) => {
