@@ -10,7 +10,11 @@ didn't (a mark before the letter's vowel, two marks on one letter, a mark beside
    anchors where marks attach to a letter move with the letter's new width. All marks, niqqud
    included, and all positioning rules stay Medium's: the Bold draws its marks at other heights,
    so its niqqud with Medium's rules misplaced the holam, for one.
-2. Size: its letters are about 7% shorter than Noto's at the same font size. Both weights are
+2. Telisha with gershayim on one letter (זֶ֠֞ה, קִ֠רְב֠֞וּ): the font pushes the two far apart, the
+   gershayim onto the next letter. A rule added to the positioning moves the pair together,
+   centred over the letter (Arye, 2026-10-14). The two marks are each about as wide as a zayin, so
+   on a narrow letter the pair still overhangs a little.
+3. Size: its letters are about 7% shorter than Noto's at the same font size. Both weights are
    enlarged by that much (a smaller unitsPerEm draws every glyph larger, outlines unchanged), so
    the site's sizes stay as they were designed.
 
@@ -25,13 +29,17 @@ v2 with the font exception; see LICENSE and GNU-GPL there). Outputs: src/assets/
 
 from pathlib import Path
 
+from fontTools.feaLib.builder import addOpenTypeFeaturesFromString
 from fontTools.ttLib import TTFont
 
 SOURCE = Path("scripts/fonts/taamey-david")
 OUTPUT = Path("src/assets/fonts/taamey-david")
 # Medium's Hebrew letters (ב מ ה ש ם) are 0.93 of Noto Sans Hebrew's height.
 ENLARGE = 1.07
-CHANGE = "modified 2026-10-14 for mikraot.net: enlarged 7%, bold rebuilt from medium"
+CHANGE = (
+    "modified 2026-10-14 for mikraot.net: enlarged 7%, bold rebuilt from medium,"
+    " telisha and gershayim on one letter brought together"
+)
 
 
 def build_bold() -> TTFont:
@@ -75,6 +83,42 @@ def build_bold() -> TTFont:
     return medium
 
 
+# Telisha gedola then gershayim on one letter: the font's own rules put the telisha ~770 units
+# from the letter's start and the gershayim at -110, out over the next letter (shaped with
+# HarfBuzz). These shifts centre the pair on the letter, a small gap between them: the telisha
+# moves 210 units in, the gershayim 230 out; the gershayim is attached to the telisha, so its own
+# shift also undoes the telisha's (210 + 230).
+CLOSER = """
+lookup telishaGershayim {
+    pos telishagedola' <-210 0 0 0> gershayimaccent' <440 0 0 0>;
+} telishaGershayim;
+feature mkmk { lookup telishaGershayim; } mkmk;
+"""
+
+
+def bring_together(font: TTFont) -> None:
+    """Adds CLOSER after the font's own positioning rules (feaLib alone would replace them)."""
+    rules = TTFont(SOURCE / "TaameyDavidCLM-Medium.ttf")
+    del rules["GPOS"]
+    addOpenTypeFeaturesFromString(rules, CLOSER, tables=["GPOS"])
+    lookups = font["GPOS"].table.LookupList.Lookup
+    first = len(lookups)
+    added = rules["GPOS"].table.LookupList.Lookup
+    for lookup in added:  # the chain's references move with the lookups
+        for subtable in lookup.SubTable:
+            for record in getattr(subtable, "PosLookupRecord", None) or []:
+                record.LookupListIndex += first
+        lookups.append(lookup)
+    font["GPOS"].table.LookupList.LookupCount = len(lookups)
+    chain = first + next(
+        i for i, lookup in enumerate(added) if lookup.LookupType in (7, 8)
+    )
+    for record in font["GPOS"].table.FeatureList.FeatureRecord:
+        if record.FeatureTag == "mkmk":
+            record.Feature.LookupListIndex.append(chain)
+            record.Feature.LookupCount = len(record.Feature.LookupListIndex)
+
+
 def save(font: TTFont, name: str) -> None:
     """Enlarged (ENLARGE), marked as modified (GPL v2 section 2a), compressed for the web."""
     font["head"].unitsPerEm = round(font["head"].unitsPerEm / ENLARGE)
@@ -88,8 +132,11 @@ def save(font: TTFont, name: str) -> None:
 
 def main() -> None:
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    save(TTFont(SOURCE / "TaameyDavidCLM-Medium.ttf"), "TaameyDavidCLM-Medium.woff2")
-    save(build_bold(), "TaameyDavidCLM-Bold.woff2")
+    medium, bold = TTFont(SOURCE / "TaameyDavidCLM-Medium.ttf"), build_bold()
+    for font in (medium, bold):
+        bring_together(font)
+    save(medium, "TaameyDavidCLM-Medium.woff2")
+    save(bold, "TaameyDavidCLM-Bold.woff2")
 
 
 if __name__ == "__main__":
