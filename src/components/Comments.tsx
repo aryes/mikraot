@@ -296,7 +296,9 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
       {/* Comment List */}
       <div className="mb-8 space-y-4">
         {loading ? (
-          <div className="py-4 text-sm text-slate-600 dark:text-slate-300">טוען תגובות...</div>
+          <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-sm text-slate-600 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-300">
+            טוען תגובות...
+          </div>
         ) : comments.length === 0 ? (
           <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-sm text-slate-600 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-300">
             אין תגובות עדיין. היו הראשונים להגיב או לשאול שאלה!
