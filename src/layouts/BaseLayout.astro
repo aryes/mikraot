@@ -27,12 +27,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
-    <!-- Fonts (astro.config.mjs). Preloaded so they're ready for the first paint: Noto Sans (body
-         text; its Hebrew and Latin parts are on every page; without them a line wrapped differently
-         in the fallback font and the text below jumped) and Taamey D (the site name). The preload
-         also fetches Noto's small Latin Extended part, which local font files can't be told apart
-         from (measured 2026-10-11: still the fastest option, Lighthouse 96-97). -->
-    <Font cssVariable="--font-noto-sans" preload />
+    <!-- Fonts (astro.config.mjs). Preloaded so they're ready for the first paint (without them a
+         line wrapped differently in the fallback font and the text below jumped): Taamey David
+         CLM (all text) and Taamey D (the site name). -->
+    <Font cssVariable="--font-taamey-david" preload />
+    <!-- Not preloaded: only the few symbols Taamey David lacks (©, –, …, arrows) use it. -->
+    <Font cssVariable="--font-noto-sans" />
     <Font cssVariable="--font-taamey" preload />
     <!-- Not preloaded: only pages with Arabic letters use it (astro.config.mjs). -->
     <Font cssVariable="--font-noto-arabic" />

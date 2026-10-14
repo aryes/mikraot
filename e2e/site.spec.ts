@@ -219,14 +219,19 @@ test('fonts are self-hosted and load (no third-party font requests)', async ({ p
   });
   await page.goto('/שווא-נע/');
   await page.evaluate(() => document.fonts.ready);
-  // Astro names each family with a hash ("Noto Sans Hebrew-79fd…"); its sized fallbacks end in
+  // Astro names each family with a hash ("Taamey David CLM-79fd…"); its sized fallbacks end in
   // "fallback: Arial" and load nothing. The page's own fonts must have loaded.
   const loaded = await page.evaluate(() =>
     [...document.fonts]
       .filter((face) => face.status === 'loaded' && !face.family.includes('fallback'))
       .map((face) => face.family.replace(/^"|"$/g, '').replace(/-[0-9a-f]+$/, '')),
   );
-  expect(new Set(loaded)).toEqual(new Set(['Noto Sans Hebrew', 'Taamey D']));
+  // Taamey David for the text, Taamey D for the site name; Noto Sans Hebrew only for the few
+  // symbols Taamey David lacks (the footer's ©), so it may load too.
+  expect(loaded).toEqual(expect.arrayContaining(['Taamey David CLM', 'Taamey D']));
+  expect(
+    loaded.filter((f) => !['Taamey David CLM', 'Taamey D', 'Noto Sans Hebrew'].includes(f)),
+  ).toEqual([]);
   expect(external).toEqual([]);
 });
 
@@ -247,8 +252,9 @@ async function renderedFonts(page: Page, path: string, selector: string): Promis
   return [...new Set(perNode.flat().map((font) => font.familyName))];
 }
 
-/** Families other than Noto Hebrew, the one font for all text (Taamey D is only the logo's). */
-const notNoto = (families: string[]) => families.filter((f) => !f.startsWith('Noto '));
+/** Families other than the site's own: Taamey David (all text), Noto for the symbols it lacks. */
+const otherFonts = (families: string[]) =>
+  families.filter((f) => f !== 'Taamey David CLM' && !f.startsWith('Noto '));
 
 test('text with cantillation marks renders in the site font only (no other or system font)', async ({
   page,
@@ -257,9 +263,11 @@ test('text with cantillation marks renders in the site font only (no other or sy
   test.skip(browserName !== 'chromium', 'uses the Chrome DevTools protocol');
   // The rarest marks in the content (קרני פרה, ירח בן יומו…) are on this page.
   const content = '.wp-content-rendered p, .wp-content-rendered li, h1';
-  expect(notNoto(await renderedFonts(page, '/טעמים-נדירים/', content))).toEqual([]);
+  const families = await renderedFonts(page, '/טעמים-נדירים/', content);
+  expect(families).toContain('Taamey David CLM');
+  expect(otherFonts(families)).toEqual([]);
   // A post title with niqqud and a טעם, in an archive list.
-  expect(notNoto(await renderedFonts(page, '/2021/08/', '.latest-posts a'))).toEqual([]);
+  expect(otherFonts(await renderedFonts(page, '/2021/08/', '.latest-posts a'))).toEqual([]);
 });
 
 test('Arabic letters render in Noto Sans Arabic (their dots showed poorly in system fonts)', async ({
@@ -271,7 +279,7 @@ test('Arabic letters render in Noto Sans Arabic (their dots showed poorly in sys
   // (the self-hosted fonts test above lists what /שווא-נע/ loads).
   const families = await renderedFonts(page, '/מבטא/', '.wp-content-rendered td');
   expect(families).toContain('Noto Sans Arabic');
-  expect(notNoto(families)).toEqual([]); // no system font for any letter in the tables
+  expect(otherFonts(families)).toEqual([]); // no system font for any letter in the tables
 });
 
 test('search finds pages by keyword (Ctrl+K), ignoring niqqud', async ({ page }) => {
