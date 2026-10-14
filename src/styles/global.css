@@ -118,12 +118,12 @@
   margin-bottom: 0.75rem;
 }
 .wp-content-rendered h2 {
-  font-size: 1.6rem;
+  font-size: 1.45rem; /* 1.6 before 2026-10-14: in Taamey David's bold it outweighed the title */
   border-bottom: 2px solid var(--heading-rule);
   padding-bottom: 0.5rem;
 }
 .wp-content-rendered h3 {
-  font-size: 1.4rem;
+  font-size: 1.3rem; /* below h2 (1.45rem) by more than a hair */
   color: var(--content-subheading);
 }
 .wp-content-rendered h4 {
