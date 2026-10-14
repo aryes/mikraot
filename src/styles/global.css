@@ -138,8 +138,9 @@
 }
 .wp-content-rendered p {
   margin-bottom: 1rem;
-  /* Room above and below the letters for stacked niqqud and cantillation marks. */
-  line-height: 2.1;
+  /* Room above and below the letters for stacked niqqud and cantillation marks: 1.8, chosen by
+     Arye from phone screenshots after the switch to Taamey David (2026-10-14; 2.1 before). */
+  line-height: 1.8;
   color: var(--content-text);
   font-size: var(--content-size);
 }
@@ -186,7 +187,7 @@
 }
 .wp-content-rendered li {
   margin-bottom: 0.4rem;
-  line-height: 2;
+  line-height: 1.8;
   color: var(--content-text);
   font-size: var(--content-size);
 }
