@@ -22,6 +22,8 @@ const refresh = process.argv.includes('--refresh');
  * site; e2e/archives.spec.ts covers them.
  */
 const NOT_CONTENT = /^\/(\d{4}\/\d{2}|category\/[^/]+|מה-חדש)\/$/;
+/** Pages published here but never on WordPress (a draft there): no live page to compare. */
+const NEW_HERE = new Set(['/privacy-policy/']);
 const pageUrls = [
   ...readFileSync('dist/client/sitemap-0.xml', 'utf8').matchAll(
     /<loc>https:\/\/mikraot\.net([^<]*)<\/loc>/g,
@@ -110,13 +112,11 @@ function textDifference(live: string, ours: string): string | null {
   return `TEXT differs at ${i}: live "…${x.slice(i, i + 50)}" vs ours "…${y.slice(i, i + 50)}"`;
 }
 
-/** The live page's HTML, or null for a page WordPress doesn't publish (new on this site). */
-async function livePage(url: string): Promise<string | null> {
+async function livePage(url: string): Promise<string> {
   mkdirSync(CACHE, { recursive: true });
   const file = `${CACHE}/${encodeURIComponent(url)}.html`;
   if (!refresh && existsSync(file)) return readFileSync(file, 'utf8');
   const res = await fetch(LIVE + encodeURI(url));
-  if (res.status === 404) return null;
   if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
   const html = await res.text();
   writeFileSync(file, html);
@@ -126,13 +126,11 @@ async function livePage(url: string): Promise<string | null> {
 const rows: string[] = [];
 let differing = 0;
 for (const url of pageUrls) {
-  const html = await livePage(url);
-  if (html === null) {
-    // E.g. the privacy policy, published here on 2026-10-14 (never on WordPress): not a difference.
-    rows.push(`| ${url} | new: not on the live site |`);
+  if (NEW_HERE.has(url)) {
+    rows.push(`| ${url} | new: not published on WordPress |`);
     continue;
   }
-  const live = parseHTML(html).document.querySelector('.entry-content');
+  const live = parseHTML(await livePage(url)).document.querySelector('.entry-content');
   const ours = parseHTML(
     readFileSync(`dist/client${url}index.html`, 'utf8'),
   ).document.querySelector('.wp-content-rendered');
