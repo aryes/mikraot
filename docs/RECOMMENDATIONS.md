@@ -333,6 +333,8 @@ Privacy-first, without cookies, so no consent banner:
   for, saying what is missing; bigger tap areas on phones; visitor statistics and events (Umami);
   error tracking (Sentry, replacing the browser error reports to the Worker logs); the newsletter
   sign-up in the footer (Brevo double opt-in, welcome email, a notice to Arye).
+- 2026-10-14: Taamey David CLM for all text, replacing Noto, which misplaced rarer cantillation
+  combinations (with a rebuilt bold that keeps the marks).
 - 2026-10-13: newsletter open and click tracking stays on (Brevo's default), stated in the privacy
   policy only (Arye: a consent line in the form would drive subscribers away; the audience is
   Israeli, while France's regulator wants consent for open tracking since April 2026).

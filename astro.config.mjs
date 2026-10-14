@@ -123,14 +123,37 @@ export default defineConfig({
   // fonts, but Fontsource's online copies were up to 70% larger (measured 2026-10-11).
   fonts: [
     {
-      // All text, headings included, with or without marks: one font for all Hebrew, so pointed
-      // and plain words look alike side by side (Arye, 2026-10-11); headings differ by size and
-      // weight only. Noto covers every niqqud and cantillation mark.
+      // Only the few symbols Taamey David lacks (©, –, …, arrows) since 2026-10-14; not preloaded.
       provider: fontProviders.local(),
       name: 'Noto Sans Hebrew',
       cssVariable: '--font-noto-sans',
       fallbacks: ['sans-serif'],
       options: { variants: notoSubsets('noto-sans-hebrew') },
+    },
+    {
+      // All text, headings included (2026-10-14, Arye): Taamey David CLM places cantillation marks
+      // correctly where Noto doesn't. scripts/fonts/taamey-david.py rebuilds its bold (Culmus's has
+      // no cantillation) and enlarges both weights to Noto's letter size.
+      provider: fontProviders.local(),
+      name: 'Taamey David CLM',
+      cssVariable: '--font-taamey-david',
+      // No stand-in font of its own: symbols it lacks must reach Noto next in --font-sans, not a
+      // system serif (it's preloaded, so the page rarely draws before it arrives).
+      fallbacks: [],
+      options: {
+        variants: [
+          {
+            src: ['./src/assets/fonts/taamey-david/TaameyDavidCLM-Medium.woff2'],
+            weight: '400',
+            style: 'normal',
+          },
+          {
+            src: ['./src/assets/fonts/taamey-david/TaameyDavidCLM-Bold.woff2'],
+            weight: '700',
+            style: 'normal',
+          },
+        ],
+      },
     },
     {
       // The Arabic letters on the pronunciation pages: without a font of our own they fell back to
