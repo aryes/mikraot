@@ -253,9 +253,10 @@
   color: var(--mark-muted); /* context, e.g. the surrounding words of a trope chain */
 }
 .wp-content-rendered .mark-silent {
-  color: var(--mark-silent); /* silent letters: lighter than context, and dotted underneath */
-  text-decoration: underline dotted 1px;
-  text-underline-offset: 0.45em;
+  /* Silent letters: lighter than the text around them (AA contrast in both modes). The dotted
+     underline that was a second cue went at Arye's request (2026-10-14): it read as noise under
+     pointed text. */
+  color: var(--mark-silent);
 }
 /* As on the live site, kbd has no frame: the content uses it (with spaces) to indent verses. */
 .wp-content-rendered .content-kbd {
