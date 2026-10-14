@@ -243,8 +243,9 @@
 
 /* Content tags (markdoc.config.mjs). The colours carry meaning in the lessons. */
 /* Teaching colours (2026-10-04): the WordPress shades (#ff6600, #c3c3c3, #d1cfcf) were below
-   WCAG AA contrast. These meet 4.5:1 on every content background (white, table rows), and each
-   mark has a cue besides colour (WCAG 1.4.1). */
+   WCAG AA contrast. These meet 4.5:1 on every content background (white, table rows). The taught
+   letter is also bold; the muted and silent ones differ by colour only (Arye, 2026-10-14), which
+   WCAG 1.4.1 (not colour alone) doesn't strictly allow. */
 .wp-content-rendered .mark-highlight {
   color: var(--mark-highlight); /* the letter or vowel being taught */
   font-weight: 700;
