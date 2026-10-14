@@ -7,24 +7,20 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 
 /**
- * The self-hosted Noto variable fonts (Fontsource packages), as Astro font variants: the Hebrew,
- * Latin and Latin Extended subsets, each with its unicode range, so browsers fetch only the
- * subsets a page uses (as Fontsource's own CSS did). The ranges are Fontsource's. The Hebrew subset
- * is our copy with bold vowel and cantillation marks (scripts/fonts/bold-marks.py).
+ * The self-hosted Noto variable fonts (Fontsource packages), as Astro font variants: the Latin and
+ * Latin Extended subsets, each with its unicode range, so browsers fetch only the subsets a page
+ * uses (as Fontsource's own CSS did). The ranges are Fontsource's.
  */
 const notoSubsets = (/** @type {string} */ name) => {
   const variant = (/** @type {string} */ subset, /** @type {string} */ range) => ({
     src: /** @type {[string]} */ ([
-      subset === 'hebrew'
-        ? `./src/assets/fonts/noto-bold-marks/${name}-hebrew-wght-normal.woff2`
-        : `@fontsource-variable/${name}/files/${name}-${subset}-wght-normal.woff2`,
+      `@fontsource-variable/${name}/files/${name}-${subset}-wght-normal.woff2`,
     ]),
     weight: /** @type {const} */ ('100 900'),
     style: /** @type {const} */ ('normal'),
     unicodeRange: /** @type {[string]} */ ([range]),
   });
   return /** @type {[ReturnType<typeof variant>, ...ReturnType<typeof variant>[]]} */ ([
-    variant('hebrew', 'U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F'),
     variant(
       'latin',
       'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD',

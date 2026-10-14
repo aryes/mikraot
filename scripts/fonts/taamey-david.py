@@ -14,8 +14,9 @@ didn't (a mark before the letter's vowel, two marks on one letter, a mark beside
    enlarged by that much (a smaller unitsPerEm draws every glyph larger, outlines unchanged), so
    the site's sizes stay as they were designed.
 
-Run from the repository root, in the Python environment of bold-marks.py:
+Run from the repository root, in a Python environment with fontTools:
 
+    python -m venv .venv && .venv/Scripts/python -m pip install -r scripts/fonts/requirements.txt
     .venv/Scripts/python scripts/fonts/taamey-david.py
 
 Inputs: scripts/fonts/taamey-david/TaameyDavidCLM-{Medium,Bold}.ttf (Culmus, by Yoram Gnat, GPL
