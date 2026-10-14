@@ -110,11 +110,13 @@ function textDifference(live: string, ours: string): string | null {
   return `TEXT differs at ${i}: live "…${x.slice(i, i + 50)}" vs ours "…${y.slice(i, i + 50)}"`;
 }
 
-async function livePage(url: string): Promise<string> {
+/** The live page's HTML, or null for a page WordPress doesn't publish (new on this site). */
+async function livePage(url: string): Promise<string | null> {
   mkdirSync(CACHE, { recursive: true });
   const file = `${CACHE}/${encodeURIComponent(url)}.html`;
   if (!refresh && existsSync(file)) return readFileSync(file, 'utf8');
   const res = await fetch(LIVE + encodeURI(url));
+  if (res.status === 404) return null;
   if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
   const html = await res.text();
   writeFileSync(file, html);
@@ -124,7 +126,13 @@ async function livePage(url: string): Promise<string> {
 const rows: string[] = [];
 let differing = 0;
 for (const url of pageUrls) {
-  const live = parseHTML(await livePage(url)).document.querySelector('.entry-content');
+  const html = await livePage(url);
+  if (html === null) {
+    // E.g. the privacy policy, published here on 2026-10-14 (never on WordPress): not a difference.
+    rows.push(`| ${url} | new: not on the live site |`);
+    continue;
+  }
+  const live = parseHTML(html).document.querySelector('.entry-content');
   const ours = parseHTML(
     readFileSync(`dist/client${url}index.html`, 'utf8'),
   ).document.querySelector('.wp-content-rendered');
