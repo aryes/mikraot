@@ -26,6 +26,9 @@ const collapse = (/** @type {boolean} */ inline) => ({
  */
 const LETTER = /^(?:[\p{Script=Hebrew}\p{Script=Arabic}]\p{M}*|\p{Script=Latin}{1,2})$/u;
 
+/** One or two English letters, then a Hebrew example of their sound ("th כמו במילה the"). */
+const EXAMPLE = /^(\p{Script=Latin}{1,2})\s+(.*\p{Script=Hebrew}.*)$/u;
+
 /** A cell holding a letter, or letters separated by "/" ("ס / שׂ"): shown large. */
 const isLetters = (/** @type {string} */ text) =>
   text !== '' && text.split('/').every((part) => LETTER.test(part.trim()));
@@ -67,6 +70,17 @@ const td = {
         { ...attributes, class: 'cell-letter' },
         node.transformChildren(config),
       );
+    }
+    // English letters with an example ("th כמו במילה the"): the letters large like their column,
+    // the example under them at text size (Arye, 2026-10-15).
+    const example = others.length === 0 && audio.length === 0 && EXAMPLE.exec(text);
+    if (example) {
+      const [, letters = '', words = ''] = example;
+      return new Markdoc.Tag('td', { ...attributes, class: 'cell-letter' }, [
+        letters,
+        ' ', // keeps "th" and "כמו" apart for search and screen readers
+        new Markdoc.Tag('span', { class: 'cell-example' }, [words]),
+      ]);
     }
     return new Markdoc.Tag('td', attributes, node.transformChildren(config));
   },

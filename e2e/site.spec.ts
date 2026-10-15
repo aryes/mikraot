@@ -712,8 +712,7 @@ test('in the letter tables a letter is its own play button, drawn large', async 
   const tile = page.getByRole('button', { name: 'השמע: בּ (ב דגושה)' });
   await expect(tile).toHaveText('בּ');
   const cellSize = await page
-    .locator('td')
-    .filter({ hasText: 'במילה' })
+    .locator('.wp-content-rendered p') // text size, as in a table's text cells
     .first()
     .evaluate((td) => parseFloat(getComputedStyle(td).fontSize));
   const letterSize = await tile
@@ -725,7 +724,16 @@ test('in the letter tables a letter is its own play button, drawn large', async 
 
   // Letters alone in a cell are large too: Arabic, and English for uniformity (not words).
   await expect(page.locator('td.cell-letter').filter({ hasText: /^\s*b\s*$/ })).toHaveCount(1);
-  await expect(page.locator('td.cell-letter').filter({ hasText: 'במילה' })).toHaveCount(0);
+  // Letters with an example: the letters large, the example under them at text size.
+  const example = page.locator('td.cell-letter .cell-example').filter({ hasText: 'כמו במילה the' });
+  await expect(example).toHaveCount(1);
+  expect(
+    await example.evaluate(
+      (span) =>
+        parseFloat(getComputedStyle(span.parentElement ?? span).fontSize) /
+        parseFloat(getComputedStyle(span).fontSize),
+    ),
+  ).toBeCloseTo(1.7, 1);
   await page.goto('/מבטא/');
   await expect(page.locator('td.cell-letter').filter({ hasText: 'غ' })).toHaveCount(1);
   await expect(page.locator('td.cell-letter').filter({ hasText: /^\s*sh\s*$/ })).toHaveCount(1);
