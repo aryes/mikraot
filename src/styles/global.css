@@ -34,6 +34,7 @@
   --page: #f3f7f5;
   --content-text: #1e293b;
   --content-heading: #334155;
+  --section-heading: var(--color-brand-strong);
   --content-subheading: #44505b;
   --content-link: var(--color-brand-strong);
   --content-link-hover: var(--color-brand-deep);
@@ -74,6 +75,7 @@
     --page: #020617;
     --content-text: #e2e8f0;
     --content-heading: #f1f5f9;
+    --section-heading: var(--color-brand);
     --content-subheading: #cbd5e1;
     --content-link: var(--color-brand);
     --content-link-hover: var(--color-brand-light);
@@ -135,12 +137,17 @@
   margin-bottom: 0.75rem;
 }
 .wp-content-rendered h2 {
-  font-size: 1.45rem; /* 1.6 before 2026-10-14: in Taamey David's bold it outweighed the title */
+  /* Section headings: regular weight, larger and green (Arye, 2026-10-15). In Taamey David's bold
+     they were heavy and looked like the bold words in the text; the weight sets them apart from
+     the page title (bold green), the colour from bold words. */
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: var(--section-heading);
   border-bottom: 2px solid var(--heading-rule);
   padding-bottom: 0.5rem;
 }
 .wp-content-rendered h3 {
-  font-size: 1.3rem; /* below h2 (1.45rem) by more than a hair */
+  font-size: 1.3rem; /* bold and grey, below the regular green h2 (1.75rem) */
   color: var(--content-subheading);
 }
 .wp-content-rendered h4 {
@@ -149,6 +156,7 @@
 /* A heading drawn smaller than its level (markdoc.config.mjs, size="small"). */
 .wp-content-rendered .heading-small {
   font-size: 1.3rem;
+  font-weight: 700; /* stays as it was: the front page's topic headings */
   color: var(--content-heading);
   border-bottom: 0;
   padding-bottom: 0;
