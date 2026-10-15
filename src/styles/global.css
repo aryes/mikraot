@@ -288,6 +288,13 @@
   line-height: 1.2;
   white-space: nowrap; /* "ס / שׂ" on one line */
 }
+/* The example under large English letters ("th", then "כמו במילה the"), at text size. */
+.wp-content-rendered .cell-example {
+  display: block;
+  font-size: var(--content-size);
+  line-height: 1.5;
+  white-space: normal;
+}
 /* A recording alone in its cell sits in the middle of it. */
 .wp-content-rendered td .inline-audio-btn:not(.audio-tile) {
   display: flex;
