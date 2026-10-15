@@ -1,9 +1,11 @@
 ---
 /**
  * The newest posts (the WordPress "latest posts" block), with a link to all announcements ("מה
- * חדש", which also lists update notes; it was a sidebar box until 2026-10-12).
+ * חדש", which also lists update notes; it was a sidebar box until 2026-10-12), and under them an
+ * invitation to the email updates (the footer has the same form folded behind a button).
  */
 import { getPosts, WHATS_NEW_URL } from '../../lib/site';
+import { NewsletterSignup } from '../NewsletterSignup';
 import PostList from '../PostList.astro';
 ---
 
@@ -11,3 +13,4 @@ import PostList from '../PostList.astro';
 <p>
   <a href={WHATS_NEW_URL}>לכל העדכונים</a>
 </p>
+<NewsletterSignup client:visible variant="box" />
