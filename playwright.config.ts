@@ -26,8 +26,9 @@ export default defineConfig({
   globalSetup: './e2e/warm-up.ts',
   forbidOnly: Boolean(process.env['CI']),
   // One retry (in every run, CI and deployed ones too) absorbs a rare page load that aborts after
-  // 30 s, in a different test each time: likely a stall of the local server on Windows
-  // (investigated 2026-10-07; not seen in CI on Linux). Retried tests are still reported as flaky.
+  // 30 s, in a different test each time: Cloudflare's local runtime resetting connections under
+  // load on Windows (found 2026-10-15, see webServer below; not seen in CI on Linux). Retried tests
+  // are still reported as flaky.
   retries: 1,
   // In CI (pull requests and main, not the deployed-site runs) the screenshots go to Argos, which
   // compares them with main's and reports the differences on the pull request.
@@ -43,7 +44,7 @@ export default defineConfig({
     ],
   ],
   use: {
-    baseURL: deployed ?? `http://localhost:${port}`,
+    baseURL: deployed ?? `http://127.0.0.1:${port}`, // where wrangler dev listens (not ::1)
     trace: 'retain-on-failure',
     // The same text rendering on every machine (Argos's advice for stable screenshots).
     launchOptions: { args: ['--disable-lcd-text', '--font-render-hinting=none'] },
@@ -53,12 +54,17 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] }, ...readOnly },
   ],
   // Tests run against the production build in Cloudflare's workerd runtime, with the local D1
-  // database reset to e2e/fixtures/comments.sql (fictional data).
+  // database reset to e2e/fixtures/comments.sql (fictional data). Served by `wrangler dev` with the
+  // built Worker's config rather than `astro preview`: the latter adds Vite's proxy in front of
+  // workerd, whose loopback connections reset under the suite's load on Windows (requests left
+  // pending, page loads never finishing; 3–11 stalled tests per local run, 2026-10-15). Directly
+  // on workerd: 0–3 per run, and the suite is faster. --persist-to: the D1 that
+  // db:local:reset fills (by default wrangler would keep its data beside dist/server/).
   webServer: deployed
     ? []
     : {
-        command: `npm run db:local:reset && npm run build:site && npx astro preview --port ${port}`,
-        url: `http://localhost:${port}/`,
+        command: `npm run db:local:reset && npm run build:site && npx wrangler dev --config dist/server/wrangler.json --port ${port} --persist-to .wrangler/state`,
+        url: `http://127.0.0.1:${port}/`,
         reuseExistingServer: !process.env['CI'],
         timeout: 180_000,
         // Cloudflare's always-pass Turnstile test key (.dev.vars has the matching test secret).
