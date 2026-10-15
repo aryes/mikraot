@@ -14,7 +14,10 @@ didn't (a mark before the letter's vowel, two marks on one letter, a mark beside
    gershayim onto the next letter. A rule added to the positioning moves the pair together,
    centred over the letter (Arye, 2026-10-14). The two marks are each about as wide as a zayin, so
    on a narrow letter the pair still overhangs a little.
-3. Size: its letters are about 7% shorter than Noto's at the same font size. Both weights are
+3. Vertical metrics: the font reserves more room below its letters than above (for niqqud), so
+   text centred in a box (a button, a menu item) sat ~0.1em high (Arye, 2026-10-15). The ascent
+   and descent are rebalanced around the letters' middle, their sum unchanged.
+4. Size: its letters are about 7% shorter than Noto's at the same font size. Both weights are
    enlarged by that much (a smaller unitsPerEm draws every glyph larger, outlines unchanged), so
    the site's sizes stay as they were designed.
 
@@ -30,6 +33,8 @@ v2 with the font exception; see LICENSE and GNU-GPL there). Outputs: src/assets/
 from pathlib import Path
 
 from fontTools.feaLib.builder import addOpenTypeFeaturesFromString
+from fontTools.otlLib.maxContextCalc import maxCtxFont
+from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 
 SOURCE = Path("scripts/fonts/taamey-david")
@@ -38,7 +43,7 @@ OUTPUT = Path("src/assets/fonts/taamey-david")
 ENLARGE = 1.07
 CHANGE = (
     "modified 2026-10-14 for mikraot.net: enlarged 7%, bold rebuilt from medium,"
-    " telisha and gershayim on one letter brought together"
+    " telisha and gershayim on one letter brought together, vertical metrics centred on the letters"
 )
 
 
@@ -119,6 +124,45 @@ def bring_together(font: TTFont) -> None:
             record.Feature.LookupCount = len(record.Feature.LookupListIndex)
 
 
+# Letters whose tops give the Hebrew letter height (no ascenders like ל or descenders like ק).
+LETTERS = "במהשטס"
+
+
+def letters_middle(font: TTFont) -> float:
+    """Half the Hebrew letters' height, in font units."""
+    glyphs, cmap = font.getGlyphSet(), font.getBestCmap()
+    tops = []
+    for letter in LETTERS:
+        pen = BoundsPen(glyphs)
+        glyphs[cmap[ord(letter)]].draw(pen)
+        tops.append(pen.bounds[3])
+    return sum(tops) / len(tops) / 2
+
+
+def centre_letters(font: TTFont, middle: float) -> None:
+    """Moves ascent and descent so that the line's middle is `middle` (see 3 above).
+
+    Both weights get the same values (Medium's middle), so a bold word doesn't change a line's
+    height. The line gap is dropped: `line-height: normal` is then ascent + descent everywhere,
+    as Windows already had it (it read the win metrics, which have no gap).
+    """
+    hhea, os2 = font["hhea"], font["OS/2"]
+    height = hhea.ascent - hhea.descent
+    ascent = round(height / 2 + middle)
+    descent = ascent - height
+    hhea.ascent, hhea.descent, hhea.lineGap = ascent, descent, 0
+    os2.usWinAscent, os2.usWinDescent = ascent, -descent
+    os2.sTypoAscender, os2.sTypoDescender, os2.sTypoLineGap = ascent, descent, 0
+    # The typo metrics, now the same as the others, are what browsers on every system should use
+    # (fsSelection bit 7, USE_TYPO_METRICS, defined from OS/2 version 4).
+    if os2.version < 4:
+        os2.version = 4
+        os2.sxHeight = os2.sCapHeight = round(middle * 2)
+        os2.usDefaultChar, os2.usBreakChar = 0, 32
+        os2.usMaxContext = maxCtxFont(font)
+    os2.fsSelection |= 1 << 7
+
+
 def save(font: TTFont, name: str) -> None:
     """Enlarged (ENLARGE), marked as modified (GPL v2 section 2a), compressed for the web."""
     font["head"].unitsPerEm = round(font["head"].unitsPerEm / ENLARGE)
@@ -133,8 +177,10 @@ def save(font: TTFont, name: str) -> None:
 def main() -> None:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     medium, bold = TTFont(SOURCE / "TaameyDavidCLM-Medium.ttf"), build_bold()
+    middle = letters_middle(medium)
     for font in (medium, bold):
         bring_together(font)
+        centre_letters(font, middle)
     save(medium, "TaameyDavidCLM-Medium.woff2")
     save(bold, "TaameyDavidCLM-Bold.woff2")
 

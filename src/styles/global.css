@@ -357,13 +357,6 @@
 .wp-content-rendered .list-picker-choice {
   background: transparent;
 }
-/* Taamey David leaves room above and below its letters for vowel and cantillation marks, more
-   below, so a line of it sits ~3 px above a box's centre. Trimming the text to its letters
-   (cap height to baseline) centres it. Firefox has no text-box yet: there the text stays ~3 px
-   high in the taller pill. */
-.wp-content-rendered :is(.list-picker-choice, .list-picker-link, .list-picker-label) > span {
-  text-box: trim-both cap alphabetic;
-}
 /* Readings are links to videos: a filled pill with a play mark, unlike the outlined choices. */
 .wp-content-rendered .list-picker-link {
   border-color: transparent;
