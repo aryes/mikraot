@@ -116,3 +116,20 @@ test('the privacy policy is published and linked from the footer and both forms'
     });
   }).toPass();
 });
+
+test('the front page invites to the email updates under its latest posts', async ({ page }) => {
+  await page.goto('/');
+  const box = page.locator('main section', { hasText: 'רוצים לדעת כשמתווסף משהו חדש?' });
+  await expect(box).toBeVisible();
+  // It opens its own form, in place (the footer keeps its own button).
+  const form = page.getByRole('form', { name: 'רוצים לדעת כשמתווסף משהו חדש?' });
+  await expect(async () => {
+    await box.getByRole('button', { name: 'הרשמה לעדכונים באימייל' }).click();
+    await expect(form).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  await expect(form.locator('xpath=ancestor::main')).toHaveCount(1);
+  await expect(form.getByLabel(/שם/)).toBeFocused();
+  await expect(
+    page.locator('footer').getByRole('button', { name: 'הרשמה לעדכונים באימייל' }),
+  ).toBeVisible();
+});
