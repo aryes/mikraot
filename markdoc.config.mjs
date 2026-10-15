@@ -20,8 +20,11 @@ const collapse = (/** @type {boolean} */ inline) => ({
   },
 });
 
-/** One Hebrew or Arabic letter with its marks ("בּ", "غ"). */
-const LETTER = /^[\p{Script=Hebrew}\p{Script=Arabic}]\p{M}*$/u;
+/**
+ * One Hebrew or Arabic letter with its marks ("בּ", "غ"), or the one or two Latin letters that
+ * write a sound ("b", "sh"; large too for uniformity, Arye 2026-10-15).
+ */
+const LETTER = /^(?:[\p{Script=Hebrew}\p{Script=Arabic}]\p{M}*|\p{Script=Latin}{1,2})$/u;
 
 /** A cell holding a letter, or letters separated by "/" ("ס / שׂ"): shown large. */
 const isLetters = (/** @type {string} */ text) =>
