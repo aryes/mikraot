@@ -295,6 +295,11 @@
   line-height: 1.5;
   white-space: normal;
 }
+/* Its English words, whose lowercase is ¾ the height of Hebrew letters (markdoc.config.mjs). */
+.wp-content-rendered .cell-example .latin {
+  font-size: 1.2em;
+  line-height: 1; /* no wider gap above it when it wraps to its own line */
+}
 /* A recording alone in its cell sits in the middle of it. */
 .wp-content-rendered td .inline-audio-btn:not(.audio-tile) {
   display: flex;

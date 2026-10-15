@@ -29,6 +29,19 @@ const LETTER = /^(?:[\p{Script=Hebrew}\p{Script=Arabic}]\p{M}*|\p{Script=Latin}{
 /** One or two English letters, then a Hebrew example of their sound ("th כמו במילה the"). */
 const EXAMPLE = /^(\p{Script=Latin}{1,2})\s+(.*\p{Script=Hebrew}.*)$/u;
 
+/**
+ * The example's English words in their own spans: Taamey David's lowercase Latin is three
+ * quarters the height of its Hebrew letters, so "the" looked smaller than "כמו במילה" (Arye,
+ * 2026-10-15); the CSS draws them larger.
+ */
+const withLatinMarked = (/** @type {string} */ text) =>
+  text
+    .split(/(\p{Script=Latin}+)/u)
+    .filter((part) => part !== '')
+    .map((part) =>
+      /\p{Script=Latin}/u.test(part) ? new Markdoc.Tag('span', { class: 'latin' }, [part]) : part,
+    );
+
 /** A cell holding a letter, or letters separated by "/" ("ס / שׂ"): shown large. */
 const isLetters = (/** @type {string} */ text) =>
   text !== '' && text.split('/').every((part) => LETTER.test(part.trim()));
@@ -79,7 +92,7 @@ const td = {
       return new Markdoc.Tag('td', { ...attributes, class: 'cell-letter' }, [
         letters,
         ' ', // keeps "th" and "כמו" apart for search and screen readers
-        new Markdoc.Tag('span', { class: 'cell-example' }, [words]),
+        new Markdoc.Tag('span', { class: 'cell-example' }, withLatinMarked(words)),
       ]);
     }
     return new Markdoc.Tag('td', attributes, node.transformChildren(config));
