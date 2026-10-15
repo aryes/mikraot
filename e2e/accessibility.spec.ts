@@ -94,7 +94,7 @@ test('the first Tab offers a skip to the content; sound buttons say what they pl
   await page.keyboard.press('Enter');
   await page.keyboard.press('Tab');
   await expect(page.locator('main :focus')).toHaveCount(1);
-  await expect(page.getByRole('button', { name: 'השמע: ב דגושה' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'השמע: בּ (ב דגושה)' })).toBeVisible();
 });
 
 // The recordings picker's chosen choices and readings appear only after clicks.

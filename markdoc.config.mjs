@@ -20,6 +20,55 @@ const collapse = (/** @type {boolean} */ inline) => ({
   },
 });
 
+/** One Hebrew or Arabic letter with its marks ("בּ", "غ"). */
+const LETTER = /^[\p{Script=Hebrew}\p{Script=Arabic}]\p{M}*$/u;
+
+/** A cell holding a letter, or letters separated by "/" ("ס / שׂ"): shown large. */
+const isLetters = (/** @type {string} */ text) =>
+  text !== '' && text.split('/').every((part) => LETTER.test(part.trim()));
+
+/**
+ * Table cells of the letter tables: a letter (or a sound's name, "A") with its recording ("בּ" +
+ * audio) becomes one button with the letter in it (AudioButton's tile); a cell of letters alone
+ * gets the class `cell-letter`.
+ */
+const td = {
+  ...nodes.td,
+  transform(
+    /** @type {import('@markdoc/markdoc').Node} */ node,
+    /** @type {import('@markdoc/markdoc').Config} */ config,
+  ) {
+    const [first] = node.children;
+    const parts =
+      node.children.length === 1 && first?.type === 'inline' ? first.children : node.children;
+    const text = parts
+      .filter((part) => part.type === 'text')
+      .map((part) => String(part.attributes['content']))
+      .join('')
+      .trim();
+    const audio = parts.filter((part) => part.type === 'tag' && part.tag === 'audio');
+    const others = parts.filter((part) => part.type !== 'text' && !audio.includes(part));
+    const attributes = node.transformAttributes(config);
+    if (others.length === 0 && audio.length === 1 && audio[0] && text) {
+      const tile = new Markdoc.Ast.Node(
+        'tag',
+        { ...audio[0].attributes, label: text },
+        [],
+        'audio',
+      );
+      return new Markdoc.Tag('td', attributes, [Markdoc.transform(tile, config)]);
+    }
+    if (others.length === 0 && audio.length === 0 && isLetters(text)) {
+      return new Markdoc.Tag(
+        'td',
+        { ...attributes, class: 'cell-letter' },
+        node.transformChildren(config),
+      );
+    }
+    return new Markdoc.Tag('td', attributes, node.transformChildren(config));
+  },
+};
+
 export default defineMarkdocConfig({
   nodes: {
     heading: {
@@ -43,6 +92,7 @@ export default defineMarkdocConfig({
     },
     link: { ...nodes.link, render: component('./src/components/content/ContentLink.astro') },
     table: { ...nodes.table, render: component('./src/components/content/ContentTable.astro') },
+    td,
   },
   tags: {
     // Colour marks: the taught letter/vowel, de-emphasised context, silent letters.
@@ -52,7 +102,8 @@ export default defineMarkdocConfig({
     kbd: styled('kbd', 'content-kbd'),
     audio: {
       render: component('./src/components/content/AudioButton.astro'),
-      attributes: { src: { type: String, required: true } },
+      // label: set by `td` above, not written in content.
+      attributes: { src: { type: String, required: true }, label: { type: String } },
       selfClosing: true,
     },
     // A hidden explanation within a sentence, or (collapse-block) whole hidden paragraphs.

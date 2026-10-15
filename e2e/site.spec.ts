@@ -359,7 +359,7 @@ test('a printed lesson keeps the content and drops navigation, comments and play
   await page.locator('.collapse-toggle-btn').first().click();
   await page.emulateMedia({ media: 'print' });
   const layoutParts = page.locator(
-    'header, footer, aside, .banner-photo, .inline-audio-btn, [data-pagefind-ignore], dialog',
+    'header, footer, aside, .banner-photo, .inline-audio-btn:not(.audio-tile), .audio-tile svg, [data-pagefind-ignore], dialog',
   );
   expect(await layoutParts.count()).toBeGreaterThan(5);
   const visible = await layoutParts.evaluateAll((parts) =>
@@ -368,6 +368,8 @@ test('a printed lesson keeps the content and drops navigation, comments and play
   expect(visible).toEqual([]);
   await expect(page.locator('h1')).toBeVisible();
   await expect(page.locator('table').first()).toBeVisible();
+  // A letter that is also a play button prints as the letter.
+  await expect(page.locator('.audio-tile-letter').first()).toBeVisible();
   // Printers drop backgrounds by default: text that relied on one must turn dark.
   const black = 'rgb(0, 0, 0)';
   await expect(page.locator('th').first()).toHaveCSS('color', black);
@@ -376,6 +378,10 @@ test('a printed lesson keeps the content and drops navigation, comments and play
     black,
   );
   await expect(page.getByText('מקראות: https://mikraot.net/דגש-קל/')).toBeVisible();
+
+  // A recording in its own column (מבטא) doesn't print.
+  await page.goto('/מבטא/');
+  await expect(page.locator('td .inline-audio-btn').first()).toBeHidden();
 });
 
 test(
@@ -699,4 +705,25 @@ test('the Babylonian-Iraqi recordings use the same picker: part, book, chapter',
     'ג',
     'הכול ברצף',
   ]);
+});
+
+test('in the letter tables a letter is its own play button, drawn large', async ({ page }) => {
+  await page.goto('/דגש-קל/');
+  const tile = page.getByRole('button', { name: 'השמע: בּ (ב דגושה)' });
+  await expect(tile).toHaveText('בּ');
+  const cellSize = await page
+    .locator('td')
+    .filter({ hasText: /^\s*b\s*$/ })
+    .first()
+    .evaluate((td) => parseFloat(getComputedStyle(td).fontSize));
+  const letterSize = await tile
+    .locator('.audio-tile-letter')
+    .evaluate((letter) => parseFloat(getComputedStyle(letter).fontSize));
+  expect(letterSize / cellSize).toBeCloseTo(1.7, 1);
+  await tile.click();
+  await expect(tile.locator('.pause-icon')).toBeVisible();
+
+  // Letters alone in a cell (the Arabic column of מבטא) are large too.
+  await page.goto('/מבטא/');
+  await expect(page.locator('td.cell-letter').filter({ hasText: 'غ' })).toHaveCount(1);
 });
