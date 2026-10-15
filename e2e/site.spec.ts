@@ -666,6 +666,16 @@ test('the recordings are chosen row by row: part, book, parasha, reading', async
   await expect(chapter).toHaveText('ב');
   await chapter.click();
   await expect(page.getByRole('dialog').getByRole('heading')).toHaveText('רות · פרק ב');
+  // Centred, with room around it (the reset of Tailwind had put it in a corner).
+  const box = await page.getByRole('dialog').boundingBox();
+  const viewport = page.viewportSize();
+  expect(box).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  if (box && viewport) {
+    expect(Math.abs(box.x + box.width / 2 - viewport.width / 2)).toBeLessThan(2);
+    expect(Math.abs(box.y + box.height / 2 - viewport.height / 2)).toBeLessThan(2);
+    expect(box.x).toBeGreaterThanOrEqual(15);
+  }
 
   // The book's whole playlist plays in the same popup.
   await page.getByRole('dialog').getByRole('button', { name: 'סגירה' }).click();
