@@ -113,7 +113,7 @@ function openVideo(embed: string, title: string): void {
   track('video-play', { video: embed });
   const dialog = document.createElement('dialog');
   dialog.className =
-    'w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-0 shadow-2xl backdrop:bg-slate-900/70';
+    'm-auto w-[calc(100%-2rem)] max-w-3xl overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-0 shadow-2xl backdrop:bg-slate-900/70';
   const header = document.createElement('div');
   header.className =
     'flex items-center justify-between border-b border-slate-100 dark:border-slate-800 p-4';
