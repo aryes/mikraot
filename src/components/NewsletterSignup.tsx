@@ -14,7 +14,7 @@ const MESSAGES: Record<State, string> = {
 
 // Slate-400 borders: at least 3:1 against the footer and the field (WCAG 1.4.11).
 const field =
-  'w-full rounded-xl border border-slate-400 bg-slate-800 px-3.5 py-2 text-sm text-white transition-all focus:border-transparent focus:ring-2 focus:ring-brand focus:outline-none aria-invalid:border-red-400 aria-invalid:focus:ring-red-400';
+  'w-full rounded-xl border border-slate-400 bg-slate-800 px-3.5 py-2 text-base text-white transition-all focus:border-transparent focus:ring-2 focus:ring-brand focus:outline-none aria-invalid:border-red-400 aria-invalid:focus:ring-red-400';
 
 /**
  * Newsletter sign-up in the footer (always dark). Posts to src/pages/api/newsletter.ts; Brevo
@@ -105,16 +105,16 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
       </h2>
       {!sent && (
         <>
-          <p className="text-sm text-slate-400">
+          <p className="text-base text-slate-300">
             מדי פעם, כשמתווסף משהו חדש באתר, נשלח אליכם אימייל קצר. אפשר לבטל בכל עת.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <label
                 htmlFor={`${id}-name`}
-                className="mb-1 block text-xs font-semibold text-slate-300"
+                className="mb-1 block text-sm font-semibold text-slate-300"
               >
-                שם <span className="font-normal text-slate-400">(לא חובה)</span>
+                שם <span className="font-normal text-slate-300">(לא חובה)</span>
               </label>
               <input
                 id={`${id}-name`}
@@ -129,7 +129,7 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
             <div>
               <label
                 htmlFor={`${id}-email`}
-                className="mb-1 block text-xs font-semibold text-slate-300"
+                className="mb-1 block text-sm font-semibold text-slate-300"
               >
                 אימייל
               </label>
@@ -147,7 +147,7 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
                 className={`${field} text-right`}
               />
               {emailError && (
-                <p id={`${id}-email-error`} className="mt-1 text-xs text-red-300">
+                <p id={`${id}-email-error`} className="mt-1 text-sm text-red-300">
                   {emailError}
                 </p>
               )}
@@ -165,7 +165,7 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
           <button
             type="submit"
             disabled={state === 'sending'}
-            className="bg-brand-strong hover:bg-brand-deep cursor-pointer rounded-xl px-5 py-2 text-sm font-bold text-white shadow-xs transition-all disabled:cursor-wait disabled:opacity-70"
+            className="bg-brand-strong hover:bg-brand-deep cursor-pointer rounded-xl px-5 py-2 text-base font-bold text-white shadow-xs transition-all disabled:cursor-wait disabled:opacity-70"
           >
             {state === 'sending' ? 'שליחה...' : 'הרשמה'}
           </button>
@@ -178,14 +178,14 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
         tabIndex={-1}
         className={
           sent
-            ? 'rounded-xl bg-slate-800 p-4 text-sm leading-relaxed text-white focus:outline-none'
-            : 'text-xs text-red-300'
+            ? 'rounded-xl bg-slate-800 p-4 text-base leading-relaxed text-white focus:outline-none'
+            : 'text-sm text-red-300'
         }
       >
         {MESSAGES[state]}
       </p>
       {!sent && (
-        <p className="text-xs text-slate-400">
+        <p className="text-sm text-slate-300">
           הכתובת נשמרת אצל Brevo, שירות הדיוור שלנו, רק לצורך העדכונים (
           <a
             href={PRIVACY_POLICY_URL}
