@@ -83,8 +83,8 @@ function setUp(picker: HTMLElement, index: number): void {
         choices.append(readingLink(option.name, name, option.href, [...path, option.name]));
       }
     }
-    // The chosen item's own link (a parasha's YouTube playlist) comes after its readings.
-    if (all) choices.append(playlistLink(all));
+    // The chosen item's own link (a book's or parasha's YouTube playlist) comes after its readings.
+    if (all) choices.append(playlistLink(all, path));
     rows.append(row);
 
     const [only] = buttons;
@@ -97,9 +97,9 @@ function setUp(picker: HTMLElement, index: number): void {
 }
 
 /**
- * A reading, shown without the row's name it repeats ("א" in the row "פרק", read out in full; the
- * play mark is drawn by the CSS). src/scripts/content.ts opens it in the video popup, titled with
- * its path without the top row ("במדבר · קרח · ראשון").
+ * A reading (or the whole playlist), shown without the row's name it repeats ("א" in the row
+ * "פרק", read out in full; the play mark is drawn by the CSS). src/scripts/content.ts opens it in
+ * the video popup, titled with its path without the top row ("במדבר · קרח · ראשון").
  */
 function readingLink(
   name: string,
@@ -116,12 +116,9 @@ function readingLink(
   return anchor;
 }
 
-/** The chosen item's whole playlist, on YouTube. */
-function playlistLink(href: string): HTMLAnchorElement {
-  const anchor = externalLink(href);
-  anchor.className = 'list-picker-all';
-  anchor.textContent = 'הכול ברצף ב־YouTube';
-  return anchor;
+/** The chosen item's whole playlist, styled and played as its readings are. */
+function playlistLink(href: string, path: string[]): HTMLAnchorElement {
+  return readingLink('הכול ברצף', '', href, path);
 }
 
 function externalLink(href: string): HTMLAnchorElement {

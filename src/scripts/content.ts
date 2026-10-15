@@ -1,14 +1,20 @@
 /**
  * Browser behaviour for page content (components in src/components/content/): audio buttons,
- * collapsible explanations, and YouTube links in lists opening a popup.
+ * collapsible explanations, and YouTube links (videos, playlists) in lists opening a popup.
  */
 import { track } from './analytics';
 
 const YOUTUBE_ID =
   /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/;
 
-function getYouTubeId(url: string): string | null {
-  return YOUTUBE_ID.exec(url)?.[1] ?? null;
+const YOUTUBE_PLAYLIST = /youtube\.com\/playlist\?(?:.+&)?list=([\w-]+)/;
+
+/** What follows /embed/ in a YouTube player's address: a video's id, or a whole playlist. */
+function youtubeEmbed(url: string): string | null {
+  const video = YOUTUBE_ID.exec(url)?.[1];
+  if (video) return video;
+  const list = YOUTUBE_PLAYLIST.exec(url)?.[1];
+  return list ? `videoseries?list=${list}` : null;
 }
 
 let audio: HTMLAudioElement | null = null;
@@ -77,9 +83,10 @@ function toggleCollapse(button: HTMLElement): void {
 }
 
 /** A YouTube player (privacy-enhanced domain) that starts playing: created only on a click. */
-function youtubePlayer(id: string, title: string): HTMLIFrameElement {
+function youtubePlayer(embed: string, title: string): HTMLIFrameElement {
   const frame = document.createElement('iframe');
-  frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
+  const separator = embed.includes('?') ? '&' : '?';
+  frame.src = `https://www.youtube-nocookie.com/embed/${embed}${separator}autoplay=1`;
   frame.title = title;
   frame.allow =
     'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
@@ -102,8 +109,8 @@ function playEmbeddedVideo(button: HTMLElement): void {
   frame.focus();
 }
 
-function openVideo(id: string, title: string): void {
-  track('video-play', { video: id });
+function openVideo(embed: string, title: string): void {
+  track('video-play', { video: embed });
   const dialog = document.createElement('dialog');
   dialog.className =
     'w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-0 shadow-2xl backdrop:bg-slate-900/70';
@@ -122,7 +129,7 @@ function openVideo(id: string, title: string): void {
   close.addEventListener('click', () => dialog.close());
   header.append(heading, close);
 
-  const frame = youtubePlayer(id, title);
+  const frame = youtubePlayer(embed, title);
   frame.className = 'aspect-video w-full border-0 bg-black';
 
   dialog.append(header, frame);
@@ -160,12 +167,13 @@ document.addEventListener('click', (event) => {
   }
 
   const link = event.target.closest('a');
-  // Recordings: links in lists, and the readings of a list picker (titled with their path).
+  // Recordings (videos and playlists): links in lists, and the readings of a list picker
+  // (titled with their path).
   const listed = link?.closest('li, .list-picker');
-  const videoId = listed ? getYouTubeId(link?.getAttribute('href') ?? '') : null;
-  if (link && videoId) {
+  const embed = listed ? youtubeEmbed(link?.getAttribute('href') ?? '') : null;
+  if (link && embed) {
     event.preventDefault();
     const title = link.dataset['videoTitle'] ?? link.textContent?.trim();
-    openVideo(videoId, title || 'וידאו קריאה מוקלטת');
+    openVideo(embed, title || 'וידאו קריאה מוקלטת');
   }
 });
