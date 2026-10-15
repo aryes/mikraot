@@ -23,6 +23,9 @@ test('unknown URLs get a 404 page', async ({ page }) => {
   const response = await page.goto('/no-such-page/');
   expect(response?.status()).toBe(404);
   await expect(page.locator('h1')).toContainText('404');
+  // It offers the site's search as well as the way home.
+  await page.getByRole('main').getByRole('button', { name: 'חיפוש באתר' }).click();
+  await expect(page.getByRole('dialog', { name: 'חיפוש באתר' })).toBeVisible();
 });
 
 test('collapsible explanations open and close', async ({ page }) => {
