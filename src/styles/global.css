@@ -320,8 +320,12 @@
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
 }
+/* As tall as a choice and centred like one, so it lines up with the row's first line. */
 .wp-content-rendered .list-picker-label {
-  padding-top: 0.35rem;
+  display: flex;
+  align-self: start;
+  align-items: center;
+  min-height: 2.6rem;
   color: var(--text-faint);
   font-size: 1rem;
 }
@@ -336,7 +340,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.3rem 1rem;
+  min-height: 2.6rem;
+  padding: 0 1rem;
   border: 1px solid var(--chip-border);
   border-radius: 999px;
   background: var(--chip-bg);
@@ -351,6 +356,13 @@
 }
 .wp-content-rendered .list-picker-choice {
   background: transparent;
+}
+/* Taamey David leaves room above and below its letters for vowel and cantillation marks, more
+   below, so a line of it sits ~3 px above a box's centre. Trimming the text to its letters
+   (cap height to baseline) centres it. Firefox has no text-box yet: there the text stays ~3 px
+   high in the taller pill. */
+.wp-content-rendered :is(.list-picker-choice, .list-picker-link, .list-picker-label) > span {
+  text-box: trim-both cap alphabetic;
 }
 /* Readings are links to videos: a filled pill with a play mark, unlike the outlined choices. */
 .wp-content-rendered .list-picker-link {
