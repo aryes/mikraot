@@ -26,8 +26,10 @@
   /* Lesson text: large enough for vowel and cantillation marks to stay clear (Noto draws them
      small); a little smaller on phones, where wide tables are short of room. */
   --content-size: 1.125rem;
-  /* Table cells: tight on phones, where four columns share ~310 px. */
-  --cell-padding: 10px 6px;
+  /* Table cells and headings: tight on phones, where four to six columns share ~310 px (the
+     דגש קל table has six; Arye, 2026-10-15). */
+  --cell-padding: 10px 3px;
+  --heading-size: calc(var(--content-size) * 0.8);
   color-scheme: light dark;
   --page: #f3f7f5;
   --content-text: #1e293b;
@@ -64,6 +66,7 @@
   :root {
     --content-size: 1.25rem;
     --cell-padding: 12px 16px;
+    --heading-size: calc(var(--content-size) * 0.9);
   }
 }
 @media screen and (prefers-color-scheme: dark) {
@@ -101,6 +104,7 @@
     /* Printed worksheets keep their size: paper is read closer than a screen. */
     --content-size: 1.1rem;
     --cell-padding: 12px 16px;
+    --heading-size: calc(var(--content-size) * 0.9);
   }
 }
 
@@ -237,7 +241,7 @@
   background: var(--table-head);
   color: #ffffff;
   font-weight: 700;
-  font-size: calc(var(--content-size) * 0.9);
+  font-size: var(--heading-size);
   padding: var(--cell-padding);
   text-align: center;
   border: 1px solid var(--table-head-border);
@@ -288,10 +292,11 @@
   line-height: 1.2;
   white-space: nowrap; /* "ס / שׂ" on one line */
 }
-/* The example under large English letters ("th", then "כמו במילה the"), at text size. */
+/* The example under large English letters ("th", then "כמו במילה the"), a little smaller than
+   the text: on phones its column is one of six. */
 .wp-content-rendered .cell-example {
   display: block;
-  font-size: var(--content-size);
+  font-size: calc(var(--content-size) * 0.85);
   line-height: 1.5;
   white-space: normal;
 }
@@ -312,8 +317,8 @@
   gap: 0.15rem;
   /* One width for a column's tiles (ת and O are wider letters); narrow sides on phones, where a
      six-column table is short of room. */
-  min-width: 3.25rem;
-  padding: 0.35rem 0.5rem 0.4rem;
+  min-width: 2.75rem;
+  padding: 0.35rem 0.35rem 0.4rem;
   border: 1px solid var(--chip-border);
   border-radius: 0.75rem;
   background: var(--chip-bg);

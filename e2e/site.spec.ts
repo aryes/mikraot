@@ -724,7 +724,7 @@ test('in the letter tables a letter is its own play button, drawn large', async 
 
   // Letters alone in a cell are large too: Arabic, and English for uniformity (not words).
   await expect(page.locator('td.cell-letter').filter({ hasText: /^\s*b\s*$/ })).toHaveCount(1);
-  // Letters with an example: the letters large, the example under them at text size.
+  // Letters with an example: the letters large, the example under them a little smaller than text (0.85).
   const example = page.locator('td.cell-letter .cell-example').filter({ hasText: 'כמו במילה the' });
   await expect(example).toHaveCount(1);
   expect(
@@ -733,8 +733,29 @@ test('in the letter tables a letter is its own play button, drawn large', async 
         parseFloat(getComputedStyle(span.parentElement ?? span).fontSize) /
         parseFloat(getComputedStyle(span).fontSize),
     ),
-  ).toBeCloseTo(1.7, 1);
+  ).toBeCloseTo(1.7 / 0.85, 1);
   await page.goto('/מבטא/');
   await expect(page.locator('td.cell-letter').filter({ hasText: 'غ' })).toHaveCount(1);
   await expect(page.locator('td.cell-letter').filter({ hasText: /^\s*sh\s*$/ })).toHaveCount(1);
+});
+
+test('table headings that share a first word are grouped, so wide tables fit a phone', async ({
+  page,
+}) => {
+  await page.goto('/דגש-קל/');
+  const table = page.locator('.table-scroll').first();
+  const rows = table.locator('thead tr');
+  await expect(rows).toHaveCount(2);
+  await expect(rows.first().locator('th')).toHaveText([
+    'האות הדגושה',
+    'מקבילות',
+    'האות הרפויה',
+    'מקבילות',
+  ]);
+  await expect(rows.nth(1).locator('th')).toHaveText(['אנגלית', 'ערבית', 'אנגלית', 'ערבית']);
+  // Six columns, no sideways scroll on a common phone (390 px and up).
+  const width = page.viewportSize()?.width ?? 0;
+  if (width >= 390) {
+    expect(await table.evaluate((e) => e.scrollWidth <= e.clientWidth)).toBe(true);
+  }
 });
