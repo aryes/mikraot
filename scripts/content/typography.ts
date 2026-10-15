@@ -16,6 +16,9 @@ export function hebrewTypography(text: string): string {
     .replace(/(\S) - (?=\S)/g, '$1 – ');
 }
 
-/** Folds typographic variants together, for comparing text across the change. */
+/**
+ * Folds typographic variants together, for comparing text across the change. The IPA "ɡ"
+ * (U+0261) of the live site's דגש קל table is a plain "g" here: Taamey David has no IPA letters.
+ */
 export const plainTypography = (text: string) =>
-  text.replace(/[’‘׳]/g, "'").replace(/[”“״]/g, '"').replace(/–/g, '-');
+  text.replace(/[’‘׳]/g, "'").replace(/[”“״]/g, '"').replace(/–/g, '-').replace(/ɡ/g, 'g');
