@@ -97,6 +97,20 @@ test('the first Tab offers a skip to the content; sound buttons say what they pl
   await expect(page.getByRole('button', { name: 'השמע: ב דגושה' })).toBeVisible();
 });
 
+// The recordings picker's chosen choices and readings appear only after clicks.
+for (const colorScheme of ['light', 'dark'] as const) {
+  test(`no accessibility violations in the opened recordings picker (${colorScheme})`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme });
+    await page.goto('/קריאות-מוקלטות-בנוסח-אשכנז/');
+    await page.getByRole('button', { name: 'תורה' }).click();
+    await page.getByRole('button', { name: 'במדבר' }).click();
+    await page.getByRole('button', { name: 'קרח' }).click();
+    expect(await scan(page)).toEqual([]);
+  });
+}
+
 // Dark mode (the system setting): the same scan on every page, desktop only (the colours are the
 // same on a phone), plus loaded comments and the search dialog, whose colours come from scripts.
 test.describe('dark mode', () => {

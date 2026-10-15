@@ -5,7 +5,16 @@
  */
 import { collection, config, fields, singleton } from '@keystatic/core';
 import { block, inline, mark, wrapper } from '@keystatic/core/content-components';
-import { Eye, EyeOff, Highlighter, Keyboard, Newspaper, Video, Volume2 } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  Highlighter,
+  Keyboard,
+  ListTree,
+  Newspaper,
+  Video,
+  Volume2,
+} from 'lucide-react';
 import { slugFromTitle } from './src/lib/slug';
 
 const collapseSchema = {
@@ -79,6 +88,16 @@ const content = fields.markdoc({
       label: 'סרטון YouTube',
       icon: <Video />,
       schema: { videoId: fields.text({ label: 'מזהה הסרטון (11 תווים)' }) },
+    }),
+    picker: wrapper({
+      label: 'בורר (רשימה מקוננת)',
+      icon: <ListTree />,
+      schema: {
+        levels: fields.text({ label: 'שמות הרמות, מופרדים בפסיק (למשל חלק,ספר,פרשה,קריאה)' }),
+        chapters: fields.text({
+          label: 'שם שורת הקישורים כשהיא מגיעה לפני הרמה האחרונה (למשל פרק: בכתובים, ספר ← פרק)',
+        }),
+      },
     }),
     'latest-posts': block({ label: 'פוסטים אחרונים', icon: <Newspaper />, schema: {} }),
   },

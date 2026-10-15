@@ -48,6 +48,13 @@
   /* The line under section headings and the front page title: the logo green, lighter than the
      text (Arye, 2026-10-12). */
   --heading-rule: #5b763e66;
+  /* List picker (ListPicker.astro): choices outlined in --chip-border (3:1 for controls), readings
+     filled with --chip-bg, the chosen choice white on --chip-chosen. */
+  --chip-border: var(--color-brand-strong);
+  --chip-bg: #8cb65f2e;
+  --chip-hover: #8cb65f4d;
+  --chip-chosen: var(--color-brand-strong);
+  --chip-text: var(--color-brand-deep); /* on --chip-bg: 4.5:1 needs the darker green */
   --scrollbar-track: #f1f5f9;
   --scrollbar-thumb: #cbd5e1;
   --scrollbar-thumb-hover: #94a3b8;
@@ -77,6 +84,11 @@
     --mark-silent: #8b95a1;
     --text-faint: #94a3b8;
     --heading-rule: #8cb65f66;
+    --chip-border: var(--color-brand);
+    --chip-bg: #8cb65f26;
+    --chip-hover: #8cb65f40;
+    --chip-chosen: var(--color-brand-deep);
+    --chip-text: var(--color-brand);
     --scrollbar-track: #0f172a;
     --scrollbar-thumb: #334155;
     --scrollbar-thumb-hover: #475569;
@@ -279,6 +291,97 @@
   display: block;
   font-size: 0.8rem;
   color: var(--text-faint);
+}
+
+/* List pickers (ListPicker.astro): rows of rounded choices, each after its name. Until the script
+   has built them the list is hidden, so it doesn't flash by; without scripts it shows as a plain
+   list, and if the script fails it shows after 3 seconds (an animated display). */
+@media (scripting: enabled) {
+  .wp-content-rendered .list-picker:not(.is-ready) > ul {
+    display: none;
+    animation: list-picker-fallback 0s 3s forwards;
+  }
+}
+@keyframes list-picker-fallback {
+  to {
+    display: block;
+  }
+}
+.wp-content-rendered .list-picker-rows {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9rem 1rem;
+  align-items: start;
+  margin: 0 0 1.5rem;
+}
+/* Each row's name and choices sit in the grid's two columns, so wrapped choices stay aligned. */
+.wp-content-rendered .list-picker-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+.wp-content-rendered .list-picker-label {
+  padding-top: 0.35rem;
+  color: var(--text-faint);
+  font-size: 1rem;
+}
+.wp-content-rendered .list-picker-choices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.wp-content-rendered .list-picker-choice,
+.wp-content-rendered .list-picker-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 1rem;
+  border: 1px solid var(--chip-border);
+  border-radius: 999px;
+  background: var(--chip-bg);
+  color: var(--chip-text);
+  font-size: calc(var(--content-size) * 0.95);
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+.wp-content-rendered .list-picker-choice {
+  background: transparent;
+}
+/* Readings are links to videos: a filled pill with a play mark, unlike the outlined choices. */
+.wp-content-rendered .list-picker-link {
+  border-color: transparent;
+}
+.wp-content-rendered .list-picker-link::before {
+  content: '';
+  border-width: 0.3em 0 0.3em 0.5em;
+  border-style: solid;
+  border-color: transparent transparent transparent currentColor;
+}
+.wp-content-rendered .list-picker-choice:hover,
+.wp-content-rendered .list-picker-link:hover {
+  background: var(--chip-hover);
+  color: var(--content-link-hover);
+  text-decoration: none;
+}
+.wp-content-rendered .list-picker-choice[aria-expanded='true'] {
+  border-color: transparent;
+  background: var(--chip-chosen);
+  color: #ffffff;
+}
+.wp-content-rendered :is(.list-picker-choice, .list-picker-link):focus-visible {
+  outline: 2px solid var(--content-link);
+  outline-offset: 2px;
+}
+.wp-content-rendered .list-picker-all {
+  margin-inline-start: 0.5rem;
+  font-size: 1rem;
+  font-weight: 400;
+  text-decoration: underline;
 }
 
 /* Printing (teachers print lessons): the layout parts are hidden with Tailwind `print:` classes in

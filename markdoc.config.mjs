@@ -63,6 +63,11 @@ export default defineMarkdocConfig({
       attributes: { videoId: { type: String, required: true } },
       selfClosing: true,
     },
+    // A nested list of links shown as rows of choices (book, then parasha, then reading).
+    picker: {
+      render: component('./src/components/content/ListPicker.astro'),
+      attributes: { levels: { type: String }, chapters: { type: String } },
+    },
     'latest-posts': {
       render: component('./src/components/content/LatestPosts.astro'),
       selfClosing: true,

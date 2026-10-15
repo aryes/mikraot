@@ -160,9 +160,12 @@ document.addEventListener('click', (event) => {
   }
 
   const link = event.target.closest('a');
-  const videoId = link?.closest('li') ? getYouTubeId(link.getAttribute('href') ?? '') : null;
+  // Recordings: links in lists, and the readings of a list picker (titled with their path).
+  const listed = link?.closest('li, .list-picker');
+  const videoId = listed ? getYouTubeId(link?.getAttribute('href') ?? '') : null;
   if (link && videoId) {
     event.preventDefault();
-    openVideo(videoId, link.textContent?.trim() || 'וידאו קריאה מוקלטת');
+    const title = link.dataset['videoTitle'] ?? link.textContent?.trim();
+    openVideo(videoId, title || 'וידאו קריאה מוקלטת');
   }
 });

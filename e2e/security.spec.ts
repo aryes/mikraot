@@ -82,7 +82,9 @@ test('search (WebAssembly) and the video popup work under the CSP', async ({ pag
   await expect(page.getByRole('dialog').getByRole('link').first()).toBeVisible();
   await page.keyboard.press('Escape');
 
-  await page.locator('.wp-content-rendered a[href*="youtu.be/"]').first().click();
+  await page.getByRole('button', { name: 'תורה' }).click();
+  await page.getByRole('button', { name: 'ויקרא' }).click();
+  await page.getByRole('link', { name: 'ראשון' }).click();
   await expect(page.locator('dialog iframe[src*="youtube-nocookie.com"]')).toBeVisible();
 
   expect(violations).toEqual([]);

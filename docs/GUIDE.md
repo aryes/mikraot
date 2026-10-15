@@ -50,6 +50,13 @@ Insert **סרטון YouTube** with the video's id: the 11 characters after `v=` 
 (`youtube.com/watch?v=ATPZtXouTC0` → `ATPZtXouTC0`). The site shows its picture and title on its own.
 A mistyped id is caught when the site is built.
 
+## Add a recorded reading to a list
+
+On the recorded-readings pages the readings are a nested list inside **בורר**: part, book,
+parasha, reading (or part, book, chapter). Visitors choose row by row. Add a line at the right
+level with its link (a YouTube video opens in the site's player). A book without any linked
+reading isn't offered, so it can be added ahead of its recordings.
+
 ## Tell readers what's new
 
 In the page's settings, under **הודעות על תוכן חדש בעמוד**, add a line (date and one sentence).
