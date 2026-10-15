@@ -640,3 +640,30 @@ test('visitor statistics (Umami) count only on mikraot.net, so tests and preview
   await page.waitForLoadState('load');
   expect(sent).toEqual([]);
 });
+
+test('the recordings are chosen row by row: part, book, parasha, reading', async ({ page }) => {
+  await page.goto('/קריאות-מוקלטות-בנוסח-אשכנז/');
+  const rows = page.locator('.list-picker-row');
+  // At first only the parts; books without recordings are not offered.
+  await expect(rows).toHaveCount(1);
+  await expect(rows.first().getByRole('button')).toHaveText(['תורה', 'כתובים']);
+
+  await page.getByRole('button', { name: 'תורה' }).click();
+  await page.getByRole('button', { name: 'ויקרא' }).click();
+  // ויקרא has one parasha, opened right away.
+  await expect(page.getByRole('button', { name: 'שמיני' })).toHaveAttribute(
+    'aria-expanded',
+    'true',
+  );
+  await expect(page.getByRole('group', { name: 'קריאה' }).getByRole('link')).toHaveCount(9);
+
+  // A book of chapters names its row פרק; choosing again replaces the rows below.
+  await page.getByRole('button', { name: 'כתובים' }).click();
+  await page.getByRole('button', { name: 'רות' }).click();
+  await expect(rows).toHaveCount(3);
+  // The row's name isn't repeated on its links ("ב"), but is read out ("פרק ב").
+  const chapter = page.getByRole('group', { name: 'פרק' }).getByRole('link', { name: 'פרק ב' });
+  await expect(chapter).toHaveText('ב');
+  await chapter.click();
+  await expect(page.getByRole('dialog').getByRole('heading')).toHaveText('רות · פרק ב');
+});

@@ -1,0 +1,25 @@
+---
+/**
+ * A nested list of links shown as rows of choices: choosing an item (a book) shows its children
+ * (its parashot) in the next row, down to the links themselves (the readings). Used for the
+ * recordings pages, whose full list ran down the page as one narrow column (Arye, 2026-10-15).
+ *
+ * The content stays a plain nested list, so it is edited as one and read as one without scripts
+ * (and by the search index); the rows are built from it in the browser (src/scripts/list-picker.ts).
+ *
+ * levels: the rows' names by depth, comma-separated ("חלק,ספר,פרשה,קריאה"). chapters: the name
+ * of a row of links one level up or more (כתובים → רות → פרק, where the Torah has a parasha
+ * between the book and its readings).
+ */
+interface Props {
+  levels?: string;
+  chapters?: string;
+}
+const { levels = '', chapters = '' } = Astro.props;
+---
+
+<div class="list-picker" data-levels={levels} data-chapters={chapters}>
+  <slot />
+</div>
+
+<script src="../../scripts/list-picker.ts"></script>
