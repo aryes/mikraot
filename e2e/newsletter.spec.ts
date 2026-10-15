@@ -20,8 +20,13 @@ test(
       await open.click();
       await expect(form).toBeVisible({ timeout: 1000 });
     }).toPass();
-    // The cursor is in the first field.
+    // The cursor is in the first field; "ביטול" folds it away again, back to the button.
     await expect(form.getByLabel(/שם/)).toBeFocused();
+    await form.getByRole('button', { name: 'ביטול' }).click();
+    await expect(form).toHaveCount(0);
+    await expect(open).toBeFocused();
+    await open.click();
+    await expect(form).toBeVisible();
 
     const email = form.getByLabel('אימייל');
     await form.getByRole('button', { name: 'הרשמה' }).click();
