@@ -280,8 +280,8 @@
   font: inherit;
 }
 /* The letters taught in the tables are drawn large, so the dagesh dot and the Arabic letters'
-   dots are clear on a phone (Arye, 2026-10-15): cells of letters alone and the letter tiles
-   (markdoc.config.mjs). */
+   dots are clear on a phone (Arye, 2026-10-15): cells of letters alone (English ones too, for
+   uniformity) and the letter tiles (markdoc.config.mjs). */
 .wp-content-rendered td.cell-letter,
 .wp-content-rendered .audio-tile-letter {
   font-size: calc(var(--content-size) * 1.7);

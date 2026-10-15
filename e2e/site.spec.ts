@@ -713,7 +713,7 @@ test('in the letter tables a letter is its own play button, drawn large', async 
   await expect(tile).toHaveText('בּ');
   const cellSize = await page
     .locator('td')
-    .filter({ hasText: /^\s*b\s*$/ })
+    .filter({ hasText: 'במילה' })
     .first()
     .evaluate((td) => parseFloat(getComputedStyle(td).fontSize));
   const letterSize = await tile
@@ -723,7 +723,10 @@ test('in the letter tables a letter is its own play button, drawn large', async 
   await tile.click();
   await expect(tile.locator('.pause-icon')).toBeVisible();
 
-  // Letters alone in a cell (the Arabic column of מבטא) are large too.
+  // Letters alone in a cell are large too: Arabic, and English for uniformity (not words).
+  await expect(page.locator('td.cell-letter').filter({ hasText: /^\s*b\s*$/ })).toHaveCount(1);
+  await expect(page.locator('td.cell-letter').filter({ hasText: 'במילה' })).toHaveCount(0);
   await page.goto('/מבטא/');
   await expect(page.locator('td.cell-letter').filter({ hasText: 'غ' })).toHaveCount(1);
+  await expect(page.locator('td.cell-letter').filter({ hasText: /^\s*sh\s*$/ })).toHaveCount(1);
 });
