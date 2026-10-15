@@ -48,8 +48,9 @@
   /* The line under section headings and the front page title: the logo green, lighter than the
      text (Arye, 2026-10-12). */
   --heading-rule: #5b763e66;
-  /* List picker (ListPicker.astro): choices outlined in --chip-border (3:1 for controls), readings
-     filled with --chip-bg, the chosen choice white on --chip-chosen. */
+  /* List picker (ListPicker.astro) and letter tiles (AudioButton): choices outlined in
+     --chip-border (3:1 for controls), readings filled with --chip-bg, the chosen choice white on
+     --chip-chosen. */
   --chip-border: var(--color-brand-strong);
   --chip-bg: #8cb65f2e;
   --chip-hover: #8cb65f4d;
@@ -278,10 +279,50 @@
   padding: 0 0.3rem;
   font: inherit;
 }
-/* In tables a recording sits under its letter. */
-.wp-content-rendered td .inline-audio-btn {
+/* The letters taught in the tables are drawn large, so the dagesh dot and the Arabic letters'
+   dots are clear on a phone (Arye, 2026-10-15): cells of letters alone and the letter tiles
+   (markdoc.config.mjs). */
+.wp-content-rendered td.cell-letter,
+.wp-content-rendered .audio-tile-letter {
+  font-size: calc(var(--content-size) * 1.7);
+  line-height: 1.2;
+  white-space: nowrap; /* "ס / שׂ" on one line */
+}
+/* A recording alone in its cell sits in the middle of it. */
+.wp-content-rendered td .inline-audio-btn:not(.audio-tile) {
   display: flex;
-  margin: 0.25rem auto 0;
+  margin: 0 auto;
+}
+/* A letter with its recording is one button: the letter, a speaker under it (AudioButton). */
+.wp-content-rendered .audio-tile {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  /* One width for a column's tiles (ת and O are wider letters); narrow sides on phones, where a
+     six-column table is short of room. */
+  min-width: 3.25rem;
+  padding: 0.35rem 0.5rem 0.4rem;
+  border: 1px solid var(--chip-border);
+  border-radius: 0.75rem;
+  background: var(--chip-bg);
+  color: var(--chip-text);
+}
+@media (min-width: 640px) {
+  .wp-content-rendered .audio-tile {
+    min-width: 4rem;
+    padding-inline: 0.9rem;
+  }
+}
+.wp-content-rendered .audio-tile svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.wp-content-rendered .audio-tile:hover {
+  background: var(--chip-hover);
+}
+.wp-content-rendered .audio-tile:focus-visible {
+  outline: 2px solid var(--content-link);
+  outline-offset: 2px;
 }
 .wp-content-rendered .latest-posts {
   list-style: none;
@@ -387,9 +428,16 @@
    the components; these rules cover the content. Collapsed explanations print as they are on
    screen, so a lesson prints as a worksheet, or with its answers after opening them. */
 @media print {
-  .wp-content-rendered .inline-audio-btn,
-  .wp-content-rendered td .inline-audio-btn {
+  .wp-content-rendered .inline-audio-btn:not(.audio-tile),
+  .wp-content-rendered td .inline-audio-btn:not(.audio-tile),
+  .wp-content-rendered .audio-tile svg {
     display: none;
+  }
+  /* A letter tile prints as its letter. */
+  .wp-content-rendered .audio-tile {
+    border: 0;
+    background: none;
+    color: #000000;
   }
   .wp-content-rendered .table-scroll {
     overflow: visible;

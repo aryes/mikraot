@@ -1,35 +1,54 @@
 ---
-/** Plays a short recording in place; behaviour in src/scripts/content.ts. */
+/**
+ * Plays a short recording in place; behaviour in src/scripts/content.ts.
+ *
+ * With a label (a table cell holding a letter, or a sound's name such as "A", and its recording;
+ * markdoc.config.mjs), the label itself is the button: a tile with it large and a speaker under
+ * it (Arye, 2026-10-15).
+ * Without one, a round speaker button.
+ */
 interface Props {
   src: string;
+  label?: string;
 }
-const { src } = Astro.props;
+const { src, label: letter } = Astro.props;
 // Says what it plays (the recordings are named after it: ב-דגושה.mp3 → "ב דגושה"), so a screen reader
 // can tell the buttons of a table apart.
 const sound = decodeURIComponent(src.split('/').at(-1) ?? '')
   .replace(/\.mp3$/i, '')
   .replaceAll('-', ' ');
-const label = sound ? `השמע: ${sound}` : 'השמע צליל';
+// A tile's name starts with the letter it shows, so voice control finds it by what's on screen
+// (WCAG 2.5.3): "השמע: בּ (ב דגושה)".
+const what = letter && sound && sound !== letter ? `${letter} (${sound})` : letter || sound;
+const label = what ? `השמע: ${what}` : 'השמע צליל';
 ---
 
 <button
   type="button"
-  class="inline-audio-btn mx-1 inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-brand-strong align-middle text-white shadow-xs transition-transform hover:bg-brand-deep active:scale-95"
+  class:list={[
+    'inline-audio-btn cursor-pointer items-center transition-transform active:scale-95',
+    letter
+      ? 'audio-tile'
+      : 'mx-1 inline-flex h-8 w-8 justify-center rounded-full bg-brand-strong align-middle text-white shadow-xs hover:bg-brand-deep',
+  ]}
   data-audio-src={src}
   title={label}
   aria-label={label}
 >
+  {letter && <span class="audio-tile-letter">{letter}</span>}
   <svg
     class="play-icon pointer-events-none h-4 w-4"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    stroke-width="2.5"
+    stroke-width="2"
     stroke-linecap="round"
     stroke-linejoin="round"
     aria-hidden="true"
   >
-    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+    <path d="M11 5 6 9H2v6h4l5 4z"></path>
+    <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+    <path d="M19 5a10 10 0 0 1 0 14"></path>
   </svg>
   <svg
     class="pause-icon pointer-events-none hidden h-4 w-4"
