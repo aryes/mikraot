@@ -686,3 +686,17 @@ test('the recordings are chosen row by row: part, book, parasha, reading', async
     /youtube-nocookie\.com\/embed\/videoseries\?list=[\w-]+&autoplay=1$/,
   );
 });
+
+test('the Babylonian-Iraqi recordings use the same picker: part, book, chapter', async ({
+  page,
+}) => {
+  await page.goto('/קריאות-מוקלטות-בנוסח-בבלי-עירקי/');
+  await page.getByRole('button', { name: 'נביאים' }).click();
+  await page.getByRole('button', { name: 'מלאכי' }).click();
+  await expect(page.getByRole('group', { name: 'פרק' }).getByRole('link')).toHaveText([
+    'א',
+    'ב',
+    'ג',
+    'הכול ברצף',
+  ]);
+});
