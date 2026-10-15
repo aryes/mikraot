@@ -600,7 +600,7 @@ test('home page outline: topic headings at level 2, drawn small as on WordPress'
 }) => {
   await page.goto('/');
   const headings = page.locator('.wp-content-rendered').getByRole('heading');
-  await expect(headings).toHaveText(['הגיה', 'דקדוק', 'טעמים', 'דברי הימים']);
+  await expect(headings).toHaveText(['הגיה', 'דקדוק', 'טעמים', 'דִּבְרֵ֥י הַיָּמִ֖ים']);
   // No level is skipped: the page title is h1 and these are all h2.
   for (const level of await headings.evaluateAll((all) => all.map((h) => h.tagName))) {
     expect(level).toBe('H2');
