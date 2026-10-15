@@ -107,7 +107,7 @@ Success means all of these:
       email and Arye's notice (`docs/OPERATIONS.md`, Newsletter). The form can't be tried before:
       the human check's key works only on mikraot.net.
 - [ ] Response headers (CSP, HSTS…) present; no console errors or CSP blocks on a few pages.
-- [ ] Umami receives visits (it counts only on mikraot.net); Search Console: submit `/sitemap-index.xml`.
+- [ ] Umami receives visits (it counts only on mikraot.net); Search Console: submit `/sitemap-index.xml`, then review queries and titles a month or two later (`docs/ROADMAP.md`).
 - [ ] A Cloudflare rate limiting rule (the free plan has one, counted per IP over 10 seconds, action
       block; checked 2026-10-08; Security → WAF → Rate limiting rules) on all of `mikraot.net`
       (unknown addresses run the Worker too, not only `/api/*`), with a threshold well above normal
