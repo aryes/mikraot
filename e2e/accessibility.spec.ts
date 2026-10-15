@@ -97,6 +97,17 @@ test('the first Tab offers a skip to the content; sound buttons say what they pl
   await expect(page.getByRole('button', { name: 'השמע: בּ (ב דגושה)' })).toBeVisible();
 });
 
+// The footer's newsletter form is folded behind a button until asked for.
+test('no accessibility violations with the newsletter form opened', async ({ page }) => {
+  await page.goto('/about/');
+  const form = page.getByRole('form', { name: 'עדכונים באימייל' });
+  await expect(async () => {
+    await page.getByRole('button', { name: 'הרשמה לעדכונים באימייל' }).click();
+    await expect(form).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  expect(await scan(page)).toEqual([]);
+});
+
 // The recordings picker's chosen choices and readings appear only after clicks.
 for (const colorScheme of ['light', 'dark'] as const) {
   test(`no accessibility violations in the opened recordings picker (${colorScheme})`, async ({

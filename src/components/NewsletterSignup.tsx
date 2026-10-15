@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { Mail } from 'lucide-react';
 import { PRIVACY_POLICY_URL } from '../lib/urls';
 import { Turnstile } from './Turnstile';
 
@@ -19,6 +20,9 @@ const field =
 /**
  * Newsletter sign-up in the footer (always dark). Posts to src/pages/api/newsletter.ts; Brevo
  * then emails a confirmation link, and the address joins the list once it is clicked.
+ *
+ * Folded behind one green button until asked for, as the comment form is (Arye and the design
+ * review, 2026-10-15): the explanation, the fields and the privacy note open with it.
  */
 export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingClass }) => {
   const id = useId();
@@ -26,7 +30,8 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
   const [name, setName] = useState('');
   const [emailError, setEmailError] = useState('');
   const [state, setState] = useState<State>('idle');
-  // The human check loads when a visitor first uses the form, not for every page view.
+  const [open, setOpen] = useState(false);
+  // The human check loads when a visitor opens the form, not for every page view.
   const [checkStarted, setCheckStarted] = useState(false);
   const [token, setToken] = useState('');
   const [turnstileKey, setTurnstileKey] = useState(0);
@@ -34,12 +39,18 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
   const [waiting, setWaiting] = useState(false);
   const form = useRef<HTMLFormElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
   const statusRef = useRef<HTMLParagraphElement>(null);
 
   // A send that waited for the human check goes out as soon as the check is done.
   useEffect(() => {
     if (waiting && token) form.current?.requestSubmit();
   }, [waiting, token]);
+
+  // Opened: the cursor goes to the first field.
+  useEffect(() => {
+    if (open) nameRef.current?.focus();
+  }, [open]);
 
   // Once sent, the fields go and focus moves to the message that replaces them.
   useEffect(() => {
@@ -91,6 +102,24 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
   }, []);
 
   const sent = state === 'sent';
+  if (!open) {
+    return (
+      <section aria-labelledby={`${id}-title`}>
+        {/* The section keeps its name for screen readers; the button says the rest. */}
+        <h2 id={`${id}-title`} className="sr-only">
+          עדכונים באימייל
+        </h2>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="bg-brand-strong hover:bg-brand-deep inline-flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2.5 text-base font-bold text-white shadow-xs transition-all"
+        >
+          <Mail className="h-4 w-4" aria-hidden="true" />
+          הרשמה לעדכונים באימייל
+        </button>
+      </section>
+    );
+  }
   return (
     <form
       ref={form}
@@ -118,6 +147,7 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
               </label>
               <input
                 id={`${id}-name`}
+                ref={nameRef}
                 type="text"
                 autoComplete="given-name"
                 maxLength={100}
