@@ -40,6 +40,9 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
   const form = useRef<HTMLFormElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  // Closed by its "ביטול" button: focus goes back to the button that opened it.
+  const focusOpenButton = useRef(false);
   const statusRef = useRef<HTMLParagraphElement>(null);
 
   // A send that waited for the human check goes out as soon as the check is done.
@@ -47,10 +50,26 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
     if (waiting && token) form.current?.requestSubmit();
   }, [waiting, token]);
 
-  // Opened: the cursor goes to the first field.
+  // Opened: the cursor goes to the first field; closed again: back to the button.
   useEffect(() => {
     if (open) nameRef.current?.focus();
+    else if (focusOpenButton.current) {
+      focusOpenButton.current = false;
+      openButtonRef.current?.focus();
+    }
   }, [open]);
+
+  // As the comment form's "ביטול": folds the form away, keeping what was typed.
+  const close = () => {
+    setOpen(false);
+    setEmailError('');
+    setWaiting(false);
+    if (state !== 'sent') setState('idle');
+    // A fresh human check when it's opened again (a token expires after a few minutes).
+    setToken('');
+    setTurnstileKey((key) => key + 1);
+    focusOpenButton.current = true;
+  };
 
   // Once sent, the fields go and focus moves to the message that replaces them.
   useEffect(() => {
@@ -110,6 +129,7 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
           עדכונים באימייל
         </h2>
         <button
+          ref={openButtonRef}
           type="button"
           onClick={() => setOpen(true)}
           className="bg-brand-strong hover:bg-brand-deep inline-flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2.5 text-base font-bold text-white shadow-xs transition-all"
@@ -198,6 +218,15 @@ export const NewsletterSignup: React.FC<{ headingClass: string }> = ({ headingCl
             className="bg-brand-strong hover:bg-brand-deep cursor-pointer rounded-xl px-5 py-2 text-base font-bold text-white shadow-xs transition-all disabled:cursor-wait disabled:opacity-70"
           >
             {state === 'sending' ? 'שליחה...' : 'הרשמה'}
+          </button>
+          {/* Not once the sign-up is on its way: it would go through anyway. */}
+          <button
+            type="button"
+            onClick={close}
+            disabled={state === 'sending' && !waiting}
+            className="mr-2 cursor-pointer rounded-xl px-3 py-2 text-base font-semibold text-slate-300 hover:bg-slate-700 hover:text-white disabled:cursor-wait disabled:opacity-60"
+          >
+            ביטול
           </button>
         </>
       )}
