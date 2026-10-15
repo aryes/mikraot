@@ -11,12 +11,17 @@ test(
       if (sent.url().includes('challenges.cloudflare.com')) checks.push(sent.url());
     });
     await page.goto('/about/');
+    // Folded behind a button, which works once the form's script has loaded (in view).
+    const open = page.getByRole('button', { name: 'הרשמה לעדכונים באימייל' });
     const form = page.getByRole('form', { name: 'עדכונים באימייל' });
-    await form.scrollIntoViewIfNeeded();
-    await expect(form).toBeVisible();
-    // The form works once its script has run (Astro removes `ssr` from the island then).
-    await expect(page.locator('astro-island:has(form)')).not.toHaveAttribute('ssr');
-    expect(checks).toEqual([]);
+    await open.scrollIntoViewIfNeeded();
+    expect(checks).toEqual([]); // nothing loaded before the form is opened
+    await expect(async () => {
+      await open.click();
+      await expect(form).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    // The cursor is in the first field.
+    await expect(form.getByLabel(/שם/)).toBeFocused();
 
     const email = form.getByLabel('אימייל');
     await form.getByRole('button', { name: 'הרשמה' }).click();
@@ -90,11 +95,19 @@ test('the privacy policy is published and linked from the footer and both forms'
   expect(policy?.status()).toBe(200);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('מדיניות הפרטיות');
   await page.goto('/about/');
-  await expect(page.locator('footer a[href="/privacy-policy/"]')).toHaveCount(2); // line + form
+  await expect(page.locator('footer a[href="/privacy-policy/"]')).toHaveCount(1); // bottom line
+  // The comment form's link (the page's content has none of its own). First, as opening the
+  // footer form below scrolls past the comments, which load on the way.
   const loaded = page.waitForResponse((r) => r.url().includes('/api/comments/') && r.ok());
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
   await loaded;
   await page.getByRole('button', { name: 'כתבו תגובה או שאלה' }).click();
-  // The comment form's link (the page's content has none of its own).
   await expect(page.locator('main').getByRole('link', { name: 'מדיניות הפרטיות' })).toBeVisible();
+  // The newsletter form's link, once it's opened (the button works once its script has loaded).
+  await expect(async () => {
+    await page.getByRole('button', { name: 'הרשמה לעדכונים באימייל' }).click();
+    await expect(page.locator('footer a[href="/privacy-policy/"]')).toHaveCount(2, {
+      timeout: 1000,
+    });
+  }).toPass();
 });
