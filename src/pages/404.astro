@@ -3,15 +3,33 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="העמוד לא נמצא – מקראות">
-  <div class="mx-auto max-w-3xl px-4 py-20 text-center">
-    <h1 class="mb-3 text-3xl font-bold text-slate-800 dark:text-slate-100">העמוד לא נמצא (404)</h1>
-    <p class="mb-6 text-slate-600 dark:text-slate-300">העמוד המבוקש אינו קיים או שהועבר.</p>
-    <a
-      href="/"
-      class="inline-block rounded-xl bg-brand-strong print:hidden px-6 py-2.5 font-bold text-white shadow-xs transition-all hover:bg-brand-deep"
-    >
-      חזרה לדף הבית
-    </a>
+  {/* In the same white card as every page's content (ContentLayout), with the site's search as a
+       second way on: visitors come here from old or broken links (Arye, 2026-10-15). */}
+  <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900 p-6 text-center shadow-xs sm:p-10">
+      <h1 class="mb-3 text-3xl font-bold text-brand-deep dark:text-brand-light">
+        העמוד לא נמצא (404)
+      </h1>
+      <p class="mb-6 text-slate-600 dark:text-slate-300">
+        העמוד המבוקש אינו קיים או שהועבר. אפשר לחפש אותו, או לחזור לדף הבית.
+      </p>
+      <div class="flex flex-wrap justify-center gap-3 print:hidden">
+        <a
+          href="/"
+          class="inline-block rounded-xl bg-brand-strong px-6 py-2.5 font-bold text-white shadow-xs transition-all hover:bg-brand-deep"
+        >
+          חזרה לדף הבית
+        </a>
+        {/* Opens the search dialog: src/scripts/search.ts listens on [data-open-search]. */}
+        <button
+          type="button"
+          data-open-search
+          class="cursor-pointer rounded-xl border border-brand-strong dark:border-brand px-6 py-2.5 font-bold text-brand-strong dark:text-brand-light transition-all hover:bg-brand/10"
+        >
+          חיפוש באתר
+        </button>
+      </div>
+    </div>
   </div>
   <script>
     import { track } from '../scripts/analytics';
