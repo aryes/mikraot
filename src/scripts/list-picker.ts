@@ -54,7 +54,7 @@ function setUp(picker: HTMLElement, index: number): void {
     // The label column stays even when empty, so the rows' choices line up.
     const label = document.createElement('span');
     label.className = 'list-picker-label';
-    label.textContent = name;
+    label.append(centred(name));
     if (name) {
       label.id = `list-picker-${index}-${depth}`;
       row.setAttribute('role', 'group');
@@ -70,7 +70,7 @@ function setUp(picker: HTMLElement, index: number): void {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'list-picker-choice';
-        button.textContent = option.name;
+        button.append(centred(option.name));
         button.setAttribute('aria-expanded', 'false');
         button.addEventListener('click', () => {
           buttons.forEach((other) => other.setAttribute('aria-expanded', 'false'));
@@ -112,13 +112,20 @@ function readingLink(
   const shown = rowName && name.startsWith(`${rowName} `) ? name.slice(rowName.length + 1) : name;
   if (shown !== name) anchor.setAttribute('aria-label', name);
   anchor.dataset['videoTitle'] = path.slice(path.length > 1 ? 1 : 0).join(' · ');
-  anchor.textContent = shown;
+  anchor.append(centred(shown));
   return anchor;
 }
 
 /** The chosen item's whole playlist, styled and played as its readings are. */
 function playlistLink(href: string, path: string[]): HTMLAnchorElement {
   return readingLink('הכול ברצף', '', href, path);
+}
+
+/** Text in its own element, so the CSS can centre it in its box (text-box, global.css). */
+function centred(text: string): HTMLSpanElement {
+  const span = document.createElement('span');
+  span.textContent = text;
+  return span;
 }
 
 function externalLink(href: string): HTMLAnchorElement {
