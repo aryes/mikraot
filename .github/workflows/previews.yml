@@ -1,0 +1,42 @@
+# Deletes a pull request's Cloudflare Preview once the pull request is merged or closed, so old
+# versions of the site don't stay public (Arye, 2026-10-15; the free plan keeps up to 100 and only
+# then drops the oldest). Workers Builds creates the Preview for each branch, named after it
+# (claude/review-bugs → claude-review-bugs); this follows Cloudflare's own example:
+# https://developers.cloudflare.com/workers/previews/examples/#delete-closed-pull-request-previews
+# The staging branch's Preview is kept.
+name: Previews
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  delete:
+    # Not for pull requests from forks (no secrets there), nor the staging branch.
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref != 'staging'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # No checkout or install: the Worker is named on the command line, so none of the branch's code
+    # runs on a machine that holds the token. Wrangler's version as in package-lock.json.
+    steps:
+      - name: Delete the Preview
+        # The branch name as Workers Builds turns it into a Preview name: lower case, anything
+        # but letters, digits and dashes becomes a dash. Passed through the environment, not
+        # pasted into the script, as branch names come from whoever opens the pull request.
+        # A branch whose build never made a Preview is fine ("Preview not found", code 10025);
+        # any other error fails the run.
+        run: |
+          name="$(printf '%s' "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')"
+          if ! out="$(npx --yes wrangler@4.149.0 preview delete --worker-name mikraot --name "$name" --skip-confirmation 2>&1)"; then
+            printf '%s\n' "$out"
+            grep -q 'code: 10025' <<< "$out" || exit 1
+            echo "No Preview named $name"
+          fi
+        env:
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          # Edit rights on Workers scripts only, this account; not the configuration token in .env.
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_PREVIEWS_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}

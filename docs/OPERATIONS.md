@@ -116,6 +116,10 @@ file; the template and the webhook (with its header) were made through Brevo's A
 
 - `CF_CONFIG_API_TOKEN` (the scoped Cloudflare token in `.env`): expires **2027-01-31**. Arye
   creates a new one with the same permissions (CLAUDE.md, Secrets policy) before then.
+- `CF_PREVIEWS_API_TOKEN` (GitHub secret, since 2026-10-15; expiry: as set when created): edit rights on Workers scripts in
+  this account, used only by `.github/workflows/previews.yml` to delete a pull request's Cloudflare
+  Preview when it closes. If it expires or is revoked, that workflow fails on each merge or close and old
+  Previews stay public (no data, test settings) until a new token is saved under the same name.
 - `security.txt` expires 330 days after the build (`src/lib/security-txt.ts`); every deploy renews
   it, so it only lapses if nothing is deployed for 11 months.
 
