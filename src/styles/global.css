@@ -377,12 +377,6 @@
   outline: 2px solid var(--content-link);
   outline-offset: 2px;
 }
-.wp-content-rendered .list-picker-all {
-  margin-inline-start: 0.5rem;
-  font-size: 1rem;
-  font-weight: 400;
-  text-decoration: underline;
-}
 
 /* Printing (teachers print lessons): the layout parts are hidden with Tailwind `print:` classes in
    the components; these rules cover the content. Collapsed explanations print as they are on

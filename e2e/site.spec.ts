@@ -666,4 +666,13 @@ test('the recordings are chosen row by row: part, book, parasha, reading', async
   await expect(chapter).toHaveText('ב');
   await chapter.click();
   await expect(page.getByRole('dialog').getByRole('heading')).toHaveText('רות · פרק ב');
+
+  // The book's whole playlist plays in the same popup.
+  await page.getByRole('dialog').getByRole('button', { name: 'סגירה' }).click();
+  await page.getByRole('link', { name: 'הכול ברצף' }).click();
+  await expect(page.getByRole('dialog').getByRole('heading')).toHaveText('רות');
+  await expect(page.locator('dialog iframe')).toHaveAttribute(
+    'src',
+    /youtube-nocookie\.com\/embed\/videoseries\?list=[\w-]+&autoplay=1$/,
+  );
 });
