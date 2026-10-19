@@ -41,10 +41,10 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
 - [ ] **Pages changed on purpose** (decided with Arye 2026-10-15, to do with the switch-over
       preparation): give `scripts/compare-with-live.ts` a list of the pages edited since the import,
       each with its reason, reported as "changed on purpose" so a real difference stands out on the
-      switch day. Today (13): `/` (link to מה חדש, the email-updates box, the pointed "דברי הימים" heading), `/טעמים-נדירים/` and
+      switch day. Today (14): `/` (link to מה חדש, the email-updates box, the pointed "דברי הימים" heading), `/טעמים-נדירים/` and
       `/טעמים/1-word-2-tropes/` (corrected telisha on קִ֠רְב֞וּ), the two recordings pages (the
       picker), `/דגש-קל/`, `/מבטא/` and `/תנועות-עיצורים-וניקוד/` (grouped table headings; דגש קל
-      also one more link), `/סמיכות/`, `/קמץ-קטן/` and `/משה-מוציא-וכלב-מכניס/` (one more link), `/טעמים/נוסח-אשכנז/` and `/שיטת-גלגלי-עזר/` (ואַזְלָ֜א pointed: וְאַזְלָ֜א).
+      also one more link), `/סמיכות/`, `/קמץ-קטן/` and `/משה-מוציא-וכלב-מכניס/` (one more link), `/טעמים/נוסח-אשכנז/` and `/שיטת-גלגלי-עזר/` (ואַזְלָ֜א pointed: וְאַזְלָ֜א), `/silent-letters/` ("הי׳ והה׳").
 - [x] The Turnstile widget's hostnames include `mikraot.net` (set at creation, 2026-10-02).
 - [x] **Comments tested before the switch** (2026-10-05): with the workers.dev hostname briefly
       allowed in the Turnstile widget, Arye posted a real comment from his browser (automated
@@ -139,6 +139,8 @@ header or CSP problem breaking pages.
    (`gh pr list`, then `gh pr merge --disable-auto <number>`; Renovate's included) and open no new
    ones until step 3 is done. The revert's own checks take about 4 minutes; the site is already
    back on WordPress from step 2, so only this freeze matters meanwhile.
+   Without Claude (Arye, from the browser): Cloudflare → Workers & Pages → mikraot → Settings →
+   Builds → Disconnect stops every deploy instead (`docs/GUIDE.md`, "If Claude is unavailable").
 2. **Delete the `mikraot.net/*` route** (Cloudflare API or dashboard: Workers → mikraot →
    Settings → Domains & Routes). WordPress serves the site again at once; no cache purge needed.
 3. Merge the revert pull request opened right after the switch (`gh pr merge --rebase`: the

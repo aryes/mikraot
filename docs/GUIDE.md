@@ -89,3 +89,47 @@ the test site, https://mikraot.mikraot-app.workers.dev).
 
 Tell Claude what you see and on which page. Every published version is kept, so any change can be
 undone.
+
+## If Claude is unavailable
+
+Everything below works from a browser, with your own logins, and none of it needs the laptop or a
+command. When in doubt, do nothing: the site keeps running on its own, and backups are made daily.
+
+**Emails you may get, and what they mean**
+
+- **"תקלה במקראות: בקשה לאתר נכשלה"**: one visit to the site failed. A single email (at most one
+  an hour) is usually nothing. Open the site: if pages load, ignore it. If emails keep coming every
+  hour, or pages fail, see "The site is broken" below.
+- **"תקלה במקראות: הגיבוי היומי נכשל"**: last night's copy of the comments wasn't made. The site
+  is fine; one missed night is harmless. Several nights in a row need a developer.
+- **UptimeRobot, "down"**: the site didn't answer. Open it yourself; also check
+  <https://www.cloudflarestatus.com> (if Cloudflare has a problem, just wait).
+- **Sentry, "new issue"**: an error a visitor's browser or the server reported. Read it only if the
+  site misbehaves; most are harmless (old browsers, extensions).
+- **GitHub, a failed "Daily check"** (if GitHub's notifications for failed runs are on): the daily
+  outside check found something off, such as a missing backup or traffic near the free limit. It
+  needs a developer only if it repeats.
+
+**The site is broken** (this applies once mikraot.net serves the new site; until the switch it
+is still WordPress)
+
+1. **Stop automatic publishing first**, or the next update would undo your fix: Cloudflare
+   dashboard → Workers & Pages → mikraot → Settings → Builds → Disconnect. Updates (Claude's, and
+   the automatic dependency updates, which can come any day) then stay on GitHub unpublished, until
+   a developer reconnects it.
+2. **In the first weeks after the switch: go back to WordPress.** Same place → Settings → Domains &
+   Routes → delete the route `mikraot.net/*`. WordPress is back within seconds. Comments made on
+   the new site meanwhile stay in its database, hidden until the next switch forward.
+3. **Later, or if step 2 doesn't apply: go back one version.** Same place → Deployments → the
+   version before the problem → ⋯ → Rollback. Cloudflare may refuse a rollback across a change in
+   the site's storage settings; then go back to WordPress (step 2) if that's still possible, or
+   wait for a developer.
+
+**A spam or offensive comment**: the "ניהול התגובה" link in its email → "הסתר תגובה".
+
+**Getting help**: any web developer can take over from `CLAUDE.md` (how the site is built) and
+`docs/OPERATIONS.md` (every procedure: restore, rollback, limits, expiry dates), both in the public
+repository <https://github.com/aryes/mikraot>. Accounts are yours: Cloudflare (site and database),
+GitHub (code), Brevo (emails and newsletter), Sentry (errors), UptimeRobot, Umami (statistics), and
+the domain's registrar. Give a developer access through each service's own team or member settings,
+never by sharing your password.
