@@ -22,3 +22,10 @@
   Content-Type: application/rss+xml; charset=utf-8
 /.well-known/security.txt
   Content-Type: text/plain; charset=utf-8
+
+# Pagefind's index pieces have content-hashed names: a new build gets new names (its unhashed
+# pagefind.js and pagefind-entry.json keep the default, revalidated each time).
+/pagefind/fragment/*
+  Cache-Control: public, max-age=31536000, immutable
+/pagefind/index/*
+  Cache-Control: public, max-age=31536000, immutable

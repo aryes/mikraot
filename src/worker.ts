@@ -59,7 +59,13 @@ export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
         // The whole file from the assets; the browser's other headers (If-None-Match) still apply.
         const whole = new Request(request.url, { headers: request.headers });
         whole.headers.delete('Range');
-        return withSecurityHeaders(await answerRange(request, await env.ASSETS.fetch(whole)));
+        const recording = await answerRange(request, await env.ASSETS.fetch(whole));
+        // A week in the browser: each play otherwise asks again (a Worker request). A recording
+        // replaced at the same address reaches returning visitors within that week.
+        // Also on a 304: browsers take its headers for the copy they keep.
+        if (recording.ok || recording.status === 304)
+          recording.headers.set('Cache-Control', 'public, max-age=604800');
+        return withSecurityHeaders(recording);
       }
       const unsubscribe = await oneClickUnsubscribe(request);
       if (unsubscribe !== null) {
