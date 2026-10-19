@@ -263,6 +263,7 @@ export const NewsletterSignup: React.FC<{
           {checkStarted && (
             <Turnstile
               key={turnstileKey}
+              action="newsletter"
               onToken={setToken}
               onError={handleCheckError}
               theme={look.theme}

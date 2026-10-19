@@ -41,7 +41,15 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
 
   const turnstileKey = env.TURNSTILE_SECRET_KEY;
   if (!turnstileKey) throw new Error('TURNSTILE_SECRET_KEY is not set');
-  if (!(await verifyTurnstile(turnstileKey, tokenFrom(body), clientAddress))) {
+  if (
+    !(await verifyTurnstile({
+      key: turnstileKey,
+      token: tokenFrom(body),
+      remoteIp: clientAddress,
+      hostname: url.hostname,
+      action: 'newsletter',
+    }))
+  ) {
     return json({ error: 'Human check failed' }, 403);
   }
   // Each sign-up sends an email (from Brevo's daily allowance): a few a minute per visitor, and

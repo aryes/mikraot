@@ -57,6 +57,7 @@ interface Window {
       container: HTMLElement,
       options: {
         sitekey: string;
+        action: string;
         theme: 'auto' | 'dark';
         appearance: 'always' | 'interaction-only';
         callback: (token: string) => void;

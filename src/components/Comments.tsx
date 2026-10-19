@@ -490,7 +490,12 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
             </p>
             <div className="flex flex-wrap items-center justify-between gap-4">
               {checkStarted ? (
-                <Turnstile key={turnstileKey} onToken={handleToken} onError={handleCheckError} />
+                <Turnstile
+                  key={turnstileKey}
+                  action="comment"
+                  onToken={handleToken}
+                  onError={handleCheckError}
+                />
               ) : (
                 <div className="min-h-[65px] w-[300px] max-w-full" /> // the widget's space, so nothing moves
               )}

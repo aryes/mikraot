@@ -111,7 +111,8 @@ Success means all of these:
 - [ ] Email addresses on pages are obfuscated by Cloudflare (Scrape Shield), as for WordPress.
 - [ ] The URL parity checks from step 1 pass against `https://mikraot.net`, plus
       `npm run check:links -- https://mikraot.net` and `npm run test:deployed -- https://mikraot.net`.
-- [ ] A real test comment posts, appears, and is hidden again (approval for the D1 change).
+- [ ] A real test comment posts, appears, and is hidden again (approval for the D1 change). It also
+      proves the human check's hostname and action checks, which only the real key runs.
 - [ ] A real test sign-up from the footer: confirmation email, `/newsletter/confirmed/`, welcome
       email and Arye's notice (`docs/OPERATIONS.md`, Newsletter). The form can't be tried before:
       the human check's key works only on mikraot.net.
