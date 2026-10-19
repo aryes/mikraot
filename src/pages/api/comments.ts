@@ -63,7 +63,15 @@ export const POST: APIRoute = async ({ request, url, clientAddress, locals }) =>
     }
     const turnstileKey = env.TURNSTILE_SECRET_KEY;
     if (!turnstileKey) throw new Error('TURNSTILE_SECRET_KEY is not set');
-    if (!(await verifyTurnstile(turnstileKey, tokenFrom(body), clientAddress))) {
+    if (
+      !(await verifyTurnstile({
+        key: turnstileKey,
+        token: tokenFrom(body),
+        remoteIp: clientAddress,
+        hostname: url.hostname,
+        action: 'comment',
+      }))
+    ) {
       return json({ error: 'Human check failed' }, 403);
     }
     // Counted only for comments that would be saved, so rejected junk doesn't use up the quota.

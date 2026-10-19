@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+import type { TurnstileAction } from '../server/turnstile';
 
 /** Cloudflare's always-pass test key, for `astro dev` (the real widget only works on mikraot.net). */
 const TEST_SITE_KEY = '1x00000000000000000000AA';
@@ -25,6 +26,8 @@ function loadScript(): Promise<void> {
 }
 
 interface TurnstileProps {
+  /** Which form this check is for; the server accepts its token only for that form. */
+  action: TurnstileAction;
   /**
    * Called with a fresh token when the check passes, and with '' when it expires or fails.
    * Must be stable (e.g. a state setter): a new function re-renders the widget. So must onError.
@@ -43,6 +46,7 @@ interface TurnstileProps {
  * A token works once: remount the widget (change its React `key`) after each use.
  */
 export const Turnstile: React.FC<TurnstileProps> = ({
+  action,
   onToken,
   onError,
   theme = 'auto',
@@ -58,6 +62,7 @@ export const Turnstile: React.FC<TurnstileProps> = ({
         if (!active || !container.current || !window.turnstile) return;
         widgetId = window.turnstile.render(container.current, {
           sitekey: SITE_KEY,
+          action,
           theme,
           appearance,
           callback: (token) => onToken(token),
@@ -76,7 +81,7 @@ export const Turnstile: React.FC<TurnstileProps> = ({
       active = false;
       if (widgetId !== undefined) window.turnstile?.remove(widgetId);
     };
-  }, [onToken, onError, theme, appearance]);
+  }, [action, onToken, onError, theme, appearance]);
 
   return <div ref={container} className={appearance === 'always' ? 'min-h-[65px]' : ''} />;
 };

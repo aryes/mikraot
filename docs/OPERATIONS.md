@@ -20,6 +20,10 @@ The site emails Arye when a request ends in a server error or the daily backup f
 2. If a deploy caused it: roll back (below), then fix through a pull request.
 3. If D1 or KV is failing on Cloudflare's side: <https://www.cloudflarestatus.com>. Nothing to do
    but wait; the static pages keep working, only comments are affected.
+4. "POST /api/comments" or "POST /api/newsletter" with "Turnstile siteverify" or a timeout in
+   the logs: Cloudflare's human check didn't answer within 5 seconds
+   (`src/server/turnstile.ts`). Check cloudflarestatus.com (Turnstile); visitors were asked to try
+   again.
 
 ### UptimeRobot: the site is down
 
