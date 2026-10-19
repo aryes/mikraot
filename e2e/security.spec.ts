@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { readdirSync } from 'node:fs';
 import { LOCAL_ONLY } from './tags';
 
 /** Collects Content-Security-Policy violations reported in the console. */
@@ -60,6 +61,21 @@ test('hashed build files are cached for a year; pages are not', async ({ page, r
   const cached = await request.get(asset);
   expect(cached.ok()).toBe(true);
   expect(cached.headers()['cache-control']).toBe('public, max-age=31536000, immutable');
+});
+
+test('search index pieces are cached for a year, recordings for a week', async ({ request }) => {
+  // A piece of the built index (content-hashed name), as the search loads it.
+  const [piece = ''] = readdirSync('dist/client/pagefind/fragment');
+  const fragment = await request.get(`/pagefind/fragment/${piece}`);
+  expect(fragment.headers()['cache-control']).toBe('public, max-age=31536000, immutable');
+  const mp3 = '/wp-content/uploads/2023/07/ארגב.mp3';
+  const recording = await request.get(mp3);
+  expect(recording.headers()['cache-control']).toBe('public, max-age=604800');
+  // Revalidated after the week: the 304 keeps the week (browsers copy its headers).
+  const etag = recording.headers()['etag'] ?? '';
+  const unchanged = await request.get(mp3, { headers: { 'If-None-Match': etag } });
+  expect(unchanged.status()).toBe(304);
+  expect(unchanged.headers()['cache-control']).toBe('public, max-age=604800');
 });
 
 test('security.txt is served (RFC 9116)', async ({ request }) => {
