@@ -1,7 +1,10 @@
 /**
  * Site search (Ctrl+K or the header button) backed by Pagefind's static index, which the build
- * writes to /pagefind/. Pagefind loads on first use, so pages carry no search cost until then.
+ * writes to /pagefind/. Pagefind loads when the search opens, so pages carry no search cost until
+ * then. A query that finds few pages is also tried in other spellings and without a prefix letter
+ * (src/lib/search-variants.ts), exact matches first.
  */
+import { queryVariants } from '../lib/search-variants';
 
 interface PagefindResult {
   url: string;
@@ -9,12 +12,16 @@ interface PagefindResult {
   meta: { title?: string };
 }
 interface Pagefind {
-  search(query: string): Promise<{ results: { data(): Promise<PagefindResult> }[] }>;
+  search(query: string): Promise<{ results: { id: string; data(): Promise<PagefindResult> }[] }>;
 }
 
 const MAX_RESULTS = 8;
+/** Fewer exact results than this: the other forms of the query are searched too. */
+const FEW_RESULTS = 3;
 /** How long a search with no results must stay unchanged before it counts as a miss. */
 const MISS_DELAY_MS = 2000;
+/** A pause in typing before searching: each search may be several (the other forms). */
+const TYPING_PAUSE_MS = 200;
 let pagefind: Promise<Pagefind> | null = null;
 
 function isPagefind(value: unknown): value is Pagefind {
@@ -32,16 +39,57 @@ async function importPagefind(): Promise<Pagefind> {
 }
 
 function loadPagefind(): Promise<Pagefind> {
-  pagefind ??= importPagefind();
+  // A failed load is forgotten, so the next search tries again (a dropped connection on a phone).
+  pagefind ??= importPagefind().catch((error: unknown) => {
+    pagefind = null;
+    throw error;
+  });
   return pagefind;
 }
+
+/**
+ * The query's results, and whether they are only near matches: exact matches first, then, when
+ * those are few, the pages its other forms find.
+ */
+async function find(query: string): Promise<{ results: PagefindResult[]; near: boolean }> {
+  const pf = await loadPagefind();
+  const exact = (await pf.search(query)).results;
+  let found = exact;
+  if (exact.length < FEW_RESULTS) {
+    // Without prefix letters only when nothing matched: it also misfires (שמיני → מיני).
+    const variants = queryVariants(query, { prefixes: exact.length === 0 });
+    const others = await Promise.all(variants.map((variant) => pf.search(variant)));
+    found = [...exact, ...others.flatMap((search) => search.results)];
+  }
+  // A page found by several forms once, at its best place; each result's data is a download, so
+  // only the first few pages' (no more than an exact search alone would fetch).
+  const pages = [...new Map(found.map((result) => [result.id, result])).values()];
+  const results = await Promise.all(pages.slice(0, MAX_RESULTS).map((result) => result.data()));
+  return { results, near: exact.length === 0 && results.length > 0 };
+}
+
+/** Where to go when nothing is found: the topics (the front page) and the recordings. */
+const NOTHING_FOUND_LINKS: [string, string][] = [
+  ['דף הבית', '/'],
+  ['קריאות מוקלטות', '/קריאות-מוקלטות-בנוסח-אשכנז/'],
+];
 
 function renderResults(list: HTMLElement, results: PagefindResult[], query: string): void {
   list.replaceChildren();
   if (results.length === 0) {
     const empty = document.createElement('li');
     empty.className = 'px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-400';
-    empty.textContent = query ? `לא נמצאו תוצאות עבור "${query}"` : '';
+    empty.textContent = `לא נמצאו תוצאות עבור "${query}". אפשר לנסות מילה אחרת, או להתחיל מכאן:`;
+    const links = document.createElement('span');
+    links.className = 'mt-3 flex flex-wrap justify-center gap-x-4 gap-y-2';
+    for (const [text, href] of NOTHING_FOUND_LINKS) {
+      const link = document.createElement('a');
+      link.href = href;
+      link.textContent = text;
+      link.className = 'text-brand-strong dark:text-brand font-semibold underline';
+      links.append(link);
+    }
+    empty.append(links);
     list.append(empty);
     return;
   }
@@ -71,6 +119,7 @@ function setUpSearch(dialog: HTMLDialogElement): void {
   if (!input || !list || !status) return;
 
   let latest = 0;
+  let typingTimer: ReturnType<typeof setTimeout> | undefined;
 
   // A search that found nothing is reported (src/pages/api/search-misses.ts) once the visitor
   // stops typing, closes the search or leaves the page, so the letters typed on the way to a
@@ -107,31 +156,44 @@ function setUpSearch(dialog: HTMLDialogElement): void {
     const query = input.value.trim();
     const run = ++latest;
     clearTimeout(missTimer);
+    clearTimeout(typingTimer);
     miss = '';
     if (!query) {
       list.replaceChildren();
+      status.textContent = '';
       return;
     }
-    void loadPagefind()
-      .then((pf) => pf.search(query))
-      .then((search) => Promise.all(search.results.slice(0, MAX_RESULTS).map((r) => r.data())))
-      .then((results) => {
-        if (run !== latest) return; // ignore stale responses
-        renderResults(list, results, query);
-        if (results.length === 0 && typed && dialog.open) {
-          miss = query;
-          missTimer = setTimeout(reportMiss, MISS_DELAY_MS);
-        }
-      })
-      .catch((error: unknown) => {
-        console.error('Search failed:', error);
-        status.textContent = 'החיפוש אינו זמין כרגע.';
-      });
+    // Searched once typing pauses (a synthetic event, from an old /?s= link, at once).
+    typingTimer = setTimeout(
+      () => {
+        void find(query)
+          .then(({ results, near }) => {
+            if (run !== latest) return; // ignore stale responses
+            // In the status line, which screen readers announce, not among the results.
+            status.textContent = near ? `לא נמצא "${query}" בדיוק. תוצאות קרובות:` : '';
+            renderResults(list, results, query);
+            // Counted when nothing matched exactly, also when another form found something:
+            // those show which spellings src/lib/search-variants.ts should know.
+            if ((results.length === 0 || near) && typed && dialog.open) {
+              miss = query;
+              missTimer = setTimeout(reportMiss, MISS_DELAY_MS);
+            }
+          })
+          .catch((error: unknown) => {
+            if (run !== latest) return;
+            console.error('Search failed:', error);
+            status.textContent = 'החיפוש אינו זמין כרגע.';
+          });
+      },
+      typed ? TYPING_PAUSE_MS : 0,
+    );
   });
 
   const open = () => {
     if (!dialog.open) dialog.showModal();
     input.select();
+    // Start loading while the visitor types (a failure shows on the first search).
+    loadPagefind().catch(() => undefined);
   };
   for (const button of document.querySelectorAll('[data-open-search]')) {
     button.addEventListener('click', open);

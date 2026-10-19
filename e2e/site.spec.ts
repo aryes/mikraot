@@ -337,6 +337,23 @@ test('search opens from the header button and reports no results', LOCAL_ONLY, a
   const dialog = page.getByRole('dialog', { name: 'חיפוש באתר' });
   await dialog.getByRole('searchbox').fill('מילה');
   await expect(dialog.getByText('לא נמצאו תוצאות עבור "מילה"')).toBeVisible();
+  // Not a dead end: places to start.
+  await expect(dialog.getByRole('link', { name: 'קריאות מוקלטות' })).toBeVisible();
+});
+
+test('search finds a term in another spelling or with a prefix letter', async ({ page }) => {
+  await page.goto('/about/');
+  await page.keyboard.press('Control+k');
+  const dialog = page.getByRole('dialog', { name: 'חיפוש באתר' });
+  // The traditional one-vav spelling finds the lesson written "שווא נע".
+  await dialog.getByRole('searchbox').fill('שוא נע');
+  await expect(
+    dialog.locator(`a[href="${encodeURI('/שווא-נע/')}"], a[href="/שווא-נע/"]`).first(),
+  ).toBeVisible();
+  await dialog.getByRole('searchbox').fill('הסמיכות');
+  await expect(
+    dialog.locator(`a[href="${encodeURI('/סמיכות/')}"], a[href="/סמיכות/"]`).first(),
+  ).toBeVisible();
 });
 
 test('pages carry structured data for search engines (as All in One SEO did)', async ({ page }) => {
@@ -366,7 +383,10 @@ test('search matches abbreviations however they are typed: " or ״, apostrophe o
     await expect(dialog.getByRole('link')).toHaveCount(0);
     await dialog.getByRole('searchbox').fill(query);
     await expect(dialog.getByRole('link').first()).toBeVisible();
-    return dialog.getByRole('link').allTextContents();
+    // The pages, by address: a snippet's highlight follows the form of the query that found it.
+    return dialog
+      .getByRole('link')
+      .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
   };
   expect(await results('תנ"ך')).toEqual(await results('תנ״ך'));
   expect(await results("ו' החיבור")).toEqual(await results('ו׳ החיבור'));
