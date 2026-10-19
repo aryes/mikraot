@@ -2,7 +2,8 @@
  * The Worker's entry point: Astro's request handler, plus the daily database backup
  * (wrangler.jsonc `triggers.crons`). Server errors and a failed backup email the owner
  * (src/server/alerts.ts). Mail apps' one-click unsubscribe is answered here, before Astro
- * (src/server/one-click-unsubscribe.ts). Sentry records the errors with their details
+ * (src/server/one-click-unsubscribe.ts), and recordings asked for in pieces by the Worker itself
+ * (src/server/audio-range.ts). Sentry records the errors with their details
  * (src/server/sentry.ts).
  */
 import { handle } from '@astrojs/cloudflare/handler';
@@ -10,6 +11,7 @@ import * as Sentry from '@sentry/cloudflare';
 import { PUBLIC_SENTRY_DSN } from 'astro:env/client';
 import { env } from 'cloudflare:workers';
 import { alertOwner, type AlertKind } from './server/alerts';
+import { answerRange } from './server/audio-range';
 import { backupDatabase } from './server/backup';
 import { unsubscribeReplies } from './server/comments';
 import { unsubscribeNewsletter } from './server/newsletter';
@@ -48,6 +50,12 @@ export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
     const [request, , context] = args;
     const where = `${request.method} ${new URL(request.url).pathname}`;
     try {
+      if ((request.method === 'GET' || request.method === 'HEAD') && where.endsWith('.mp3')) {
+        // The whole file from the assets; the browser's other headers (If-None-Match) still apply.
+        const whole = new Request(request.url, { headers: request.headers });
+        whole.headers.delete('Range');
+        return await answerRange(request, await env.ASSETS.fetch(whole));
+      }
       const unsubscribe = await oneClickUnsubscribe(request);
       if (unsubscribe !== null) {
         const { stop, token } = unsubscribe;

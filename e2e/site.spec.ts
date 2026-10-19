@@ -131,6 +131,15 @@ test('media is served by the site at the WordPress paths', async ({ page, reques
   const mp3 = await request.get('/wp-content/uploads/2023/07/ארגב.mp3');
   expect(mp3.status()).toBe(200);
   expect(mp3.headers()['content-type']).toContain('audio/mpeg');
+  expect(mp3.headers()['accept-ranges']).toBe('bytes');
+  // Safari asks for audio in pieces, first two bytes (src/server/audio-range.ts).
+  const piece = await request.get('/wp-content/uploads/2023/07/ארגב.mp3', {
+    headers: { Range: 'bytes=0-1' },
+  });
+  expect(piece.status()).toBe(206);
+  expect(piece.headers()['content-range']).toMatch(/^bytes 0-1\/\d+$/);
+  expect((await piece.body()).length).toBe(2);
+  expect(piece.headers()['x-content-type-options']).toBe('nosniff');
 
   await page.goto('/דגש-קל/');
   const sources = await page
