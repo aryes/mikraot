@@ -13,6 +13,7 @@
  *    from Brevo carry Brevo's own unsubscribe link.
  */
 import { escapeHtml, OWNER_EMAIL, sendEmail, type BrevoEmail } from './notify';
+import { readToken, signToken } from './signing';
 
 const BREVO_DOI_URL = 'https://api.brevo.com/v3/contacts/doubleOptinConfirmation';
 /** Brevo list "ניוזלטר מקראות". */
@@ -153,51 +154,19 @@ export async function welcome(
   await sendEmail(apiKey, subscriberNotice(subscriber), fetchFn);
 }
 
-const base64url = (bytes: Uint8Array) =>
-  btoa(String.fromCharCode(...bytes))
-    .replaceAll('+', '-')
-    .replaceAll('/', '_')
-    .replace(/=+$/, '');
-const fromBase64url = (encoded: string) =>
-  Uint8Array.from(atob(encoded.replaceAll('-', '+').replaceAll('_', '/')), (c) => c.charCodeAt(0));
-const hmacKey = (secret: string) =>
-  crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign', 'verify'],
-  );
-// The webhook's secret signs these links too; the prefix keeps the two uses apart.
-const signedText = (email: string) => new TextEncoder().encode(`newsletter-unsubscribe:${email}`);
+// The webhook's secret signs these links too; the purpose keeps the two uses apart.
+const PURPOSE = 'newsletter-unsubscribe';
 
 /**
- * The unsubscribe token for an address: the address (encoded) and its signature, so no list of
- * tokens needs keeping, and no one can unsubscribe an address they didn't receive a link for.
+ * The unsubscribe token for an address (src/server/signing.ts): no list of tokens needs keeping,
+ * and no one can unsubscribe an address they didn't receive a link for.
  */
-export async function unsubscribeToken(secret: string, email: string): Promise<string> {
-  const signature = await crypto.subtle.sign('HMAC', await hmacKey(secret), signedText(email));
-  return `${base64url(new TextEncoder().encode(email))}.${base64url(new Uint8Array(signature))}`;
-}
+export const unsubscribeToken = (secret: string, email: string): Promise<string> =>
+  signToken(secret, PURPOSE, email);
 
 /** The address a token was made for, or null if the token isn't one of ours. */
-export async function emailFromToken(secret: string, token: string): Promise<string | null> {
-  const [address, signature, rest] = token.split('.');
-  if (!secret || !address || !signature || rest !== undefined) return null;
-  try {
-    const email = new TextDecoder().decode(fromBase64url(address));
-    const key = await hmacKey(secret);
-    const valid = await crypto.subtle.verify(
-      'HMAC',
-      key,
-      fromBase64url(signature),
-      signedText(email),
-    );
-    return valid ? email : null;
-  } catch {
-    return null; // not base64url
-  }
-}
+export const emailFromToken = (secret: string, token: string): Promise<string | null> =>
+  readToken(secret, PURPOSE, token);
 
 /** Removes an address from the newsletter list; one that is already gone counts as removed. */
 export async function removeFromList(
