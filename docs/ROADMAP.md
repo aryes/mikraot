@@ -93,7 +93,7 @@
   - [x] Uptime monitor with email alerts (replaces Jetpack Monitor): UptimeRobot, 2026-10-08
   - [x] Renovate for dependency updates (replaces WordPress auto-updates): `renovate.json` (weekly pull requests, security fixes at once, 3-day release age, grouped Astro and dev tools, no auto-merge); active once the repo is on GitHub with the Renovate app installed
   - [x] Preview URL per change (replaces staging): Workers Builds makes one for every branch (since 2026-10-04)
-  - [ ] 2FA and login alerts on GitHub, Cloudflare and GoDaddy (replaces Wordfence 2FA and login alerts)
+  - [ ] 2FA and login alerts on GitHub, Cloudflare and GoDaddy (replaces Wordfence 2FA and login alerts). Postponed by Arye (2026-10-19); when taken up, in this order: Google, GitHub, Cloudflare, GoDaddy, Brevo, Sentry
   - [x] Minor: images in the sitemap and `loading="lazy"`: not applicable (checked 2026-10-04: no page content has images; the only image is the banner, which must load first; images are off in the Keystatic editor). Revisit if content images are added
   - [x] Before cutover: export Google Analytics history (done 2026-10-16, see below); when finishing the draft "משמעות הטעמים", take its content from Elementor's data (the page text is incomplete)
   - [x] **Newsletter: Brevo** (decided 2026-10-03; ready-made service, free plan: unlimited contacts, 300 emails/day, RSS campaigns, double opt-in, unsubscribe, open/click reports, EU company). Chosen over MailerLite (free plan cut to 250 subscribers) and building our own (Cloudflare email sending needs the paid Workers plan)
