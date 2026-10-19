@@ -7,7 +7,8 @@
  * At most one email per kind of failure per hour: an outage can fail every request, and Brevo's
  * free plan sends 300 emails a day. The details stay in the Worker logs.
  */
-import { OWNER_EMAIL, sendEmail } from './notify';
+import { sendOrRetry, type EmailRetry } from './email';
+import { OWNER_EMAIL } from './notify';
 
 /** The part of a KV namespace binding the throttle uses. */
 export interface AlertStore {
@@ -46,9 +47,11 @@ export async function alertOwner(options: {
   /** What failed, for the email: a path and status, or an error message. */
   detail: string;
   now: Date;
+  /** Tries again later an alert Brevo refuses (src/server/email.ts). */
+  retry?: EmailRetry | undefined;
   fetchFn?: typeof fetch;
 }): Promise<void> {
-  const { apiKey, store, limiter, kind, detail, now, fetchFn } = options;
+  const { apiKey, store, limiter, kind, detail, now, retry, fetchFn } = options;
   if (!apiKey) return;
   try {
     const key = `alert/${kind}`;
@@ -57,9 +60,9 @@ export async function alertOwner(options: {
     await store.put(key, now.toISOString(), { expirationTtl: ALERT_INTERVAL_SECONDS });
     const title = TITLES[kind];
     const text = `${title} (${now.toISOString()}):\n${detail}\n\nהפרטים ביומן: ${LOGS}\nהודעות נוספות מאותו סוג לא יישלחו בשעה הקרובה.`;
-    await sendEmail(
+    await sendOrRetry({
       apiKey,
-      {
+      email: {
         sender: { name: 'מקראות', email: OWNER_EMAIL },
         to: [{ email: OWNER_EMAIL }],
         subject: `תקלה במקראות: ${title}`,
@@ -68,8 +71,12 @@ export async function alertOwner(options: {
           .replaceAll('&', '&amp;')
           .replaceAll('<', '&lt;')}</div>`,
       },
+      what: 'Alert email',
+      retry,
+      // An alert is news for a few hours; a day-old backlog would use up the renewed quota.
+      maxAttempts: 3,
       fetchFn,
-    );
+    });
   } catch (error) {
     console.error('Alert email failed:', error);
   }

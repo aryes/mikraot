@@ -16,6 +16,9 @@ declare module 'cloudflare:workers' {
     BREVO_API_KEY?: string;
     /** Shared with Brevo's newsletter webhook (wrangler secret; src/pages/api/newsletter-webhook.ts). */
     NEWSLETTER_WEBHOOK_SECRET?: string;
+    /** Emails Brevo refused, sent again later (wrangler.jsonc `queues`; src/server/email.ts). */
+    // oxlint-disable-next-line typescript/consistent-type-imports
+    EMAIL_RETRY?: import('./server/email').EmailRetry;
     /** Signs the comment management links (wrangler secret; src/server/comment-manage.ts). */
     COMMENT_MANAGE_SECRET?: string;
     /** Per-visitor limit on newsletter sign-ups (src/pages/api/newsletter.ts). */

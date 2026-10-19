@@ -5,7 +5,8 @@
  * It names who replied and links to the reply, without quoting it: anyone can reply, and quoting
  * would let a stranger have any text emailed from the site's address.
  */
-import { escapeHtml, OWNER_EMAIL, sendEmail, type BrevoEmail } from './notify';
+import { sendOrRetry, type BrevoEmail, type EmailRetry } from './email';
+import { escapeHtml, OWNER_EMAIL } from './notify';
 import type { ReplyRecipient } from './comments';
 
 export interface ReplyNotice {
@@ -51,19 +52,21 @@ export function replyEmail(notice: ReplyNotice): BrevoEmail {
 /**
  * Sends the reply notice. Never rejects: the reply is already saved, and the caller runs this in
  * the background. Without a key (branch previews, local runs) nothing is sent; nobody is told
- * about their own reply.
+ * about their own reply. One Brevo refuses is tried again later (`retry`).
  */
 export async function notifyReplyAuthor(options: {
   apiKey: string | undefined;
   notice: ReplyNotice;
   replierEmail: string | null;
+  retry?: EmailRetry | undefined;
   fetchFn?: typeof fetch;
 }): Promise<void> {
-  const { apiKey, notice, replierEmail, fetchFn } = options;
+  const { apiKey, notice, replierEmail, retry, fetchFn } = options;
   if (!apiKey) return;
   if (replierEmail && replierEmail.toLowerCase() === notice.recipient.email.toLowerCase()) return;
   try {
-    await sendEmail(apiKey, replyEmail(notice), fetchFn);
+    const email = replyEmail(notice);
+    await sendOrRetry({ apiKey, email, what: 'Reply notification', retry, fetchFn });
   } catch (error) {
     console.error('Reply notification failed:', error);
   }

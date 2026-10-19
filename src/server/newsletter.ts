@@ -12,7 +12,8 @@
  *    one-click unsubscribe in src/worker.ts) takes the address off the list. Newsletters sent
  *    from Brevo carry Brevo's own unsubscribe link.
  */
-import { escapeHtml, OWNER_EMAIL, sendEmail, type BrevoEmail } from './notify';
+import { sendEmail, type BrevoEmail } from './email';
+import { escapeHtml, OWNER_EMAIL } from './notify';
 import { readToken, signToken } from './signing';
 
 const BREVO_DOI_URL = 'https://api.brevo.com/v3/contacts/doubleOptinConfirmation';

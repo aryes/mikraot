@@ -3,8 +3,8 @@
  * (wrangler.jsonc `triggers.crons`). Server errors and a failed backup email the owner
  * (src/server/alerts.ts). Mail apps' one-click unsubscribe is answered here, before Astro
  * (src/server/one-click-unsubscribe.ts), and recordings asked for in pieces by the Worker itself
- * (src/server/audio-range.ts). Sentry records the errors with their details
- * (src/server/sentry.ts).
+ * (src/server/audio-range.ts). Emails Brevo refused are sent again from a queue
+ * (src/server/email.ts). Sentry records the errors with their details (src/server/sentry.ts).
  */
 import { handle } from '@astrojs/cloudflare/handler';
 import * as Sentry from '@sentry/cloudflare';
@@ -13,6 +13,7 @@ import { env } from 'cloudflare:workers';
 import { alertOwner, type AlertKind } from './server/alerts';
 import { answerRange } from './server/audio-range';
 import { backupDatabase } from './server/backup';
+import { retryEmails, type RetryMessage } from './server/email';
 import { unsubscribeReplies } from './server/comments';
 import { unsubscribeNewsletter } from './server/newsletter';
 import { oneClickUnsubscribe } from './server/one-click-unsubscribe';
@@ -31,6 +32,7 @@ const alert = (context: Context, kind: AlertKind, detail: string) => {
       kind,
       detail,
       now: new Date(),
+      retry: env.EMAIL_RETRY,
     }),
   );
 };
@@ -83,6 +85,10 @@ export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
       alert(context, 'request', `${where}: ${String(error)}`);
       throw error;
     }
+  },
+  // Emails Brevo refused, sent again (wrangler.jsonc `queues`).
+  async queue(batch: { messages: readonly RetryMessage[] }) {
+    await retryEmails(batch.messages, env.BREVO_API_KEY);
   },
   async scheduled(_controller: unknown, _env: unknown, context: Context) {
     try {
