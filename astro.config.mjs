@@ -195,7 +195,6 @@ export default defineConfig({
     // React-19-only APIs that Preact lacks (CLAUDE.md).
     preact({ compat: true }),
     markdoc(),
-    // The author archive is noindex, as on the live site.
     // Not the author archive (noindex), nor the pages opened only from email links.
     sitemap({
       filter: (page) =>
@@ -210,7 +209,7 @@ export default defineConfig({
     // server still needed (seen 2026-10-08).
     ...(isDevServer && { cacheDir: 'node_modules/.vite-dev' }),
     // Vite inlines small files as data: URLs; fonts must stay files, since the CSP allows only
-    // font-src 'self' (Noto's tiny Cyrillic/Greek subsets were being inlined).
+    // font-src 'self' (small font subsets were once inlined).
     build: { assetsInlineLimit: (file) => (file.endsWith('.woff2') ? false : undefined) },
     // The icons are React components. Bundled into the server render (here and in the prerender
     // step) so that Preact's React alias applies; loaded from node_modules they'd use real React.

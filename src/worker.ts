@@ -4,7 +4,7 @@
  * (src/server/alerts.ts). Mail apps' one-click unsubscribe is answered here, before Astro
  * (src/server/one-click-unsubscribe.ts), and recordings asked for in pieces by the Worker itself
  * (src/server/audio-range.ts). Emails Brevo refused are sent again from a queue
- * (src/server/email.ts). Sentry records the errors with their details (src/server/sentry.ts).
+ * (src/server/email.ts). Sentry records the errors with their details (src/lib/sentry.ts).
  */
 import { handle } from '@astrojs/cloudflare/handler';
 import * as Sentry from '@sentry/cloudflare';

@@ -1,6 +1,6 @@
 /**
  * Reports JavaScript errors and Content-Security-Policy blocks in visitors' browsers to Sentry
- * (options in src/server/sentry.ts), so a page that breaks only in some browser is noticed.
+ * (options in src/lib/sentry.ts), so a page that breaks only in some browser is noticed.
  *
  * Sentry's code (about 30 kB compressed) loads only once the page is idle, so it never delays a
  * page: errors that happen earlier are held here and sent once it has loaded. Without a DSN (any

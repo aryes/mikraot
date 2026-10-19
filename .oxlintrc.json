@@ -34,15 +34,7 @@
     "browser": true,
     "es2024": true
   },
-  "ignorePatterns": [
-    "dist",
-    "node_modules",
-    "src/data/siteData.json",
-    "worker-configuration.d.ts",
-    ".astro",
-    "test-results",
-    "playwright-report"
-  ],
+  "ignorePatterns": ["dist", "node_modules", ".astro", "test-results", "playwright-report"],
   "overrides": [
     {
       "files": ["scripts/**"],

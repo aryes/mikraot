@@ -8,7 +8,7 @@ import { site } from '../lib/site';
 import { isGeneratedOgImage } from '../lib/og';
 
 interface Props {
-  /** Full document title, as the live site renders it (see src/data/seo.json). */
+  /** Full document title, as the live site renders it (each page's `seo` frontmatter). */
   title: string;
   description?: string | undefined;
   /** Site-relative image path for social previews. */

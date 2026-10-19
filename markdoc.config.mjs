@@ -55,7 +55,7 @@ export default defineMarkdocConfig({
     kbd: styled('kbd', 'content-kbd'),
     audio: {
       render: component('./src/components/content/AudioButton.astro'),
-      // label: set by `td` above, not written in content.
+      // label: set by the `td` transform (src/lib/markdoc-tables.mjs), not written in content.
       attributes: { src: { type: String, required: true }, label: { type: String } },
       selfClosing: true,
     },
