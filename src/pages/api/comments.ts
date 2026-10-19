@@ -19,14 +19,13 @@ import { tokenFrom, verifyTurnstile } from '../../server/turnstile';
 // Runs in the Worker on each request (the rest of the site is static).
 export const prerender = false;
 
-// public/_headers covers static files only, so the API sets its own.
+// The security headers are added by src/worker.ts.
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), {
     status,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
       'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
     },
   });
 

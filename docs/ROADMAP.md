@@ -19,7 +19,7 @@
 - [x] Delete the pre-rewrite backup bundle once the new history is confirmed
 - [x] Stop tracking `.idea/`
 - [x] Delete Supabase API keys and reset its DB password
-- [x] Security headers: CSP (Astro, hashed inline scripts), HSTS, nosniff, frame-ancestors, Referrer-Policy, Permissions-Policy, COOP (`public/_headers`); `e2e/security.spec.ts` checks every feature works with no violations
+- [x] Security headers: CSP (Astro, hashed inline scripts), HSTS, nosniff, frame-ancestors, Referrer-Policy, Permissions-Policy, COOP (`public/_headers`; the Worker's own answers: `src/server/security-headers.ts`, since 2026-10-19); `e2e/security.spec.ts` checks every feature works with no violations
 - [x] Security review of the new build (local, 2026-10-02): no exposed files or source maps, CSRF blocked (Astro origin check), SQL parameterized, comments rendered as text. Fixed: comments for nonexistent pages, no rate limit (now 5/min per IP), no bot trap (honeypot field), unbounded body size, API responses without nosniff
 - [x] Supabase's fate (decided 2026-10-03): not needed. Logins use Better Auth in our own Worker and D1; its only data (4 comments) is already in D1
 - [ ] Delete the Supabase project (after a final export; approval needed)

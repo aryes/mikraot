@@ -10,7 +10,7 @@ export const prerender = false;
 const done = (status = 204) =>
   new Response(null, {
     status,
-    headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' },
+    headers: { 'Cache-Control': 'no-store' },
   });
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {

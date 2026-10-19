@@ -10,6 +10,22 @@ function watchCsp(page: Page): string[] {
   return violations;
 }
 
+test('answers from the Worker itself carry the same security headers', async ({ request }) => {
+  // _headers reaches static files only; src/worker.ts adds them to the rest (read-only requests).
+  for (const path of ['/api/comments/?page_slug=x', '/unsubscribe/', '/comments/feed/']) {
+    // oxlint-disable-next-line no-await-in-loop -- three requests, one after another
+    const headers = (await request.get(path)).headers();
+    expect(headers, path).toMatchObject({
+      'x-frame-options': 'DENY',
+      'x-content-type-options': 'nosniff',
+      'strict-transport-security': expect.stringContaining('max-age='),
+      'permissions-policy': expect.stringContaining('camera=()'),
+      'cross-origin-opener-policy': 'same-origin',
+      'content-security-policy': expect.stringContaining("frame-ancestors 'none'"),
+    });
+  }
+});
+
 test('security headers are sent', async ({ page }) => {
   const response = await page.goto('/');
   // One assertion on the whole set, so a failure shows every header (and the status) received.

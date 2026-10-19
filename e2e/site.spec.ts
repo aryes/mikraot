@@ -791,6 +791,10 @@ test(
 
     const response = await page.goto(`/comments/manage/?token=${encodeURIComponent(token)}`);
     expect(response?.headers()['x-frame-options']).toBe('DENY');
+    // An on-demand page: Astro's policy is a header, with the Worker's frame-ancestors appended.
+    const policy = response?.headers()['content-security-policy'] ?? '';
+    expect(policy).toContain('script-src');
+    expect(policy).toContain("frame-ancestors 'none'");
     expect(response?.headers()['referrer-policy']).toBe('no-referrer');
     await expect(page.getByText('תגובה לבדיקת הניהול')).toBeVisible();
     // Opening the link changes nothing (mail scanners open links); the button does.

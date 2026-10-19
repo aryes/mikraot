@@ -64,7 +64,8 @@ export default defineConfig({
   image: { domains: ['i.ytimg.com'] },
   session: false,
   // Content-Security-Policy as a <meta> on every page: Astro adds hashes for its own inline scripts
-  // and styles. frame-ancestors can't be set this way; it is in public/_headers.
+  // and styles. frame-ancestors can't be set this way; it is in public/_headers and, for pages the
+  // Worker answers (whose policy Astro sends as a header), src/server/security-headers.ts.
   security: {
     csp: {
       directives: [

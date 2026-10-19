@@ -14,11 +14,9 @@ import { findPage, getPageIndex } from '../../server/page-index';
 // Runs in the Worker on each request.
 export const prerender = false;
 
-// The answer depends on the database, and the page must not be shown inside another site's
-// frame, where a visitor could be tricked into pressing its button (static pages get this from
-// public/_headers; pages the Worker answers don't).
+// The answer depends on the database. (Not framed by other sites: src/worker.ts adds the
+// security headers, X-Frame-Options among them.)
 Astro.response.headers.set('Cache-Control', 'no-store');
-Astro.response.headers.set('X-Frame-Options', 'DENY');
 // The address holds the link's key: never pass it on to the next page (or its statistics).
 Astro.response.headers.set('Referrer-Policy', 'no-referrer');
 
