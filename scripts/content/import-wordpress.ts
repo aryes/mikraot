@@ -6,13 +6,26 @@
  * - src/data/menu.json              the main menu
  * Every conversion is verified (text and element counts); any difference aborts the import.
  *
- * Run: npx tsx scripts/content/import-wordpress.ts
+ * The site's content has been edited since the import (2026-10-04 on), and this replaces it all:
+ * it refuses to run without --overwrite-edits. Merge any re-import by hand (git diff), never
+ * commit it as it is.
+ *
+ * Run: npx tsx scripts/content/import-wordpress.ts --overwrite-edits
  */
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { stringify } from 'yaml';
 import { hebrewTypography } from './typography.ts';
 import { verifyConversion } from './verify-conversion.ts';
 import { wpToMarkdoc } from './wp-to-markdoc.ts';
+
+if (!process.argv.includes('--overwrite-edits')) {
+  console.error(
+    'Refused: this replaces every page in src/content/pages/ and src/data/, undoing all edits made\n' +
+      'since the import. To compare with WordPress, run it with --overwrite-edits on a branch and\n' +
+      'merge the differences by hand (CLAUDE.md).',
+  );
+  process.exit(1);
+}
 
 interface WpPost {
   id: number;
