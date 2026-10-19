@@ -50,6 +50,30 @@ test(
   },
 );
 
+// When Brevo sends nothing (down, its daily quota used up, or refusing the address), the server
+// answers with an error: the visitor is told nothing was sent and what to do.
+test('a sign-up the email service cannot send says so, with what to do', async ({ page }) => {
+  await page.route('**/api/newsletter/', (route) =>
+    route.fulfill({ status: 500, json: { error: 'Server error' } }),
+  );
+  await page.goto('/about/');
+  const open = page.getByRole('button', { name: 'הרשמה לעדכונים באימייל' });
+  const form = page.getByRole('form', { name: 'עדכונים באימייל' });
+  await open.scrollIntoViewIfNeeded();
+  await expect(async () => {
+    await open.click();
+    await expect(form).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  await form.getByLabel('אימייל').fill('someone@example.com');
+  await form.getByRole('button', { name: 'הרשמה' }).click();
+  const status = form.getByRole('status');
+  await expect(status).toContainText('לא נשלח אליכם אימייל');
+  await expect(status.getByRole('link', { name: 'admin@mikraot.net' })).toHaveAttribute(
+    'href',
+    'mailto:admin@mikraot.net',
+  );
+});
+
 test('the newsletter API refuses junk and calls without a human check', async ({ request }) => {
   const post = (data: unknown) => request.post('/api/newsletter/', { data });
   expect((await post({ email: 'not an email' })).status()).toBe(400);

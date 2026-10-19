@@ -69,7 +69,7 @@ Comment notices, reply notices and error alerts that Brevo refuses (its free 300
 or Brevo down) wait in the Cloudflare Queue `mikraot-email-retry` and are sent again every hour for up to 22 tries, about a day (alerts: 3 tries, since a day-old backlog of alerts would use up the renewed quota) (`src/server/email.ts`). Each failed try is in the Worker logs;
 one given up says "given up after … tries". An email Brevo accepted but answered with an error is sent twice (rare). What is waiting: Cloudflare dashboard → Storage &
 databases → Queues → mikraot-email-retry. Queued emails hold the email's text and addresses for
-at most 24 hours. Newsletter confirmations are not retried (Brevo refusing one, as when its quota is used up, is logged and the visitor still sees "we sent you an email"; a Brevo server error shows "not sent, try again"), nor (for now) the welcome email and its notice to Arye: a failure there is logged only.
+at most 24 hours. Newsletter confirmations are not retried (the visitor is told instead: whenever Brevo sends nothing, whether down, out of quota or refusing the address, the form says nothing was sent and to try later or write to admin@mikraot.net, and the Worker emails Arye; one message for every failure, since Brevo's codes don't reliably tell these apart), nor (for now) the welcome email and its notice to Arye: a failure there is logged only.
 
 ### Hide a comment
 

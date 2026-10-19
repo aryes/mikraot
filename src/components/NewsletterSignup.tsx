@@ -9,7 +9,7 @@ const MESSAGES: Record<State, string> = {
   idle: '',
   sending: '',
   sent: 'כמעט סיימנו: שלחנו אליכם אימייל עם קישור לאישור ההרשמה. ההרשמה תושלם אחרי שתלחצו עליו.',
-  error: 'ההרשמה לא נשלחה. נסו שוב בעוד רגע.',
+  error: '', // below: it holds a link
   'check-failed': 'בדיקת ״האם אתם אדם״ לא נטענה. רעננו את העמוד ונסו שוב.',
 };
 
@@ -300,7 +300,18 @@ export const NewsletterSignup: React.FC<{
             : `text-sm ${look.error}`
         }
       >
-        {MESSAGES[state]}
+        {state === 'error' ? (
+          <>
+            ההרשמה לא הושלמה, ולא נשלח אליכם אימייל. נסו שוב מאוחר יותר, או כתבו לנו ל־
+            {/* Its own link, left to right: tapped or copied without the Hebrew around it. */}
+            <a href="mailto:admin@mikraot.net" dir="ltr" className={look.link}>
+              admin@mikraot.net
+            </a>{' '}
+            ונרשום אתכם.
+          </>
+        ) : (
+          MESSAGES[state]
+        )}
       </div>
       {!sent && (
         <div className={`text-sm ${look.text}`}>
