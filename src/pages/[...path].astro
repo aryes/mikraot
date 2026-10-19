@@ -81,7 +81,11 @@ const crumbs = isPost
   )}
 
   <div data-pagefind-ignore class="print:hidden">
-    <Comments client:visible pageKey={commentKey(page)} lookupKeys={commentKeys(page)} />
+    <Comments
+      client:visible={{ rootMargin: '600px' }}
+      pageKey={commentKey(page)}
+      lookupKeys={commentKeys(page)}
+    />
   </div>
 </ContentLayout>
 

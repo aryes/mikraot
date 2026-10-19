@@ -23,7 +23,9 @@ function formatDate(dateStr: string): string {
 export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
   // Comments are stored together with the query key they were loaded for, so a response
   // for a previous page can never be shown on the current one.
-  const [loaded, setLoaded] = useState<{ key: string; comments: CommentItem[] } | null>(null);
+  const [loaded, setLoaded] = useState<{ key: string; comments: CommentItem[] | null } | null>(
+    null,
+  );
   const [authorName, setAuthorName] = useState('');
   const [authorEmail, setAuthorEmail] = useState('');
   const [content, setContent] = useState('');
@@ -66,7 +68,9 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
 
   const slugKey = lookupKeys.join(',');
   const loading = loaded?.key !== slugKey;
-  const comments = loaded?.key === slugKey ? loaded.comments : [];
+  // null: they couldn't be loaded (the page says so, rather than "no comments yet").
+  const failed = !loading && loaded.comments === null;
+  const comments = (loaded?.key === slugKey ? loaded.comments : null) ?? [];
 
   // Name and email saved in this browser by an earlier comment ("remember me"). Read after
   // hydration: the server-rendered form has no access to the browser's storage.
@@ -169,7 +173,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
       });
 
       if (saved.id) {
-        setLoaded((prev) => prev && { ...prev, comments: [...prev.comments, saved] });
+        setLoaded((prev) => prev && { ...prev, comments: [...(prev.comments ?? []), saved] });
       }
 
       rememberCommenter({ name: authorName.trim(), email: authorEmail.trim() }, remember);
@@ -299,6 +303,10 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
           <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-sm text-slate-600 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-300">
             טוען תגובות...
           </div>
+        ) : failed ? (
+          <div className="rounded-xl border border-amber-300 bg-amber-50 p-5 text-center text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
+            התגובות לא נטענו. רעננו את העמוד כדי לנסות שוב.
+          </div>
         ) : comments.length === 0 ? (
           <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-sm text-slate-600 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-300">
             אין תגובות עדיין. היו הראשונים להגיב או לשאול שאלה!
@@ -377,7 +385,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
               <div>
                 <label
                   htmlFor={`${fieldId}-name`}
-                  className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300"
+                  className="mb-1 block text-sm font-semibold text-slate-600 dark:text-slate-300"
                 >
                   שם <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
@@ -392,7 +400,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                   placeholder="השם שלכם"
                   aria-invalid={nameError !== ''}
                   aria-describedby={nameError ? `${fieldId}-name-error` : undefined}
-                  className="focus:ring-brand-strong dark:focus:ring-brand w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none aria-invalid:border-red-600 aria-invalid:focus:ring-red-600 dark:border-slate-600 dark:aria-invalid:border-red-400 dark:aria-invalid:focus:ring-red-400"
+                  className="focus:ring-brand-strong dark:focus:ring-brand w-full rounded-xl border border-slate-500 px-3.5 py-2 text-base transition-all focus:border-transparent focus:ring-2 focus:outline-none aria-invalid:border-red-600 aria-invalid:focus:ring-red-600 dark:border-slate-400 dark:aria-invalid:border-red-400 dark:aria-invalid:focus:ring-red-400"
                 />
                 {nameError && (
                   <p
@@ -407,7 +415,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
               <div>
                 <label
                   htmlFor={`${fieldId}-email`}
-                  className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300"
+                  className="mb-1 block text-sm font-semibold text-slate-600 dark:text-slate-300"
                 >
                   אימייל{' '}
                   <span className="font-normal text-slate-500 dark:text-slate-400">
@@ -417,11 +425,12 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                 <input
                   id={`${fieldId}-email`}
                   type="email"
+                  dir="ltr"
                   autoComplete="email"
                   value={authorEmail}
                   onChange={(e) => setAuthorEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="focus:ring-brand-strong dark:focus:ring-brand w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none dark:border-slate-600"
+                  className="focus:ring-brand-strong dark:focus:ring-brand w-full rounded-xl border border-slate-500 px-3.5 py-2 text-right text-base transition-all focus:border-transparent focus:ring-2 focus:outline-none dark:border-slate-400"
                 />
               </div>
             </div>
@@ -429,7 +438,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
             <div>
               <label
                 htmlFor={`${fieldId}-content`}
-                className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300"
+                className="mb-1 block text-sm font-semibold text-slate-600 dark:text-slate-300"
               >
                 תוכן התגובה <span className="text-red-500 dark:text-red-400">*</span>
               </label>
@@ -443,7 +452,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                 placeholder="כתבו את תגובתכם או שאלתכם כאן..."
                 aria-invalid={contentError !== ''}
                 aria-describedby={contentError ? `${fieldId}-content-error` : undefined}
-                className="focus:ring-brand-strong dark:focus:ring-brand w-full resize-y rounded-xl border border-slate-300 px-3.5 py-2 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none aria-invalid:border-red-600 aria-invalid:focus:ring-red-600 dark:border-slate-600 dark:aria-invalid:border-red-400 dark:aria-invalid:focus:ring-red-400"
+                className="focus:ring-brand-strong dark:focus:ring-brand w-full resize-y rounded-xl border border-slate-500 px-3.5 py-2 text-base transition-all focus:border-transparent focus:ring-2 focus:outline-none aria-invalid:border-red-600 aria-invalid:focus:ring-red-600 dark:border-slate-400 dark:aria-invalid:border-red-400 dark:aria-invalid:focus:ring-red-400"
               />
               {contentError && (
                 <p
