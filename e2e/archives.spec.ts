@@ -67,7 +67,11 @@ test('RSS feeds at the WordPress URLs', async ({ request }) => {
   const comments = await request.get('/comments/feed/');
   expect(comments.headers()['content-type']).toContain('application/rss+xml');
   // Comments link to their anchor on the page (WordPress's #comment-<id>).
-  expect(await comments.text()).toMatch(/<link>[^<]*\/#comment-\d+<\/link>/);
+  const feed = await comments.text();
+  expect(feed).toMatch(/<link>[^<]*\/#comment-\d+<\/link>/);
+  // A commenter's markup is text: escaped for HTML, then for XML (readers show descriptions as HTML).
+  expect(feed).toContain('&amp;lt;b&amp;gt;ולא מודגשת');
+  expect(feed).not.toContain('&lt;b&gt;ולא');
 });
 
 test('old WordPress links still work', async ({ page }) => {
