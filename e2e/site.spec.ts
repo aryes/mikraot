@@ -68,6 +68,14 @@ test(
   },
 );
 
+test('comments that fail to load say so, not "no comments yet"', async ({ page }) => {
+  await page.route('**/api/comments/**', (route) => route.fulfill({ status: 500, json: {} }));
+  await page.goto('/about/');
+  await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
+  await expect(page.getByText('התגובות לא נטענו')).toBeVisible(COMMENTS_LOADED);
+  await expect(page.getByText('אין תגובות עדיין')).toHaveCount(0);
+});
+
 test(
   'replies appear under the comment they answer, and "reply" sets up the form',
   LOCAL_ONLY,

@@ -3,7 +3,8 @@ import type { PublicComment } from '../server/comments';
 
 export type CommentItem = PublicComment;
 
-export async function fetchComments(pageKeys: string[]): Promise<CommentItem[]> {
+/** The page's comments, or null if they couldn't be loaded. */
+export async function fetchComments(pageKeys: string[]): Promise<CommentItem[] | null> {
   try {
     const res = await fetch(`/api/comments/?page_slug=${encodeURIComponent(pageKeys.join(','))}`);
     if (!res.ok) throw new Error(`Failed to fetch comments: ${res.status}`);
@@ -11,7 +12,7 @@ export async function fetchComments(pageKeys: string[]): Promise<CommentItem[]> 
     return data;
   } catch (err) {
     console.error('[API] Error loading comments:', err);
-    return [];
+    return null;
   }
 }
 
