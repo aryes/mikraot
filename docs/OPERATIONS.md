@@ -69,8 +69,7 @@ Comment notices, reply notices and error alerts that Brevo refuses (its free 300
 or Brevo down) wait in the Cloudflare Queue `mikraot-email-retry` and are sent again every hour for up to 22 tries, about a day (alerts: 3 tries, since a day-old backlog of alerts would use up the renewed quota) (`src/server/email.ts`). Each failed try is in the Worker logs;
 one given up says "given up after … tries". An email Brevo accepted but answered with an error is sent twice (rare). What is waiting: Cloudflare dashboard → Storage &
 databases → Queues → mikraot-email-retry. Queued emails hold the email's text and addresses for
-at most 24 hours. Newsletter confirmations are not retried (the visitor sees "not sent, try
-again"), nor (for now) the welcome email and its notice to Arye: a failure there is logged only.
+at most 24 hours. Newsletter confirmations are not retried (Brevo refusing one, as when its quota is used up, is logged and the visitor still sees "we sent you an email"; a Brevo server error shows "not sent, try again"), nor (for now) the welcome email and its notice to Arye: a failure there is logged only.
 
 ### Hide a comment
 
@@ -110,7 +109,7 @@ Deletions on request (date, comment id, what):
 Sign-ups are limited per visitor (3 a minute) and per address (1 confirmation a minute), behind
 the human check, but there is no daily total (Arye, 2026-10-19: WordPress had none and saw only a
 trickle of fake sign-ups; Brevo's 300 a day is far above real use). If abuse ever uses up the
-quota, the Worker logs show refused confirmations, and notices and alerts wait in the retry queue
+quota, the Worker logs show refused confirmations, and comment and reply notices and alerts wait in the retry queue
 (above); a daily cap is then the fix.
 
 The footer form (`src/components/NewsletterSignup.tsx`) posts to `/api/newsletter/`, which asks
