@@ -9,7 +9,7 @@ declare module 'cloudflare:workers' {
     // oxlint-disable-next-line typescript/consistent-type-imports
     DB: import('./server/comments').CommentsDb & import('./server/backup').BackupDb;
     /** The static files (dist/client). */
-    ASSETS: { fetch(input: string | URL): Promise<Response> };
+    ASSETS: { fetch(input: string | URL | Request): Promise<Response> };
     /** Turnstile secret key (wrangler secret; locally in .dev.vars). */
     TURNSTILE_SECRET_KEY?: string;
     /** Brevo API key for comment notices (wrangler secret); without it nothing is sent. */

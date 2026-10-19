@@ -19,6 +19,8 @@
       "/unsubscribe/*",
       "/newsletter/unsubscribe/*",
       "/comments/feed/*",
+      // Recordings, answered in pieces (src/server/audio-range.ts).
+      "/wp-content/uploads/*.mp3",
     ],
   },
   "d1_databases": [
