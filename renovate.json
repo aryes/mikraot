@@ -40,11 +40,36 @@
       "allowedVersions": "<7"
     },
     {
+      "description": "Wrangler moves in one pull request, in package.json and where a workflow runs it by version (previews.yml), so they stay the same",
+      "matchPackageNames": ["wrangler"],
+      "groupName": "Wrangler"
+    },
+    {
       "description": "Minor, patch and lockfile updates merge on their own (Monday mornings) once every check passes (tests, build, Lighthouse, the Keystatic patch); majors, and any update of a 0.x package (where minor versions may break), wait for review.",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest", "lockFileMaintenance"],
       "automerge": true,
       "matchCurrentVersion": "!/^v?0\\./"
     }
   ],
-  "automergeSchedule": ["before 9am on monday"]
+  "automergeSchedule": ["before 9am on monday"],
+  "customManagers": [
+    {
+      "description": "Tools pinned inside workflow commands (npx --yes <package>@<version>), which Renovate's GitHub Actions manager doesn't read",
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/.+\\.ya?ml$/"],
+      "matchStrings": [
+        "npx --yes (?<depName>@?[a-z0-9][a-z0-9./_-]*)@(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "npm"
+    },
+    {
+      "description": "gitleaks in the secret scan (its checksum beside it must be updated by hand: the check fails until then)",
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/ci\\.yml$/"],
+      "matchStrings": ["GITLEAKS_VERSION: (?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      "depNameTemplate": "gitleaks/gitleaks",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    }
+  ]
 }
