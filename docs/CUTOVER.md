@@ -41,10 +41,10 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
 - [ ] **Pages changed on purpose** (decided with Arye 2026-10-15, to do with the switch-over
       preparation): give `scripts/compare-with-live.ts` a list of the pages edited since the import,
       each with its reason, reported as "changed on purpose" so a real difference stands out on the
-      switch day. Today (11): `/` (link to מה חדש, the email-updates box, the pointed "דברי הימים" heading), `/טעמים-נדירים/` and
+      switch day. Today (13): `/` (link to מה חדש, the email-updates box, the pointed "דברי הימים" heading), `/טעמים-נדירים/` and
       `/טעמים/1-word-2-tropes/` (corrected telisha on קִ֠רְב֞וּ), the two recordings pages (the
       picker), `/דגש-קל/`, `/מבטא/` and `/תנועות-עיצורים-וניקוד/` (grouped table headings; דגש קל
-      also one more link), `/סמיכות/`, `/קמץ-קטן/` and `/משה-מוציא-וכלב-מכניס/` (one more link).
+      also one more link), `/סמיכות/`, `/קמץ-קטן/` and `/משה-מוציא-וכלב-מכניס/` (one more link), `/טעמים/נוסח-אשכנז/` and `/שיטת-גלגלי-עזר/` (ואַזְלָ֜א pointed: וְאַזְלָ֜א).
 - [x] The Turnstile widget's hostnames include `mikraot.net` (set at creation, 2026-10-02).
 - [x] **Comments tested before the switch** (2026-10-05): with the workers.dev hostname briefly
       allowed in the Turnstile widget, Arye posted a real comment from his browser (automated
