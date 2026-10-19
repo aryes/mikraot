@@ -158,5 +158,7 @@ address once it is on again, or people who confirm after the rollback get no wel
       the server). Before that: a Cloudflare redirect rule `www.mikraot.net/*` →
       `https://mikraot.net/$1` (301), replacing WordPress's.
 - [ ] Remove the old Worker `mikraot-api`, the `worker/` folder and `/staging/` on Bluehost.
+- [ ] Sentry → javascript-astro → Settings → Allowed Domains: remove
+      `mikraot.mikraot-app.workers.dev` (the switch turns workers.dev off).
 - [ ] Move email off Bluehost (`docs/ROADMAP.md`, launch step 5), then cancel Bluehost.
 - [ ] Move the domain to Cloudflare Registrar; DNSSEC on.
