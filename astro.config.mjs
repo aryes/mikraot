@@ -196,10 +196,12 @@ export default defineConfig({
     preact({ compat: true }),
     markdoc(),
     // The author archive is noindex, as on the live site.
-    // Not the author archive (noindex) or the unsubscribe page (for email links only).
+    // Not the author archive (noindex), nor the pages opened only from email links.
     sitemap({
       filter: (page) =>
-        !['/author/', '/unsubscribe/', '/newsletter/'].some((path) => page.includes(path)),
+        !['/author/', '/unsubscribe/', '/newsletter/', '/comments/manage/'].some((path) =>
+          page.includes(path),
+        ),
     }),
   ],
   vite: {
