@@ -107,6 +107,12 @@ Deletions on request (date, comment id, what):
 
 ### Newsletter (Brevo)
 
+Sign-ups are limited per visitor (3 a minute) and per address (1 confirmation a minute), behind
+the human check, but there is no daily total (Arye, 2026-10-19: WordPress had none and saw only a
+trickle of fake sign-ups; Brevo's 300 a day is far above real use). If abuse ever uses up the
+quota, the Worker logs show refused confirmations, and notices and alerts wait in the retry queue
+(above); a daily cap is then the fix.
+
 The footer form (`src/components/NewsletterSignup.tsx`) posts to `/api/newsletter/`, which asks
 Brevo for a double opt-in: Brevo emails the confirmation link (template 5, "מקראות – אישור הרשמה
 (עברית)") and adds the address to list 4 ("ניוזלטר מקראות") once it is clicked, then sends the
