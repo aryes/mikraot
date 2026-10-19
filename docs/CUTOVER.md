@@ -80,8 +80,17 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
 1. One commit to `wrangler.jsonc`: route `mikraot.net/*` → `mikraot`, `workers_dev: false` and
    `preview_urls: true` (keeps branch previews); in the same commit, `DEPLOYED_URL` in
    `.github/workflows/deployed.yml` becomes `https://mikraot.net` (workers.dev goes away).
-   After the go/no-go approval it is reviewed and pushed directly to `main`; its deploy
-   (Workers Builds) **is** the switch.
+   It goes through a pull request like any change: `main` accepts only commits whose checks
+   passed, with no bypass (ruleset "Tests must pass"), so a direct push would be refused. A day or
+   two ahead, open it with green checks and **without auto-merge** (which would merge, and so
+   switch, whenever the checks finish). At the agreed hour Claude merges it by hand (`gh pr merge --rebase`); its
+   deploy (Workers Builds) **is** the switch. Not on a Monday morning, when Renovate merges its
+   updates; and no other pull request may have auto-merge on at that time (`gh pr list`; switch it
+   off with `gh pr merge --disable-auto <number>`): Renovate's security updates come any day. If
+   `main` moved after the checks ran, update the pull request (`gh pr update-branch --rebase`) and
+   let its checks run again (about 4 minutes) first, so the switch deploys a tested whole. Right after the merge, open
+   its revert (`git revert`) as a pull request too, likewise without auto-merge, so a rollback's
+   step 3 needs only a merge.
    Right after that deploy, point the Brevo newsletter webhook at
    `https://mikraot.net/api/newsletter-webhook/` (`PUT /v3/webhooks/<id>`): it is on the
    workers.dev address, which the switch turns off, so confirmations would get no welcome email.
@@ -125,13 +134,16 @@ header or CSP problem breaking pages.
 
 ## 4. Rollback (seconds via the dashboard)
 
-1. **Freeze pushes to `main`** (including dependency merges): any deploy would bring the route
-   back while the config still contains it.
+1. **Freeze merges into `main`**, except the revert in step 3: any other deploy would bring the
+   route back while the config still contains it. Switch off auto-merge on every open pull request
+   (`gh pr list`, then `gh pr merge --disable-auto <number>`; Renovate's included) and open no new
+   ones until step 3 is done. The revert's own checks take about 4 minutes; the site is already
+   back on WordPress from step 2, so only this freeze matters meanwhile.
 2. **Delete the `mikraot.net/*` route** (Cloudflare API or dashboard: Workers → mikraot →
    Settings → Domains & Routes). WordPress serves the site again at once; no cache purge needed.
-3. The very next commit is the revert (route out of `wrangler.jsonc`, `workers_dev` back on). It
-   doesn't remove routes itself; it keeps a later deploy from re-adding the route. Confirm the route
-   is still gone after that deploy.
+3. Merge the revert pull request opened right after the switch (`gh pr merge --rebase`: the
+   whole switch commit undone, route out of `wrangler.jsonc` and `workers_dev` back on). It doesn't remove routes itself; it keeps a later deploy from re-adding
+   the route. Confirm the route is still gone after that deploy.
 
 Comments posted on the new site in between stay in D1 and are not shown by WordPress; they
 reappear when switching forward again. Point the Brevo newsletter webhook back at the workers.dev
