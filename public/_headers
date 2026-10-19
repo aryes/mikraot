@@ -1,4 +1,5 @@
-# Security headers for every static response (Cloudflare Workers static assets).
+# Security headers for every static response (Cloudflare Workers static assets); the Worker adds
+# the same to its own answers (src/server/security-headers.ts, which a test keeps in step).
 # The Content-Security-Policy for scripts, styles and frames is a <meta> in each page (astro.config.mjs);
 # this header adds what a <meta> cannot: frame-ancestors (no embedding of the site elsewhere).
 # HSTS deliberately without includeSubDomains: mail. and ftp. are not served over HTTPS via Cloudflare.

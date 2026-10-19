@@ -3,8 +3,10 @@
  * (wrangler.jsonc `triggers.crons`). Server errors and a failed backup email the owner
  * (src/server/alerts.ts). Mail apps' one-click unsubscribe is answered here, before Astro
  * (src/server/one-click-unsubscribe.ts), and recordings asked for in pieces by the Worker itself
- * (src/server/audio-range.ts). Emails Brevo refused are sent again from a queue
- * (src/server/email.ts). Sentry records the errors with their details (src/lib/sentry.ts).
+ * (src/server/audio-range.ts). Every answer gets public/_headers' security headers, which
+ * Cloudflare applies to static files only (src/server/security-headers.ts). Emails Brevo refused
+ * are sent again from a queue (src/server/email.ts). Sentry records the errors with their details
+ * (src/lib/sentry.ts).
  */
 import { handle } from '@astrojs/cloudflare/handler';
 import * as Sentry from '@sentry/cloudflare';
@@ -12,6 +14,7 @@ import { PUBLIC_SENTRY_DSN } from 'astro:env/client';
 import { env } from 'cloudflare:workers';
 import { alertOwner, type AlertKind } from './server/alerts';
 import { answerRange } from './server/audio-range';
+import { withSecurityHeaders } from './server/security-headers';
 import { backupDatabase } from './server/backup';
 import { retryEmails, type RetryMessage } from './server/email';
 import { unsubscribeReplies } from './server/comments';
@@ -56,7 +59,7 @@ export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
         // The whole file from the assets; the browser's other headers (If-None-Match) still apply.
         const whole = new Request(request.url, { headers: request.headers });
         whole.headers.delete('Range');
-        return await answerRange(request, await env.ASSETS.fetch(whole));
+        return withSecurityHeaders(await answerRange(request, await env.ASSETS.fetch(whole)));
       }
       const unsubscribe = await oneClickUnsubscribe(request);
       if (unsubscribe !== null) {
@@ -69,7 +72,9 @@ export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
         }
         drainUnreadBody(request, context); // only a clone was read
         // The same answer for any token: nothing to learn about which tokens exist.
-        return new Response('Unsubscribed', { headers: { 'Cache-Control': 'no-store' } });
+        return withSecurityHeaders(
+          new Response('Unsubscribed', { headers: { 'Cache-Control': 'no-store' } }),
+        );
       }
       const response = await handle(...args);
       drainUnreadBody(request, context);
@@ -79,9 +84,10 @@ export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
         Sentry.captureMessage(`${where}: ${response.status}`, 'error');
         alert(context, 'request', `${where}: ${response.status}`);
       }
-      return response;
+      return withSecurityHeaders(response);
     } catch (error) {
-      // Thrown before Astro could answer: still reported, then left to Workers (a 500).
+      // Thrown before Astro could answer: still reported, then left to Workers (a bare 500,
+      // without the security headers: it has no content to protect).
       alert(context, 'request', `${where}: ${String(error)}`);
       throw error;
     }

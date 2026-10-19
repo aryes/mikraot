@@ -36,6 +36,5 @@ export const GET: APIRoute = async ({ url }) => {
   });
   response.headers.set('Content-Type', 'application/rss+xml; charset=utf-8');
   response.headers.set('Cache-Control', 'public, max-age=300');
-  response.headers.set('X-Content-Type-Options', 'nosniff');
   return response;
 };
