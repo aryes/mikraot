@@ -59,16 +59,17 @@ export const isBlocked = (email: string) => {
 };
 
 /**
- * Asks Brevo to send the confirmation email. Brevo refusing an address (4xx: one it won't accept,
- * or perhaps one already on the list) is logged and reported as 'refused', so the visitor sees the
- * same answer as for any sign-up and the form can't tell who subscribed. Throws if Brevo is down.
+ * Asks Brevo to send the confirmation email. Throws if Brevo doesn't (down, its daily quota used
+ * up, or refusing the address): the visitor is told nothing was sent and what to do, and the Worker
+ * emails Arye (a server error; src/worker.ts). One answer for every failure (Arye, 2026-10-19):
+ * Brevo's error codes don't reliably tell a refused address from a setup or quota problem.
  */
 export async function requestConfirmation(
   apiKey: string,
   signup: Signup,
   origin: string,
   fetchFn: typeof fetch = fetch,
-): Promise<'sent' | 'refused'> {
+): Promise<void> {
   const res = await fetchFn(BREVO_DOI_URL, {
     method: 'POST',
     headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
@@ -80,11 +81,7 @@ export async function requestConfirmation(
       redirectionUrl: new URL(CONFIRMED_PATH, origin).href,
     }),
   });
-  if (res.ok) return 'sent';
-  const detail = `Brevo double opt-in failed: ${res.status} ${await res.text()}`;
-  if (res.status >= 500) throw new Error(detail);
-  console.error(detail);
-  return 'refused';
+  if (!res.ok) throw new Error(`Brevo double opt-in failed: ${res.status} ${await res.text()}`);
 }
 
 /**

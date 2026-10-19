@@ -74,24 +74,24 @@ describe('requestConfirmation', () => {
     });
   });
 
-  it('sends no name attribute without a name; a refused address is logged, not thrown', async () => {
-    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(new Response('bad', { status: 400 }));
-    await expect(
-      requestConfirmation('key', { email: 'a@b.co', name: '' }, 'https://x.example', fetchFn),
-    ).resolves.toBe('refused');
-    expect(log).toHaveBeenCalledWith(expect.stringContaining('400 bad'));
-    log.mockRestore();
+  it('sends no name attribute without a name', async () => {
+    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}', { status: 201 }));
+    await requestConfirmation('key', { email: 'a@b.co', name: '' }, 'https://x.example', fetchFn);
     expect(sentBody(fetchFn.mock.calls[0]?.[1])).not.toHaveProperty('attributes');
   });
 });
 
-describe('requestConfirmation when Brevo is down', () => {
-  it('throws, so the visitor is told to try again', async () => {
-    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(new Response('down', { status: 503 }));
+describe('requestConfirmation when Brevo sends nothing', () => {
+  it.each([
+    [503, 'down'],
+    [400, '{"code":"not_enough_credits"}'],
+    [400, '{"code":"invalid_parameter"}'],
+    [429, 'Too many requests'],
+  ])('throws on %i, so the visitor is told nothing was sent', async (status, reply) => {
+    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(new Response(reply, { status }));
     await expect(
       requestConfirmation('key', { email: 'a@b.co', name: '' }, 'https://x.example', fetchFn),
-    ).rejects.toThrow('503 down');
+    ).rejects.toThrow(`${status} ${reply}`);
   });
 });
 
