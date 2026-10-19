@@ -2,7 +2,18 @@
  * Builds the rows of choices of each list picker (src/components/content/ListPicker.astro) from
  * its nested list: one row per depth, each choice a button opening the next row, and the deepest
  * items as links. A choice that is alone in its row is opened right away (ויקרא has one parasha).
+ * The page's first picker keeps its choices in the address (#תורה/ויקרא/שמיני), so a shared link
+ * or a return to the page opens them again.
  */
+
+/** The choices in the address's #fragment, or [] if it isn't a picker path. */
+function pathFromHash(): string[] {
+  try {
+    return decodeURIComponent(location.hash.slice(1)).split('/').filter(Boolean);
+  } catch {
+    return []; // a malformed %-escape
+  }
+}
 
 interface Item {
   name: string;
@@ -72,10 +83,16 @@ function setUp(picker: HTMLElement, index: number): void {
         button.className = 'list-picker-choice';
         button.textContent = option.name;
         button.setAttribute('aria-expanded', 'false');
-        button.addEventListener('click', () => {
+        button.addEventListener('click', (event) => {
           buttons.forEach((other) => other.setAttribute('aria-expanded', 'false'));
           button.setAttribute('aria-expanded', 'true');
-          showRow(option.children, depth + 1, [...path, option.name], option.href);
+          const chosen = [...path, option.name];
+          // Replaced, not added: Back leaves the page rather than stepping through the choices.
+          // Only a visitor's own click: one opened automatically (a single choice, or from the
+          // address) leaves the address as it came.
+          if (keepInAddress && event.isTrusted)
+            history.replaceState(history.state, '', `#${chosen.join('/')}`);
+          showRow(option.children, depth + 1, chosen, option.href);
         });
         buttons.push(button);
         choices.append(button);
@@ -91,9 +108,18 @@ function setUp(picker: HTMLElement, index: number): void {
     if (only && buttons.length === 1) only.click();
   }
 
+  // Before the first row: opening the choices from the address must not rewrite it midway.
+  const keepInAddress = index === 0;
+  const wanted = keepInAddress ? pathFromHash() : [];
   showRow(items, 0, [], null);
   list.replaceWith(rows);
   picker.classList.add('is-ready');
+  // Open the address's choices, as far as they match (another #fragment, a heading's, matches none).
+  wanted.forEach((name, depth) => {
+    const row = rows.children[depth];
+    const button = [...(row?.querySelectorAll('button') ?? [])].find((b) => b.textContent === name);
+    if (button?.getAttribute('aria-expanded') === 'false') button.click();
+  });
 }
 
 /**

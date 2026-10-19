@@ -734,6 +734,30 @@ test('the recordings are chosen row by row: part, book, parasha, reading', async
   );
 });
 
+test('the recordings picker keeps the choices in the address, and opens them from it', async ({
+  page,
+}) => {
+  const recordings = '/קריאות-מוקלטות-בנוסח-אשכנז/';
+  await page.goto(recordings);
+  await page.getByRole('button', { name: 'כתובים' }).click();
+  await page.getByRole('button', { name: 'רות' }).click();
+  expect(decodeURIComponent(new URL(page.url()).hash)).toBe('#כתובים/רות');
+
+  // A shared link (or a return to the page) opens the same choices. From another page: a change of
+  // the #fragment alone doesn't reload this one.
+  await page.goto('/about/');
+  await page.goto(`${recordings}#${encodeURIComponent('תורה/ויקרא')}`);
+  await expect(page.getByRole('button', { name: 'שמיני' })).toHaveAttribute(
+    'aria-expanded',
+    'true',
+  );
+  // Another #fragment (a heading's) opens nothing and is left as it is.
+  await page.goto('/about/');
+  await page.goto(`${recordings}#no-such-choice`);
+  await expect(page.locator('.list-picker-row')).toHaveCount(1);
+  expect(new URL(page.url()).hash).toBe('#no-such-choice');
+});
+
 test('the Babylonian-Iraqi recordings use the same picker: part, book, chapter', async ({
   page,
 }) => {
