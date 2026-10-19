@@ -26,6 +26,16 @@ describe('commentEmail', () => {
     expect(htmlContent).not.toContain('<b>חשובה');
   });
 
+  it('offers the comment management link when there is one', () => {
+    const manageUrl = 'https://mikraot.net/comments/manage/?token=a.b';
+    const email = commentEmail({ ...notice, manageUrl }, 'admin@mikraot.net');
+    expect(email.textContent).toContain(
+      `ניהול התגובה (הסתרה או החזרה של התגובה באתר):\n${manageUrl}`,
+    );
+    expect(email.htmlContent).toContain(`<a href="${manageUrl}">ניהול התגובה</a>`);
+    expect(commentEmail(notice, 'admin@mikraot.net').textContent).not.toContain('ניהול');
+  });
+
   it('has no reply-to when the commenter gave no email', () => {
     expect(commentEmail({ ...notice, email: null }, 'a@b.c').replyTo).toBeUndefined();
   });

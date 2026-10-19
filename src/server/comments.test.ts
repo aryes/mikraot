@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest';
 import {
   addComment,
   approvedCommentPage,
+  commentToManage,
   listComments,
   listRecentComments,
   parseNewComment,
   parsePageKeys,
   replyRecipient,
+  setCommentShown,
   unsubscribeReplies,
   type CommentsDb,
   type PublicComment,
@@ -234,5 +236,20 @@ describe('reply emails', () => {
     );
     expect(calls[1]?.values).toEqual(['d@e.co']);
     expect(await unsubscribeReplies(fakeDb([]).db, 'unknown')).toBe(false);
+  });
+});
+
+describe('managing a comment', () => {
+  it('reads the comment whether shown or hidden, and sets the state asked for', async () => {
+    const { db, calls } = fakeDb([{ id: 3, approved: 0 }]);
+    expect(await commentToManage(db, 3)).toEqual({ id: 3, approved: 0 });
+    expect(calls[0]?.query).not.toMatch(/approved = 1/);
+    await setCommentShown(db, 3, false);
+    await setCommentShown(db, 3, true);
+    expect(calls[1]?.query).toMatch(/UPDATE comments SET approved = \? WHERE id = \?/);
+    expect(calls.slice(1).map((call) => call.values)).toEqual([
+      [0, 3],
+      [1, 3],
+    ]);
   });
 });

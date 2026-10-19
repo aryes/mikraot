@@ -87,7 +87,7 @@
   - [x] Reply to a specific comment (threaded replies, as on WordPress): "השיבו" button, replies nested under their comment, the API checks the parent is an approved comment on the same page. Needs migration `0003_comment_replies.sql` (adds `parent_id`) on production D1 before the new Worker goes live
   - [x] Email the commenter when someone replies (Jetpack "notify me of follow-up comments"): `src/server/reply-notice.ts`, with an opt-in checkbox, an unsubscribe link and one-click unsubscribe
   - [x] Remember the commenter's name and email in the browser (opt-in checkbox, as on WordPress; `src/lib/commenter.ts`, localStorage, nothing sent)
-  - [ ] Comment moderation page behind Cloudflare Access (approve, delete, edit, reply as admin). Skipped for now (Arye, 2026-10-13): comments still appear at once; Claude hides or deletes on request
+  - [ ] Comment moderation page behind Cloudflare Access (approve, delete, edit, reply as admin). Skipped for now (Arye, 2026-10-13): comments still appear at once; Claude deletes on request. Hiding: the "ניהול התגובה" link in each new-comment email (2026-10-19, `src/pages/comments/manage.astro`)
   - [x] Structured data (JSON-LD: WebSite, WebPage, BreadcrumbList, BlogPosting, Person) and Twitter title/description, as All in One SEO output (`src/lib/structured-data.ts`, typed with schema-dts)
   - [x] Previous/next post links and related posts (same category) under posts (`src/components/PostNav.astro`; nothing shows while the site has a single post)
   - [x] Uptime monitor with email alerts (replaces Jetpack Monitor): UptimeRobot, 2026-10-08

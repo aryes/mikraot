@@ -75,8 +75,10 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
         timeout-minutes: 10 # normally under 4
-      # The Worker's local .dev.vars, with Cloudflare's public always-pass Turnstile test key.
+      # The Worker's local .dev.vars: Cloudflare's public always-pass Turnstile test key, and the
+      # comment management links' test key (e2e/site.spec.ts signs with it too).
       - run: echo 'TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA' > .dev.vars
+      - run: echo 'COMMENT_MANAGE_SECRET=local-test-only' >> .dev.vars
       # Builds the site, resets the local D1 to the fixture data, and serves it in workerd.
       - run: npm run test:e2e -- --shard=${{ matrix.shard }}
       - name: Deploy dry run (bundles the Worker, uploads nothing)
@@ -146,6 +148,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
         timeout-minutes: 10 # normally under 4
       - run: echo 'TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA' > .dev.vars
+      - run: echo 'COMMENT_MANAGE_SECRET=local-test-only' >> .dev.vars
       # The site in workerd as in production, with the local D1 (fixtures) for the comments API.
       - run: npm run db:local:reset
       - run: npm run build:site

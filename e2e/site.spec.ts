@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import sharp from 'sharp';
 import { LOCAL_ONLY } from './tags';
+import { manageToken } from '../src/server/comment-manage';
 
 // Comments load lazily (island script on scroll) and then call a Worker endpoint that may start
 // cold, which can exceed the default 5s under parallel test load.
@@ -771,3 +772,39 @@ test('table headings that share a first word are grouped, so wide tables fit a p
     expect(await table.evaluate((e) => e.scrollWidth <= e.clientWidth)).toBe(true);
   }
 });
+
+// The link in the owner's new-comment email (src/server/comment-manage.ts), signed here with the
+// local test key (.dev.vars, as CI writes it).
+test(
+  'the comment management link hides a comment and shows it again',
+  LOCAL_ONLY,
+  async ({ page, request, isMobile }) => {
+    test.skip(isMobile, 'runs once: both projects would change the same comment at once');
+    const listed = async () => {
+      const res = await request.get(`/api/comments/?page_slug=${encodeURIComponent('סמיכות')}`);
+      const comments: { id: number; author_name: string }[] = await res.json();
+      return comments.find((comment) => comment.author_name === 'מגיב לניהול');
+    };
+    const comment = await listed();
+    expect(comment).toBeDefined();
+    const token = await manageToken('local-test-only', comment?.id ?? 0);
+
+    const response = await page.goto(`/comments/manage/?token=${encodeURIComponent(token)}`);
+    expect(response?.headers()['x-frame-options']).toBe('DENY');
+    expect(response?.headers()['referrer-policy']).toBe('no-referrer');
+    await expect(page.getByText('תגובה לבדיקת הניהול')).toBeVisible();
+    // Opening the link changes nothing (mail scanners open links); the button does.
+    expect(await listed()).toBeDefined();
+    await page.getByRole('button', { name: 'הסתר תגובה' }).click();
+    await expect(page.getByRole('status')).toContainText('התגובה מוסתרת');
+    expect(await listed()).toBeUndefined();
+    await page.getByRole('button', { name: 'החזר תגובה' }).click();
+    await expect(page.getByRole('status')).toContainText('התגובה מוצגת באתר');
+    expect(await listed()).toBeDefined();
+
+    // A changed token is refused.
+    await page.goto(`/comments/manage/?token=${encodeURIComponent(`${token}x`)}`);
+    await expect(page.getByText('הקישור אינו תקין')).toBeVisible();
+    await expect(page.getByRole('button', { name: /תגובה/ })).toHaveCount(0);
+  },
+);

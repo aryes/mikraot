@@ -11,3 +11,6 @@ entropy = 3.0
 [[rules.allowlists]]
 description = "Placeholders that point to .env"
 regexes = ['''^<[A-Z_]+ in \.env>$''']
+[[rules.allowlists]]
+description = "The comment management links' local and CI test key (.dev.vars, ci.yml): not a secret"
+regexes = ['''^local-test-only$''']

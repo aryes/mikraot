@@ -1,0 +1,113 @@
+---
+/**
+ * Hides a comment, or shows it again, from the "ניהול התגובה" link in the owner's new-comment
+ * email (src/server/comment-manage.ts). The link only opens this page; a button does the change,
+ * since mail scanners open every link in an email. The page always shows the comment's current
+ * state, so the same link undoes what it did. Hidden comments stay in the database.
+ */
+import { env } from 'cloudflare:workers';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { commentIdFromToken } from '../../server/comment-manage';
+import { commentToManage, setCommentShown } from '../../server/comments';
+import { findPage, getPageIndex } from '../../server/page-index';
+
+// Runs in the Worker on each request.
+export const prerender = false;
+
+// The answer depends on the database, and the page must not be shown inside another site's
+// frame, where a visitor could be tricked into pressing its button (static pages get this from
+// public/_headers; pages the Worker answers don't).
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Frame-Options', 'DENY');
+// The address holds the link's key: never pass it on to the next page (or its statistics).
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+
+const token = Astro.url.searchParams.get('token') ?? '';
+const id = token ? await commentIdFromToken(env.COMMENT_MANAGE_SECRET ?? '', token) : null;
+let done = false;
+if (id !== null && Astro.request.method === 'POST') {
+  // The state asked for, not a toggle: pressing twice (or resending) changes nothing more.
+  const shown = (await Astro.request.formData()).get('show') === '1';
+  await setCommentShown(env.DB, id, shown);
+  done = true;
+}
+const comment = id === null ? null : await commentToManage(env.DB, id);
+const page = comment
+  ? findPage(await getPageIndex(env.ASSETS, Astro.url.origin), comment.page_slug)
+  : undefined;
+const shown = comment?.approved === 1;
+const date = comment ? new Date(`${comment.created_at.replace(' ', 'T')}Z`) : null;
+const when =
+  date && !Number.isNaN(date.getTime())
+    ? date.toLocaleDateString('he-IL', { dateStyle: 'medium', timeZone: 'Asia/Jerusalem' })
+    : comment?.created_at;
+const text = 'text-slate-600 dark:text-slate-300';
+const button =
+  'cursor-pointer rounded-xl px-6 py-2.5 font-bold text-white shadow-xs transition-all bg-brand-strong hover:bg-brand-deep';
+---
+
+<BaseLayout title="ניהול תגובה – מקראות" noindex>
+  <div class="mx-auto max-w-3xl px-4 py-20">
+    <h1 class="mb-6 text-center text-3xl font-bold text-slate-800 dark:text-slate-100">
+      ניהול תגובה
+    </h1>
+    {comment ? (
+      <>
+        <div
+          class={`mb-6 rounded-2xl border bg-white p-5 dark:bg-slate-900 ${shown ? 'border-slate-300 dark:border-slate-600' : 'border-dashed border-amber-500 dark:border-amber-400'}`}
+        >
+          <p class={`mb-2 text-sm ${text}`}>
+            <span
+              class={`ml-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold ${shown ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100' : 'bg-amber-100 text-amber-900 dark:bg-amber-900 dark:text-amber-100'}`}
+            >
+              {shown ? 'מוצגת באתר' : 'מוסתרת'}
+            </span>
+            <strong class="text-slate-800 dark:text-slate-100">{comment.author_name}</strong>
+            {' · '}
+            {when}
+            {page && (
+              <>
+                {' · '}
+                <a
+                  href={`${page.url}#comment-${comment.id}`}
+                  class="text-brand-strong dark:text-brand underline"
+                >
+                  {page.title}
+                </a>
+              </>
+            )}
+          </p>
+          <p
+            class={`break-words whitespace-pre-wrap ${shown ? 'text-slate-800 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400'}`}
+          >
+            {comment.content}
+          </p>
+        </div>
+        <form method="post" class="text-center">
+          <p class={`mb-4 ${text}`} role="status">
+            {done && <strong class="text-slate-800 dark:text-slate-100">✓ בוצע. </strong>}
+            {shown
+              ? 'התגובה מוצגת באתר.'
+              : 'התגובה מוסתרת: היא לא מוצגת באתר, ונשמרת כדי שאפשר יהיה להחזיר אותה.'}
+          </p>
+          <input type="hidden" name="show" value={shown ? '0' : '1'} />
+          <button type="submit" class={button}>
+            {shown ? 'הסתר תגובה' : 'החזר תגובה'}
+          </button>
+          {shown && <p class={`mt-2 text-sm ${text}`}>אפשר להחזיר אותה אחר כך, מאותו קישור.</p>}
+        </form>
+      </>
+    ) : (
+      <p class={`text-center ${text}`}>
+        {id === null
+          ? 'הקישור אינו תקין. ודאו שפתחתם את הקישור ״ניהול התגובה״ במלואו, ישירות מהאימייל.'
+          : 'התגובה לא נמצאה: אולי נמחקה.'}
+      </p>
+    )}
+    <p class="mt-8 text-center">
+      <a href="/" class="text-brand-strong dark:text-brand underline">
+        חזרה לדף הבית
+      </a>
+    </p>
+  </div>
+</BaseLayout>

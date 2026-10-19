@@ -16,6 +16,8 @@ declare module 'cloudflare:workers' {
     BREVO_API_KEY?: string;
     /** Shared with Brevo's newsletter webhook (wrangler secret; src/pages/api/newsletter-webhook.ts). */
     NEWSLETTER_WEBHOOK_SECRET?: string;
+    /** Signs the comment management links (wrangler secret; src/server/comment-manage.ts). */
+    COMMENT_MANAGE_SECRET?: string;
     /** Per-visitor limit on newsletter sign-ups (src/pages/api/newsletter.ts). */
     NEWSLETTER_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
     /** Per-address limit on newsletter sign-ups (the same file). */
