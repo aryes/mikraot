@@ -188,7 +188,7 @@ export default defineConfig({
     },
   ],
   integrations: [
-    // The comment form is written against React's API but runs on Preact (compat): the same
+    // The comment and newsletter forms are written against React's API but runs on Preact (compat): the same
     // components for about 10 KB instead of React's 60 KB, which on short posts (comments in view
     // at once) cost ~12 Lighthouse points. The Keystatic editor needs real React:
     // astro.config.cms.mjs swaps it back. Type checks use React's types (tsconfig), so avoid
