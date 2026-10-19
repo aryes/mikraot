@@ -1,10 +1,9 @@
 /**
- * Email to the site owner about each new comment (as WordPress did), sent through Brevo's
- * transactional email API: https://developers.brevo.com/reference/sendtransacemail
- * A plain fetch: Brevo's npm SDK targets Node servers, and one documented POST needs no library.
+ * Email to the site owner about each new comment (as WordPress did), sent through Brevo
+ * (src/server/email.ts).
  */
+import { sendOrRetry, type BrevoEmail, type EmailRetry } from './email';
 
-const BREVO_SEND_URL = 'https://api.brevo.com/v3/smtp/email';
 /** The site's public address: sends the notices (a Brevo-verified sender) and receives them. */
 export const OWNER_EMAIL = 'admin@mikraot.net';
 const SENDER = { name: 'מקראות', email: OWNER_EMAIL };
@@ -20,17 +19,6 @@ export interface CommentNotice {
   content: string;
   /** The comment management link (src/server/comment-manage.ts); absent without its secret. */
   manageUrl?: string;
-}
-
-export interface BrevoEmail {
-  sender: { name: string; email: string };
-  to: { email: string }[];
-  replyTo?: { email: string; name: string };
-  subject: string;
-  htmlContent: string;
-  textContent: string;
-  /** Extra headers, e.g. List-Unsubscribe (Brevo passes them through). */
-  headers?: Record<string, string>;
 }
 
 export const escapeHtml = (text: string) =>
@@ -70,39 +58,34 @@ const logFailure = (error: unknown) => {
  * Tells the owner about a saved comment, in the background (`waitUntil`: the Worker finishes the
  * send after responding). Never throws: the comment is already saved, so a failure here must not
  * turn the response into an error that invites a duplicate post. Without a key (branch previews)
- * nothing is sent. The notice is built lazily, in the background (it may sign a link), so that
- * errors building it are caught here too.
+ * nothing is sent; one Brevo refuses is tried again later (`retry`). The notice is built lazily,
+ * in the background (it may sign a link), so that errors building it are caught here too.
  */
 export function notifyOwner(options: {
   apiKey: string | undefined;
   waitUntil: (promise: Promise<unknown>) => void;
   notice: () => CommentNotice | Promise<CommentNotice>;
+  retry?: EmailRetry | undefined;
   fetchFn?: typeof fetch;
 }): void {
-  const { apiKey, waitUntil, notice, fetchFn } = options;
+  const { apiKey, waitUntil, notice, retry, fetchFn } = options;
   if (!apiKey) return;
   try {
     waitUntil(
       Promise.resolve()
         .then(notice)
-        .then((built) => sendEmail(apiKey, commentEmail(built, OWNER_EMAIL), fetchFn))
+        .then((built) =>
+          sendOrRetry({
+            apiKey,
+            email: commentEmail(built, OWNER_EMAIL),
+            what: 'Comment notification',
+            retry,
+            fetchFn,
+          }),
+        )
         .catch(logFailure),
     );
   } catch (error) {
     logFailure(error); // a waitUntil that throws
   }
-}
-
-/** Sends one email through Brevo; throws if Brevo refuses it. */
-export async function sendEmail(
-  apiKey: string,
-  email: BrevoEmail,
-  fetchFn: typeof fetch = fetch,
-): Promise<void> {
-  const res = await fetchFn(BREVO_SEND_URL, {
-    method: 'POST',
-    headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
-    body: JSON.stringify(email),
-  });
-  if (!res.ok) throw new Error(`Brevo send failed: ${res.status} ${await res.text()}`);
 }

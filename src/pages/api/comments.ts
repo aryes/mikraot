@@ -74,6 +74,7 @@ export const POST: APIRoute = async ({ request, url, clientAddress, locals }) =>
     notifyOwner({
       apiKey: env.BREVO_API_KEY,
       waitUntil: (promise) => locals.cfContext.waitUntil(promise),
+      retry: env.EMAIL_RETRY,
       notice: async () => ({
         commentId: saved.id,
         pageTitle: page.title,
@@ -98,6 +99,7 @@ export const POST: APIRoute = async ({ request, url, clientAddress, locals }) =>
               ? notifyReplyAuthor({
                   apiKey: env.BREVO_API_KEY,
                   replierEmail: comment.author_email,
+                  retry: env.EMAIL_RETRY,
                   notice: {
                     recipient,
                     replyId: saved.id,

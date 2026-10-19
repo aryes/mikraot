@@ -69,6 +69,19 @@
   "analytics_engine_datasets": [{ "binding": "SEARCH_MISSES", "dataset": "mikraot_search_misses" }],
   // Daily database backup (src/server/backup.ts), at 02:17 UTC, a quiet hour.
   "triggers": { "crons": ["17 2 * * *"] },
+  // Emails Brevo refused wait here and are sent again by the Worker's `queue` handler every hour
+  // for a day (src/server/email.ts). Free plan: messages kept 24 hours.
+  "queues": {
+    "producers": [{ "binding": "EMAIL_RETRY", "queue": "mikraot-email-retry" }],
+    "consumers": [
+      {
+        "queue": "mikraot-email-retry",
+        "max_batch_size": 10,
+        "max_retries": 23, // above the code's own limit (src/server/email.ts MAX_ATTEMPTS)
+        "retry_delay": 3600,
+      },
+    ],
+  },
   "kv_namespaces": [
     { "binding": "BACKUPS", "id": "74ecb19e9d864308bd5f9b0add3e2c11" },
     // When each kind of failure was last emailed, so an outage sends one email an hour.

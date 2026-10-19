@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { commentEmail, notifyOwner, sendEmail, type CommentNotice } from './notify';
+import type { EmailRetry } from './email';
+import { commentEmail, notifyOwner, type CommentNotice } from './notify';
 
 const notice: CommentNotice = {
   commentId: 7,
@@ -61,6 +62,23 @@ describe('notifyOwner', () => {
     expect(fetchFn).toHaveBeenCalledOnce();
   });
 
+  it('queues a notice Brevo refuses, for a retry', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const refused = vi.fn<typeof fetch>().mockResolvedValue(new Response('quota', { status: 402 }));
+    const send = vi.fn<EmailRetry['send']>().mockResolvedValue(undefined);
+    const pending: Promise<unknown>[] = [];
+    notifyOwner({
+      apiKey: 'k',
+      waitUntil: (p) => pending.push(p),
+      notice: () => notice,
+      retry: { send },
+      fetchFn: refused,
+    });
+    await Promise.all(pending);
+    expect(send).toHaveBeenCalledOnce();
+    expect(send.mock.calls[0]?.[0].email.subject).toBe('תגובה חדשה במקראות: דגש קל');
+  });
+
   it('sends nothing without a key (branch previews)', () => {
     const fetchFn = ok();
     const waitUntil = vi.fn();
@@ -84,20 +102,5 @@ describe('notifyOwner', () => {
       notifyOwner({ apiKey: 'k', waitUntil: broken, notice: () => notice }),
     ).not.toThrow();
     expect(console.error).toHaveBeenCalledTimes(2);
-  });
-});
-
-describe('sendEmail', () => {
-  it('posts the email to Brevo with the key', async () => {
-    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}', { status: 201 }));
-    await sendEmail('key', commentEmail(notice, 'admin@mikraot.net'), fetchFn);
-    const [url, init] = fetchFn.mock.calls[0] ?? [];
-    expect(url).toBe('https://api.brevo.com/v3/smtp/email');
-    expect(new Headers(init?.headers).get('api-key')).toBe('key');
-  });
-
-  it('fails loudly when Brevo refuses', async () => {
-    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(new Response('no', { status: 401 }));
-    await expect(sendEmail('bad', commentEmail(notice, 'a@b.c'), fetchFn)).rejects.toThrow('401');
   });
 });
