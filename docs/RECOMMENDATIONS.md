@@ -2,7 +2,8 @@
 
 Ideas on top of the migrated site, by Claude. Nothing here is decided or scheduled: items move to
 `docs/ROADMAP.md` (or straight into work) once Arye picks them. Updated in spare time between tasks;
-last full review 2026-10-08, brought up to date 2026-10-13.
+last full review 2026-10-19 (eight independent reviewers, then a synthesis; below), earlier
+2026-10-08.
 
 Priority: **H** high value for the effort, **M** worth doing, **L** nice to have.
 Effort: S (hours), M (days), L (weeks).
@@ -35,6 +36,45 @@ What follows from that:
    record (a simple upload flow, Arye reviews).
 6. **Content time, a suggested weekly rhythm:** ~2 h recording audio for one existing page, ~1 h
    writing or finishing one lesson section, ~1 h answering comments and reviewing the numbers.
+
+## Review of 2026-10-19
+
+Eight context-free reviewers (performance, security, content, styling, code quality, outside
+tools, UX, site management) each reviewed the site and code, then each other's findings, and a
+synthesis merged them. Done the same day: see "Done" below. Arye decided: no daily cap on
+newsletter sign-ups (WordPress had none); one error message for every sign-up failure; the
+comment management link doesn't expire; קניתָּ and "לפני שווא נח" stay as they are; two-factor
+login postponed (still open in the roadmap).
+
+Open from it, each waiting for Arye:
+
+- **Needs: decision, every page looks different.** Answer buttons: the word "פתרון" with the eye,
+  32 px visible with a 44 px tap area, a name saying which word it answers. Phone menu: 16/15 px
+  text, 44 px rows, and anchors not hidden under the sticky header (`scroll-padding-top`).
+  Audio buttons: a "loading" state at once on tap. Subsetting the fallback and logo fonts (never
+  Taamey David CLM). Wider phone text (edge-to-edge cards) and breadcrumbs that match the menu.
+- **Needs: decision.** "Next / previous lesson" links and "you are here" in the menu (reverses
+  the 2026-10-09 skip); the front page's three topics as cards plus the recordings, with an
+  audience line Arye writes (also reverses a skip); holding comments that contain links (once
+  hiding by email exists, which it now does); a monthly off-Cloudflare backup to a private GitHub
+  repository (the privacy policy gets a line); alerts to Arye's own address through Cloudflare
+  after the email move (if free and possible); a free Healthchecks.io account to catch GitHub's
+  scheduled runs stopping; branch
+  previews staying public, documented; CLAUDE.md shortened to rules and a map after the cutover;
+  a content licence (e.g. CC BY-NC-SA); a GitHub successor and a second Cloudflare member;
+  pinning GitHub Actions by full SHA as a repository rule; no longer auto-merging the weekly
+  lockfile refresh.
+- **Needs: content (Arye).** The content review's reading of: דגש חזק's promise to tell it from
+  דגש קל; "א = a" on מבטא; a stray bold "י" and two unlabelled Aramaic passages on תנועות; the
+  אזלא name in the שלישים list; one line on יְהֹוָה and יְהוָה; the ketiv/qere אשדת on שווא נע;
+  exercise 2 on שווא נע (after וּ and a געיה); on דגש קל, רבּוֹתָּי → רַבּוֹתַי, and "ןָ" in the
+  list with קניתָּ (a typo for נָ?). Recordings for "read this" pages; new short lessons
+  (קרי וכתיב, פתח גנובה, מלעיל/מלרע, ברכות התורה); verse references on practice passages; one
+  update line in "מה חדש" at the switch.
+- **Checked and not done:** raising Lighthouse's performance floor to 0.85 (CI's medians are
+  lower: the post page measures 82); `--follow` for last-changed dates (not worth the code for a
+  rare rename); loading Sentry only on the first error (saves bytes, but loses reports before it);
+  R2 for the recordings (2 MB in all).
 
 ## Decisions of 2026-10-09
 
@@ -338,3 +378,15 @@ Privacy-first, without cookies, so no consent banner:
 - 2026-10-13: newsletter open and click tracking stays on (Brevo's default), stated in the privacy
   policy only (Arye: a consent line in the form would drive subscribers away; the audience is
   Israeli, while France's regulator wants consent for open tracking since April 2026).
+- 2026-10-19 (the review): recordings answered in pieces for iPhone Safari (range requests),
+  cached a week; a "ניהול התגובה" link in each new-comment email that hides or restores the
+  comment; refused emails retried hourly from a Cloudflare Queue; an actionable message when a
+  sign-up email can't be sent; the switch-day guide merging the switch by hand; an "if Claude is
+  unavailable" card in the guide; Sentry accepting reports only from the site, 60 an hour;
+  security headers on the Worker's own answers; commenters' text kept as text in the comments
+  feed; the human check bound to the site and the form, with a 5-second limit; the comment form's
+  honest load failure, 16 px fields and 3:1 borders; search finding other spellings and
+  prefix-less forms, with links when nothing is found; the search index cached a year; the
+  recordings picker's choices in the address; the content import refusing to overwrite edits;
+  gitleaks checked against its checksum and tool versions in workflow commands tracked by
+  Renovate; content fixes (וְאַזְלָ֜א six times, "הי׳ והה׳").
