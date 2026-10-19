@@ -78,7 +78,12 @@ the test site, https://mikraot.mikraot-app.workers.dev).
 
 - Each new comment is emailed to you (admin@mikraot.net), with the page, the text and the
   commenter's email if given. Replying to that email answers the commenter privately.
-- To reply on the site, or to hide or delete a comment, ask Claude (a moderation page is planned).
+- To hide a comment, open the "ניהול התגובה" link in its email and press "הסתר תגובה". The same
+  link shows it again ("החזר תגובה"); a hidden comment is kept, not deleted. Replies to a hidden
+  comment stay visible, moved to the top of the list. The link works only
+  for that comment and doesn't expire, so don't forward the email to anyone who shouldn't manage
+  it.
+- To reply on the site, or to delete a comment, ask Claude.
 
 ## If something looks wrong
 

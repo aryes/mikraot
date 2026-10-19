@@ -63,6 +63,18 @@ the restored state, then delete the files in `.backups/`. Tested 2026-10-08: loc
 comments wiped and restored with the same rows and reply links; the Time Travel plan against
 production (read-only).
 
+### Hide a comment
+
+Arye hides a comment, or shows it again, from the "ניהול התגובה" link in its new-comment email:
+a page with the comment and one button (`src/pages/comments/manage.astro`). The link is signed
+with the Worker secret `COMMENT_MANAGE_SECRET` (random, set 2026-10-19; kept nowhere else), names
+one comment, and doesn't expire. Replacing the secret
+(`npx wrangler secret put COMMENT_MANAGE_SECRET --config wrangler.jsonc`) makes every link
+already sent stop working ("הקישור אינו תקין"): do it if an email with these links reached
+someone who shouldn't have them. Without the secret (previews) emails go out without the link.
+The Worker logs record full request addresses, these links included (as with the unsubscribe
+links): don't paste log lines with them anywhere public.
+
 ### Delete a comment or an email on request
 
 The privacy policy promises deletion on request, and that a restore from an older backup won't
@@ -73,7 +85,8 @@ bring the data back. So:
    (only the email: `UPDATE comments SET author_email = NULL, notify_replies = 0, unsubscribe_token = NULL WHERE id = <id>`). If the comment has
    replies, the database refuses the `DELETE` (each reply points to it); erase it instead:
    `UPDATE comments SET author_name = '', author_email = NULL, content = '', approved = 0, notify_replies = 0, unsubscribe_token = NULL WHERE id = <id>`.
-   Hiding a comment (`SET approved = 0` alone) is not deletion: its text and email stay.
+   Hiding a comment (`SET approved = 0` alone, or the "ניהול התגובה" link in its email) is not
+   deletion: its text and email stay.
 2. Add a line to the list below: date, comment number, and what was deleted. Numbers only, never
    names or emails (this file is public).
 3. Backups taken before the deletion keep the row until they expire (~13 months); after any

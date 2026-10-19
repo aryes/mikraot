@@ -203,3 +203,31 @@ export async function unsubscribeReplies(db: CommentsDb, token: string): Promise
     .all();
   return true;
 }
+
+/** A comment as its management page shows it (src/pages/comments/manage.astro). */
+export interface ManagedComment {
+  id: number;
+  page_slug: string;
+  author_name: string;
+  content: string;
+  created_at: string;
+  /** 1 shown on the site, 0 hidden. */
+  approved: number;
+}
+
+export async function commentToManage(db: CommentsDb, id: number): Promise<ManagedComment | null> {
+  return db
+    .prepare(
+      'SELECT id, page_slug, author_name, content, created_at, approved FROM comments WHERE id = ?',
+    )
+    .bind(id)
+    .first<ManagedComment>();
+}
+
+/** Shows or hides a comment. Hidden comments stay in the database and can be shown again. */
+export async function setCommentShown(db: CommentsDb, id: number, shown: boolean): Promise<void> {
+  await db
+    .prepare('UPDATE comments SET approved = ? WHERE id = ?')
+    .bind(shown ? 1 : 0, id)
+    .all();
+}

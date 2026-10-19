@@ -9,6 +9,7 @@ import {
   parsePageKeys,
   replyRecipient,
 } from '../../server/comments';
+import { manageUrl } from '../../server/comment-manage';
 import { notifyOwner } from '../../server/notify';
 import { notifyReplyAuthor } from '../../server/reply-notice';
 import { findPage, getPageIndex } from '../../server/page-index';
@@ -73,13 +74,16 @@ export const POST: APIRoute = async ({ request, url, clientAddress, locals }) =>
     notifyOwner({
       apiKey: env.BREVO_API_KEY,
       waitUntil: (promise) => locals.cfContext.waitUntil(promise),
-      notice: () => ({
+      notice: async () => ({
         commentId: saved.id,
         pageTitle: page.title,
         pageUrl: new URL(page.url, url.origin).href,
         author: comment.author_name,
         email: comment.author_email,
         content: comment.content,
+        ...(env.COMMENT_MANAGE_SECRET && {
+          manageUrl: await manageUrl(env.COMMENT_MANAGE_SECRET, url.origin, saved.id),
+        }),
       }),
     });
     // A reply: tell the author of the comment replied to, if they asked (in the background, so a
