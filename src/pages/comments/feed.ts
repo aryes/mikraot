@@ -5,6 +5,7 @@ import { env } from 'cloudflare:workers';
 import site from '../../data/site.json';
 import { findPage, getPageIndex } from '../../server/page-index';
 import { listRecentComments } from '../../server/comments';
+import { escapeHtml } from '../../server/notify';
 
 // Comments change at any time, so this feed is built by the Worker on each request.
 export const prerender = false;
@@ -30,7 +31,9 @@ export const GET: APIRoute = async ({ url }) => {
         link: new URL(`${page?.url ?? '/'}#comment-${comment.id}`, url.origin).href,
         // D1 stores UTC as "YYYY-MM-DD HH:MM:SS".
         pubDate: new Date(`${comment.created_at.replace(' ', 'T')}Z`),
-        description: comment.content,
+        // Readers show a description as HTML: the comment is plain text, so its < and & are
+        // escaped first (the feed library escapes again, for the XML), and its lines kept.
+        description: escapeHtml(comment.content).replace(/\r?\n/g, '<br>'),
       };
     }),
   });
