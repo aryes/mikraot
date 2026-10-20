@@ -922,3 +922,13 @@ test('an audio button shows loading at once, then says "עצירה" while playin
   await expect(tile).not.toHaveAttribute('data-state', /./);
   await expect(tile).toHaveAttribute('aria-label', name);
 });
+
+test('the footer states the content licence', async ({ page }) => {
+  await page.goto('/about/');
+  const licence = page.locator('footer a[rel~="license"]');
+  await expect(licence).toHaveText('התוכן ברישיון CC BY-NC-SA 4.0');
+  await expect(licence).toHaveAttribute(
+    'href',
+    'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+  );
+});

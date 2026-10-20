@@ -111,17 +111,35 @@ const footerLink = 'inline-block py-1 transition-colors hover:text-brand';
     </div>
 
     <div class="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-800/80 pt-6 text-sm text-slate-300 sm:flex-row">
-      <p>
-        © {years} {site.copyright}
+      {/* Each item with the dot before it, so a line never ends in a dot (phones). */}
+      <p class="text-center sm:text-start">
+        <span class="whitespace-nowrap">
+          © {years} {site.copyright}
+        </span>
+        {/* The content licence (Arye, 2026-10-20): teachers may copy and adapt the lessons, with
+            credit, not for sale, and share alike. Creative Commons has no Hebrew page for it. */}
+        <span class="whitespace-nowrap">
+          <span aria-hidden="true" class="mx-2">
+            ·
+          </span>
+          <a
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+            rel="license noopener"
+            target="_blank"
+            class={footerLink}
+          >
+            התוכן ברישיון CC BY-NC-SA 4.0
+          </a>
+        </span>
         {legalLinks.map((link) => (
-          <>
+          <span class="whitespace-nowrap">
             <span aria-hidden="true" class="mx-2">
               ·
             </span>
             <a href={link.url} class={footerLink}>
               {link.title}
             </a>
-          </>
+          </span>
         ))}
       </p>
       <a
