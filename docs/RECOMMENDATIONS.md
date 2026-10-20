@@ -71,7 +71,7 @@ Open from it, each waiting for Arye:
 - **Decided (Arye, 2026-10-20): yes.** Branch previews stay public after the switch (test database,
   no emails, the human check's test keys; locking them needs Cloudflare Zero Trust with a card on
   file). CLAUDE.md shortened to rules and a map after the switch (Claude's own working file).
-- **Decided and done (Arye, 2026-10-20).** A content licence: CC BY-NC-SA 4.0, stated in the footer.
+- **Decided and done (Arye, 2026-10-20).** A content licence: CC BY-NC-SA 4.0, in the footer and on the about page (how to credit; not YouTube videos; the recordings, all Arye's, included).
 - **Needs: decision.** A GitHub successor and a second Cloudflare member;
   pinning GitHub Actions by full SHA as a repository rule; no longer auto-merging the weekly
   lockfile refresh.
@@ -343,7 +343,7 @@ Privacy-first, without cookies, so no consent banner:
 ## Also worth considering
 
 - **Licence the content** so teachers can share it legally: CC BY-NC-SA 4.0, chosen 2026-10-20 (see
-  "Review of 2026-10-19"). The rights in the recordings are still to state.
+  "Review of 2026-10-19"). The recordings are Arye's and under it too (the about page says so).
 - **Community:** reach teachers and synagogue gabbaim (they send learners); a WhatsApp channel or the
   newsletter for new lessons. Skipped for now (2026-10-09): more involvement than there is time for.
 
