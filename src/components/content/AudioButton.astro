@@ -6,6 +6,11 @@
  * markdoc.config.mjs), the label itself is the button: a tile with it large and a speaker under
  * it (Arye, 2026-10-15).
  * Without one, a round speaker button.
+ *
+ * Its state is `data-state` (set by the script): "loading" right after the tap (a pulsing ring and
+ * three dots instead of the speaker, so a slow connection doesn't look like a missed tap), then
+ * "playing" (the pause icon); the look is in src/styles/global.css. While playing, its name says
+ * "עצירה" instead of "השמע" (the review, Arye 2026-10-20).
  */
 interface Props {
   src: string;
@@ -50,6 +55,11 @@ const label = what ? `השמע: ${what}` : 'השמע צליל';
     <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
     <path d="M19 5a10 10 0 0 1 0 14"></path>
   </svg>
+  <span class="loading-icon pointer-events-none" aria-hidden="true">
+    <span></span>
+    <span></span>
+    <span></span>
+  </span>
   <svg
     class="pause-icon pointer-events-none hidden h-4 w-4"
     viewBox="0 0 24 24"

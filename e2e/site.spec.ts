@@ -898,3 +898,25 @@ test('a jump to a heading stops below the sticky header, not under it', async ({
     expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0); // the page really jumped
   }).toPass();
 });
+
+test('an audio button shows loading at once, then says "עצירה" while playing', async ({ page }) => {
+  // A slow connection: the recording arrives after a second.
+  await page.route('**/*.mp3', async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await route.continue();
+  });
+  await page.goto('/דגש-קל/');
+  const tile = page.locator('.audio-tile').first();
+  const name = (await tile.getAttribute('aria-label')) ?? '';
+  expect(name).toMatch(/^השמע: /);
+  await tile.click();
+  await expect(tile).toHaveAttribute('data-state', 'loading');
+  await expect(tile.locator('.loading-icon')).toBeVisible();
+  await expect(tile).toHaveAttribute('data-state', 'playing', { timeout: 10_000 });
+  await expect(tile.locator('.pause-icon')).toBeVisible();
+  await expect(tile).toHaveAttribute('aria-label', name.replace(/^השמע/, 'עצירה'));
+  // Stops (the recording is short: a click after it ended would start it again).
+  await page.evaluate(() => document.querySelector<HTMLElement>('.audio-tile')?.click());
+  await expect(tile).not.toHaveAttribute('data-state', /./);
+  await expect(tile).toHaveAttribute('aria-label', name);
+});
