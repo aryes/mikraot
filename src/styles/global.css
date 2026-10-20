@@ -494,3 +494,14 @@
     break-inside: avoid;
   }
 }
+
+/* A jump to a heading (#…) or a focused element stops below the sticky header (70 px on phones,
+   115 px from md up, src/components/SiteHeader.astro), not under it (WCAG 2.4.11). */
+html {
+  scroll-padding-top: 5rem;
+}
+@media (width >= 48rem) {
+  html {
+    scroll-padding-top: 8rem;
+  }
+}
