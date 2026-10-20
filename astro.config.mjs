@@ -7,30 +7,27 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 
 /**
- * The self-hosted Noto variable fonts (Fontsource packages), as Astro font variants: the Latin and
- * Latin Extended subsets, each with its unicode range, so browsers fetch only the subsets a page
- * uses (as Fontsource's own CSS did). The ranges are Fontsource's.
+ * Noto Sans Hebrew, only for the symbols Taamey David lacks (©, –, …): its Latin and Latin Extended
+ * files trimmed to those characters by scripts/fonts/subsets.py, which prints these ranges. Each
+ * file is fetched only by a page that uses one of its characters.
  */
-const notoSubsets = (/** @type {string} */ name) => {
-  const variant = (/** @type {string} */ subset, /** @type {string} */ range) => ({
-    src: /** @type {[string]} */ ([
-      `@fontsource-variable/${name}/files/${name}-${subset}-wght-normal.woff2`,
-    ]),
-    weight: /** @type {const} */ ('100 900'),
-    style: /** @type {const} */ ('normal'),
-    unicodeRange: /** @type {[string]} */ ([range]),
-  });
-  return /** @type {[ReturnType<typeof variant>, ...ReturnType<typeof variant>[]]} */ ([
-    variant(
-      'latin',
-      'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD',
+const symbolsVariant = (/** @type {string} */ file, /** @type {string} */ range) => ({
+  src: /** @type {[string]} */ ([`./src/assets/fonts/noto-sans-hebrew/${file}`]),
+  weight: /** @type {const} */ ('100 900'),
+  style: /** @type {const} */ ('normal'),
+  unicodeRange: /** @type {[string]} */ ([range]),
+});
+const notoSymbols =
+  /** @type {[ReturnType<typeof symbolsVariant>, ...ReturnType<typeof symbolsVariant>[]]} */ ([
+    symbolsVariant(
+      'NotoSansHebrew-latin-symbols.woff2',
+      'U+000D,U+00A0-00A2,U+00A5,U+00A7-00AB,U+00AE-00B0,U+00B4,U+00B6-00B8,U+00BA-00BB,U+00BF-00FF,U+0131,U+0152-0153,U+02C6,U+02DA,U+02DC,U+0304,U+2013-2014,U+2022,U+2026,U+2039-203A,U+2122,U+2212',
     ),
-    variant(
-      'latin-ext',
-      'U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF',
+    symbolsVariant(
+      'NotoSansHebrew-latin-ext-symbols.woff2',
+      'U+0100-0107,U+010A-0113,U+0116-011B,U+011E-0123,U+0126-0127,U+012A-012B,U+012E-0130,U+0136-0137,U+0139-013E,U+0141-0148,U+0150-0151,U+0154-0155,U+0158-015B,U+015E-0161,U+0164-0165,U+016A-016B,U+016E-017E,U+0218-021B,U+0237,U+02C7,U+02C9,U+02DD,U+0304,U+1E80-1E85,U+1E9E,U+1EF2-1EF3',
     ),
   ]);
-};
 
 /** Cloudflare's always-pass Turnstile test site key. */
 const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
@@ -125,7 +122,7 @@ export default defineConfig({
       name: 'Noto Sans Hebrew',
       cssVariable: '--font-noto-sans',
       fallbacks: ['sans-serif'],
-      options: { variants: notoSubsets('noto-sans-hebrew') },
+      options: { variants: notoSymbols },
     },
     {
       // All text, headings included (2026-10-14, Arye): Taamey David CLM places cantillation marks
@@ -165,12 +162,11 @@ export default defineConfig({
       options: {
         variants: [
           {
-            src: [
-              '@fontsource-variable/noto-sans-arabic/files/noto-sans-arabic-arabic-wght-normal.woff2',
-            ],
+            // Trimmed to the basic Arabic block by scripts/fonts/subsets.py (162 → 66 KB).
+            src: ['./src/assets/fonts/noto-sans-arabic/NotoSansArabic-arabic.woff2'],
             weight: '100 900',
             style: 'normal',
-            unicodeRange: ['U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFC'],
+            unicodeRange: ['U+0600-06FF'],
           },
         ],
       },
@@ -183,7 +179,12 @@ export default defineConfig({
       fallbacks: ['serif'],
       options: {
         variants: [
-          { src: ['./src/assets/fonts/taamey-d/Taamey_D.woff2'], weight: '400', style: 'normal' },
+          // Only the site name's letters (scripts/fonts/subsets.py; 21 → 2 KB).
+          {
+            src: ['./src/assets/fonts/taamey-d/Taamey_D-logo.woff2'],
+            weight: '400',
+            style: 'normal',
+          },
         ],
       },
     },

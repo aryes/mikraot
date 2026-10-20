@@ -1,5 +1,6 @@
 ---
 /** Under a post: previous/next post and related posts (same category), as on the WordPress site. */
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { adjacentPosts, relatedPosts, type NavPost } from '../lib/post-nav';
 import { getPosts, type SitePage } from '../lib/site';
 
@@ -47,14 +48,17 @@ const link =
   >
     {previous ? (
       <a href={previous.url} rel="prev" class={link}>
-        → הפוסט הקודם: {previous.title}
+        {/* Icons: no site font has the arrow characters (e2e/fonts.spec.ts). */}
+        <ArrowRight size={14} className="inline align-[-2px]" aria-hidden="true" /> הפוסט הקודם:{' '}
+        {previous.title}
       </a>
     ) : (
       <span />
     )}
     {next && (
       <a href={next.url} rel="next" class={link}>
-        הפוסט הבא: {next.title} ←
+        הפוסט הבא: {next.title}{' '}
+        <ArrowLeft size={14} className="inline align-[-2px]" aria-hidden="true" />
       </a>
     )}
   </nav>
