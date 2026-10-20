@@ -64,8 +64,11 @@ Open from it, each waiting for Arye:
   private GitHub repository (the privacy policy gets a line).
 - **Decided (Arye, 2026-10-20): no.** Alerts keep going to admin@mikraot.net, which stays the
   address for everything (the email move changes only where its mailbox is hosted).
-- **Needs: decision.** a free Healthchecks.io account to catch GitHub's
-  scheduled runs stopping; branch
+- **Decided (Arye, 2026-10-20): not now; revisit after the switch.** A free Healthchecks.io account
+  to catch GitHub's scheduled runs stopping (UptimeRobot's free plan has no heartbeat monitors; the
+  daily check already watches the backup, so only the check itself is unwatched, and GitHub pauses
+  it only after 60 days without activity).
+- **Needs: decision.** branch
   previews staying public, documented; CLAUDE.md shortened to rules and a map after the cutover;
   a content licence (e.g. CC BY-NC-SA); a GitHub successor and a second Cloudflare member;
   pinning GitHub Actions by full SHA as a repository rule; no longer auto-merging the weekly
