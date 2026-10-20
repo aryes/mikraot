@@ -60,8 +60,9 @@ Open from it, each waiting for Arye:
 - **Decided (Arye, 2026-10-20): after the switch, once real commenters show what comes in.** Holding
   comments that contain links for approval (spam, not security: comments are always shown as escaped
   text, and the CSP blocks injected scripts).
-- **Needs: decision.** a monthly off-Cloudflare backup to a private GitHub
-  repository (the privacy policy gets a line); alerts to Arye's own address through Cloudflare
+- **Decided (Arye, 2026-10-20): after the switch.** A monthly off-Cloudflare copy of the backup to a
+  private GitHub repository (the privacy policy gets a line).
+- **Needs: decision.** alerts to Arye's own address through Cloudflare
   after the email move (if free and possible); a free Healthchecks.io account to catch GitHub's
   scheduled runs stopping; branch
   previews staying public, documented; CLAUDE.md shortened to rules and a map after the cutover;
