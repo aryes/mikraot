@@ -62,8 +62,9 @@ Open from it, each waiting for Arye:
   text, and the CSP blocks injected scripts).
 - **Decided (Arye, 2026-10-20): after the switch.** A monthly off-Cloudflare copy of the backup to a
   private GitHub repository (the privacy policy gets a line).
-- **Needs: decision.** alerts to Arye's own address through Cloudflare
-  after the email move (if free and possible); a free Healthchecks.io account to catch GitHub's
+- **Decided (Arye, 2026-10-20): no.** Alerts keep going to admin@mikraot.net, which stays the
+  address for everything (the email move changes only where its mailbox is hosted).
+- **Needs: decision.** a free Healthchecks.io account to catch GitHub's
   scheduled runs stopping; branch
   previews staying public, documented; CLAUDE.md shortened to rules and a map after the cutover;
   a content licence (e.g. CC BY-NC-SA); a GitHub successor and a second Cloudflare member;
