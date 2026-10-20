@@ -52,8 +52,10 @@ Open from it, each waiting for Arye:
   text, 44 px rows, and anchors not hidden under the sticky header (`scroll-padding-top`).
   Audio buttons: a "loading" state at once on tap. Subsetting the fallback and logo fonts (never
   Taamey David CLM). Wider phone text (edge-to-edge cards) and breadcrumbs that match the menu.
-- **Needs: decision.** "Next / previous lesson" links and "you are here" in the menu (reverses
-  the 2026-10-09 skip); the front page's three topics as cards plus the recordings, with an
+- **Decided (Arye, 2026-10-20): after the switch.** "Next / previous lesson" links and "you are here"
+  in the menu, with each lesson's next chosen by hand, since not every lesson leads to the one after
+  it in the menu.
+- **Needs: decision.** the front page's three topics as cards plus the recordings, with an
   audience line Arye writes (also reverses a skip); holding comments that contain links (once
   hiding by email exists, which it now does); a monthly off-Cloudflare backup to a private GitHub
   repository (the privacy policy gets a line); alerts to Arye's own address through Cloudflare
