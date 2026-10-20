@@ -48,8 +48,7 @@ login postponed (still open in the roadmap).
 
 Open from it, each waiting for Arye:
 
-- **Needs: decision, every page looks different.** Answer buttons: the word "פתרון" with the eye,
-  32 px visible with a 44 px tap area, a name saying which word it answers. Phone menu: 16/15 px
+- **Needs: decision, every page looks different.** Phone menu: 16/15 px
   text, 44 px rows, and anchors not hidden under the sticky header (`scroll-padding-top`).
   Audio buttons: a "loading" state at once on tap. Subsetting the fallback and logo fonts (never
   Taamey David CLM). Wider phone text (edge-to-edge cards) and breadcrumbs that match the menu.
@@ -388,5 +387,5 @@ Privacy-first, without cookies, so no consent banner:
   honest load failure, 16 px fields and 3:1 borders; search finding other spellings and
   prefix-less forms, with links when nothing is found; the search index cached a year; the
   recordings picker's choices in the address; the content import refusing to overwrite edits;
-  gitleaks checked against its checksum and tool versions in workflow commands tracked by
+  answer buttons that say "פתרון" (32 px, a 44 px tap area, named for screen readers by the word they answer; approved by Arye 2026-10-20); gitleaks checked against its checksum and tool versions in workflow commands tracked by
   Renovate; content fixes (וְאַזְלָ֜א six times, "הי׳ והה׳").

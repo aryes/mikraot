@@ -18,8 +18,8 @@ import {
 import { slugFromTitle } from './src/lib/slug';
 
 const collapseSchema = {
-  expandText: fields.text({ label: 'טקסט לפתיחה (ריק = אייקון עין בלבד)' }),
-  collapseText: fields.text({ label: 'טקסט לסגירה' }),
+  expandText: fields.text({ label: 'טקסט לפתיחה (ריק = "פתרון")' }),
+  collapseText: fields.text({ label: 'טקסט לסגירה (ריק = "הסתר")' }),
 };
 
 const content = fields.markdoc({

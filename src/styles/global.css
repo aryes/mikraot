@@ -444,7 +444,8 @@
   background: var(--chip-chosen);
   color: #ffffff;
 }
-.wp-content-rendered :is(.list-picker-choice, .list-picker-link):focus-visible {
+.wp-content-rendered
+  :is(.list-picker-choice, .list-picker-link, .collapse-toggle-btn):focus-visible {
   outline: 2px solid var(--content-link);
   outline-offset: 2px;
 }
@@ -477,6 +478,10 @@
   .wp-content-rendered .collapse-toggle-btn {
     background: none;
     color: #000000;
+  }
+  /* An answer that wasn't opened prints without its button (a worksheet, ~189 of them). */
+  .wp-content-rendered .bg-collapse-wrapper:has(> [aria-expanded='false']) {
+    display: none;
   }
   /* Open dialogs (search, the video popup) would print over the page. */
   dialog {

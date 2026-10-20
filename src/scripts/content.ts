@@ -63,24 +63,44 @@ function toggleCollapse(button: HTMLElement): void {
   if (!target) return;
   const open = !target.classList.toggle('hidden');
   if (open) track('answer-open');
+  // Its look follows aria-expanded (src/components/content/Collapse.astro).
   button.setAttribute('aria-expanded', String(open));
-  for (const name of ['bg-brand-strong', 'text-white', 'border-brand']) {
-    button.classList.toggle(name, open);
-  }
-  for (const name of [
-    'bg-slate-100',
-    'dark:bg-slate-800',
-    'text-slate-700',
-    'dark:text-slate-200',
-    'dark:border-slate-700',
-  ]) {
-    button.classList.toggle(name, !open);
-  }
   const label = button.querySelector<HTMLElement>('.collapse-label');
   if (label) {
     label.textContent = (open ? label.dataset['collapseText'] : label.dataset['expandText']) ?? '';
   }
 }
+
+/** At most this many words of the text before an answer button name it for screen readers. */
+const NAMING_WORDS = 4;
+const BLOCKS = new Set(['P', 'DIV', 'UL', 'OL', 'TABLE', 'BLOCKQUOTE', 'H2', 'H3', 'H4', 'FIGURE']);
+
+/**
+ * The text an answer button follows on its line (the exercise word, "יָֽהְצָה׃"): from the line's
+ * start, a <br> or the previous answer, at most a few words.
+ */
+function textBefore(wrapper: Element): string {
+  let text = '';
+  for (let node = wrapper.previousSibling; node; node = node.previousSibling) {
+    if (node instanceof HTMLBRElement) break;
+    // A whole paragraph or list before it (a block answer): not its line.
+    if (node instanceof Element && BLOCKS.has(node.tagName)) break;
+    if (node instanceof Element && node.matches('.collapse-target, .bg-collapse-wrapper')) break;
+    text = (node.textContent ?? '') + text;
+  }
+  const words = text.replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+  return words.slice(-NAMING_WORDS).join(' ');
+}
+
+/** Tells screen readers which word each answer button answers ("פתרון ל־יָֽהְצָה׃"). */
+function nameAnswerButtons(): void {
+  for (const wrapper of document.querySelectorAll('.bg-collapse-wrapper')) {
+    const hidden = wrapper.querySelector('.collapse-for');
+    const before = textBefore(wrapper);
+    if (hidden && before) hidden.textContent = ` ל־${before}`;
+  }
+}
+nameAnswerButtons();
 
 /** A YouTube player (privacy-enhanced domain) that starts playing: created only on a click. */
 function youtubePlayer(embed: string, title: string): HTMLIFrameElement {

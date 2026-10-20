@@ -41,17 +41,34 @@ test('collapsible explanations open and close', async ({ page }) => {
   await expect(panel).toBeHidden();
 });
 
-test('an explanation button changes its words and colours when open', async ({ page }) => {
-  await page.goto('/דגש-קל/');
-  const toggle = page.locator('.collapse-toggle-btn:has(.collapse-label)').first();
+test('an answer button says what it does, and which word it answers', async ({ page }) => {
+  await page.goto('/silent-letters/');
+  const toggle = page.locator('.collapse-toggle-btn').first();
   const label = toggle.locator('.collapse-label');
-  await expect(label).toHaveText('הראה פתרון');
+  await expect(label).toHaveText('פתרון');
+  // Screen readers also hear the exercise word before it (the first one here is יֹאכַ֔ל).
+  await expect(toggle).toHaveAccessibleName(/^פתרון ל־\S+/);
+  expect(await toggle.locator('.collapse-for').textContent()).toContain('כַ');
+  // 32 px tall (the tap area around it is larger).
+  expect((await toggle.boundingBox())?.height).toBeCloseTo(32, 0);
   await toggle.click();
-  await expect(label).toHaveText('החבא פתרון');
+  await expect(label).toHaveText('הסתר');
   await page.mouse.move(0, 0); // off the button: hover has its own colours
   await expect(toggle).toHaveCSS('color', 'rgb(255, 255, 255)');
   await toggle.click();
-  await expect(label).toHaveText('הראה פתרון');
+  await expect(label).toHaveText('פתרון');
+});
+
+test('a block explanation keeps its own words', async ({ page }) => {
+  await page.goto('/דגש-קל/');
+  const target = await page
+    .locator('.collapse-toggle-btn', { hasText: 'הראה פתרון' })
+    .first()
+    .getAttribute('data-target');
+  // By its panel, since its words change when it opens.
+  const toggle = page.locator(`.collapse-toggle-btn[data-target="${target}"]`);
+  await toggle.click();
+  await expect(toggle.locator('.collapse-label')).toHaveText('החבא פתרון');
 });
 
 // The fictional comments in e2e/fixtures/comments.sql exist only in the local database.
@@ -414,6 +431,8 @@ test('a printed lesson keeps the content and drops navigation, comments and play
   // Printers drop backgrounds by default: text that relied on one must turn dark.
   const black = 'rgb(0, 0, 0)';
   await expect(page.locator('th').first()).toHaveCSS('color', black);
+  // Answers that weren't opened print without their buttons.
+  await expect(page.locator('.collapse-toggle-btn[aria-expanded="false"]').first()).toBeHidden();
   await expect(page.locator('.collapse-toggle-btn[aria-expanded="true"]')).toHaveCSS(
     'color',
     black,
