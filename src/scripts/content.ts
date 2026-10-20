@@ -20,14 +20,33 @@ function youtubeEmbed(url: string): string | null {
 let audio: HTMLAudioElement | null = null;
 let audioButton: HTMLElement | null = null;
 
-function showPlaying(button: HTMLElement | null): void {
+/** "השמע: בּ" ↔ "עצירה: בּ"; the unnamed button's "השמע צליל" ↔ "עצירת הצליל". */
+const stopName = (label: string) =>
+  label === 'השמע צליל' ? 'עצירת הצליל' : label.replace(/^השמע/, 'עצירה');
+const playName = (label: string) =>
+  label === 'עצירת הצליל' ? 'השמע צליל' : label.replace(/^עצירה/, 'השמע');
+
+/**
+ * Shows which button is loading or playing (src/components/content/AudioButton.astro); the others
+ * go back to rest. A playing button is named "עצירה: …" instead of "השמע: …".
+ */
+function showState(button: HTMLElement | null, state: 'loading' | 'playing' | null): void {
   for (const btn of document.querySelectorAll<HTMLElement>('.inline-audio-btn')) {
-    const playing = btn === button;
-    btn.querySelector('.play-icon')?.classList.toggle('hidden', playing);
+    const own = btn === button ? state : null;
+    if (own) btn.dataset['state'] = own;
+    else delete btn.dataset['state'];
+    const playing = own === 'playing';
+    btn.querySelector('.play-icon')?.classList.toggle('hidden', own !== null);
     btn.querySelector('.pause-icon')?.classList.toggle('hidden', !playing);
     btn.classList.toggle('ring-4', playing);
     btn.classList.toggle('ring-brand/30', playing);
     btn.classList.toggle('scale-110', playing);
+    const label = btn.getAttribute('aria-label') ?? '';
+    const named = playing ? stopName(label) : playName(label);
+    if (named !== label) {
+      btn.setAttribute('aria-label', named);
+      btn.title = named;
+    }
   }
 }
 
@@ -44,17 +63,25 @@ function toggleAudio(button: HTMLElement): void {
   const next = new Audio(src);
   audio = next;
   audioButton = button;
-  next.addEventListener('pause', () => showPlaying(null));
-  next.addEventListener('ended', () => showPlaying(null));
+  // The events of a recording replaced by another tap come late: they must not reset the new one.
+  const stopped = () => {
+    if (audio === next) showState(null, null);
+  };
+  next.addEventListener('pause', stopped);
+  next.addEventListener('ended', stopped);
+  showState(button, 'loading'); // at once: the recording may take a moment to arrive
   next
     .play()
     .then(() => {
-      showPlaying(button);
+      // Only if it's still the one asked for (another tap may have replaced it meanwhile).
+      if (audio === next) showState(button, 'playing');
       track('audio-play', { file: decodeURIComponent(src.split('/').pop() ?? src) });
     })
     .catch((error: unknown) => {
+      // Stopped while loading (a second tap, or another button): not a failure.
+      if (error instanceof DOMException && error.name === 'AbortError') return;
       console.error('Audio playback failed:', error);
-      showPlaying(null);
+      if (audio === next) showState(null, null);
     });
 }
 
