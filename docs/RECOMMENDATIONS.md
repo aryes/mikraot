@@ -72,9 +72,11 @@ Open from it, each waiting for Arye:
   no emails, the human check's test keys; locking them needs Cloudflare Zero Trust with a card on
   file). CLAUDE.md shortened to rules and a map after the switch (Claude's own working file).
 - **Decided and done (Arye, 2026-10-20).** A content licence: CC BY-NC-SA 4.0, in the footer and on the about page (how to credit; not YouTube videos; the recordings, all Arye's, included).
-- **Needs: decision.** A GitHub successor and a second Cloudflare member;
-  pinning GitHub Actions by full SHA as a repository rule; no longer auto-merging the weekly
-  lockfile refresh.
+- **Decided (Arye, 2026-10-20).** A GitHub successor and a second Cloudflare member: not relevant.
+  GitHub Actions pinned by full SHA: now required by the repository (all 18 already were). The
+  weekly lockfile refresh keeps merging itself, but waits 3 days for indirect packages too
+  (`.npmrc` `min-release-age=3`, npm 11.10+; tested: a fresh lockfile picked only versions at
+  least 3 days old), instead of being merged by hand.
 - **Needs: content (Arye).** The content review's reading of: דגש חזק's promise to tell it from
   דגש קל; "א = a" on מבטא; a stray bold "י" and two unlabelled Aramaic passages on תנועות; the
   אזלא name in the שלישים list; one line on יְהֹוָה and יְהוָה; the ketiv/qere אשדת on שווא נע;

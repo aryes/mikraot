@@ -7,9 +7,11 @@
   "minimumReleaseAge": "3 days",
   "prConcurrentLimit": 5,
   "vulnerabilityAlerts": {
+    "description": "Security fixes at once: no release-age wait in Renovate, and npm without .npmrc's 3-day minimum (this npmrc replaces the repository's for these pull requests)",
     "enabled": true,
     "schedule": ["at any time"],
-    "minimumReleaseAge": null
+    "minimumReleaseAge": null,
+    "npmrc": "min-release-age=0\n"
   },
   "lockFileMaintenance": {
     "enabled": true
@@ -45,7 +47,7 @@
       "groupName": "Wrangler"
     },
     {
-      "description": "Minor, patch and lockfile updates merge on their own (Monday mornings) once every check passes (tests, build, Lighthouse, the Keystatic patch); majors, and any update of a 0.x package (where minor versions may break), wait for review.",
+      "description": "Minor, patch and lockfile updates merge on their own (the lockfile refresh waits 3 days for indirect packages too, through .npmrc min-release-age) (Monday mornings) once every check passes (tests, build, Lighthouse, the Keystatic patch); majors, and any update of a 0.x package (where minor versions may break), wait for review.",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest", "lockFileMaintenance"],
       "automerge": true,
       "matchCurrentVersion": "!/^v?0\\./"
@@ -71,5 +73,8 @@
       "datasourceTemplate": "github-releases",
       "extractVersionTemplate": "^v(?<version>.+)$"
     }
-  ]
+  ],
+  "constraints": {
+    "npm": ">=11.10.0"
+  }
 }
