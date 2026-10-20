@@ -803,8 +803,10 @@ test('in the letter tables a letter is its own play button, drawn large', async 
     .locator('.audio-tile-letter')
     .evaluate((letter) => parseFloat(getComputedStyle(letter).fontSize));
   expect(letterSize / cellSize).toBeCloseTo(1.7, 1);
+  // By its recording from here on: playing, its name says "עצירה" instead of "השמע".
+  const src = await tile.getAttribute('data-audio-src');
   await tile.click();
-  await expect(tile.locator('.pause-icon')).toBeVisible();
+  await expect(page.locator(`.audio-tile[data-audio-src="${src}"] .pause-icon`)).toBeVisible();
 
   // Letters alone in a cell are large too: Arabic, and English for uniformity (not words).
   await expect(page.locator('td.cell-letter').filter({ hasText: /^\s*b\s*$/ })).toHaveCount(1);
