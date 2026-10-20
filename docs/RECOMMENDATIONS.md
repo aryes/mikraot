@@ -68,9 +68,10 @@ Open from it, each waiting for Arye:
   to catch GitHub's scheduled runs stopping (UptimeRobot's free plan has no heartbeat monitors; the
   daily check already watches the backup, so only the check itself is unwatched, and GitHub pauses
   it only after 60 days without activity).
-- **Needs: decision.** branch
-  previews staying public, documented; CLAUDE.md shortened to rules and a map after the cutover;
-  a content licence (e.g. CC BY-NC-SA); a GitHub successor and a second Cloudflare member;
+- **Decided (Arye, 2026-10-20): yes.** Branch previews stay public after the switch (test database,
+  no emails, the human check's test keys; locking them needs Cloudflare Zero Trust with a card on
+  file). CLAUDE.md shortened to rules and a map after the switch (Claude's own working file).
+- **Needs: decision.** a content licence (e.g. CC BY-NC-SA); a GitHub successor and a second Cloudflare member;
   pinning GitHub Actions by full SHA as a repository rule; no longer auto-merging the weekly
   lockfile refresh.
 - **Needs: content (Arye).** The content review's reading of: דגש חזק's promise to tell it from
