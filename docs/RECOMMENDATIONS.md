@@ -72,7 +72,7 @@ Open from it, each waiting for Arye:
   no emails, the human check's test keys; locking them needs Cloudflare Zero Trust with a card on
   file). CLAUDE.md shortened to rules and a map after the switch (Claude's own working file).
 - **Decided and done (Arye, 2026-10-20).** A content licence: CC BY-NC-SA 4.0, stated in the footer.
-- **Needs: decision.** a GitHub successor and a second Cloudflare member;
+- **Needs: decision.** A GitHub successor and a second Cloudflare member;
   pinning GitHub Actions by full SHA as a repository rule; no longer auto-merging the weekly
   lockfile refresh.
 - **Needs: content (Arye).** The content review's reading of: דגש חזק's promise to tell it from
@@ -125,7 +125,7 @@ Open questions, for later:
 - **Recording helper:** Arye records (Audacity, a good microphone); Claude trims, evens the volume,
   reduces noise, converts and places the files. Agreed in principle, later.
 - **Read-along** (skipped for now): <https://www.ben13.co.il/> has it; look at how before building.
-- **Content licence** (e.g. CC BY-NC-SA): to discuss.
+- **Content licence:** CC BY-NC-SA 4.0, chosen 2026-10-20 (in the footer).
 
 Skipped for now: previous/next links, self-check exercises, the landing home page, the teaching
 audio player and read-along (good ideas), the verse practice view, the weekly parasha box (not
@@ -342,8 +342,8 @@ Privacy-first, without cookies, so no consent banner:
 
 ## Also worth considering
 
-- **Licence the content** (e.g. CC BY-NC-SA) so teachers can share it legally; state the rights in
-  the recordings. To discuss (2026-10-09).
+- **Licence the content** so teachers can share it legally: CC BY-NC-SA 4.0, chosen 2026-10-20 (see
+  "Review of 2026-10-19"). The rights in the recordings are still to state.
 - **Community:** reach teachers and synagogue gabbaim (they send learners); a WhatsApp channel or the
   newsletter for new lessons. Skipped for now (2026-10-09): more involvement than there is time for.
 
