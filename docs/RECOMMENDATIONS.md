@@ -71,7 +71,8 @@ Open from it, each waiting for Arye:
 - **Decided (Arye, 2026-10-20): yes.** Branch previews stay public after the switch (test database,
   no emails, the human check's test keys; locking them needs Cloudflare Zero Trust with a card on
   file). CLAUDE.md shortened to rules and a map after the switch (Claude's own working file).
-- **Needs: decision.** a content licence (e.g. CC BY-NC-SA); a GitHub successor and a second Cloudflare member;
+- **Decided and done (Arye, 2026-10-20).** A content licence: CC BY-NC-SA 4.0, stated in the footer.
+- **Needs: decision.** a GitHub successor and a second Cloudflare member;
   pinning GitHub Actions by full SHA as a repository rule; no longer auto-merging the weekly
   lockfile refresh.
 - **Needs: content (Arye).** The content review's reading of: דגש חזק's promise to tell it from
