@@ -883,3 +883,18 @@ test(
     await expect(page.getByRole('button', { name: /תגובה/ })).toHaveCount(0);
   },
 );
+
+test('a jump to a heading stops below the sticky header, not under it', async ({ page }) => {
+  await page.goto(`/#${encodeURIComponent('טעמים')}`);
+  const heading = page.locator('[id="טעמים"]');
+  await expect(heading).toBeVisible();
+  // After the browser's jump: the heading starts below the header's bottom edge.
+  await expect(async () => {
+    const header = await page.locator('body > header').boundingBox();
+    const target = await heading.boundingBox();
+    const below = header!.y + header!.height;
+    expect(target!.y).toBeGreaterThanOrEqual(below);
+    expect(target!.y).toBeLessThan(below + 40); // just below it, not far down
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0); // the page really jumped
+  }).toPass();
+});
