@@ -160,21 +160,32 @@ try {
 try {
   mkdirSync('.backups', { recursive: true });
   const file = `.backups/cutover-${new Date().toISOString().slice(0, 10)}.sql`;
-  execFileSync(
-    process.execPath,
-    [
-      'node_modules/wrangler/bin/wrangler.js',
-      'd1',
-      'export',
-      'mikraot-db',
-      '--remote',
-      '--output',
-      file,
-      '--config',
-      'wrangler.jsonc',
-    ],
-    { stdio: 'inherit' },
-  );
+  const exportDatabase = () =>
+    execFileSync(
+      process.execPath,
+      [
+        'node_modules/wrangler/bin/wrangler.js',
+        'd1',
+        'export',
+        'mikraot-db',
+        '--remote',
+        '--output',
+        file,
+        '--config',
+        'wrangler.jsonc',
+      ],
+      { stdio: 'inherit' },
+    );
+  try {
+    exportDatabase();
+  } catch {
+    // Wrangler's login token expires hourly: the first call can fail with "Authentication error
+    // [code: 10000]" while it refreshes (seen 2026-10-21); the second works.
+    console.log(
+      '\nThe export failed; trying once more (a login token may have just been refreshed).',
+    );
+    exportDatabase();
+  }
   record('Database export', true, `${file} (git-ignored; keep it until the switch has settled)`);
 } catch (error) {
   record('Database export', false, String(error));
