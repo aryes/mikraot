@@ -45,7 +45,7 @@ test(
       name: 'בודק',
     });
     const status = form.getByRole('status');
-    await expect(status).toContainText('שלחנו אליכם אימייל עם קישור לאישור ההרשמה');
+    await expect(status).toContainText('שלחנו אליה אימייל עם קישור לאישור ההרשמה');
     await expect(status).toBeFocused();
   },
 );

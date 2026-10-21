@@ -16,7 +16,8 @@ import { sendEmail, type BrevoEmail } from './email';
 import { escapeHtml, OWNER_EMAIL } from './notify';
 import { readToken, signToken } from './signing';
 
-const BREVO_DOI_URL = 'https://api.brevo.com/v3/contacts/doubleOptinConfirmation';
+const BREVO_CONTACTS_URL = 'https://api.brevo.com/v3/contacts';
+const BREVO_DOI_URL = `${BREVO_CONTACTS_URL}/doubleOptinConfirmation`;
 /** Brevo list "ניוזלטר מקראות". */
 export const NEWSLETTER_LIST_ID = 4;
 const BREVO_LIST_URL = `https://api.brevo.com/v3/contacts/lists/${NEWSLETTER_LIST_ID}`;
@@ -59,7 +60,38 @@ export const isBlocked = (email: string) => {
 };
 
 /**
- * Asks Brevo to send the confirmation email. Throws if Brevo doesn't (down, its daily quota used
+ * Whether an address is already on the newsletter list (and not blocked from emails). Any doubt
+ * (unknown to Brevo, Brevo down) counts as not subscribed: then a confirmation goes out, as before.
+ */
+async function isSubscribed(
+  apiKey: string,
+  email: string,
+  fetchFn: typeof fetch = fetch,
+): Promise<boolean> {
+  try {
+    const res = await fetchFn(
+      `${BREVO_CONTACTS_URL}/${encodeURIComponent(email)}?identifierType=email_id`,
+      {
+        headers: { 'api-key': apiKey, accept: 'application/json' },
+        signal: AbortSignal.timeout(5_000),
+      },
+    );
+    if (!res.ok) return false;
+    const contact: unknown = await res.json();
+    const lists: unknown =
+      contact && typeof contact === 'object' ? Reflect.get(contact, 'listIds') : [];
+    const blocked =
+      contact && typeof contact === 'object' && Reflect.get(contact, 'emailBlacklisted') === true;
+    return Array.isArray(lists) && lists.includes(NEWSLETTER_LIST_ID) && !blocked;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Asks Brevo to send the confirmation email, unless the address is already subscribed (Arye,
+ * 2026-10-21: no second confirmation; the visitor gets the same answer either way, so the form
+ * doesn't tell who is on the list). Throws if Brevo doesn't (down, its daily quota used
  * up, or refusing the address): the visitor is told nothing was sent and what to do, and the Worker
  * emails Arye (a server error; src/worker.ts). One answer for every failure (Arye, 2026-10-19):
  * Brevo's error codes don't reliably tell a refused address from a setup or quota problem.
@@ -70,6 +102,7 @@ export async function requestConfirmation(
   origin: string,
   fetchFn: typeof fetch = fetch,
 ): Promise<void> {
+  if (await isSubscribed(apiKey, signup.email, fetchFn)) return;
   const res = await fetchFn(BREVO_DOI_URL, {
     method: 'POST',
     headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },

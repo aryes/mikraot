@@ -8,7 +8,9 @@ type State = 'idle' | 'sending' | 'sent' | 'error' | 'check-failed';
 const MESSAGES: Record<State, string> = {
   idle: '',
   sending: '',
-  sent: 'כמעט סיימנו: שלחנו אליכם אימייל עם קישור לאישור ההרשמה. ההרשמה תושלם אחרי שתלחצו עליו.',
+  // The same for an address already on the list, which gets no email (src/server/newsletter.ts):
+  // the form doesn't tell who is subscribed (Arye, 2026-10-21).
+  sent: 'כמעט סיימנו: אם הכתובת עוד לא רשומה, שלחנו אליה אימייל עם קישור לאישור ההרשמה. ההרשמה תושלם אחרי שתלחצו עליו.',
   error: '', // below: it holds a link
   'check-failed': 'בדיקת ״האם אתם אדם״ לא נטענה. רעננו את העמוד ונסו שוב.',
 };
