@@ -561,3 +561,23 @@ html {
     scroll-padding-top: 8rem;
   }
 }
+
+/* Footnotes in the content ("[1]" linked to a note with id note-N under a "---" divider; e.g.
+   שווא נע): the marker small and raised, the divider short and light, the note smaller. */
+.wp-content-rendered a[href^='#note-'] {
+  margin-inline-start: 0.15em;
+  font-size: 0.7em;
+  vertical-align: super;
+  line-height: 0;
+  text-decoration: none;
+}
+.wp-content-rendered hr:has(+ [id^='note-']) {
+  width: 30%;
+  margin-block: 2rem 0.75rem;
+  margin-inline: 0 auto;
+  border: 0;
+  border-top: 1px solid var(--table-border);
+}
+.wp-content-rendered [id^='note-'] {
+  font-size: 0.875em;
+}
