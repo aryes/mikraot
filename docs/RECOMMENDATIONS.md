@@ -84,6 +84,11 @@ Open from it, each waiting for Arye:
   list with קניתָּ (a typo for נָ?). Recordings for "read this" pages; new short lessons
   (קרי וכתיב, פתח גנובה, מלעיל/מלרע, ברכות התורה); verse references on practice passages; one
   update line in "מה חדש" at the switch.
+- **After the switch (Arye, 2026-10-20).** Trope names across traditions: the site mostly uses the
+  Ashkenazi names (e.g. אַזְלָ֜א for the mark the review would call גֵּרֵשׁ); a site-wide way to show
+  the other names (linked to the review's idea of a trope-name map between נוסחים).
+- **After the switch (Arye, 2026-10-21).** A page on קרי וכתיב. Until then the exercises show only the
+  קרי (שווא נע's Deuteronomy 33:2: no longer "אשדת" before it).
 - **Checked and not done:** raising Lighthouse's performance floor to 0.85 (CI's medians are
   lower: the post page measures 82); `--follow` for last-changed dates (not worth the code for a
   rare rename); loading Sentry only on the first error (saves bytes, but loses reports before it);
