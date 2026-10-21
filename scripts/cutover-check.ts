@@ -7,8 +7,8 @@
  *   2. Content: every page matches the live WordPress site (build, then compare:live --refresh).
  *   3. Cloudflare rules: no redirect, transform, cache, config or origin rules, no Page Rules and no
  *      Bulk Redirects that could change mikraot.net's responses (the API; token in .env); and the
- *      zone settings the new site needs (Rocket Loader off, HTTPS only, TLS 1.2 at least, the
- *      browser cache following the site's own headers, email addresses obfuscated).
+ *      zone settings the new site needs (Rocket Loader off, HTTPS only, TLS 1.2 at least,
+ *      email addresses obfuscated), with a reminder about the Browser Cache TTL.
  *   4. WordPress: nothing edited or commented since the content export (WP-CLI over SSH).
  *   5. A fresh export of the production database.
  */
@@ -109,14 +109,11 @@ try {
   if (!account) throw new Error('could not read account rulesets');
   const custom = account.filter((ruleset) => ruleset.kind !== 'managed');
   if (custom.length > 0) found.push(custom.map((r) => `account ${r.kind} ${r.phase}`).join(', '));
-  // Zone settings: Rocket Loader would rewrite the scripts the CSP allows by hash; a Browser Cache
-  // TTL other than "Respect Existing Headers" (0) makes browsers keep pages (max-age=0) for hours,
-  // even after a fix or a rollback.
+  // Zone settings: Rocket Loader would rewrite the scripts the CSP allows by hash.
   const expected: Record<string, (value: unknown) => boolean> = {
     rocket_loader: (value) => value === 'off',
     always_use_https: (value) => value === 'on',
     min_tls_version: (value) => typeof value === 'string' && Number(value) >= 1.2,
-    browser_cache_ttl: (value) => value === 0,
     email_obfuscation: (value) => value === 'on',
   };
   for (const [name, ok] of Object.entries(expected)) {
@@ -126,6 +123,17 @@ try {
     );
     if (!result || !ok(result.value))
       found.push(`zone setting ${name} is ${JSON.stringify(result?.value)}`);
+  }
+  // Changed with the switch, not before (docs/CUTOVER.md step 2): a reminder, not a failure.
+  const ttl = await cloudflare(
+    `/zones/${zone}/settings/browser_cache_ttl`,
+    z.object({ value: z.unknown() }),
+  );
+  if (ttl?.value !== 0) {
+    console.log(
+      `
+NOTE Browser Cache TTL is ${JSON.stringify(ttl?.value)}: set it to "Respect Existing Headers" with the switch (CUTOVER step 2).`,
+    );
   }
   record(
     'Cloudflare rules',

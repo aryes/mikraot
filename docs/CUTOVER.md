@@ -69,11 +69,8 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
       routes win, so while they exist comments would go to the old Worker.
 - [x] Redirects in `public/_redirects` (`/sitemap.xml`, `/page/*`, `/category/uncategorized/`, BuddyPress) as 302 during the
       fallback weeks: browsers keep 301s, which would survive a rollback. Back to 301 in step 5.
-- [ ] **Approval:** Cloudflare → Caching → Configuration → Browser Cache TTL: "Respect Existing
-      Headers" (it is 4 hours, checked 2026-10-21). Otherwise browsers keep the new site's pages
-      (sent with max-age=0) for up to 4 hours, after a fix or a rollback too. `npm run cutover:check`
-      checks it with the other zone settings (Rocket Loader off, HTTPS only, TLS 1.2 at least, email
-      obfuscation on; all as needed on 2026-10-21).
+- [ ] Zone settings: `npm run cutover:check` checks Rocket Loader off, HTTPS only, TLS 1.2 at least
+      and email obfuscation on (all as needed on 2026-10-21), and reminds about the Browser Cache TTL (4 hours; changed with the switch, step 2).
 - [ ] A fresh production D1 export the same day (`npm run cutover:check` makes it).
 - [ ] **Approval (go/no-go)**, with a fixed date and time (a quiet hour) and the observation
       window below.
@@ -94,6 +91,12 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
    let its checks run again (about 4 minutes) first, so the switch deploys a tested whole. Right after the merge, open
    its revert (`git revert`) as a pull request too, likewise without auto-merge, so a rollback's
    step 3 needs only a merge.
+   **Approval**, as a precaution, with the switch: Cloudflare → Caching → Configuration → Browser
+   Cache TTL → "Respect Existing Headers" (it is 4 hours). Cloudflare's docs don't say whether it
+   applies to the Worker's answers; if it does, browsers would keep the new site's pages (sent with
+   max-age=0) for up to 4 hours, after a fix or a rollback too. Not before the switch: it also
+   changes how browsers cache the WordPress site. Check after: `curl -I https://mikraot.net/`
+   shows `cache-control: public, max-age=0, must-revalidate`, not `max-age=14400`.
    Right after that deploy, point the Brevo newsletter webhook at
    `https://mikraot.net/api/newsletter-webhook/` (`PUT /v3/webhooks/<id>`): it is on the
    workers.dev address, which the switch turns off, so confirmations would get no welcome email.

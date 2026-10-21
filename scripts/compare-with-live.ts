@@ -181,6 +181,18 @@ for (const url of pageUrls) {
   rows.push(`| ${url} | ${reason ? `changed on purpose (${reason}): ${found}` : found} |`);
 }
 
+// A key that matches no page (a typo, a page renamed) would silently exempt nothing.
+const stale = Object.keys(CHANGED_ON_PURPOSE).filter((url) => !pageUrls.includes(url));
+if (stale.length > 0) {
+  console.warn(`CHANGED_ON_PURPOSE lists pages not in the build: ${stale.join(', ')}`);
+  differing += stale.length;
+}
+// Not counted, but read: an unintended change on one of these pages shows only here.
+const onPurpose = rows.filter((row) => row.includes('changed on purpose ('));
+console.log(
+  `\nChanged on purpose (${onPurpose.length}): check that each shows only its reason.\n${onPurpose.join('\n')}\n`,
+);
+
 const report = `# Live vs new: ${pageUrls.length} pages, ${differing} differ\n\n| Page | Result |\n| --- | --- |\n${rows.join('\n')}\n`;
 writeFileSync('.migration/compare-report.md', report);
 console.log(report);
