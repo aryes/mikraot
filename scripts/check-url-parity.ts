@@ -2,7 +2,7 @@
  * URL parity gate for the cutover (docs/CUTOVER.md): every URL the WordPress site publishes, plus
  * the old link forms, must work on the new site: a 200, an expected redirect, or a deliberate 404.
  *
- *   npm run check:urls -- https://mikraot.net [--urls extra-urls.txt]
+ *   npm run check:urls -- https://mikraot.mikraot-app.workers.dev [--urls extra-urls.txt]
  *
  * URLs come from the live WordPress sitemaps (read-only) and, optionally, a file with one URL or
  * path per line (e.g. Search Console's top pages). Exits non-zero if any URL fails.

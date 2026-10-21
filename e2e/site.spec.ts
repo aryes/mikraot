@@ -203,9 +203,9 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
   const index = await request.get('/sitemap-index.xml');
   expect(index.status()).toBe(200);
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
-  // 36 pages and posts (the privacy policy since 2026-10-13, the launch post since the switch),
-  // the two month archives and the category archive, "What's new" (the author archive is noindex).
-  expect(sitemap.match(/<loc>/g)).toHaveLength(40);
+  // 35 pages and posts (the privacy policy since 2026-10-13), the month and category archives,
+  // "What's new" (the author archive is noindex).
+  expect(sitemap.match(/<loc>/g)).toHaveLength(38);
   expect(sitemap).not.toContain('/author/');
 
   const old = await request.get('/sitemap.xml', { maxRedirects: 0 });
