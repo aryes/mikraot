@@ -69,7 +69,12 @@ test('RSS feeds at the WordPress URLs', async ({ request }) => {
   // Comments link to their anchor on the page (WordPress's #comment-<id>).
   const feed = await comments.text();
   expect(feed).toMatch(/<link>[^<]*\/#comment-\d+<\/link>/);
-  // A commenter's markup is text: escaped for HTML, then for XML (readers show descriptions as HTML).
+});
+
+// Local only: it reads a fixture comment (the deployed site has real ones).
+test("the comments feed shows a commenter's markup as text", LOCAL_ONLY, async ({ request }) => {
+  const feed = await (await request.get('/comments/feed/')).text();
+  // Escaped for HTML, then for XML (readers show descriptions as HTML).
   expect(feed).toContain('&amp;lt;b&amp;gt;ולא מודגשת');
   expect(feed).not.toContain('&lt;b&gt;ולא');
 });
