@@ -6,6 +6,11 @@
   "main": "./src/worker.ts",
   "compatibility_date": "2026-09-30",
   "compatibility_flags": ["nodejs_compat"],
+  // The switch (docs/CUTOVER.md, step 2): this Worker serves mikraot.net. workers.dev goes away;
+  // branch previews stay.
+  "routes": [{ "pattern": "mikraot.net/*", "zone_name": "mikraot.net" }],
+  "workers_dev": false,
+  "preview_urls": true,
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
