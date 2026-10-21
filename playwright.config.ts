@@ -45,6 +45,19 @@ export default defineConfig({
   ],
   use: {
     baseURL: deployed ?? `http://127.0.0.1:${port}`, // where wrangler dev listens (not ::1)
+    // On the live site the tests must not count as visitors: Umami's own opt-out, a localStorage
+    // flag its script checks before sending anything.
+    ...(deployed && {
+      storageState: {
+        cookies: [],
+        origins: [
+          {
+            origin: new URL(deployed).origin,
+            localStorage: [{ name: 'umami.disabled', value: '1' }],
+          },
+        ],
+      },
+    }),
     trace: 'retain-on-failure',
     // The same text rendering on every machine (Argos's advice for stable screenshots).
     launchOptions: { args: ['--disable-lcd-text', '--font-render-hinting=none'] },
