@@ -30,7 +30,7 @@ const NOT_CONTENT = /^\/(\d{4}\/\d{2}|category\/[^/]+|מה-חדש)\/$/;
  * content is edited.
  */
 const CHANGED_ON_PURPOSE: Readonly<Record<string, string>> = {
-  '/': 'link to מה חדש, the email-updates box, the pointed "דִּבְרֵ֥י הַיָּמִ֖ים" heading, the launch post',
+  '/': 'link to מה חדש, the email-updates box, the pointed "דִּבְרֵ֥י הַיָּמִ֖ים" heading, the launch post as the only latest post',
   '/טעמים-נדירים/': 'corrected telisha on קִ֠רְב֞וּ',
   '/טעמים/1-word-2-tropes/': 'corrected telisha on קִ֠רְב֞וּ',
   '/טעמים/נוסח-אשכנז/': 'וְאַזְלָ֜א pointed',

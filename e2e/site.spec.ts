@@ -242,12 +242,21 @@ test('heading anchors from WordPress survive (Hebrew ones included)', async ({ p
   await expect(page.locator('[id="הגיה"]')).toHaveCount(1);
 });
 
-test('the home page lists the latest posts, as on WordPress', async ({ page }) => {
+test('the home page shows the newest post, as the first one in the news feed', async ({
+  page,
+  request,
+}) => {
+  const feed = await (await request.get('/feed/')).text();
+  const newest =
+    /<item>\s*<title>[^<]*<\/title>\s*<link>https:\/\/mikraot\.net([^<]+)<\/link>/.exec(feed)?.[1];
+  expect(newest, 'the newest post in /feed/').toBeTruthy();
   await page.goto('/');
-  // Found by address, not position: newer posts (such as the launch post) come first.
-  const post = page.locator('.latest-posts li').filter({ has: page.locator('a[href="/בראשית/"]') });
-  await expect(post.locator('time')).toHaveText('11/08/2021');
-  await expect(post.locator('.latest-posts-excerpt')).toContainText('בשמחה ובהתרגשות');
+  // Only the newest (Arye, 2026-10-21); "לכל העדכונים" under it leads to the rest.
+  const posts = page.locator('.latest-posts li');
+  await expect(posts).toHaveCount(1);
+  await expect(posts.locator('a').first()).toHaveAttribute('href', decodeURI(newest ?? ''));
+  await expect(posts.locator('time')).toBeVisible();
+  await expect(posts.locator('.latest-posts-excerpt')).not.toBeEmpty();
 });
 
 test('fonts are self-hosted and load (no third-party font requests)', async ({ page }) => {
