@@ -932,3 +932,31 @@ test('the footer states the content licence', async ({ page }) => {
     'https://creativecommons.org/licenses/by-nc-sa/4.0/',
   );
 });
+
+test('a footnote is a raised number linked both ways, shown beside it on hover', async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto('/שווא-נע/');
+  const ref = page.locator('main sup.footnote-ref a');
+  await expect(ref).toHaveText('1');
+  await expect(ref).toHaveAttribute('href', '#note-1');
+  const note = page.locator('#note-1');
+  await expect(note.locator('a.footnote-back')).toHaveAttribute('href', '#ref-1');
+  // Touch screens have no hover: a tap jumps to the note.
+  if (!isMobile) {
+    await ref.hover();
+    const popup = page.getByRole('tooltip');
+    await expect(popup).toContainText('יוצאים מן הכלל');
+    await expect(ref).toHaveAttribute('aria-describedby', 'footnote-popup');
+    // The copy drops the note's way back (the reader is already at the text).
+    await expect(popup.locator('.footnote-back')).toHaveCount(0);
+    await page.keyboard.press('Escape');
+    await expect(popup).toBeHidden();
+  }
+  await ref.click();
+  await expect(page).toHaveURL(/#note-1$/);
+  await note.locator('a.footnote-back').click();
+  await expect(page).toHaveURL(/#ref-1$/);
+  await expect(ref).toBeInViewport();
+});
