@@ -5,7 +5,9 @@
  * beside the title. The front page keeps the live site's wide photo, now without the shaded box
  * over it; its title and tagline open the content card instead (ContentLayout.astro). The photo is
  * zoomed (1.2x, 1.6x on phones) toward its upper right, so the yad fills the strip and its handle
- * leaves just below the top corner instead of leaving an empty area (Arye, 2026-10-12).
+ * leaves just below the top corner instead of leaving an empty area (Arye, 2026-10-12). On phones
+ * (Arye, 2026-10-21) the card spans the screen and leaves out the photo crop and some padding, so
+ * the first screen shows the content rather than the title.
  */
 import type { Crumb } from '../../lib/site';
 
@@ -25,11 +27,11 @@ import bannerYad from '../../assets/banner-yad.jpg';
 ---
 
 {crumbs ? (
-  <div class="mx-auto max-w-4xl px-4 pt-6 sm:px-6 lg:px-8 print:max-w-none print:p-0">
-    <div class="rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900 px-4 py-3 shadow-xs sm:px-5 print:border-0 print:p-0 print:shadow-none">
+  <div class="mx-auto max-w-4xl sm:px-6 sm:pt-6 lg:px-8 print:max-w-none print:p-0">
+    <div class="border-b border-slate-200/80 sm:rounded-2xl sm:border dark:border-slate-700/80 bg-white dark:bg-slate-900 px-4 py-3 shadow-xs sm:px-5 print:border-0 print:p-0 print:shadow-none">
       <nav
         aria-label="פירורי לחם"
-        class="mb-2 text-sm text-brand-strong dark:text-brand print:hidden"
+        class="mb-1 text-sm sm:mb-2 text-brand-strong dark:text-brand print:hidden"
       >
         <ol class="flex flex-wrap items-center gap-2">
           <li>
@@ -53,7 +55,7 @@ import bannerYad from '../../assets/banner-yad.jpg';
           </li>
         </ol>
       </nav>
-      <div class="flex items-center gap-4 sm:gap-5">
+      <div class="flex items-center sm:gap-5">
         <Picture
           src={bannerYad}
           formats={['avif', 'webp']}
@@ -61,9 +63,9 @@ import bannerYad from '../../assets/banner-yad.jpg';
           sizes="120px"
           alt=""
           loading="eager"
-          class="banner-photo h-16 w-[120px] flex-none rounded-lg object-cover print:hidden"
+          class="banner-photo hidden h-16 w-[120px] flex-none rounded-lg object-cover sm:block print:hidden"
         />
-        <h1 class="text-[2rem] leading-tight font-bold text-brand-deep dark:text-brand-light sm:text-4xl print:text-black">
+        <h1 class="text-[1.75rem] leading-tight font-bold text-brand-deep dark:text-brand-light sm:text-4xl print:text-black">
           {title}
         </h1>
       </div>
