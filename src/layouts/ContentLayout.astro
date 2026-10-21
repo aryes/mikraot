@@ -36,7 +36,10 @@ const structured = structuredData(
     url: absolute(Astro.url.pathname),
     name: documentTitle,
     description,
-    crumbs: (crumbs ?? []).map((crumb) => ({ title: crumb.title, url: absolute(crumb.url) })),
+    crumbs: (crumbs ?? []).map((crumb) => ({
+      title: crumb.title,
+      url: crumb.url && absolute(crumb.url),
+    })),
     heading: title,
     isFrontPage: crumbs === undefined,
     post: post && { datePublished: post.date, section: post.category },

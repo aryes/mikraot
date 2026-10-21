@@ -2,7 +2,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import menu from '../data/menu.json';
 import siteSettings from '../data/site.json';
 import type { MenuItem } from '../types';
-import { buildMenuTree } from './menu';
+import { buildMenuTree, menuTrail } from './menu';
 import { collectUpdates, type Update } from './updates';
 import { excerptOf, pagePath, urlForPath } from './urls';
 
@@ -63,11 +63,23 @@ export async function getPosts(): Promise<SitePage[]> {
 
 export interface Crumb {
   title: string;
-  url: string;
+  /** None for a menu section that only opens a submenu (shown as plain text). */
+  url?: string | undefined;
 }
 
-/** The pages a page nests under, outermost first (for its breadcrumb trail). */
-export function parentCrumbs({ path }: SitePage, pages: SitePage[]): Crumb[] {
+/**
+ * A page's breadcrumb trail, outermost first: its place in the menu (sections included, as the
+ * visitor finds it there; Arye, 2026-10-21), or for pages not in the menu the pages it nests under.
+ */
+export function pageCrumbs(page: SitePage, pages: SitePage[]): Crumb[] {
+  const trail = menuTrail(menu, page.url);
+  return trail
+    ? trail.map((item) => ({ title: item.title, url: item.url ?? undefined }))
+    : parentCrumbs(page, pages);
+}
+
+/** The pages a page nests under, outermost first. */
+function parentCrumbs({ path }: SitePage, pages: SitePage[]): Crumb[] {
   const byPath = new Map(pages.map((p) => [p.path, p]));
   const segments = path.split('/');
   return segments.slice(0, -1).flatMap((_, i) => {

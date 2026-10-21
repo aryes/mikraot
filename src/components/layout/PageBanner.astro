@@ -42,9 +42,16 @@ import bannerYad from '../../assets/banner-yad.jpg';
           {crumbs.map((crumb) => (
             <li class="flex items-center gap-2">
               <span aria-hidden="true">/</span>
-              <a href={crumb.url} class="inline-block py-1 underline-offset-2 hover:underline">
-                {crumb.title}
-              </a>
+              {crumb.url ? (
+                <a href={crumb.url} class="inline-block py-1 underline-offset-2 hover:underline">
+                  {crumb.title}
+                </a>
+              ) : (
+                // Grey, unlike the links: a menu section with no page of its own.
+                <span class="inline-block py-1 text-slate-600 dark:text-slate-400">
+                  {crumb.title}
+                </span>
+              )}
             </li>
           ))}
           <li class="flex items-center gap-2">

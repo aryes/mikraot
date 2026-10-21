@@ -13,7 +13,7 @@ import {
   commentKey,
   commentKeys,
   getSitePages,
-  parentCrumbs,
+  pageCrumbs,
   site,
   type SitePage,
 } from '../lib/site';
@@ -39,10 +39,10 @@ const lastUpdated =
   entry.data.showLastUpdated && entry.filePath ? lastChanged(entry.filePath) : undefined;
 const isFrontPage = path === '';
 const isPost = kind === 'post';
-// A post's trail runs through its category, as on WordPress; a page's through its parents.
+// A post's trail runs through its category, as on WordPress; a page's through the menu.
 const crumbs = isPost
   ? categories.map((slug) => ({ title: categoryName(slug), url: categoryUrl(slug) })).slice(0, 1)
-  : parentCrumbs(page, pages);
+  : pageCrumbs(page, pages);
 ---
 
 <ContentLayout
