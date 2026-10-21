@@ -5,10 +5,6 @@ import YadMark from './YadMark.astro';
 import { archiveMonths, categoryUrl } from '../lib/archive';
 import { getPosts, getSitePages, menuTree, pointedTitle, site, WHATS_NEW_URL } from '../lib/site';
 
-// Top-level menu items that have a page (groups such as הגיה only open a dropdown in the header).
-const quickLinks = menuTree.filter(
-  (item): item is (typeof menuTree)[number] & { url: string } => item.url !== null,
-);
 // The post archives (by month) and categories, as in the live site's sidebar.
 const posts = await getPosts();
 const months = archiveMonths(posts.map(({ entry }) => entry.data.date));
@@ -25,6 +21,12 @@ const legalLinks = [
   { title: 'מדיניות הפרטיות', url: pageUrl.get('privacy-policy') },
   { title: 'אודות', url: pageUrl.get('about') },
 ].filter((link): link is { title: string; url: string } => link.url !== undefined);
+// Top-level menu items that have a page (groups such as הגיה only open a dropdown in the header),
+// except those already in the bottom line (אודות: once is enough; Arye, 2026-10-21).
+const quickLinks = menuTree.filter(
+  (item): item is (typeof menuTree)[number] & { url: string } =>
+    item.url !== null && !legalLinks.some((link) => link.url === item.url),
+);
 const footerHeading = 'mb-3 border-b border-slate-700 pb-2 text-base font-bold text-white';
 // Taller tap areas on phones (about 24 px; the design review, 2026-10-12), same look.
 const footerLink = 'inline-block py-1 transition-colors hover:text-brand';
