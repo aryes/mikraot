@@ -8,10 +8,19 @@ const postLink = (page: Page) => page.locator(`main a[href="${POST}"]`).first();
 test('pages show the photo banner with title and breadcrumb trail', async ({ page }) => {
   await page.goto('/טעמים/נוסח-אשכנז/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('טעמים בנוסח אשכנז');
+  // The trail follows the menu; its sections, which have no page, are plain text.
   const trail = page.getByRole('navigation', { name: 'פירורי לחם' });
-  await expect(trail.getByRole('link', { name: 'תפקידי הטעמים' })).toHaveAttribute(
+  await expect(trail.getByRole('listitem')).toHaveText([
+    'ראשי',
+    /^\/\s*טעמים$/,
+    /^\/\s*שיר הטעמים$/,
+    /^\/\s*טעמים בנוסח אשכנז$/,
+  ]);
+  await expect(trail.getByRole('link')).toHaveText(['ראשי']);
+  await page.goto('/ה-הידיעה-וה-השאלה/');
+  await expect(trail.getByRole('link', { name: 'אותיות השימוש' })).toHaveAttribute(
     'href',
-    '/טעמים/',
+    '/אותיות-השימוש/',
   );
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('מקראות');

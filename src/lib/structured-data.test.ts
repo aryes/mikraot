@@ -25,12 +25,12 @@ describe('structuredData', () => {
     expect(graph['@graph']).toMatchObject(types('WebSite', 'Person', 'WebPage'));
   });
 
-  it('gives a page its breadcrumb trail from the home page to itself', () => {
+  it('gives a page its breadcrumb trail from the home page to itself, menu sections left out', () => {
     const graph = structuredData(
       {
         url: 'https://mikraot.net/טעמים/נוסח-אשכנז/',
         name: 'טעמים בנוסח אשכנז - מקראות',
-        crumbs: [{ title: 'תפקידי הטעמים', url: 'https://mikraot.net/טעמים/' }],
+        crumbs: [{ title: 'טעמים' }, { title: 'תפקידי הטעמים', url: 'https://mikraot.net/טעמים/' }],
         heading: 'טעמים בנוסח אשכנז',
         isFrontPage: false,
       },

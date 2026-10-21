@@ -19,8 +19,11 @@ export interface StructuredPage {
   /** Document title (as in <title>). */
   name: string;
   description?: string | undefined;
-  /** The trail above the page (absolute URLs), not including the home page or the page itself. */
-  crumbs: { title: string; url: string }[];
+  /**
+   * The trail above the page (absolute URLs), not including the home page or the page itself. A
+   * step without an address (a menu section with no page) is left out: search engines need one.
+   */
+  crumbs: { title: string; url?: string | undefined }[];
   /** The page heading; the last breadcrumb. */
   heading: string;
   isFrontPage: boolean;
@@ -74,7 +77,7 @@ export function structuredData(page: StructuredPage, site: StructuredSite): Grap
   if (!page.isFrontPage) {
     const trail = [
       { title: 'ראשי', url: home },
-      ...page.crumbs,
+      ...page.crumbs.flatMap(({ title, url }) => (url ? [{ title, url }] : [])),
       { title: page.heading, url: page.url },
     ];
     const breadcrumbs: BreadcrumbList = {

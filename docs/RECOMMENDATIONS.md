@@ -48,10 +48,10 @@ login postponed (still open in the roadmap).
 
 Open from it, each waiting for Arye:
 
-- **Needs: decision, every page looks different.** Phone menu: 16/15 px
-  text, 44 px rows, and anchors not hidden under the sticky header (`scroll-padding-top`).
-  Audio buttons: a "loading" state at once on tap. Subsetting the fallback and logo fonts (never
-  Taamey David CLM). Wider phone text (edge-to-edge cards) and breadcrumbs that match the menu.
+- **Done (2026-10-21).** Phone menu: 16/15 px text, 44 px rows, and anchors not hidden under the
+  sticky header (`scroll-padding-top`). Audio buttons: a "loading" state at once on tap.
+  Subsetting the fallback and logo fonts (never Taamey David CLM). Wider phone text (edge-to-edge
+  cards, a slimmer title card) and breadcrumbs that follow the menu.
 - **Decided (Arye, 2026-10-20): after the switch.** "Next / previous lesson" links and "you are here"
   in the menu, with each lesson's next chosen by hand, since not every lesson leads to the one after
   it in the menu.
