@@ -52,8 +52,9 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
   ) {
     return json({ error: 'Human check failed' }, 403);
   }
-  // Each sign-up sends an email (from Brevo's daily allowance): a few a minute per visitor, and
-  // one a minute per address, so no one can flood someone else's inbox from many connections.
+  // Each sign-up may send an email (from Brevo's daily allowance; none to an address already on
+  // the list): a few a minute per visitor, and one a minute per address, so no one can flood
+  // someone else's inbox from many connections.
   const perVisitor = await env.NEWSLETTER_RATE_LIMIT.limit({ key: rateLimitKey(clientAddress) });
   const perAddress = await env.NEWSLETTER_EMAIL_RATE_LIMIT.limit({ key: signup.email });
   if (!perVisitor.success || !perAddress.success) {

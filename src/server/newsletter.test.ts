@@ -62,7 +62,7 @@ describe('requestConfirmation', () => {
       'https://mikraot.net',
       fetchFn,
     );
-    const [url, init] = fetchFn.mock.calls[0] ?? [];
+    const [url, init] = fetchFn.mock.calls[1] ?? [];
     expect(url).toBe('https://api.brevo.com/v3/contacts/doubleOptinConfirmation');
     expect(new Headers(init?.headers).get('api-key')).toBe('key');
     expect(sentBody(init)).toEqual({
@@ -77,7 +77,39 @@ describe('requestConfirmation', () => {
   it('sends no name attribute without a name', async () => {
     const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}', { status: 201 }));
     await requestConfirmation('key', { email: 'a@b.co', name: '' }, 'https://x.example', fetchFn);
-    expect(sentBody(fetchFn.mock.calls[0]?.[1])).not.toHaveProperty('attributes');
+    expect(sentBody(fetchFn.mock.calls[1]?.[1])).not.toHaveProperty('attributes');
+  });
+});
+
+/** Brevo's answer for a contact it knows. */
+const contact = (body: object) => new Response(JSON.stringify(body), { status: 200 });
+
+describe('requestConfirmation for an address already on the list', () => {
+  it('sends no second confirmation', async () => {
+    const fetchFn = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(contact({ listIds: [NEWSLETTER_LIST_ID] }));
+    await requestConfirmation('key', { email: 'a+b@c.co', name: '' }, 'https://x.example', fetchFn);
+    expect(fetchFn).toHaveBeenCalledOnce();
+    expect(fetchFn.mock.calls[0]?.[0]).toBe(
+      'https://api.brevo.com/v3/contacts/a%2Bb%40c.co?identifierType=email_id',
+    );
+  });
+
+  it.each([
+    ['on another list', contact({ listIds: [1] })],
+    ['blocked from emails', contact({ listIds: [NEWSLETTER_LIST_ID], emailBlacklisted: true })],
+    ['unknown to Brevo', new Response('{}', { status: 404 })],
+    ['when Brevo is down', new Response('down', { status: 503 })],
+  ])('still sends a confirmation to an address %s', async (_, reply) => {
+    const fetchFn = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(reply)
+      .mockResolvedValue(new Response('{}', { status: 201 }));
+    await requestConfirmation('key', { email: 'a@b.co', name: '' }, 'https://x.example', fetchFn);
+    expect(fetchFn.mock.calls[1]?.[0]).toBe(
+      'https://api.brevo.com/v3/contacts/doubleOptinConfirmation',
+    );
   });
 });
 
