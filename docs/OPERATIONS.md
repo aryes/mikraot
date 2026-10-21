@@ -210,8 +210,16 @@ Zone protections for mikraot.net (set at the switch, 2026-10-21, with Arye's app
   to it. The forms keep Turnstile and their own rate limits; Browser Integrity Check stays on.
 - **Browser Cache TTL: "Respect Existing Headers"**, so browsers follow the site's own
   `cache-control` (pages: `max-age=0`) instead of keeping pages 4 hours.
-- **Cloudflare Web Analytics** must stay off for mikraot.net (Umami counts visits): its injected
-  script breaks the CSP, logs two errors on every page view and reports them to Sentry.
+- **No Cloudflare script injected into pages.** The site's CSP is a `<meta>` tag with hashed
+  inline scripts; Cloudflare adds its nonce only to a CSP sent as a header, so the inline loader
+  it injects is blocked (the files it loads are on our own domain and would pass), logs errors on
+  every page view and is reported to Sentry (its source is our page). Hence off (2026-10-21,
+  Arye): Web Analytics (Umami counts visits), JavaScript detections (`enable_js`) and Precursor
+  (Security → Settings → Precursor; the newer bot detection that superseded JavaScript detections,
+  `/cdn-cgi/challenge-platform/scripts/precursor/main.js`). Allowing them would need
+  `'unsafe-inline'`; on the free plan their bot score feeds nothing we use (Bot Fight Mode is off;
+  the forms have Turnstile). The CSP tests in the live-site run after each deploy catch a new
+  script injected into every page.
 
 Assumptions to watch:
 
