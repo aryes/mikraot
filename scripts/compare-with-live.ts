@@ -4,7 +4,9 @@
  * colour highlights). Live pages are fetched read-only and cached in .migration/live/.
  *
  * Run after a build: npx tsx scripts/compare-with-live.ts [--refresh]
- * Writes .migration/compare-report.md and exits non-zero if any page differs.
+ * Writes .migration/compare-report.md and exits non-zero if any page differs, other than the pages
+ * changed on purpose since the import (CHANGED_ON_PURPOSE: reported with their reason and their
+ * differences, which the switch day reads; not counted).
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { parseHTML } from 'linkedom';
@@ -22,6 +24,30 @@ const refresh = process.argv.includes('--refresh');
  * site; e2e/archives.spec.ts covers them.
  */
 const NOT_CONTENT = /^\/(\d{4}\/\d{2}|category\/[^/]+|מה-חדש)\/$/;
+/**
+ * Pages edited here on purpose since the WordPress import, with why (decided with Arye 2026-10-15:
+ * listed, so that on the switch day a difference anywhere else stands out). Add a page when its
+ * content is edited.
+ */
+const CHANGED_ON_PURPOSE: Readonly<Record<string, string>> = {
+  '/': 'link to מה חדש, the email-updates box, the pointed "דִּבְרֵ֥י הַיָּמִ֖ים" heading',
+  '/טעמים-נדירים/': 'corrected telisha on קִ֠רְב֞וּ',
+  '/טעמים/1-word-2-tropes/': 'corrected telisha on קִ֠רְב֞וּ',
+  '/טעמים/נוסח-אשכנז/': 'וְאַזְלָ֜א pointed',
+  '/שיטת-גלגלי-עזר/': 'וְאַזְלָ֜א pointed',
+  '/קריאות-מוקלטות-בנוסח-אשכנז/': 'the recordings picker',
+  '/קריאות-מוקלטות-בנוסח-בבלי-עירקי/': 'the recordings picker',
+  '/דגש-קל/': 'grouped table headings, one more link, יִשַׁי and וּמְצֶ֣אןָ (2026-10-20)',
+  '/מבטא/': 'grouped table headings',
+  '/תנועות-עיצורים-וניקוד/': 'grouped table headings, a stray verse number removed',
+  '/שווא-נע/': 'only the קרי of Deuteronomy 33:2, a footnote on rule ג',
+  '/הגיית-שם-יהוה/': 'a footnote on the Aleppo Codex',
+  '/silent-letters/': '"הי׳ והה׳"',
+  '/about/': 'the content licence paragraph',
+  '/סמיכות/': 'one more link',
+  '/קמץ-קטן/': 'one more link',
+  '/משה-מוציא-וכלב-מכניס/': 'one more link',
+};
 /** Pages published here but never on WordPress (a draft there): no live page to compare. */
 const NEW_HERE = new Set(['/privacy-policy/']);
 const pageUrls = [
@@ -147,9 +173,12 @@ for (const url of pageUrls) {
   const text = textDifference(String(a['text']), String(b['text']));
   if (text) diffs.push(text);
   // Typography and whitespace differences are deliberate (Hebrew geresh and gershayim): reported,
-  // not counted.
-  if (diffs.some((diff) => !diff.startsWith('text: '))) differing++;
-  rows.push(`| ${url} | ${diffs.length === 0 ? 'same' : diffs.join('; ')} |`);
+  // not counted; so are pages changed on purpose, with their reason.
+  const reason = CHANGED_ON_PURPOSE[url];
+  const real = diffs.some((diff) => !diff.startsWith('text: '));
+  if (real && !reason) differing++;
+  const found = diffs.length === 0 ? 'same' : diffs.join('; ');
+  rows.push(`| ${url} | ${reason ? `changed on purpose (${reason}): ${found}` : found} |`);
 }
 
 const report = `# Live vs new: ${pageUrls.length} pages, ${differing} differ\n\n| Page | Result |\n| --- | --- |\n${rows.join('\n')}\n`;
