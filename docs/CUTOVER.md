@@ -80,11 +80,11 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
 1. One commit to `wrangler.jsonc`: route `mikraot.net/*` → `mikraot`, `workers_dev: false` and
    `preview_urls: true` (keeps branch previews); in the same commit, `DEPLOYED_URL` in
    `.github/workflows/deployed.yml` becomes `https://mikraot.net` (workers.dev goes away).
-   The same commit publishes the launch post (`src/content/pages/בדק-הבית.mdoc`, text agreed with
-   Arye 2026-10-21): `draft: false`, `date` the switch day, and its address added to `NEW_HERE` in
-   `scripts/compare-with-live.ts` (it was never on WordPress), and "the launch post" added to the front
-   page's reason in `CHANGED_ON_PURPOSE` there (its latest posts list it). It also appears in the
-   month and category archives and the feeds.
+   A launch post only if Arye has approved its text (title chosen: "לְחַזֵּ֖ק בֶּ֥דֶק הַבָּֽיִת׃"); nothing
+   of it goes into the repository before his approval (Arye, 2026-10-21). If approved, the post
+   goes in this commit (dated the switch day), with its address in `NEW_HERE` in
+   `scripts/compare-with-live.ts` and "the launch post" in the front page's `CHANGED_ON_PURPOSE`
+   reason there.
    It goes through a pull request like any change: `main` accepts only commits whose checks
    passed, with no bypass (ruleset "Tests must pass"), so a direct push would be refused. A day or
    two ahead, open it with green checks and **without auto-merge** (which would merge, and so
