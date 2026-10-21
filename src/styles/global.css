@@ -566,7 +566,6 @@ html {
    raised and small, without brackets; the divider short and light; the note smaller, its number
    linking back to the text. A note reached from the text is marked for a moment. */
 .wp-content-rendered .footnote-ref {
-  margin-inline-start: 0.1em;
   font-size: 0.7em;
   line-height: 0;
 }
