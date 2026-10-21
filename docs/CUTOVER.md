@@ -158,7 +158,6 @@ header or CSP problem breaking pages.
 3. Merge the revert pull request opened right after the switch (`gh pr merge --rebase`: the
    whole switch commit undone, route out of `wrangler.jsonc` and `workers_dev` back on). It doesn't remove routes itself; it keeps a later deploy from re-adding
    the route. Confirm the route is still gone after that deploy.
-   The revert also takes out the launch post; a later switch puts it back with that day's date.
 
 Comments posted on the new site in between stay in D1 and are not shown by WordPress; they
 reappear when switching forward again. Point the Brevo newsletter webhook back at the workers.dev

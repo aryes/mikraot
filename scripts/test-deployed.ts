@@ -1,6 +1,6 @@
 /**
  * Runs the read-only end-to-end tests against a deployed site, e.g. after a deploy:
- *   npm run test:deployed -- https://mikraot.net [Playwright options]
+ *   npm run test:deployed -- https://mikraot.mikraot-app.workers.dev [Playwright options]
  * Tests that write data are skipped (e2e/tags.ts). The accessibility tests take their page list
  * from the local build's sitemap, so build the same commit first (`npm run build:site`).
  */
