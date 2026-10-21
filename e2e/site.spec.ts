@@ -244,8 +244,8 @@ test('heading anchors from WordPress survive (Hebrew ones included)', async ({ p
 
 test('the home page lists the latest posts, as on WordPress', async ({ page }) => {
   await page.goto('/');
-  const post = page.locator('.latest-posts li').first();
-  await expect(post.locator('a')).toHaveAttribute('href', '/בראשית/');
+  // Found by address, not position: newer posts (such as the launch post) come first.
+  const post = page.locator('.latest-posts li').filter({ has: page.locator('a[href="/בראשית/"]') });
   await expect(post.locator('time')).toHaveText('11/08/2021');
   await expect(post.locator('.latest-posts-excerpt')).toContainText('בשמחה ובהתרגשות');
 });
