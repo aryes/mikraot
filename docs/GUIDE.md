@@ -71,8 +71,7 @@ heading look smaller without changing its level, set its **גודל** to **קט�
 ## Publish
 
 Tell Claude "publish". Claude runs the checks (content, tests, accessibility), saves the change to
-git with a description, and publishes. The site updates within a few minutes (until the cutover:
-the test site, https://mikraot.mikraot-app.workers.dev).
+git with a description, and publishes. The site, https://mikraot.net, updates within a few minutes.
 
 ## Comments
 
@@ -110,8 +109,7 @@ command. When in doubt, do nothing: the site keeps running on its own, and backu
   outside check found something off, such as a missing backup or traffic near the free limit. It
   needs a developer only if it repeats.
 
-**The site is broken** (this applies once mikraot.net serves the new site; until the switch it
-is still WordPress)
+**The site is broken**
 
 1. **Stop automatic publishing first**, or the next update would undo your fix: Cloudflare
    dashboard → Workers & Pages → mikraot → Settings → Builds → Disconnect. Updates (Claude's, and

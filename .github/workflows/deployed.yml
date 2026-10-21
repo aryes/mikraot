@@ -13,14 +13,14 @@ on:
       url:
         description: Address of the deployed site
         required: true
-        default: https://mikraot.mikraot-app.workers.dev
+        default: https://mikraot.net
 
 permissions:
   contents: read
 
 env:
   # The production address; becomes https://mikraot.net at the cutover (docs/CUTOVER.md, step 2).
-  DEPLOYED_URL: ${{ inputs.url || 'https://mikraot.mikraot-app.workers.dev' }}
+  DEPLOYED_URL: ${{ inputs.url || 'https://mikraot.net' }}
 
 jobs:
   test:

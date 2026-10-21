@@ -30,7 +30,7 @@ const NOT_CONTENT = /^\/(\d{4}\/\d{2}|category\/[^/]+|מה-חדש)\/$/;
  * content is edited.
  */
 const CHANGED_ON_PURPOSE: Readonly<Record<string, string>> = {
-  '/': 'link to מה חדש, the email-updates box, the pointed "דִּבְרֵ֥י הַיָּמִ֖ים" heading',
+  '/': 'link to מה חדש, the email-updates box, the pointed "דִּבְרֵ֥י הַיָּמִ֖ים" heading, the launch post',
   '/טעמים-נדירים/': 'corrected telisha on קִ֠רְב֞וּ',
   '/טעמים/1-word-2-tropes/': 'corrected telisha on קִ֠רְב֞וּ',
   '/טעמים/נוסח-אשכנז/': 'וְאַזְלָ֜א pointed',
@@ -49,7 +49,7 @@ const CHANGED_ON_PURPOSE: Readonly<Record<string, string>> = {
   '/משה-מוציא-וכלב-מכניס/': 'one more link',
 };
 /** Pages published here but never on WordPress (a draft there): no live page to compare. */
-const NEW_HERE = new Set(['/privacy-policy/']);
+const NEW_HERE = new Set(['/privacy-policy/', '/בדק-הבית/']);
 const pageUrls = [
   ...readFileSync('dist/client/sitemap-0.xml', 'utf8').matchAll(
     /<loc>https:\/\/mikraot\.net([^<]*)<\/loc>/g,
