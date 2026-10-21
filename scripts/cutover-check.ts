@@ -6,7 +6,9 @@
  *   1. URL parity: every old WordPress address works on the new site (check:urls).
  *   2. Content: every page matches the live WordPress site (build, then compare:live --refresh).
  *   3. Cloudflare rules: no redirect, transform, cache, config or origin rules, no Page Rules and no
- *      Bulk Redirects that could change mikraot.net's responses (the API; token in .env).
+ *      Bulk Redirects that could change mikraot.net's responses (the API; token in .env); and the
+ *      zone settings the new site needs (Rocket Loader off, HTTPS only, TLS 1.2 at least, the
+ *      browser cache following the site's own headers, email addresses obfuscated).
  *   4. WordPress: nothing edited or commented since the content export (WP-CLI over SSH).
  *   5. A fresh export of the production database.
  */
@@ -107,10 +109,28 @@ try {
   if (!account) throw new Error('could not read account rulesets');
   const custom = account.filter((ruleset) => ruleset.kind !== 'managed');
   if (custom.length > 0) found.push(custom.map((r) => `account ${r.kind} ${r.phase}`).join(', '));
+  // Zone settings: Rocket Loader would rewrite the scripts the CSP allows by hash; a Browser Cache
+  // TTL other than "Respect Existing Headers" (0) makes browsers keep pages (max-age=0) for hours,
+  // even after a fix or a rollback.
+  const expected: Record<string, (value: unknown) => boolean> = {
+    rocket_loader: (value) => value === 'off',
+    always_use_https: (value) => value === 'on',
+    min_tls_version: (value) => typeof value === 'string' && Number(value) >= 1.2,
+    browser_cache_ttl: (value) => value === 0,
+    email_obfuscation: (value) => value === 'on',
+  };
+  for (const [name, ok] of Object.entries(expected)) {
+    const result = await cloudflare(
+      `/zones/${zone}/settings/${name}`,
+      z.object({ value: z.unknown() }),
+    );
+    if (!result || !ok(result.value))
+      found.push(`zone setting ${name} is ${JSON.stringify(result?.value)}`);
+  }
   record(
     'Cloudflare rules',
     found.length === 0,
-    found.length === 0 ? 'none that change responses' : found.join('; '),
+    found.length === 0 ? 'none that change responses; zone settings as needed' : found.join('; '),
   );
 } catch (error) {
   record('Cloudflare rules', false, String(error));

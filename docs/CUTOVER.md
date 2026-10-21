@@ -69,6 +69,11 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
       routes win, so while they exist comments would go to the old Worker.
 - [x] Redirects in `public/_redirects` (`/sitemap.xml`, `/page/*`, `/category/uncategorized/`, BuddyPress) as 302 during the
       fallback weeks: browsers keep 301s, which would survive a rollback. Back to 301 in step 5.
+- [ ] **Approval:** Cloudflare → Caching → Configuration → Browser Cache TTL: "Respect Existing
+      Headers" (it is 4 hours, checked 2026-10-21). Otherwise browsers keep the new site's pages
+      (sent with max-age=0) for up to 4 hours, after a fix or a rollback too. `npm run cutover:check`
+      checks it with the other zone settings (Rocket Loader off, HTTPS only, TLS 1.2 at least, email
+      obfuscation on; all as needed on 2026-10-21).
 - [ ] A fresh production D1 export the same day (`npm run cutover:check` makes it).
 - [ ] **Approval (go/no-go)**, with a fixed date and time (a quiet hour) and the observation
       window below.
