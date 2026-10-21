@@ -1,5 +1,12 @@
 ---
-/** Links in page content: other sites open in a new tab, as on the WordPress site. */
+/**
+ * Links in page content: other sites open in a new tab, as on the WordPress site.
+ *
+ * Footnotes are links too, so the editor needs no special tag: in the text `[1](#note-1)` becomes
+ * a raised number that the note can link back to (id ref-1); the note starts with
+ * `[1](#ref-1)`, back to the text, and carries `{% #note-1 %}`. src/scripts/footnotes.ts shows
+ * the note on hover. One reference per note: a second would repeat the id ref-N.
+ */
 interface Props {
   href: string;
   title?: string;
@@ -8,8 +15,12 @@ const { href, title } = Astro.props;
 const external = /^https?:\/\//.test(href);
 const target = external ? '_blank' : undefined;
 const rel = external ? 'noopener noreferrer' : undefined;
-// The markup stays on one line: whitespace inside <a> would add visible spaces around the text.
+const note = /^#note-(\d+)$/.exec(href)?.[1];
+const back = /^#ref-(\d+)$/.exec(href)?.[1];
+// The markup stays on one line: whitespace inside <a> or <sup> would add visible spaces.
 ---
 
 <!-- prettier-ignore -->
-<a href={href} title={title} target={target} rel={rel}><slot /></a>
+{note ? <sup class="footnote-ref"><a id={`ref-${note}`} href={href} aria-label={`הערה ${note}`}><slot /></a></sup>
+  : back ? <a class="footnote-back" href={href} aria-label={`הערה ${back}, חזרה לטקסט`}><slot /></a>
+  : <a href={href} title={title} target={target} rel={rel}><slot /></a>}

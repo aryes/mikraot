@@ -562,14 +562,25 @@ html {
   }
 }
 
-/* Footnotes in the content ("[1]" linked to a note with id note-N under a "---" divider; e.g.
-   שווא נע): the marker small and raised, the divider short and light, the note smaller. */
-.wp-content-rendered a[href^='#note-'] {
-  margin-inline-start: 0.15em;
+/* Footnotes in the content (src/components/content/ContentLink.astro; e.g. שווא נע): the number
+   raised and small, without brackets; the divider short and light; the note smaller, its number
+   linking back to the text. A note reached from the text is marked for a moment. */
+.wp-content-rendered .footnote-ref {
+  margin-inline-start: 0.1em;
   font-size: 0.7em;
-  vertical-align: super;
   line-height: 0;
+}
+.wp-content-rendered .footnote-ref a,
+.wp-content-rendered .footnote-back {
   text-decoration: none;
+}
+/* A larger target for a finger, without moving the text. */
+.wp-content-rendered .footnote-ref a {
+  padding-inline: 0.15em;
+}
+.wp-content-rendered .footnote-back {
+  margin-inline-end: 0.25em;
+  font-weight: 700;
 }
 .wp-content-rendered hr:has(+ [id^='note-']) {
   width: 30%;
@@ -580,4 +591,35 @@ html {
 }
 .wp-content-rendered [id^='note-'] {
   font-size: 0.875em;
+  border-radius: 0.25rem;
+  scroll-margin-block-end: 2rem;
+}
+.wp-content-rendered [id^='note-']:target {
+  animation: footnote-target 2s ease-out;
+}
+@keyframes footnote-target {
+  from {
+    background: var(--chip-hover);
+  }
+}
+
+/* A footnote shown beside its number on hover or focus (src/scripts/footnotes.ts). */
+.footnote-popup {
+  position: absolute;
+  z-index: 40;
+  max-width: min(24rem, calc(100vw - 1rem));
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--table-border);
+  border-radius: 0.5rem;
+  background: var(--table-bg);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.15);
+  color: var(--content-text);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.footnote-popup a {
+  color: var(--content-link);
+}
+.footnote-popup a:hover {
+  color: var(--content-link-hover);
 }
