@@ -198,6 +198,21 @@ from mikraot.net and the workers.dev address (Allowed Domains; server events car
 are unaffected), at most 60 an hour (the client key's rate limit), with Sentry's Spike Protection
 on. The DSN is public in every page, so without these anyone could use up the month.
 
+Zone protections for mikraot.net (set at the switch, 2026-10-21, with Arye's approval):
+
+- **Rate-limiting rule** "Flood guard" (Security → WAF → Rate limiting rules; the free plan's one
+  rule): more than 1,000 requests in 10 seconds from one address (per Cloudflare data centre) is
+  blocked for 10 seconds. First set at 300; raised the same day because the live-site tests (four
+  workers from one GitHub machine) tripped it, and mobile carriers and schools put many visitors
+  behind one address. The link check runs 10 requests at a time for the same reason.
+- **Bot Fight Mode off.** It challenged every request from a data centre, which blocked Brevo's
+  newsletter webhook, RSS readers and the live-site tests, and the free plan allows no exceptions
+  to it. The forms keep Turnstile and their own rate limits; Browser Integrity Check stays on.
+- **Browser Cache TTL: "Respect Existing Headers"**, so browsers follow the site's own
+  `cache-control` (pages: `max-age=0`) instead of keeping pages 4 hours.
+- **Cloudflare Web Analytics** must stay off for mikraot.net (Umami counts visits): its injected
+  script breaks the CSP, logs two errors on every page view and reports them to Sentry.
+
 Assumptions to watch:
 
 - **The backup outgrows 10 ms of CPU before 25 MiB.** Reading and serialising the tables takes CPU;

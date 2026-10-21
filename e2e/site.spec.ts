@@ -690,6 +690,8 @@ test('every content page has its own share picture, a 1200×630 JPEG', async ({ 
   expect(generated.filter(({ size }) => size !== 'jpeg 1200x630')).toEqual([]);
 });
 
+// On mikraot.net itself the tests opt out of Umami (playwright.config.ts), so nothing is sent there
+// either.
 test('visitor statistics (Umami) count only on mikraot.net, so tests and previews send nothing', async ({
   page,
 }) => {

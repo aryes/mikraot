@@ -15,6 +15,10 @@ test('every internal link, image and #anchor works', async ({ baseURL }) => {
     path: `${origin}/`,
     recurse: true,
     checkFragments: true,
+    // Ten at a time, not linkinator's 100: mikraot.net's rate-limiting rule blocks one address
+    // sending over 1,000 requests in 10 seconds (docs/OPERATIONS.md), and the deployed-site run
+    // checks it from one GitHub machine.
+    concurrency: 10,
     linksToSkip: async (link) => !link.startsWith(origin),
   });
   const broken = result.links
