@@ -4,14 +4,14 @@
  *
  *   npm run check:urls -- https://mikraot.net [--urls extra-urls.txt]
  *
- * URLs come from the live WordPress sitemaps (read-only) and, optionally, a file with one URL or
- * path per line (e.g. Search Console's top pages). Exits non-zero if any URL fails.
+ * URLs come from scripts/wordpress-urls.txt (every URL in WordPress's sitemaps, saved 2026-10-22,
+ * after the switch: mikraot.net no longer serves them; BuddyPress member and activity pages left
+ * out, since their URLs carry usernames) and, optionally, a file with one URL or path per line
+ * (e.g. Search Console's top pages). Exits non-zero if any URL fails.
  */
 import { readFileSync } from 'node:fs';
 
 const LIVE = 'https://mikraot.net';
-/** WordPress publishes ~350 URLs; far fewer means the sitemaps weren't read properly. */
-const MIN_URLS = 300;
 
 const args = process.argv.slice(2);
 const urlsIndex = args.indexOf('--urls');
@@ -42,6 +42,8 @@ const OLD_FORMS: Record<string, string> = {
   '/2021/08/': 'ok',
   '/author/arye_s/': 'ok',
   '/category/uncategorized/': '/',
+  // A BuddyPress member page (a made-up name: the real ones are not kept here).
+  '/%D7%97%D7%91%D7%A8%D7%99%D7%9D/example/': '/',
 };
 
 /** Where each redirect must lead (public/_redirects); anything else is a failure. */
@@ -56,22 +58,11 @@ const REDIRECTS: [RegExp, string][] = [
 const DEFERRED =
   /^\/(courses|lessons|quizzes|questions|lp-profile|lp-checkout|lp-become-a-teacher|lp-term-conditions|instructors?)(\/|$)/;
 
-/** URLs listed in a sitemap (WordPress wraps them in CDATA). */
-const locs = (xml: string) =>
-  [...xml.matchAll(/<loc>(?:<!\[CDATA\[)?([^<\]]+)/g)].map((m) => m[1] ?? '');
-
-async function fetchText(url: string): Promise<string> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
-  return res.text();
-}
-
-async function sitemapUrls(): Promise<string[]> {
-  const sitemaps = locs(await fetchText(`${LIVE}/sitemap.xml`)).filter((url) =>
-    url.endsWith('.xml'),
-  );
-  return (await Promise.all(sitemaps.map(async (url) => locs(await fetchText(url))))).flat();
-}
+/** WordPress's own URLs (from its sitemaps; see the top of this file). */
+const wordpressUrls = (): string[] =>
+  readFileSync(new URL('wordpress-urls.txt', import.meta.url), 'utf8')
+    .split('\n')
+    .filter(Boolean);
 
 const pathOf = (url: string) => {
   const u = new URL(url, LIVE);
@@ -126,12 +117,7 @@ async function check(path: string): Promise<Result> {
   return { path: shown, outcome: 'FAIL', detail: String(res.status) };
 }
 
-const fromSitemaps = await sitemapUrls();
-if (fromSitemaps.length < MIN_URLS) {
-  throw new Error(
-    `Only ${fromSitemaps.length} URLs in the WordPress sitemaps (expected ${MIN_URLS}+)`,
-  );
-}
+const fromWordPress = wordpressUrls();
 /**
  * The extra URLs: one per line, or Search Console's Pages.csv (a header row, then the URL in the
  * first column, in quotes when it contains a comma).
@@ -149,7 +135,7 @@ function readUrls(file: string): string[] {
 }
 
 const extra = urlsFile ? readUrls(urlsFile) : [];
-const paths = [...new Set([...fromSitemaps, ...Object.keys(OLD_FORMS), ...extra].map(pathOf))];
+const paths = [...new Set([...fromWordPress, ...Object.keys(OLD_FORMS), ...extra].map(pathOf))];
 
 // A few at a time: polite to the server, still quick.
 const results: Result[] = [];
