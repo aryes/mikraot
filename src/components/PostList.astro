@@ -1,27 +1,63 @@
 ---
-/** Posts with date and a short excerpt (the WordPress "latest posts" block and archive pages). */
+/**
+ * Posts with date and a short excerpt (the WordPress "latest posts" block and archive pages). The
+ * "…" that ends a cut excerpt opens the post. With `fullUpTo`, a post no longer than that many
+ * words is shown whole, formatting and links included (the front page; Arye, 2026-10-22).
+ */
+import { render } from 'astro:content';
 import { formatDate } from '../lib/archive';
 import type { SitePage } from '../lib/site';
 import { excerptOf } from '../lib/urls';
 
 interface Props {
   posts: SitePage[];
+  fullUpTo?: number | undefined;
 }
 
 const EXCERPT_WORDS = 20;
-const { posts } = Astro.props;
+const { posts, fullUpTo } = Astro.props;
+const items = await Promise.all(
+  posts.map(async (post) => {
+    const body = post.entry.body ?? '';
+    const words = excerptOf(body, Number.POSITIVE_INFINITY).split(' ').length;
+    const whole = fullUpTo !== undefined && words <= fullUpTo;
+    const excerpt = post.entry.data.excerpt || excerptOf(body, EXCERPT_WORDS);
+    return {
+      entry: post.entry,
+      url: post.url,
+      Content: whole ? (await render(post.entry)).Content : undefined,
+      // excerptOf ends a cut excerpt with " …".
+      text: excerpt.endsWith(' …') ? excerpt.slice(0, -2) : excerpt,
+      cut: excerpt.endsWith(' …'),
+    };
+  }),
+);
 ---
 
 <ul class="latest-posts">
-  {posts.map(({ entry, url }) => (
+  {items.map(({ entry, url, Content, text, cut }) => (
     <li>
       <a href={url} class="latest-posts-title">
         {entry.data.title}
       </a>
       <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
-      <div class="latest-posts-excerpt">
-        {entry.data.excerpt || excerptOf(entry.body ?? '', EXCERPT_WORDS)}
-      </div>
+      {Content ? (
+        <div class="latest-posts-full">
+          <Content />
+        </div>
+      ) : (
+        <div class="latest-posts-excerpt">
+          {text}
+          {cut && (
+            <>
+              {' '}
+              <a href={url} aria-label={`להמשך: ${entry.data.title}`}>
+                …
+              </a>
+            </>
+          )}
+        </div>
+      )}
     </li>
   ))}
 </ul>

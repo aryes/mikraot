@@ -256,7 +256,18 @@ test('the home page shows the newest post, as the first one in the news feed', a
   await expect(posts).toHaveCount(1);
   await expect(posts.locator('a').first()).toHaveAttribute('href', decodeURI(newest ?? ''));
   await expect(posts.locator('time')).toBeVisible();
-  await expect(posts.locator('.latest-posts-excerpt')).not.toBeEmpty();
+  // Whole when short, else an excerpt (Arye, 2026-10-22).
+  await expect(posts.locator('.latest-posts-full, .latest-posts-excerpt')).not.toBeEmpty();
+});
+
+test('a cut excerpt ends in a "…" that opens the post', async ({ page }) => {
+  await page.goto('/category/חדשות-האתר/');
+  const more = page
+    .locator('.latest-posts li')
+    .filter({ has: page.locator('a[href="/בראשית/"]') })
+    .locator('.latest-posts-excerpt a');
+  await expect(more).toHaveText('…');
+  await expect(more).toHaveAttribute('href', '/בראשית/');
 });
 
 test('fonts are self-hosted and load (no third-party font requests)', async ({ page }) => {
