@@ -91,7 +91,7 @@
   - [x] Structured data (JSON-LD: WebSite, WebPage, BreadcrumbList, BlogPosting, Person) and Twitter title/description, as All in One SEO output (`src/lib/structured-data.ts`, typed with schema-dts)
   - [x] Previous/next post links and related posts (same category) under posts (`src/components/PostNav.astro`; nothing shows while the site has a single post)
   - [x] Uptime monitor with email alerts (replaces Jetpack Monitor): UptimeRobot, 2026-10-08
-  - [x] Renovate for dependency updates (replaces WordPress auto-updates): `renovate.json` (weekly pull requests, security fixes at once, 3-day release age, grouped Astro and dev tools, no auto-merge); active once the repo is on GitHub with the Renovate app installed
+  - [x] Renovate for dependency updates (replaces WordPress auto-updates): `renovate.json` (weekly pull requests, security fixes at once, 3-day release age, grouped Astro and dev tools; minor and patch updates merge themselves on Monday mornings once their checks pass); active once the repo is on GitHub with the Renovate app installed
   - [x] Preview URL per change (replaces staging): Workers Builds makes one for every branch (since 2026-10-04)
   - [ ] 2FA and login alerts on GitHub, Cloudflare and GoDaddy (replaces Wordfence 2FA and login alerts). Postponed by Arye (2026-10-19); when taken up, in this order: Google, GitHub, Cloudflare, GoDaddy, Brevo, Sentry
   - [x] Minor: images in the sitemap and `loading="lazy"`: not applicable (checked 2026-10-04: no page content has images; the only image is the banner, which must load first; images are off in the Keystatic editor). Revisit if content images are added
