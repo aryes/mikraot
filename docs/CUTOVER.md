@@ -21,7 +21,8 @@ Current state (2026-10-05): no Worker routes on the zone (the old `mikraot-api` 
 
 On the switch day, `npm run cutover:check` reruns the checks marked "again on the switch day"
 below (URL parity, content, Cloudflare rules, the WordPress freeze) and makes the fresh database
-export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
+export, ending with PASS or FAIL for each (first run 2026-10-08: all passed; on the switch day,
+2026-10-21: all passed).
 
 - [x] Production D1 backed up and migrated; Worker deployed to workers.dev with its Turnstile
       secret (2026-10-04, approved).
@@ -37,7 +38,7 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
       `npm run compare:live` for content. Passed 2026-10-08: of 353 URLs (Search Console's 8 pages
       included), 53 pass and 0 fail; the other 300 are LearnPress course URLs, deferred with the
       courses (`docs/ROADMAP.md`). Content the same except typography and the video posters. Run
-      again on the switch day.
+      again on the switch day (2026-10-21: passed, by `cutover:check`).
 - [x] **Pages changed on purpose** (decided with Arye 2026-10-15; done 2026-10-21):
       `scripts/compare-with-live.ts` lists the pages edited since the import, each with its reason
       (`CHANGED_ON_PURPOSE`; add a page when its content is edited), and reports them as "changed on
@@ -53,10 +54,11 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
       `mikraot.net/*` responses. Checked 2026-10-08 through the API: none exist, no Page Rules, and no
       account-level Bulk Redirects; the zone has only Cloudflare's managed URL normalization, free
       managed firewall and DDoS rulesets. Check again on the switch day.
-- [ ] **Content freeze on WordPress.** Carry over content edited and comments approved on
+- [x] **Content freeze on WordPress.** Carry over content edited and comments approved on
       WordPress since the export (2026-09-30). Checked 2026-10-08 (WP-CLI, read-only): nothing to
       carry over; the last post or page edit is from January 2025, the last comment from November
       2023, and no comments await approval. Check again on the switch day.
+      2026-10-21 (`cutover:check`): nothing edited or commented since the export.
 - [x] Branch previews ignore `workers_dev` (tested 2026-10-05: a preview built with
       `workers_dev: false` answered 200). The production deploy does apply it, and `preview_urls`
       may default to the same value, so the switch sets `preview_urls: true` explicitly.
@@ -69,11 +71,14 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
       routes win, so while they exist comments would go to the old Worker.
 - [x] Redirects in `public/_redirects` (`/sitemap.xml`, `/page/*`, `/category/uncategorized/`, BuddyPress) as 302 during the
       fallback weeks: browsers keep 301s, which would survive a rollback. Back to 301 in step 5.
-- [ ] Zone settings: `npm run cutover:check` checks Rocket Loader off, HTTPS only, TLS 1.2 at least
+- [x] Zone settings: `npm run cutover:check` checks Rocket Loader off, HTTPS only, TLS 1.2 at least
       and email obfuscation on (all as needed on 2026-10-21), and reminds about the Browser Cache TTL (4 hours; changed with the switch, step 2).
-- [ ] A fresh production D1 export the same day (`npm run cutover:check` makes it).
-- [ ] **Approval (go/no-go)**, with a fixed date and time (a quiet hour) and the observation
+      Browser Cache TTL set to respect the site's headers at the switch (approved).
+- [x] A fresh production D1 export the same day (`npm run cutover:check` makes it).
+      2026-10-21.
+- [x] **Approval (go/no-go)**, with a fixed date and time (a quiet hour) and the observation
       window below.
+      Go given by Arye; switched 2026-10-21 at 14:09 UTC.
 
 ## 2. The switch (one commit, about 15 minutes)
 
@@ -115,26 +120,34 @@ export, ending with PASS or FAIL for each (first run 2026-10-08: all passed).
 
 Success means all of these:
 
-- [ ] The route exists (API) and mikraot.net answers from the new Worker: not yet tested is whether
-      the Workers Builds deploy creates a route from the config (its token may lack route rights).
-      If it didn't, add it via the API at once, then investigate.
-- [ ] A branch preview still works (`preview_urls: true`).
+- [x] The route exists (API) and mikraot.net answers from the new Worker. 2026-10-21: the Workers
+      Builds deploy created the route from the config itself (`mikraot.net/*` → `mikraot`).
+- [x] A branch preview still works (`preview_urls: true`).
+      2026-10-22: a branch preview answers 200; workers.dev answers 404.
 - [ ] Email addresses on pages are obfuscated by Cloudflare (Scrape Shield), as for WordPress.
-- [ ] The URL parity checks from step 1 pass against `https://mikraot.net`, plus
+      Not working (2026-10-22): the zone setting is on, but admin@mikraot.net appears as plain text
+      in the Worker's pages. Open: decide with Arye whether to obfuscate it in the site itself.
+- [x] The URL parity checks from step 1 pass against `https://mikraot.net`, plus
       `npm run check:links -- https://mikraot.net` and `npm run test:deployed -- https://mikraot.net`.
-- [ ] A real test comment posts, appears, and is hidden again (approval for the D1 change). It also
+      2026-10-21/22: `check:urls` 347 URLs, 0 failed (299 LearnPress, deferred; WordPress's URLs now kept in `scripts/wordpress-urls.txt`), `check:links` 143 outside links, none broken (2026-10-22, after fixing the script, which had
+      skipped all of mikraot.net), and `test:deployed` passed on mikraot.net.
+- [x] A real test comment posts, appears, and is hidden again (approval for the D1 change). It also
       proves the human check's hostname and action checks, which only the real key runs.
-- [ ] A real test sign-up from the footer: confirmation email, `/newsletter/confirmed/`, welcome
+      2026-10-21: Arye posted one on About (comment 7); the notice arrived and he hid it with the management link.
+- [x] A real test sign-up from the footer: confirmation email, `/newsletter/confirmed/`, welcome
       email and Arye's notice (`docs/OPERATIONS.md`, Newsletter). The form can't be tried before:
       the human check's key works only on mikraot.net.
-- [ ] Response headers (CSP, HSTS…) present; no console errors or CSP blocks on a few pages.
-- [ ] Umami receives visits (it counts only on mikraot.net); Search Console: submit `/sitemap-index.xml`, then review queries and titles a month or two later (`docs/ROADMAP.md`).
-- [ ] A Cloudflare rate limiting rule (the free plan has one, counted per IP over 10 seconds, action
+      2026-10-21: Arye signed up; confirmation, welcome and his notice all delivered (the notice to his spam folder at first).
+- [x] Response headers (CSP, HSTS…) present; no console errors or CSP blocks on a few pages.
+      2026-10-21: HSTS, nosniff, referrer and permissions policies, frame DENY and the CSP all present. Cloudflare injected three scripts the CSP blocked (Web Analytics, JavaScript detections, Precursor); all three turned off with Arye (`docs/OPERATIONS.md`).
+- [ ] Umami receives visits (it counts only on mikraot.net); Search Console: submit `/sitemap-index.xml` (done 2026-10-22, read by Google), then review queries and titles a month or two later (`docs/ROADMAP.md`).
+- [x] A Cloudflare rate limiting rule (the free plan has one, counted per IP over 10 seconds, action
       block; checked 2026-10-08; Security → WAF → Rate limiting rules) on all of `mikraot.net`
       (unknown addresses run the Worker too, not only `/api/*`), with a threshold well above normal
       browsing, e.g. 300 requests per 10 seconds per IP: it blocks a flood before the Worker runs,
       so it can't use up the free 100,000 requests a day (`docs/OPERATIONS.md`, Limits). Needs
       Arye's approval (zone configuration; the token can't write WAF rules).
+      Done 2026-10-21 (approved): "Flood guard", 1,000 requests per 10 s per address (300 tripped the live-site tests); `docs/OPERATIONS.md`.
 - [ ] Sentry and the Workers logs read for new kinds of errors (browser errors in Sentry come
       from visitors' browsers: untrusted input, anyone can write them), and the error rate below 1% of requests over the
       observation window (Cloudflare dashboard →
