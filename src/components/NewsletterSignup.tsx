@@ -5,6 +5,8 @@ import { Turnstile } from './Turnstile';
 
 type State = 'idle' | 'sending' | 'sent' | 'error' | 'check-failed';
 
+// Put together at run time, so the address isn't in the script's text for bots to collect.
+const ADMIN_EMAIL = ['admin', 'mikraot.net'].join('@');
 const MESSAGES: Record<State, string> = {
   idle: '',
   sending: '',
@@ -307,8 +309,8 @@ export const NewsletterSignup: React.FC<{
           <>
             ההרשמה לא הושלמה, ולא נשלח אליכם אימייל. נסו שוב מאוחר יותר, או כתבו לנו ל־
             {/* Its own link, left to right: tapped or copied without the Hebrew around it. */}
-            <a href="mailto:admin@mikraot.net" dir="ltr" className={look.link}>
-              admin@mikraot.net
+            <a href={`mailto:${ADMIN_EMAIL}`} dir="ltr" className={look.link}>
+              {ADMIN_EMAIL}
             </a>{' '}
             ונרשום אתכם.
           </>

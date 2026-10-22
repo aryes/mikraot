@@ -32,6 +32,9 @@ export function excerptOf(markdoc: string, words: number): string {
     .replace(/[*_~`#>|]/g, '')
     .replace(/\\(.)/g, '$1')
     .replace(/&nbsp;/g, ' ')
+    // Excerpts go into the feeds and the front page as text: email addresses stay hidden from bots
+    // there too (src/lib/email-obfuscation.ts).
+    .replace(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g, '[כתובת אימייל]')
     .split(/\s+/)
     .filter(Boolean);
   return text.length > words ? `${text.slice(0, words).join(' ')} …` : text.join(' ');

@@ -27,6 +27,12 @@ describe('urlForPath', () => {
 });
 
 describe('excerptOf', () => {
+  it('hides email addresses, which would reach the feeds as text', () => {
+    expect(
+      excerptOf('כתבו [admin@mikraot.net](mailto:admin@mikraot.net) או a.b+c@x.co.il', 9),
+    ).toBe('כתבו [כתובת אימייל] או [כתובת אימייל]');
+  });
+
   it('takes the first words of the text, without Markdoc syntax', () => {
     const body =
       'בשמחה {% highlight %}**ובהתרגשות**{% /highlight %} אני [מציג](/x/) את&nbsp;מקראות {% audio src="/a.mp3" /%} \\[1\\] ועוד';

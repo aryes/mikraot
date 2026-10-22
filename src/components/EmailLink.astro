@@ -1,0 +1,19 @@
+---
+/**
+ * A mailto link whose address bots can't read from the page (src/lib/email-obfuscation.ts): until
+ * the script restores it (and gives the link its address), the text says the address is hidden; it
+ * is left out of the search index. With `text`, the link shows that
+ * text instead of the address.
+ */
+import { encodeEmail } from '../lib/email-obfuscation';
+
+interface Props {
+  address: string;
+  text?: string | undefined;
+}
+const { address, text } = Astro.props;
+---
+
+<!-- prettier-ignore -->
+<a data-pagefind-ignore data-email={encodeEmail(address)} data-email-text={text ? undefined : ''} dir={text ? undefined : 'ltr'}>{text ?? '[כתובת האימייל מוסתרת]'}</a>
+<script src="../scripts/email-links.ts"></script>

@@ -7,6 +7,8 @@
  * `[1](#ref-1)`, back to the text, and carries `{% #note-1 %}`. src/scripts/footnotes.ts shows
  * the note on hover. One reference per note: a second would repeat the id ref-N.
  */
+import EmailLink from '../EmailLink.astro';
+
 interface Props {
   href: string;
   title?: string;
@@ -17,10 +19,15 @@ const target = external ? '_blank' : undefined;
 const rel = external ? 'noopener noreferrer' : undefined;
 const note = /^#note-(\d+)$/.exec(href)?.[1];
 const back = /^#ref-(\d+)$/.exec(href)?.[1];
+// Email addresses are hidden from harvesting bots (EmailLink.astro); a link whose text is the
+// address itself shows the address once restored, any other text stays.
+const email = href.startsWith('mailto:') ? href.slice('mailto:'.length) : undefined;
+const label = email ? (await Astro.slots.render('default')).replace(/<[^>]*>/g, '').trim() : '';
 // The markup stays on one line: whitespace inside <a> or <sup> would add visible spaces.
 ---
 
 <!-- prettier-ignore -->
-{note ? <sup class="footnote-ref"><a id={`ref-${note}`} href={href} aria-label={`הערה ${note}`}><slot /></a></sup>
+{email ? <EmailLink address={email} text={label === email ? undefined : label} />
+  : note ? <sup class="footnote-ref"><a id={`ref-${note}`} href={href} aria-label={`הערה ${note}`}><slot /></a></sup>
   : back ? <a class="footnote-back" href={href} aria-label={`הערה ${back}, חזרה לטקסט`}><slot /></a>
   : <a href={href} title={title} target={target} rel={rel}><slot /></a>}
