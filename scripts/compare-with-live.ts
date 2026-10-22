@@ -43,7 +43,7 @@ const CHANGED_ON_PURPOSE: Readonly<Record<string, string>> = {
   '/שווא-נע/': 'only the קרי of Deuteronomy 33:2, a footnote on the big-vowel rule',
   '/הגיית-שם-יהוה/': 'a footnote on the Aleppo Codex',
   '/silent-letters/': '"הי׳ והה׳"',
-  '/about/': 'the content licence paragraph',
+  '/about/': 'the content licence paragraph, the contact address as a (hidden) link',
   '/סמיכות/': 'one more link',
   '/קמץ-קטן/': 'one more link',
   '/משה-מוציא-וכלב-מכניס/': 'one more link',

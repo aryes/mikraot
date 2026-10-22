@@ -3,7 +3,9 @@
  * `Expires` (required; the RFC advises less than a year ahead) moves forward with each release.
  * It lapses if nothing is deployed for VALID_DAYS (dependency updates alone redeploy often).
  */
-const SECURITY_CONTACT = 'mailto:admin@mikraot.net';
+// A web page, not the address itself (RFC 9116 allows either): the About page shows it to people
+// but hides it from bots (src/components/EmailLink.astro), as this file can't (Arye, 2026-10-22).
+const SECURITY_CONTACT = 'https://mikraot.net/about/#contact';
 const VALID_DAYS = 330;
 
 export function securityTxt(site: URL, now: Date): string {
