@@ -7,6 +7,7 @@
 import { LinkChecker, LinkState } from 'linkinator';
 
 const site = new URL(process.argv[2] ?? 'http://localhost:4321').origin;
+const REAL_SITE = 'https://mikraot.net';
 
 // Sites that refuse automated checks; they are reported only when the server is unreachable.
 const BOT_BLOCKED = new Set([403, 429]);
@@ -23,11 +24,11 @@ const result = await new LinkChecker().check({
   userAgent:
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36',
   // Crawl our pages, and check (without crawling) every link they point to elsewhere.
-  // Not outside links: the API, Cloudflare's own paths, and this site under its real address (the
-  // share pictures and canonical links name https://mikraot.net, which serves WordPress until the
-  // switch). The site's own links are checked on every change by e2e/links.spec.ts.
+  // Not outside links: the API, Cloudflare's own paths, and, when checking a local or preview copy,
+  // the site under its real address (the share pictures and canonical links name
+  // https://mikraot.net). The site's own links are checked on every change by e2e/links.spec.ts.
   linksToSkip: async (link) =>
-    /\/(api|cdn-cgi)\//.test(link) || link.startsWith('https://mikraot.net/'),
+    /\/(api|cdn-cgi)\//.test(link) || (site !== REAL_SITE && link.startsWith(`${REAL_SITE}/`)),
 });
 
 const broken = result.links.filter(
