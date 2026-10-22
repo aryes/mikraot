@@ -410,6 +410,16 @@
   font-size: 0.8rem;
   color: var(--text-faint);
 }
+/* The "…" that opens a cut post: a wider target for a finger, without moving the text. */
+.wp-content-rendered .latest-posts-excerpt a {
+  padding: 0.2em 0.5em;
+  margin: -0.2em -0.5em;
+  text-decoration: none;
+}
+/* A post shown whole on the front page ends with a little room before "לכל העדכונים". */
+.wp-content-rendered .latest-posts-full {
+  margin-bottom: 1.5rem;
+}
 
 /* List pickers (ListPicker.astro): rows of rounded choices, each after its name. Until the script
    has built them the list is hidden, so it doesn't flash by; without scripts it shows as a plain
