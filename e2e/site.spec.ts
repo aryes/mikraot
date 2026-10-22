@@ -971,3 +971,15 @@ test('a footnote is a raised number linked both ways, shown beside it on hover',
   await expect(page).toHaveURL(/#ref-1$/);
   await expect(ref).toBeInViewport();
 });
+
+test('email addresses are hidden from bots in the page, shown to people', async ({
+  page,
+  request,
+}) => {
+  // Cloudflare's Scrape Shield did this for WordPress; it doesn't rewrite the Worker's pages.
+  const html = await (await request.get('/privacy-policy/')).text();
+  expect(html).not.toContain('admin@mikraot.net');
+  await page.goto('/privacy-policy/');
+  const link = page.locator('main a[href="mailto:admin@mikraot.net"]').first();
+  await expect(link).toHaveText('admin@mikraot.net');
+});
