@@ -6,7 +6,7 @@ const rows: Record<string, Record<string, unknown>[]> = {
     { id: 1, author: "O'Brien", content: 'שלום', parent_id: null },
     { id: 2, author: 'דנה', content: 'שורה\nשנייה', parent_id: 1 },
   ],
-  quiz_results: [],
+  empty_table: [],
 };
 
 const fakeDb: BackupDb = {
@@ -57,7 +57,7 @@ describe('backupToSql', () => {
         `INSERT INTO "comments" ("id", "author", "content", "parent_id") VALUES (1, 'O''Brien', 'שלום', NULL);`,
         `INSERT INTO "comments" ("id", "author", "content", "parent_id") VALUES (2, 'דנה', 'שורה
 שנייה', 1);`,
-        'DELETE FROM "quiz_results";',
+        'DELETE FROM "empty_table";',
         '',
       ].join('\n'),
     );
