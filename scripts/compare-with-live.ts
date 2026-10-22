@@ -49,7 +49,7 @@ const CHANGED_ON_PURPOSE: Readonly<Record<string, string>> = {
   '/משה-מוציא-וכלב-מכניס/': 'one more link',
 };
 /** Pages published here but never on WordPress (a draft there): no live page to compare. */
-const NEW_HERE = new Set(['/privacy-policy/', '/בדק-הבית/']);
+const NEW_HERE = new Set(['/privacy-policy/', '/בדק-הבית/', '/קרי-וכתיב/']);
 const pageUrls = [
   ...readFileSync('dist/client/sitemap-0.xml', 'utf8').matchAll(
     /<loc>https:\/\/mikraot\.net([^<]*)<\/loc>/g,
