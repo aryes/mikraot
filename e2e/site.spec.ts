@@ -204,9 +204,9 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
   expect(index.status()).toBe(200);
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
   // 37 pages and posts (the privacy policy since 2026-10-13, the launch post since the switch,
-  // קרי וכתיב since 2026-10-22),
+  // קרי וכתיב since 2026-10-22, the trope list and its 26 pages since 2026-10-24),
   // the two month archives and the category archive, "What's new" (the author archive is noindex).
-  expect(sitemap.match(/<loc>/g)).toHaveLength(41);
+  expect(sitemap.match(/<loc>/g)).toHaveLength(68);
   expect(sitemap).not.toContain('/author/');
 
   const old = await request.get('/sitemap.xml', { maxRedirects: 0 });
