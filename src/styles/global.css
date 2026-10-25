@@ -632,3 +632,31 @@ html {
 .footnote-popup a:hover {
   color: var(--content-link-hover);
 }
+
+/* The trope list (/רשימת-הטעמים/): the whole row opens the trope's page. Its one link, in the first
+   cell, is stretched over the row, so the row stays a single link for screen readers (Arye,
+   2026-10-25). */
+.wp-content-rendered
+  tbody
+  tr:has(
+    > td:first-child
+      > a[href^='/%D7%A8%D7%A9%D7%99%D7%9E%D7%AA-%D7%94%D7%98%D7%A2%D7%9E%D7%99%D7%9D/']
+  ) {
+  position: relative;
+}
+.wp-content-rendered
+  tbody
+  tr:has(
+    > td:first-child
+      > a[href^='/%D7%A8%D7%A9%D7%99%D7%9E%D7%AA-%D7%94%D7%98%D7%A2%D7%9E%D7%99%D7%9D/']
+  ):hover {
+  background: var(--table-hover);
+}
+.wp-content-rendered
+  tbody
+  td:first-child
+  > a[href^='/%D7%A8%D7%A9%D7%99%D7%9E%D7%AA-%D7%94%D7%98%D7%A2%D7%9E%D7%99%D7%9D/']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
