@@ -995,3 +995,14 @@ test('email addresses are hidden from bots in the page, shown to people', async 
   const link = page.locator('main a[href="mailto:admin@mikraot.net"]').first();
   await expect(link).toHaveText('admin@mikraot.net');
 });
+
+test('in the trope list a whole row opens the trope page', async ({ page }) => {
+  await page.goto('/רשימת-הטעמים/');
+  const row = page.locator('tbody tr').filter({ has: page.locator('a', { hasText: 'טִפְּחָ֖א' }) });
+  // One link per row (for screen readers), but a click anywhere in the row follows it.
+  await expect(row.getByRole('link')).toHaveCount(1);
+  // force: the stretched link covers the cell, as intended; the click lands on the link.
+  await row.locator('td').nth(3).click({ force: true });
+  await expect(page).toHaveURL(/\/%D7%98%D7%A4%D7%97%D7%90\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('טִפְּחָ֖א');
+});
