@@ -1004,7 +1004,7 @@ test('in the trope list a whole row opens the trope page', async ({ page }) => {
   // It reads as text, not as a link (Arye, 2026-10-27).
   await expect(row.getByRole('link')).toHaveCSS('text-decoration-line', 'none');
   // force: the stretched link covers the cell, as intended; the click lands on the link.
-  await row.locator('td').nth(3).click({ force: true });
+  await row.locator('td').nth(4).click({ force: true });
   await expect(page).toHaveURL(/\/%D7%98%D7%A4%D7%97%D7%90\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('טִפְּחָ֖א');
 });
