@@ -81,8 +81,6 @@ export default defineMarkdocConfig({
         link: { type: Boolean },
       },
       selfClosing: true,
-      // Within text only: a name alone on its line would render outside a paragraph.
-      inline: true,
     },
     'latest-posts': {
       render: component('./src/components/content/LatestPosts.astro'),

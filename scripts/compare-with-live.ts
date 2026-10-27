@@ -31,13 +31,17 @@ const NOT_CONTENT = /^\/(\d{4}\/\d{2}|category\/[^/]+|מה-חדש)\/$/;
  */
 const CHANGED_ON_PURPOSE: Readonly<Record<string, string>> = {
   '/': 'link to מה חדש, the email-updates box, the pointed "דִּבְרֵ֥י הַיָּמִ֖ים" heading, the launch post as the only latest post',
-  '/טעמים-נדירים/': 'corrected telisha on קִ֠רְב֞וּ',
-  '/טעמים/1-word-2-tropes/': 'corrected telisha on קִ֠רְב֞וּ',
+  '/טעמים-נדירים/':
+    'corrected telisha on קִ֠רְב֞וּ; trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
+  '/טעמים/1-word-2-tropes/':
+    'corrected telisha on קִ֠רְב֞וּ; trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
   '/טעמים/נוסח-אשכנז/': 'וְאַזְלָ֜א pointed',
-  '/שיטת-גלגלי-עזר/': 'וְאַזְלָ֜א pointed',
+  '/שיטת-גלגלי-עזר/':
+    'וְאַזְלָ֜א pointed; trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
   '/קריאות-מוקלטות-בנוסח-אשכנז/': 'the recordings picker',
   '/קריאות-מוקלטות-בנוסח-בבלי-עירקי/': 'the recordings picker',
-  '/דגש-קל/': 'grouped table headings, one more link, יִשַׁי and וּמְצֶ֣אןָ (2026-10-20)',
+  '/דגש-קל/':
+    'grouped table headings, one more link, יִשַׁי and וּמְצֶ֣אןָ (2026-10-20); trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
   '/מבטא/': 'grouped table headings',
   '/תנועות-עיצורים-וניקוד/': 'grouped table headings, a stray verse number removed',
   '/שווא-נע/': 'only the קרי of Deuteronomy 33:2, a footnote on the big-vowel rule',
@@ -47,6 +51,17 @@ const CHANGED_ON_PURPOSE: Readonly<Record<string, string>> = {
   '/סמיכות/': 'one more link',
   '/קמץ-קטן/': 'one more link',
   '/משה-מוציא-וכלב-מכניס/': 'one more link',
+  '/מתג/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
+  '/אתנחתא-וסוף-פסוק/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
+  '/טעמים-דומים/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
+  '/טעמים/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
+  '/פַּשְׁטָא֙-זָקֵף-קָטָ֔ן/':
+    'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
+  '/רְבִיעִ֗י-דַּרְגָּ֧א-תְּבִ֛יר/':
+    'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
+  '/שילוב-הטעמים-בכתוב/':
+    'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
+  '/trope-hierarchy/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
 };
 /** Pages published here but never on WordPress (a draft there): no live page to compare. */
 const NEW_HERE = new Set([
