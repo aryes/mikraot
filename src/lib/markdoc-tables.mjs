@@ -6,10 +6,13 @@
 import { Markdoc, nodes } from '@astrojs/markdoc/config';
 
 /**
- * One Hebrew or Arabic letter with its marks ("בּ", "غ"), or the one or two Latin letters that
+ * One Hebrew or Arabic letter with its marks ("בּ", "غ"), maybe followed by a sof pasuk or a pasek
+ * ("אֽ׃", "א֣׀": tropes shown on א in the trope list), two letters that both carry a cantillation
+ * mark ("א֙א֙", two pashtas; not a pointed two-letter word), or the one or two Latin letters that
  * write a sound ("b", "sh"; large too for uniformity, Arye 2026-10-15).
  */
-const LETTER = /^(?:[\p{Script=Hebrew}\p{Script=Arabic}]\p{M}*|\p{Script=Latin}{1,2})$/u;
+const LETTER =
+  /^(?:[\p{Script=Hebrew}\p{Script=Arabic}]\p{M}*[׀׃]?|(?:\p{Script=Hebrew}\p{M}*[֑-֯]\p{M}*){2}|\p{Script=Latin}{1,2})$/u;
 
 /**
  * The text of a rendered node (a heading cell's words, bold or not).
@@ -89,9 +92,13 @@ const withLatinMarked = (/** @type {string} */ text) =>
       /\p{Script=Latin}/u.test(part) ? new Markdoc.Tag('span', { class: 'latin' }, [part]) : part,
     );
 
-/** A cell holding a letter, or letters separated by "/" ("ס / שׂ"): shown large. */
+/** A cell holding a letter, or letters separated by "/" or a space ("ס / שׂ", "א֨ א֜"): shown large. */
 const isLetters = (/** @type {string} */ text) =>
-  text !== '' && text.split('/').every((part) => LETTER.test(part.trim()));
+  text.trim() !== '' &&
+  text
+    .trim()
+    .split(/\s*\/\s*|\s+/)
+    .every((part) => LETTER.test(part));
 
 /**
  * Table cells of the letter tables: a letter (or a sound's name, "A") with its recording ("בּ" +

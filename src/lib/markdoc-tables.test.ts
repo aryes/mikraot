@@ -62,6 +62,16 @@ describe('letter table cells', () => {
     }
   });
 
+  it('draws a trope shown on א large too, with its sof pasuk, pasek or second letter', () => {
+    for (const signs of ['א֖', 'אֽ׃', 'א֣׀', 'א֙א֙', 'א֨ א֜']) {
+      expect(cell(signs)).toMatch(/^<td class="cell-letter">/);
+    }
+    // Two-letter words and words with a pasek stay text.
+    for (const words of ['לֹא', 'מִי', 'לְךָ', 'גַּם ׀']) {
+      expect(cell(words)).toMatch(/^<td>/);
+    }
+  });
+
   it('puts an English example under its letters, its English words marked', () => {
     expect(cell('th כמו במילה the')).toBe(
       '<td class="cell-letter">th <span class="cell-example">כמו במילה <span class="latin">the</span></span></td>',
