@@ -665,3 +665,13 @@ html {
   position: absolute;
   inset: 0;
 }
+
+/* Text by reading tradition (NusachText.astro): the chosen one shows, by the `data-nusach` that
+   the header switch sets on <html> (src/scripts/nusach.ts); Ashkenazi without a choice. */
+.nusach-sephardi,
+:root[data-nusach='sephardi'] .nusach-ashkenazi {
+  display: none;
+}
+:root[data-nusach='sephardi'] .nusach-sephardi {
+  display: inline;
+}

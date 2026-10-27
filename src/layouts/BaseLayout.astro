@@ -6,10 +6,17 @@ import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import { site } from '../lib/site';
 import { isGeneratedOgImage } from '../lib/og';
+import { NUSACH_HEAD_SCRIPT } from '../lib/nusach-head.mjs';
+import type { Nusach } from '../lib/tropes';
 
 interface Props {
   /** Full document title, as the live site renders it (each page's `seo` frontmatter). */
   title: string;
+  /**
+   * The title in each reading tradition, when it differs (a trope page): the saved choice picks
+   * one (src/scripts/nusach.ts).
+   */
+  titles?: Record<Nusach, string> | undefined;
   description?: string | undefined;
   /** Site-relative image path for social previews. */
   ogImage?: string | undefined;
@@ -17,16 +24,21 @@ interface Props {
   noindex?: boolean | undefined;
 }
 
-const { title, description, ogImage, noindex } = Astro.props;
+const { title, titles, description, ogImage, noindex } = Astro.props;
+const titleAttributes = Object.fromEntries(
+  Object.entries(titles ?? {}).map(([nusach, text]) => [`data-title-${nusach}`, text]),
+);
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" {...titleAttributes}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    <!-- The reader's tradition for trope names, before the page draws (src/lib/nusach-head.mjs). -->
+    <script is:inline set:html={NUSACH_HEAD_SCRIPT} />
     <!-- Fonts (astro.config.mjs). Preloaded so they're ready for the first paint (without them a
          line wrapped differently in the fallback font and the text below jumped): Taamey David
          CLM (all text) and Taamey D (the site name). -->
