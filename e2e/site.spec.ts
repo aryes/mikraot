@@ -204,9 +204,9 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
   expect(index.status()).toBe(200);
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
   // 37 pages and posts (the privacy policy since 2026-10-13, the launch post since the switch,
-  // קרי וכתיב since 2026-10-22, the trope list and its 26 pages since 2026-10-24),
+  // קרי וכתיב since 2026-10-22, the trope list and its 27 pages since 2026-10-24),
   // the two month archives and the category archive, "What's new" (the author archive is noindex).
-  expect(sitemap.match(/<loc>/g)).toHaveLength(68);
+  expect(sitemap.match(/<loc>/g)).toHaveLength(69);
   expect(sitemap).not.toContain('/author/');
 
   const old = await request.get('/sitemap.xml', { maxRedirects: 0 });
@@ -1006,5 +1006,5 @@ test('in the trope list a whole row opens the trope page', async ({ page }) => {
   // force: the stretched link covers the cell, as intended; the click lands on the link.
   await row.locator('td').nth(4).click({ force: true });
   await expect(page).toHaveURL(/\/%D7%98%D7%A4%D7%97%D7%90\/$/);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('טִפְּחָ֖א');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('א֖'); // the title is the trope on א
 });
