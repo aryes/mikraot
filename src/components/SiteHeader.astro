@@ -1,6 +1,7 @@
 ---
 import { ChevronDown, Home, Menu, Search } from 'lucide-react';
 import { menuTree, pointedTitle, site } from '../lib/site';
+import { NUSACH_LABELS, SWITCHABLE } from '../lib/tropes';
 import YadMark from './YadMark.astro';
 
 const current = decodeURI(Astro.url.pathname);
@@ -33,6 +34,19 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
     </a>
 
     <div class="flex items-center gap-2">
+      <!-- The reading tradition for trope names (src/scripts/nusach.ts, which shows it). -->
+      <label
+        hidden
+        data-nusach-switch
+        class="flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300"
+      >
+        <span class="sr-only sm:not-sr-only">נוסח</span>
+        <select class="cursor-pointer rounded-xl border-0 bg-slate-100 dark:bg-slate-800 py-2 ps-3 pe-7 text-xs font-medium text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-200/80 dark:hover:bg-slate-700/80">
+          {SWITCHABLE.map((nusach) => (
+            <option value={nusach}>{NUSACH_LABELS[nusach]}</option>
+          ))}
+        </select>
+      </label>
       <button
         type="button"
         data-open-search
@@ -226,3 +240,4 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
 </header>
 
 <script src="../scripts/menu.ts"></script>
+<script src="../scripts/nusach.ts"></script>

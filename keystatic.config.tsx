@@ -11,6 +11,7 @@ import {
   Highlighter,
   Keyboard,
   ListTree,
+  Music,
   Newspaper,
   Video,
   Volume2,
@@ -99,6 +100,24 @@ const content = fields.markdoc({
         }),
       },
     }),
+    trope: inline({
+      label: 'שם טעם (לפי הנוסח)',
+      icon: <Music />,
+      schema: {
+        name: fields.text({ label: 'הטעם (כמו בכתובת העמוד שלו, למשל זקף-קטן)' }),
+        nusach: fields.select({
+          label: 'נוסח',
+          options: [
+            { label: 'לפי בחירת הקורא', value: '' },
+            { label: 'אשכנזי', value: 'ashkenazi' },
+            { label: 'ספרדי', value: 'sephardi' },
+            { label: 'תימני', value: 'yemenite' },
+          ],
+          defaultValue: '',
+        }),
+        link: fields.checkbox({ label: 'קישור לעמוד הטעם', defaultValue: false }),
+      },
+    }),
     'latest-posts': block({ label: 'פוסטים אחרונים', icon: <Newspaper />, schema: {} }),
   },
 });
@@ -121,6 +140,9 @@ export default config({
         title: fields.slug({
           name: { label: 'כותרת' },
           slug: { label: 'כתובת (slug)', generate: slugFromTitle },
+        }),
+        trope: fields.text({
+          label: 'טעם (בעמוד של טעם: הכותרת היא שמו לפי הנוסח; src/data/tropes.json)',
         }),
         kind: fields.select({
           label: 'סוג',

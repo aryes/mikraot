@@ -17,6 +17,7 @@ import {
   site,
   type SitePage,
 } from '../lib/site';
+import { mapValues, plainName, switchNames } from '../lib/tropes';
 
 export const getStaticPaths = (async () => {
   const pages = await getSitePages();
@@ -33,7 +34,17 @@ interface Props {
 
 const { page, pages } = Astro.props;
 const { entry, path } = page;
-const { title, seo, kind, categories } = entry.data;
+const { title, seo, kind, categories, trope } = entry.data;
+// A trope page's heading and tab title name the trope in the reader's tradition.
+const titleNames = trope ? switchNames(trope) : undefined;
+const documentTitle = seo?.title || `${title} - ${site.title}`;
+// The Ashkenazi tab title is the page's own, so switching back restores it.
+const documentTitles = trope
+  ? {
+      ...mapValues(switchNames(trope, plainName), (name) => `${name} - ${site.title}`),
+      ashkenazi: documentTitle,
+    }
+  : undefined;
 const { Content } = await render(entry);
 const lastUpdated =
   entry.data.showLastUpdated && entry.filePath ? lastChanged(entry.filePath) : undefined;
@@ -46,10 +57,12 @@ const crumbs = isPost
 ---
 
 <ContentLayout
-  documentTitle={seo?.title || `${title} - ${site.title}`}
+  documentTitle={documentTitle}
   description={seo?.description || undefined}
   ogImage={seo?.ogImage || ogImagePath(path)}
   title={isFrontPage ? site.title : title}
+  titleNames={titleNames}
+  documentTitles={documentTitles}
   subtitle={isFrontPage ? site.tagline : undefined}
   crumbs={isFrontPage ? undefined : crumbs}
   post={

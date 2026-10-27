@@ -72,6 +72,18 @@ export default defineMarkdocConfig({
       render: component('./src/components/content/ListPicker.astro'),
       attributes: { levels: { type: String }, chapters: { type: String } },
     },
+    // A trope's name in the reader's tradition (src/data/tropes.json), or in one tradition.
+    trope: {
+      render: component('./src/components/content/TropeName.astro'),
+      attributes: {
+        name: { type: String, required: true },
+        nusach: { type: String, matches: ['', 'ashkenazi', 'sephardi', 'yemenite'] },
+        link: { type: Boolean },
+      },
+      selfClosing: true,
+      // Within text only: a name alone on its line would render outside a paragraph.
+      inline: true,
+    },
     'latest-posts': {
       render: component('./src/components/content/LatestPosts.astro'),
       selfClosing: true,

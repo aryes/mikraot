@@ -1006,5 +1006,39 @@ test('in the trope list a whole row opens the trope page', async ({ page }) => {
   // force: the stretched link covers the cell, as intended; the click lands on the link.
   await row.locator('td').nth(4).click({ force: true });
   await expect(page).toHaveURL(/\/%D7%98%D7%A4%D7%97%D7%90\/$/);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('א֖'); // the title is the trope on א
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('טִפְחָ֖א', {
+    useInnerText: true,
+  });
+});
+
+test('the tradition switch names the tropes in the chosen tradition, and remembers it', async ({
+  page,
+}) => {
+  await page.goto('/רשימת-הטעמים/אתנחתא/');
+  // innerText: the page holds every tradition's name, and shows one.
+  const heading = page.getByRole('heading', { level: 1 });
+  await expect(heading).toHaveText('אֶתְנַחְתָּ֑א', { useInnerText: true });
+  await expect(page).toHaveTitle('אתנחתא - מקראות');
+  await page.getByRole('combobox', { name: 'נוסח' }).selectOption('sephardi');
+  await expect(heading).toHaveText('אַתְנָ֑ח', { useInnerText: true });
+  await expect(page).toHaveTitle('אתנח - מקראות');
+  // Names in the text follow it; the names table keeps every tradition's name.
+  await expect(page.locator('.wp-content-rendered p').first()).toContainText('הטעם אַתְנָ֑ח', {
+    useInnerText: true,
+  });
+  await expect(page.locator('.wp-content-rendered table')).toContainText('אֶתְנַחְתָּ֑א');
+  // Saved for the next page, applied before it draws (by an inline script the CSP allows).
+  const blocked: string[] = [];
+  page.on('console', (message) => {
+    if (/Content Security Policy|Refused to/.test(message.text())) blocked.push(message.text());
+  });
+  await page.goto('/רשימת-הטעמים/טפחא/');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('טַרְחָ֖א', {
+    useInnerText: true,
+  });
+  await expect(page.getByRole('combobox', { name: 'נוסח' })).toHaveValue('sephardi');
+  // On the 404 page, which gets its CSP as a header that covers the whole page.
+  await page.goto('/no-such-page/');
+  await expect(page.locator('html')).toHaveAttribute('data-nusach', 'sephardi');
+  expect(blocked).toEqual([]);
 });
