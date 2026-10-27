@@ -36,20 +36,23 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
     <div class="flex items-center gap-2">
       <!-- The reading tradition for trope names (src/scripts/nusach.ts, which shows it): a native
            select styled as the search pill beside it, with the menu's arrow; as wide as the
-           chosen name (field-sizing; browsers without it size it to the longest). -->
+           chosen name (field-sizing; browsers without it size it to the longest). Its list is
+           styled too where the browser allows (global.css, .nusach-select). -->
       <label
         hidden
         data-nusach-switch
         title="שמות הטעמים לפי נוסח"
         class="relative flex items-center rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-200/80 dark:hover:bg-slate-700/80 has-focus-visible:ring-2 has-focus-visible:ring-brand"
       >
-        <span class="hidden ps-3 text-slate-600 dark:text-slate-400 sm:inline">טעמים:</span>
+        <span class="hidden ps-3 text-slate-600 dark:text-slate-400 sm:inline">נוסח:</span>
         <select
           aria-label="נוסח שמות הטעמים"
-          class="cursor-pointer appearance-none border-0 bg-transparent py-1.5 ps-3 pe-7 text-xs font-medium outline-none field-sizing-content sm:ps-1 dark:scheme-dark"
+          class="nusach-select cursor-pointer appearance-none border-0 bg-transparent py-1.5 ps-3 pe-7 text-xs font-medium outline-none field-sizing-content sm:ps-1 dark:scheme-dark"
         >
           {SWITCHABLE.map((nusach) => (
-            <option value={nusach}>{NUSACH_LABELS[nusach]}</option>
+            <option value={nusach} class="dark:bg-slate-800 dark:text-slate-200">
+              {NUSACH_LABELS[nusach]}
+            </option>
           ))}
         </select>
         <ChevronDown size={14} className="pointer-events-none absolute end-2 text-slate-400" />
