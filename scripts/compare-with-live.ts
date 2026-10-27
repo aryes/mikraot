@@ -51,7 +51,8 @@ const CHANGED_ON_PURPOSE: Readonly<Record<string, string>> = {
   '/סמיכות/': 'one more link',
   '/קמץ-קטן/': 'one more link',
   '/משה-מוציא-וכלב-מכניס/': 'one more link',
-  '/מתג/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
+  '/מתג/':
+    'its names table; trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
   '/אתנחתא-וסוף-פסוק/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
   '/טעמים-דומים/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
   '/טעמים/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
@@ -87,6 +88,7 @@ const NEW_HERE = new Set([
   '/רשימת-הטעמים/תלישא-גדולה/',
   '/רשימת-הטעמים/גרש/',
   '/רשימת-הטעמים/קדמא-ואזלא/',
+  '/רשימת-הטעמים/מאילא/',
   '/רשימת-הטעמים/גרשיים/',
   '/רשימת-הטעמים/מונח-לגרמיה/',
   '/רשימת-הטעמים/מרכא/',
