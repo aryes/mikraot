@@ -204,9 +204,9 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
   expect(index.status()).toBe(200);
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
   // 37 pages and posts (the privacy policy since 2026-10-13, the launch post since the switch,
-  // קרי וכתיב since 2026-10-22, the trope list and its 28 pages since 2026-10-24),
+  // קרי וכתיב since 2026-10-22, the trope list and its 29 pages since 2026-10-24),
   // the two month archives and the category archive, "What's new" (the author archive is noindex).
-  expect(sitemap.match(/<loc>/g)).toHaveLength(70);
+  expect(sitemap.match(/<loc>/g)).toHaveLength(71);
   expect(sitemap).not.toContain('/author/');
 
   const old = await request.get('/sitemap.xml', { maxRedirects: 0 });
@@ -998,7 +998,7 @@ test('email addresses are hidden from bots in the page, shown to people', async 
 
 test('in the trope list a whole row opens the trope page', async ({ page }) => {
   await page.goto('/רשימת-הטעמים/');
-  const row = page.locator('tbody tr').filter({ has: page.locator('a', { hasText: 'טִפְחָ֖א' }) });
+  const row = page.locator('tbody tr').filter({ has: page.locator('a', { hasText: 'טִפְּחָ֖א' }) });
   // One link per row (for screen readers), but a click anywhere in the row follows it.
   await expect(row.getByRole('link')).toHaveCount(1);
   // It reads as text, not as a link (Arye, 2026-10-27).
@@ -1006,7 +1006,7 @@ test('in the trope list a whole row opens the trope page', async ({ page }) => {
   // force: the stretched link covers the cell, as intended; the click lands on the link.
   await row.locator('td').nth(4).click({ force: true });
   await expect(page).toHaveURL(/\/%D7%98%D7%A4%D7%97%D7%90\/$/);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('טִפְחָ֖א', {
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('טִפְּחָ֖א', {
     useInnerText: true,
   });
 });
