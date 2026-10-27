@@ -998,9 +998,11 @@ test('email addresses are hidden from bots in the page, shown to people', async 
 
 test('in the trope list a whole row opens the trope page', async ({ page }) => {
   await page.goto('/רשימת-הטעמים/');
-  const row = page.locator('tbody tr').filter({ has: page.locator('a', { hasText: 'טִפְּחָ֖א' }) });
+  const row = page.locator('tbody tr').filter({ has: page.locator('a', { hasText: 'טִפְחָ֖א' }) });
   // One link per row (for screen readers), but a click anywhere in the row follows it.
   await expect(row.getByRole('link')).toHaveCount(1);
+  // It reads as text, not as a link (Arye, 2026-10-27).
+  await expect(row.getByRole('link')).toHaveCSS('text-decoration-line', 'none');
   // force: the stretched link covers the cell, as intended; the click lands on the link.
   await row.locator('td').nth(3).click({ force: true });
   await expect(page).toHaveURL(/\/%D7%98%D7%A4%D7%97%D7%90\/$/);
