@@ -664,8 +664,8 @@ html {
 }
 
 /* The trope list (/רשימת-הטעמים/; a table whose rows link to trope pages): the whole row opens
-   its page. Each row's one link (the Ashkenazi name, after the sign) is stretched over the row, so
-   the row stays a single link for screen readers; it reads as plain text, the row's hover showing
+   its page. The row's link (the Ashkenazi name, after the sign) is stretched over the row, so
+   a screen reader meets the page's link once; it reads as plain text, the row's hover showing
    it can be clicked (Arye, 2026-10-25/27). */
 .wp-content-rendered
   table:has(td > a[href^='/%D7%A8%D7%A9%D7%99%D7%9E%D7%AA-%D7%94%D7%98%D7%A2%D7%9E%D7%99%D7%9D/'])
@@ -694,6 +694,23 @@ html {
   content: '';
   position: absolute;
   inset: 0;
+}
+/* The last column's link, to the trope's rank on the hierarchy page (Arye, 2026-10-28), is a link
+   of its own: drawn as one, and above the row's stretched link. */
+.wp-content-rendered
+  table:has(td > a[href^='/%D7%A8%D7%A9%D7%99%D7%9E%D7%AA-%D7%94%D7%98%D7%A2%D7%9E%D7%99%D7%9D/'])
+  td
+  > a[href^='/trope-hierarchy/'] {
+  position: relative;
+  z-index: 1;
+  color: var(--content-link);
+  text-decoration: underline;
+}
+.wp-content-rendered
+  table:has(td > a[href^='/%D7%A8%D7%A9%D7%99%D7%9E%D7%AA-%D7%94%D7%98%D7%A2%D7%9E%D7%99%D7%9D/'])
+  td
+  > a[href^='/trope-hierarchy/']::after {
+  content: none;
 }
 
 /* Text by reading tradition (NusachText.astro): the chosen one shows, by the `data-nusach` that
