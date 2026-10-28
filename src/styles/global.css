@@ -287,15 +287,15 @@
   color: var(--mark-silent);
 }
 /* A paseq is drawn hollow, a מונח לגרמיה's line solid (Arye, 2026-10-28): the font has no hollow
-   line, so the glyph is outlined and its inside left empty, and widened threefold so the inside
+   line, so the glyph is outlined and its inside left empty, and widened twofold so the inside
    shows even on a 1x screen. A transform takes no room in the line: the margin makes room for the
    wider glyph (enough for this font's narrow line). */
 .wp-content-rendered .mark-paseq {
   display: inline-block;
-  margin-inline: 0.12em;
-  transform: scaleX(3);
+  margin-inline: 0.06em;
+  transform: scaleX(2);
   -webkit-text-fill-color: transparent; /* the stroke keeps the text colour */
-  -webkit-text-stroke: 0.025em currentColor;
+  -webkit-text-stroke: 0.03em currentColor;
 }
 /* High-contrast modes may drop the stroke: draw the line solid rather than not at all. */
 @media (forced-colors: active) {

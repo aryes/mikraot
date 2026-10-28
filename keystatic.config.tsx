@@ -75,10 +75,10 @@ const content = fields.markdoc({
       schema: {},
       style: {
         display: 'inline-block',
-        margin: '0 0.12em',
-        transform: 'scaleX(3)',
+        margin: '0 0.06em',
+        transform: 'scaleX(2)',
         WebkitTextFillColor: 'transparent',
-        WebkitTextStroke: '0.025em currentColor',
+        WebkitTextStroke: '0.03em currentColor',
       },
     }),
     kbd: mark({ label: 'הזחה (kbd)', icon: <Keyboard />, schema: {}, tag: 'kbd' }),
