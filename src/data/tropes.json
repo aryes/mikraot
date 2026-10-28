@@ -144,6 +144,11 @@
     "sephardi": "",
     "yemenite": ""
   },
+  "פסק": {
+    "ashkenazi": "פְּסִיק",
+    "sephardi": "פָּסֵק",
+    "yemenite": "פָּסֵק"
+  },
   "מתג": {
     "ashkenazi": "מֶתֶג",
     "sephardi": "מַעֲמִיד (גַּעְיָא)",
