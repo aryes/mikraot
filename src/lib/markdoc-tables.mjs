@@ -100,6 +100,10 @@ const isLetters = (/** @type {string} */ text) =>
     .split(/\s*\/\s*|\s+/)
     .every((part) => LETTER.test(part));
 
+/** A hollow paseq ({% paseq %}׀{% /paseq %}, the sign in the trope list): read as the character ׀. */
+const isPaseq = (/** @type {import('@markdoc/markdoc').Node} */ part) =>
+  part.type === 'tag' && part.tag === 'paseq';
+
 /**
  * Table cells of the letter tables: a letter (or a sound's name, "A") with its recording ("בּ" +
  * audio) becomes one button with the letter in it (AudioButton's tile); a cell of letters alone
@@ -115,12 +119,14 @@ export const td = {
     const parts =
       node.children.length === 1 && first?.type === 'inline' ? first.children : node.children;
     const text = parts
-      .filter((part) => part.type === 'text')
-      .map((part) => String(part.attributes['content']))
+      .filter((part) => part.type === 'text' || isPaseq(part))
+      .map((part) => (isPaseq(part) ? '׀' : String(part.attributes['content'])))
       .join('')
       .trim();
     const audio = parts.filter((part) => part.type === 'tag' && part.tag === 'audio');
-    const others = parts.filter((part) => part.type !== 'text' && !audio.includes(part));
+    const others = parts.filter(
+      (part) => part.type !== 'text' && !isPaseq(part) && !audio.includes(part),
+    );
     const attributes = node.transformAttributes(config);
     if (others.length === 0 && audio.length === 1 && audio[0] && text) {
       const tile = new Markdoc.Ast.Node(
