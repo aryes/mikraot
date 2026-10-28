@@ -287,20 +287,33 @@
   color: var(--mark-silent);
 }
 /* A paseq is drawn hollow, a מונח לגרמיה's line solid (Arye, 2026-10-28): the font has no hollow
-   line, so the glyph is outlined and its inside left empty, and widened twofold so the inside
-   shows even on a 1x screen. A transform takes no room in the line: the margin makes room for the
-   wider glyph (enough for this font's narrow line). */
+   line, and its line's ends are slanted, so the glyph is hidden (it keeps its place in the line)
+   and a frame with straight ends is drawn over it: as high as the glyph and twice as wide, so the
+   inside shows even on a 1x screen. The em offsets are the glyph's ink box in Taamey David CLM
+   (from y=-143 to 1132, x=100 to 229, of 1914 units; ascent 1812, descent 709), widened about
+   its centre and grown by half the frame's thickness. The offsets are the regular weight's (the bold
+   glyph is wider), hence the normal weight in bold text too. The margin keeps a little space
+   beside the wider line. */
 .wp-content-rendered .mark-paseq {
-  display: inline-block;
+  position: relative;
   margin-inline: 0.06em;
-  transform: scaleX(2);
-  -webkit-text-fill-color: transparent; /* the stroke keeps the text colour */
-  -webkit-text-stroke: 0.03em currentColor;
+  font-weight: normal;
+  -webkit-text-fill-color: transparent; /* the frame keeps the text colour */
 }
-/* High-contrast modes may drop the stroke: draw the line solid rather than not at all. */
+.wp-content-rendered .mark-paseq::before {
+  content: '';
+  position: absolute;
+  inset: 0.34em auto 0.281em 0.003em;
+  width: 0.165em;
+  border: 0.03em solid currentColor;
+}
+/* High-contrast modes may ignore the hidden fill: draw the font's solid line, not both. */
 @media (forced-colors: active) {
   .wp-content-rendered .mark-paseq {
     -webkit-text-fill-color: currentColor;
+  }
+  .wp-content-rendered .mark-paseq::before {
+    content: none;
   }
 }
 /* As on the live site, kbd has no frame: the content uses it (with spaces) to indent verses. */
