@@ -287,10 +287,21 @@
   color: var(--mark-silent);
 }
 /* A paseq is drawn hollow, a מונח לגרמיה's line solid (Arye, 2026-10-28): the font has no hollow
-   line, so the glyph is outlined and its inside left empty. */
+   line, so the glyph is outlined and its inside left empty, and widened threefold so the inside
+   shows even on a 1x screen. A transform takes no room in the line: the margin makes room for the
+   wider glyph (enough for this font's narrow line). */
 .wp-content-rendered .mark-paseq {
+  display: inline-block;
+  margin-inline: 0.12em;
+  transform: scaleX(3);
   -webkit-text-fill-color: transparent; /* the stroke keeps the text colour */
-  -webkit-text-stroke: 0.035em currentColor;
+  -webkit-text-stroke: 0.025em currentColor;
+}
+/* High-contrast modes may drop the stroke: draw the line solid rather than not at all. */
+@media (forced-colors: active) {
+  .wp-content-rendered .mark-paseq {
+    -webkit-text-fill-color: currentColor;
+  }
 }
 /* As on the live site, kbd has no frame: the content uses it (with spaces) to indent verses. */
 .wp-content-rendered .content-kbd {
