@@ -999,16 +999,28 @@ test('email addresses are hidden from bots in the page, shown to people', async 
 test('in the trope list a whole row opens the trope page', async ({ page }) => {
   await page.goto('/רשימת-הטעמים/');
   const row = page.locator('tbody tr').filter({ has: page.locator('a', { hasText: 'טִפְּחָ֖א' }) });
-  // One link per row (for screen readers), but a click anywhere in the row follows it.
-  await expect(row.getByRole('link')).toHaveCount(1);
+  // The trope page's link is in the row once, but a click anywhere in the row follows it.
+  const trope = row.getByRole('link', { name: 'טִפְּחָ֖א' });
+  await expect(trope).toHaveCount(1);
   // It reads as text, not as a link (Arye, 2026-10-27).
-  await expect(row.getByRole('link')).toHaveCSS('text-decoration-line', 'none');
+  await expect(trope).toHaveCSS('text-decoration-line', 'none');
   // force: the stretched link covers the cell, as intended; the click lands on the link.
-  await row.locator('td').nth(4).click({ force: true });
+  await row.locator('td').nth(2).click({ force: true });
   await expect(page).toHaveURL(/\/%D7%98%D7%A4%D7%97%D7%90\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('טִפְּחָ֖א', {
     useInnerText: true,
   });
+});
+
+test('in the trope list the last column opens the rank of the trope on the hierarchy page', async ({
+  page,
+}) => {
+  await page.goto('/רשימת-הטעמים/');
+  const row = page.locator('tbody tr').filter({ has: page.locator('a', { hasText: 'טִפְּחָ֖א' }) });
+  // A link of its own, above the row's (Arye, 2026-10-28).
+  await row.getByRole('link', { name: 'מפסיק – מלך' }).click();
+  await expect(page).toHaveURL(/\/trope-hierarchy\/#kings$/);
+  await expect(page.locator('#kings')).toBeInViewport();
 });
 
 test('the tradition switch names the tropes in the chosen tradition, and remembers it', async ({
