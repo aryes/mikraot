@@ -11,6 +11,7 @@ import {
   Highlighter,
   Keyboard,
   ListTree,
+  Minus,
   Music,
   Newspaper,
   Video,
@@ -67,6 +68,12 @@ const content = fields.markdoc({
       icon: <EyeOff />,
       schema: {},
       style: { color: '#707070', textDecoration: 'underline dotted' },
+    }),
+    paseq: mark({
+      label: 'פסק (קו חלול, לא לגרמיה)',
+      icon: <Minus />,
+      schema: {},
+      style: { WebkitTextFillColor: 'transparent', WebkitTextStroke: '0.5px currentColor' },
     }),
     kbd: mark({ label: 'הזחה (kbd)', icon: <Keyboard />, schema: {}, tag: 'kbd' }),
     collapse: mark({

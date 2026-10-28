@@ -286,6 +286,12 @@
      pointed text. */
   color: var(--mark-silent);
 }
+/* A paseq is drawn hollow, a מונח לגרמיה's line solid (Arye, 2026-10-28): the font has no hollow
+   line, so the glyph is outlined and its inside left empty. */
+.wp-content-rendered .mark-paseq {
+  -webkit-text-fill-color: transparent; /* the stroke keeps the text colour */
+  -webkit-text-stroke: 0.035em currentColor;
+}
 /* As on the live site, kbd has no frame: the content uses it (with spaces) to indent verses. */
 .wp-content-rendered .content-kbd {
   padding: 0 0.3rem;

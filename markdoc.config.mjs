@@ -52,6 +52,8 @@ export default defineMarkdocConfig({
     highlight: styled('span', 'mark-highlight'),
     muted: styled('span', 'mark-muted'),
     silent: styled('span', 'mark-silent'),
+    // A paseq (׀), drawn hollow so it isn't read as the line of a מונח לגרמיה (Arye, 2026-10-28).
+    paseq: styled('span', 'mark-paseq'),
     kbd: styled('kbd', 'content-kbd'),
     audio: {
       render: component('./src/components/content/AudioButton.astro'),
