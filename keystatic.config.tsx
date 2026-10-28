@@ -73,7 +73,13 @@ const content = fields.markdoc({
       label: 'פסק (קו חלול, לא לגרמיה)',
       icon: <Minus />,
       schema: {},
-      style: { WebkitTextFillColor: 'transparent', WebkitTextStroke: '0.5px currentColor' },
+      style: {
+        display: 'inline-block',
+        margin: '0 0.12em',
+        transform: 'scaleX(3)',
+        WebkitTextFillColor: 'transparent',
+        WebkitTextStroke: '0.025em currentColor',
+      },
     }),
     kbd: mark({ label: 'הזחה (kbd)', icon: <Keyboard />, schema: {}, tag: 'kbd' }),
     collapse: mark({
