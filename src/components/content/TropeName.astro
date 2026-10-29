@@ -1,0 +1,28 @@
+---
+/**
+ * The content tag `{% trope name="טפחא" /%}`: a trope's name in the reader's tradition
+ * (NusachText; names in src/data/tropes.json, without the table's bracketed alternatives). With
+ * `nusach`, one tradition's full name as the names table gives it (the trope pages' names tables,
+ * the trope list). With `link`, a link to the trope's page.
+ */
+import { PASEQ, shortName, switchNames, trope, type Tradition } from '../../lib/tropes';
+import NusachText from './NusachText.astro';
+import TropeText from './TropeText.astro';
+
+interface Props {
+  name: string;
+  nusach?: Tradition | '';
+  link?: boolean;
+}
+
+const { name, nusach, link } = Astro.props;
+const names = trope(name);
+const fixed = nusach ? names[nusach] || '—' : undefined;
+const paseq = name === PASEQ;
+// Encoded like the content's other links (the trope list's CSS matches the encoded address).
+const href = link ? encodeURI(names.href) : undefined;
+// One line: whitespace inside <a> would add visible spaces.
+---
+
+<!-- prettier-ignore -->
+{href ? <a href={href}>{fixed ? <TropeText name={fixed} paseq={paseq} /> : <NusachText names={switchNames(name, shortName)} paseq={paseq} />}</a> : fixed ? <TropeText name={fixed} paseq={paseq} /> : <NusachText names={switchNames(name, shortName)} paseq={paseq} />}

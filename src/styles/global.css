@@ -286,6 +286,36 @@
      pointed text. */
   color: var(--mark-silent);
 }
+/* A paseq is drawn hollow, a מונח לגרמיה's line solid (Arye, 2026-10-28): the font has no hollow
+   line, and its line's ends are slanted, so the glyph is hidden (it keeps its place in the line)
+   and a frame with straight ends is drawn over it: as high as the glyph and twice as wide, so the
+   inside shows even on a 1x screen. The em offsets are the glyph's ink box in Taamey David CLM
+   (from y=-143 to 1132, x=100 to 229, of 1914 units; ascent 1812, descent 709), widened about
+   its centre and grown by half the frame's thickness. The offsets are the regular weight's (the bold
+   glyph is wider), hence the normal weight in bold text too. The margin keeps a little space
+   beside the wider line. */
+.mark-paseq {
+  position: relative;
+  margin-inline: 0.06em;
+  font-weight: normal;
+  -webkit-text-fill-color: transparent; /* the frame keeps the text colour */
+}
+.mark-paseq::before {
+  content: '';
+  position: absolute;
+  inset: 0.34em auto 0.281em 0.003em;
+  width: 0.165em;
+  border: 0.03em solid currentColor;
+}
+/* High-contrast modes may ignore the hidden fill: draw the font's solid line, not both. */
+@media (forced-colors: active) {
+  .mark-paseq {
+    -webkit-text-fill-color: currentColor;
+  }
+  .mark-paseq::before {
+    content: none;
+  }
+}
 /* As on the live site, kbd has no frame: the content uses it (with spaces) to indent verses. */
 .wp-content-rendered .content-kbd {
   padding: 0 0.3rem;
@@ -631,4 +661,116 @@ html {
 }
 .footnote-popup a:hover {
   color: var(--content-link-hover);
+}
+
+/* The trope list (/רשימת-הטעמים/; a table whose rows link to trope pages): the whole row opens
+   its page. The row's link (the Ashkenazi name, after the sign) is stretched over the row, so
+   a screen reader meets the page's link once; it reads as plain text, the row's hover showing
+   it can be clicked (Arye, 2026-10-25/27). */
+.wp-content-rendered
+  table:has(td > a[href^='/%D7%A8%D7%A9%D7%99%D7%9E%D7%AA-%D7%94%D7%98%D7%A2%D7%9E%D7%99%D7%9D/'])
+  tbody
+  tr {
+  position: relative;
+}
+.wp-content-rendered
+  table:has(td > a[href^='/%D7%A8%D7%A9%D7%99%D7%9E%D7%AA-%D7%94%D7%98%D7%A2%D7%9E%D7%99%D7%9D/'])
+  tbody
+  tr:hover {
+  background: var(--table-hover);
+}
+.wp-content-rendered
+  table:has(td > a[href^='/%D7%A8%D7%A9%D7%99%D7%9E%D7%AA-%D7%94%D7%98%D7%A2%D7%9E%D7%99%D7%9D/'])
+  td
+  > a {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
+.wp-content-rendered
+  table:has(td > a[href^='/%D7%A8%D7%A9%D7%99%D7%9E%D7%AA-%D7%94%D7%98%D7%A2%D7%9E%D7%99%D7%9D/'])
+  td
+  > a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+/* The last column's link, to the trope's rank on the hierarchy page (Arye, 2026-10-28), is a link
+   of its own: drawn as one, and above the row's stretched link. */
+.wp-content-rendered
+  table:has(td > a[href^='/%D7%A8%D7%A9%D7%99%D7%9E%D7%AA-%D7%94%D7%98%D7%A2%D7%9E%D7%99%D7%9D/'])
+  td
+  > a[href^='/trope-hierarchy/'] {
+  position: relative;
+  z-index: 1;
+  color: var(--content-link);
+  text-decoration: underline;
+}
+.wp-content-rendered
+  table:has(td > a[href^='/%D7%A8%D7%A9%D7%99%D7%9E%D7%AA-%D7%94%D7%98%D7%A2%D7%9E%D7%99%D7%9D/'])
+  td
+  > a[href^='/trope-hierarchy/']::after {
+  content: none;
+}
+
+/* Text by reading tradition (NusachText.astro): the chosen one shows, by the `data-nusach` that
+   the header switch sets on <html> (src/scripts/nusach.ts); Ashkenazi without a choice. */
+.nusach-sephardi,
+:root[data-nusach='sephardi'] .nusach-ashkenazi {
+  display: none;
+}
+:root[data-nusach='sephardi'] .nusach-sephardi {
+  display: inline;
+}
+
+/* The header's נוסח switch (SiteHeader.astro): where the browser lets a select's list be styled
+   (customizable select: Chrome, Edge), the list is a rounded card like the header's menus, in the
+   page's colours, instead of the system's square, light list. Elsewhere the native list stays. */
+@supports (appearance: base-select) {
+  .nusach-select,
+  .nusach-select::picker(select) {
+    appearance: base-select;
+  }
+  .nusach-select::picker-icon {
+    display: none; /* the pill draws its own arrow */
+  }
+  .nusach-select::picker(select) {
+    margin-block-start: 0.375rem;
+    border: 1px solid var(--color-slate-200);
+    border-radius: 0.75rem;
+    background: white;
+    padding: 0.25rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  }
+  .nusach-select option {
+    border-radius: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    color: var(--color-slate-700);
+  }
+  .nusach-select option:hover,
+  .nusach-select option:focus-visible {
+    background: var(--color-slate-100);
+  }
+  .nusach-select option::checkmark {
+    color: var(--color-brand-strong);
+  }
+}
+@media screen and (prefers-color-scheme: dark) {
+  @supports (appearance: base-select) {
+    .nusach-select::picker(select) {
+      border-color: var(--color-slate-700);
+      background: var(--color-slate-900);
+    }
+    .nusach-select option {
+      background: transparent;
+      color: var(--color-slate-200);
+    }
+    .nusach-select option:hover,
+    .nusach-select option:focus-visible {
+      background: var(--color-slate-800);
+    }
+    .nusach-select option::checkmark {
+      color: var(--color-brand);
+    }
+  }
 }

@@ -1,0 +1,17 @@
+---
+/**
+ * One name of a trope. The line of פסק (PASEQ) is drawn hollow, as in the content's paseq tag
+ * (global.css, mark-paseq), so its name isn't read as the line of מונח לגרמיה.
+ */
+interface Props {
+  name: string;
+  paseq?: boolean | undefined;
+}
+
+const { name, paseq } = Astro.props;
+const parts = paseq ? name.split('׀') : [name];
+// One line: whitespace between the parts would add visible spaces.
+---
+
+<!-- prettier-ignore -->
+{parts.map((part, i) => <>{i > 0 && <span class="mark-paseq">׀</span>}{part}</>)}

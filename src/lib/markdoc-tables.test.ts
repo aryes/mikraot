@@ -5,6 +5,7 @@ import { td, thead } from './markdoc-tables.mjs';
 const config = {
   nodes: { td, thead },
   tags: {
+    paseq: { render: 'span', attributes: { class: { type: String, default: 'mark-paseq' } } },
     audio: {
       render: 'audio-button',
       attributes: { src: { type: String }, label: { type: String } },
@@ -58,6 +59,18 @@ describe('letter table cells', () => {
       expect(cell(letters)).toMatch(/^<td class="cell-letter">/);
     }
     for (const words of ['פרק', 'abc', 'קמץ']) {
+      expect(cell(words)).toMatch(/^<td>/);
+    }
+  });
+
+  it('draws a trope shown on א large too, with its sof pasuk, pasek or second letter', () => {
+    for (const signs of ['א֖', 'אֽ׃', 'א֣׀', 'א֙א֙', 'א֨ א֜']) {
+      expect(cell(signs)).toMatch(/^<td class="cell-letter">/);
+    }
+    // The paseq sign itself, its line drawn hollow (a tag), is a letter cell as well.
+    expect(cell('א{% paseq %}׀{% /paseq %}')).toMatch(/^<td class="cell-letter">א<span/);
+    // Two-letter words and words with a pasek stay text.
+    for (const words of ['לֹא', 'מִי', 'לְךָ', 'גַּם ׀']) {
       expect(cell(words)).toMatch(/^<td>/);
     }
   });

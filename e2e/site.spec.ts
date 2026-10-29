@@ -204,9 +204,9 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
   expect(index.status()).toBe(200);
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
   // 37 pages and posts (the privacy policy since 2026-10-13, the launch post since the switch,
-  // קרי וכתיב since 2026-10-22),
+  // קרי וכתיב since 2026-10-22, the trope list and its 29 pages since 2026-10-24, פסק since 2026-10-28),
   // the two month archives and the category archive, "What's new" (the author archive is noindex).
-  expect(sitemap.match(/<loc>/g)).toHaveLength(41);
+  expect(sitemap.match(/<loc>/g)).toHaveLength(72);
   expect(sitemap).not.toContain('/author/');
 
   const old = await request.get('/sitemap.xml', { maxRedirects: 0 });
@@ -994,4 +994,63 @@ test('email addresses are hidden from bots in the page, shown to people', async 
   await page.goto('/privacy-policy/');
   const link = page.locator('main a[href="mailto:admin@mikraot.net"]').first();
   await expect(link).toHaveText('admin@mikraot.net');
+});
+
+test('in the trope list a whole row opens the trope page', async ({ page }) => {
+  await page.goto('/רשימת-הטעמים/');
+  const row = page.locator('tbody tr').filter({ has: page.locator('a', { hasText: 'טִפְּחָ֖א' }) });
+  // The trope page's link is in the row once, but a click anywhere in the row follows it.
+  const trope = row.getByRole('link', { name: 'טִפְּחָ֖א' });
+  await expect(trope).toHaveCount(1);
+  // It reads as text, not as a link (Arye, 2026-10-27).
+  await expect(trope).toHaveCSS('text-decoration-line', 'none');
+  // force: the stretched link covers the cell, as intended; the click lands on the link.
+  await row.locator('td').nth(2).click({ force: true });
+  await expect(page).toHaveURL(/\/%D7%98%D7%A4%D7%97%D7%90\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('טִפְּחָ֖א', {
+    useInnerText: true,
+  });
+});
+
+test('in the trope list the last column opens the rank of the trope on the hierarchy page', async ({
+  page,
+}) => {
+  await page.goto('/רשימת-הטעמים/');
+  const row = page.locator('tbody tr').filter({ has: page.locator('a', { hasText: 'טִפְּחָ֖א' }) });
+  // A link of its own, above the row's (Arye, 2026-10-28).
+  await row.getByRole('link', { name: 'מפסיק – מלך' }).click();
+  await expect(page).toHaveURL(/\/trope-hierarchy\/#kings$/);
+  await expect(page.locator('#kings')).toBeInViewport();
+});
+
+test('the tradition switch names the tropes in the chosen tradition, and remembers it', async ({
+  page,
+}) => {
+  await page.goto('/רשימת-הטעמים/אתנחתא/');
+  // innerText: the page holds every tradition's name, and shows one.
+  const heading = page.getByRole('heading', { level: 1 });
+  await expect(heading).toHaveText('אֶתְנַחְתָּ֑א', { useInnerText: true });
+  await expect(page).toHaveTitle('אתנחתא - מקראות');
+  await page.getByRole('combobox', { name: 'נוסח' }).selectOption('sephardi');
+  await expect(heading).toHaveText('אַתְנָ֑ח', { useInnerText: true });
+  await expect(page).toHaveTitle('אתנח - מקראות');
+  // Names in the text follow it; the names table keeps every tradition's name.
+  await expect(page.locator('.wp-content-rendered p').first()).toContainText('הטעם אַתְנָ֑ח', {
+    useInnerText: true,
+  });
+  await expect(page.locator('.wp-content-rendered table')).toContainText('אֶתְנַחְתָּ֑א');
+  // Saved for the next page, applied before it draws (by an inline script the CSP allows).
+  const blocked: string[] = [];
+  page.on('console', (message) => {
+    if (/Content Security Policy|Refused to/.test(message.text())) blocked.push(message.text());
+  });
+  await page.goto('/רשימת-הטעמים/טפחא/');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('טַרְחָ֖א', {
+    useInnerText: true,
+  });
+  await expect(page.getByRole('combobox', { name: 'נוסח' })).toHaveValue('sephardi');
+  // On the 404 page, which gets its CSP as a header that covers the whole page.
+  await page.goto('/no-such-page/');
+  await expect(page.locator('html')).toHaveAttribute('data-nusach', 'sephardi');
+  expect(blocked).toEqual([]);
 });

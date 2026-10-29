@@ -52,6 +52,8 @@ export default defineMarkdocConfig({
     highlight: styled('span', 'mark-highlight'),
     muted: styled('span', 'mark-muted'),
     silent: styled('span', 'mark-silent'),
+    // A paseq (׀), drawn hollow so it isn't read as the line of a מונח לגרמיה (Arye, 2026-10-28).
+    paseq: styled('span', 'mark-paseq'),
     kbd: styled('kbd', 'content-kbd'),
     audio: {
       render: component('./src/components/content/AudioButton.astro'),
@@ -71,6 +73,16 @@ export default defineMarkdocConfig({
     picker: {
       render: component('./src/components/content/ListPicker.astro'),
       attributes: { levels: { type: String }, chapters: { type: String } },
+    },
+    // A trope's name in the reader's tradition (src/data/tropes.json), or in one tradition.
+    trope: {
+      render: component('./src/components/content/TropeName.astro'),
+      attributes: {
+        name: { type: String, required: true },
+        nusach: { type: String, matches: ['', 'ashkenazi', 'sephardi', 'yemenite'] },
+        link: { type: Boolean },
+      },
+      selfClosing: true,
     },
     'latest-posts': {
       render: component('./src/components/content/LatestPosts.astro'),

@@ -11,6 +11,7 @@ import PageBanner from '../components/layout/PageBanner.astro';
 import { authorUrl } from '../lib/archive';
 import { site, type Crumb } from '../lib/site';
 import { jsonLd, structuredData } from '../lib/structured-data';
+import type { Nusach } from '../lib/tropes';
 import BaseLayout from './BaseLayout.astro';
 
 interface Props {
@@ -20,6 +21,10 @@ interface Props {
   ogImage?: string | undefined;
   /** The page heading (the h1). */
   title: string;
+  /** A trope page's trope: the heading names it in the reader's tradition, in place of `title`. */
+  titleTrope?: string | undefined;
+  /** The document title in each tradition, likewise. */
+  documentTitles?: Record<Nusach, string> | undefined;
   /** The front page's tagline, under its title. */
   subtitle?: string | undefined;
   crumbs?: Crumb[] | undefined;
@@ -28,7 +33,18 @@ interface Props {
   post?: { date: Date; category?: string | undefined } | undefined;
 }
 
-const { documentTitle, description, ogImage, title, subtitle, crumbs, noindex, post } = Astro.props;
+const {
+  documentTitle,
+  description,
+  ogImage,
+  title,
+  titleTrope,
+  documentTitles,
+  subtitle,
+  crumbs,
+  noindex,
+  post,
+} = Astro.props;
 const origin = (Astro.site ?? Astro.url).origin;
 const absolute = (path: string) => new URL(path, origin).href;
 const structured = structuredData(
@@ -53,9 +69,15 @@ const structured = structuredData(
 );
 ---
 
-<BaseLayout title={documentTitle} description={description} ogImage={ogImage} noindex={noindex}>
+<BaseLayout
+  title={documentTitle}
+  titles={documentTitles}
+  description={description}
+  ogImage={ogImage}
+  noindex={noindex}
+>
   <script slot="head" type="application/ld+json" set:html={jsonLd(structured)} />
-  <PageBanner title={title} crumbs={crumbs} />
+  <PageBanner title={title} titleTrope={titleTrope} crumbs={crumbs} />
   <div class="mx-auto max-w-4xl pb-3 sm:px-6 sm:py-8 lg:px-8 print:max-w-none print:p-0 print:pt-4">
     <div class="min-w-0 border-b border-slate-200/80 sm:rounded-2xl sm:border dark:border-slate-700/80 bg-white dark:bg-slate-900 px-4 py-6 shadow-xs sm:p-10 print:border-0 print:p-0 print:shadow-none">
       {crumbs === undefined && (

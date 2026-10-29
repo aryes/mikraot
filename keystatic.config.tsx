@@ -11,6 +11,8 @@ import {
   Highlighter,
   Keyboard,
   ListTree,
+  Minus,
+  Music,
   Newspaper,
   Video,
   Volume2,
@@ -67,6 +69,18 @@ const content = fields.markdoc({
       schema: {},
       style: { color: '#707070', textDecoration: 'underline dotted' },
     }),
+    paseq: mark({
+      label: 'פסק (קו חלול, לא לגרמיה)',
+      icon: <Minus />,
+      schema: {},
+      style: {
+        display: 'inline-block',
+        margin: '0 0.06em',
+        transform: 'scaleX(2)',
+        WebkitTextFillColor: 'transparent',
+        WebkitTextStroke: '0.03em currentColor',
+      },
+    }),
     kbd: mark({ label: 'הזחה (kbd)', icon: <Keyboard />, schema: {}, tag: 'kbd' }),
     collapse: mark({
       label: 'ביאור מוסתר',
@@ -99,6 +113,24 @@ const content = fields.markdoc({
         }),
       },
     }),
+    trope: inline({
+      label: 'שם טעם (לפי הנוסח)',
+      icon: <Music />,
+      schema: {
+        name: fields.text({ label: 'הטעם (כמו בכתובת העמוד שלו, למשל זקף-קטן)' }),
+        nusach: fields.select({
+          label: 'נוסח',
+          options: [
+            { label: 'לפי בחירת הקורא', value: '' },
+            { label: 'אשכנזי', value: 'ashkenazi' },
+            { label: 'ספרדי', value: 'sephardi' },
+            { label: 'תימני', value: 'yemenite' },
+          ],
+          defaultValue: '',
+        }),
+        link: fields.checkbox({ label: 'קישור לעמוד הטעם', defaultValue: false }),
+      },
+    }),
     'latest-posts': block({ label: 'פוסטים אחרונים', icon: <Newspaper />, schema: {} }),
   },
 });
@@ -121,6 +153,9 @@ export default config({
         title: fields.slug({
           name: { label: 'כותרת' },
           slug: { label: 'כתובת (slug)', generate: slugFromTitle },
+        }),
+        trope: fields.text({
+          label: 'טעם (בעמוד של טעם: הכותרת היא שמו לפי הנוסח; src/data/tropes.json)',
         }),
         kind: fields.select({
           label: 'סוג',

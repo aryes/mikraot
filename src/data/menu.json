@@ -165,7 +165,7 @@
     "title": "שיר הטעמים",
     "url": null,
     "parentId": 348,
-    "order": 23
+    "order": 24
   },
   {
     "id": 220,
@@ -250,6 +250,13 @@
     "url": "/trope-hierarchy/",
     "parentId": 348,
     "order": 35
+  },
+  {
+    "id": 658,
+    "title": "רשימת הטעמים",
+    "url": "/רשימת-הטעמים/",
+    "parentId": 348,
+    "order": 23
   },
   {
     "id": 389,

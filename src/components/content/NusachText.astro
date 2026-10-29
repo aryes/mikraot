@@ -1,0 +1,25 @@
+---
+/**
+ * Text that differs by reading tradition (a trope's name): every tradition's version is in the
+ * page, and CSS shows the one the reader chose (global.css, `nusach-`; BaseLayout.astro applies
+ * the saved choice before the page draws). The default, Ashkenazi, is what search engines and readers
+ * without JavaScript see; the others are left out of the search index, so its excerpts don't
+ * show two names side by side. One tradition's text alone, or all the same, is plain text.
+ */
+import type { Nusach } from '../../lib/tropes';
+import TropeText from './TropeText.astro';
+
+interface Props {
+  names: Record<Nusach, string>;
+  /** The names are of פסק (TropeText). */
+  paseq?: boolean | undefined;
+}
+
+const { names, paseq } = Astro.props;
+const { ashkenazi, ...others } = names;
+const variants = Object.entries(others).filter(([, name]) => name !== ashkenazi);
+// The markup stays on one line: whitespace between the spans would add visible spaces.
+---
+
+<!-- prettier-ignore -->
+{variants.length === 0 ? <TropeText name={ashkenazi} paseq={paseq} /> : <><span class="nusach-ashkenazi"><TropeText name={ashkenazi} paseq={paseq} /></span>{variants.map(([nusach, name]) => <span class={`nusach-${nusach}`} data-pagefind-ignore><TropeText name={name} paseq={paseq} /></span>)}</>}
