@@ -27,6 +27,9 @@ export function trope(id: string): Trope & { href: string } {
   return { ...found, href: found.href ?? `/רשימת-הטעמים/${id}/` };
 }
 
+/** The sign whose line (׀) is drawn hollow (mark-paseq), unlike the line of מונח לגרמיה. */
+export const PASEQ = 'פסק';
+
 /** A name without the alternative the table adds in brackets ("רְבִ֗יעַ (רְבִיעִי)"). */
 export const shortName = (name: string) => name.replace(/\s*\(.*\)$/, '');
 
