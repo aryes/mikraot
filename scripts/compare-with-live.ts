@@ -55,7 +55,7 @@ const CHANGED_ON_PURPOSE: Readonly<Record<string, string>> = {
     'its names table; trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
   '/אתנחתא-וסוף-פסוק/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
   '/טעמים-דומים/':
-    'trope names follow the reader’s נוסח and link to their pages (2026-10-27); legarmeh before revia "almost always", not "only" (2026-10-29)',
+    'trope names follow the reader’s נוסח and link to their pages (2026-10-27); legarmeh before revia "almost always", not "only", and "almost all" the rest are paseq (2026-10-29)',
   '/טעמים/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
   '/פַּשְׁטָא֙-זָקֵף-קָטָ֔ן/':
     'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
