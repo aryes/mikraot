@@ -35,8 +35,7 @@ interface Props {
 const { page, pages } = Astro.props;
 const { entry, path } = page;
 const { title, seo, kind, categories, trope } = entry.data;
-// A trope page's heading and tab title name the trope in the reader's tradition.
-const titleNames = trope ? switchNames(trope) : undefined;
+// A trope page's tab title names the trope in the reader's tradition (its heading: titleTrope).
 const documentTitle = seo?.title || `${title} - ${site.title}`;
 // The Ashkenazi tab title is the page's own, so switching back restores it.
 const documentTitles = trope
@@ -61,7 +60,7 @@ const crumbs = isPost
   description={seo?.description || undefined}
   ogImage={seo?.ogImage || ogImagePath(path)}
   title={isFrontPage ? site.title : title}
-  titleNames={titleNames}
+  titleTrope={trope ?? undefined}
   documentTitles={documentTitles}
   subtitle={isFrontPage ? site.tagline : undefined}
   crumbs={isFrontPage ? undefined : crumbs}

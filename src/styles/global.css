@@ -294,13 +294,13 @@
    its centre and grown by half the frame's thickness. The offsets are the regular weight's (the bold
    glyph is wider), hence the normal weight in bold text too. The margin keeps a little space
    beside the wider line. */
-.wp-content-rendered .mark-paseq {
+.mark-paseq {
   position: relative;
   margin-inline: 0.06em;
   font-weight: normal;
   -webkit-text-fill-color: transparent; /* the frame keeps the text colour */
 }
-.wp-content-rendered .mark-paseq::before {
+.mark-paseq::before {
   content: '';
   position: absolute;
   inset: 0.34em auto 0.281em 0.003em;
@@ -309,10 +309,10 @@
 }
 /* High-contrast modes may ignore the hidden fill: draw the font's solid line, not both. */
 @media (forced-colors: active) {
-  .wp-content-rendered .mark-paseq {
+  .mark-paseq {
     -webkit-text-fill-color: currentColor;
   }
-  .wp-content-rendered .mark-paseq::before {
+  .mark-paseq::before {
     content: none;
   }
 }

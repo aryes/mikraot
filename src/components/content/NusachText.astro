@@ -7,15 +7,19 @@
  * show two names side by side. One tradition's text alone, or all the same, is plain text.
  */
 import type { Nusach } from '../../lib/tropes';
+import TropeText from './TropeText.astro';
 
 interface Props {
   names: Record<Nusach, string>;
+  /** The names are of פסק (TropeText). */
+  paseq?: boolean | undefined;
 }
 
-const { ashkenazi, ...others } = Astro.props.names;
+const { names, paseq } = Astro.props;
+const { ashkenazi, ...others } = names;
 const variants = Object.entries(others).filter(([, name]) => name !== ashkenazi);
 // The markup stays on one line: whitespace between the spans would add visible spaces.
 ---
 
 <!-- prettier-ignore -->
-{variants.length === 0 ? ashkenazi : <><span class="nusach-ashkenazi">{ashkenazi}</span>{variants.map(([nusach, name]) => <span class={`nusach-${nusach}`} data-pagefind-ignore>{name}</span>)}</>}
+{variants.length === 0 ? <TropeText name={ashkenazi} paseq={paseq} /> : <><span class="nusach-ashkenazi"><TropeText name={ashkenazi} paseq={paseq} /></span>{variants.map(([nusach, name]) => <span class={`nusach-${nusach}`} data-pagefind-ignore><TropeText name={name} paseq={paseq} /></span>)}</>}

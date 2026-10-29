@@ -10,18 +10,17 @@
  * the first screen shows the content rather than the title.
  */
 import type { Crumb } from '../../lib/site';
-import type { Nusach } from '../../lib/tropes';
-import NusachText from '../content/NusachText.astro';
+import TropeName from '../content/TropeName.astro';
 
 interface Props {
   title: string;
-  /** A title that follows the reader's tradition (a trope page), in place of `title`. */
-  titleNames?: Record<Nusach, string> | undefined;
+  /** A trope page's trope: the title names it in the reader's tradition, in place of `title`. */
+  titleTrope?: string | undefined;
   /** Pages above this one; the trail starts at the home page and ends with the title. */
   crumbs?: Crumb[] | undefined;
 }
 
-const { title, titleNames, crumbs } = Astro.props;
+const { title, titleTrope, crumbs } = Astro.props;
 import { Picture } from 'astro:assets';
 // The WordPress banner photo (also kept at its old URLs in public/wp-content/uploads/), resized
 // and converted to AVIF/WebP at build time; the banner shows only a strip of it.
@@ -61,7 +60,7 @@ import bannerYad from '../../assets/banner-yad.jpg';
           <li class="flex items-center gap-2">
             <span aria-hidden="true">/</span>
             <span aria-current="page" class="font-semibold text-brand-deep dark:text-brand-light">
-              {titleNames ? <NusachText names={titleNames} /> : title}
+              {titleTrope ? <TropeName name={titleTrope} /> : title}
             </span>
           </li>
         </ol>
@@ -77,7 +76,7 @@ import bannerYad from '../../assets/banner-yad.jpg';
           class="banner-photo hidden h-16 w-[120px] flex-none rounded-lg object-cover sm:block print:hidden"
         />
         <h1 class="text-[1.75rem] leading-tight font-bold text-brand-deep dark:text-brand-light sm:text-4xl print:text-black">
-          {titleNames ? <NusachText names={titleNames} /> : title}
+          {titleTrope ? <TropeName name={titleTrope} /> : title}
         </h1>
       </div>
     </div>
