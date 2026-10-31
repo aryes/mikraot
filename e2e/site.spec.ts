@@ -1012,15 +1012,15 @@ test('in the trope list a whole row opens the trope page', async ({ page }) => {
   });
 });
 
-test('in the trope list the last column opens the rank of the trope on the hierarchy page', async ({
+test('in the trope list the last column opens the trope page like the rest of the row', async ({
   page,
 }) => {
   await page.goto('/רשימת-הטעמים/');
   const row = page.locator('tbody tr').filter({ has: page.locator('a', { hasText: 'טִפְּחָ֖א' }) });
-  // A link of its own, above the row's (Arye, 2026-10-28).
-  await row.getByRole('link', { name: 'מפסיק – מלך' }).click();
-  await expect(page).toHaveURL(/\/trope-hierarchy\/#kings$/);
-  await expect(page.locator('#kings')).toBeInViewport();
+  // No link of its own: every column of a row leads to the same place (Arye, 2026-10-31).
+  await expect(row.getByRole('link')).toHaveCount(1);
+  await row.locator('td').last().click({ force: true });
+  await expect(page).toHaveURL(/\/%D7%98%D7%A4%D7%97%D7%90\/$/);
 });
 
 test('the tradition switch names the tropes in the chosen tradition, and remembers it', async ({
