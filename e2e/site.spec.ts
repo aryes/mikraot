@@ -243,6 +243,13 @@ test('heading anchors from WordPress survive (Hebrew ones included)', async ({ p
   await expect(page.locator('[id="הגיה"]')).toHaveCount(1);
 });
 
+test('exercise titles can be linked to', async ({ page }) => {
+  await page.goto('/רשימת-הטעמים/תביר/');
+  await expect(page.locator('[id="תרגול-2-הטעם-ברצף"]')).toHaveText('תרגול 2 – הטעם ברצף');
+  await page.goto('/רשימת-הטעמים/פסק/');
+  await expect(page.locator('[id="מונח-לגרמיה-עם-פסק"]')).toHaveCount(1);
+});
+
 test('the home page shows the newest post, as the first one in the news feed', async ({
   page,
   request,

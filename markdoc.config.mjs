@@ -21,6 +21,20 @@ const collapse = (/** @type {boolean} */ inline) => ({
   },
 });
 
+/**
+ * An exercise heading's id, so each exercise can be linked to: its words joined by dashes. A heading
+ * with a tag in it (a trope name, say) has no plain words to use and needs an explicit anchor.
+ */
+const exerciseId = (/** @type {import('@markdoc/markdoc').Node} */ node) => {
+  const parts = [...node.walk()];
+  if (parts.some((part) => part.type === 'tag')) return undefined;
+  const text = parts
+    .filter((part) => part.type === 'text')
+    .map((part) => part.attributes.content)
+    .join('');
+  return text.startsWith('תרגול') ? text.trim().replace(/[\s–]+/g, '-') : undefined;
+};
+
 export default defineMarkdocConfig({
   nodes: {
     heading: {
@@ -35,9 +49,10 @@ export default defineMarkdocConfig({
       // An explicit anchor (the target of in-page links) becomes the heading's id.
       transform(node, config) {
         const { level, anchor, size } = node.transformAttributes(config);
+        const id = anchor ?? exerciseId(node);
         return new Markdoc.Tag(
           `h${level}`,
-          { ...(anchor && { id: anchor }), ...(size === 'small' && { class: 'heading-small' }) },
+          { ...(id && { id }), ...(size === 'small' && { class: 'heading-small' }) },
           node.transformChildren(config),
         );
       },
