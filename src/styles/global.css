@@ -153,6 +153,35 @@
 .wp-content-rendered h4 {
   font-size: 1.3rem;
 }
+/* The link beside a section title: shown on hover or focus, always on touch screens. */
+.heading-link {
+  display: inline-block;
+  margin-inline-start: 0.35em;
+  padding: 0.25rem;
+  vertical-align: middle;
+  opacity: 0;
+}
+.heading-link svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+:is(h2, h3, h4, h5, h6):hover .heading-link,
+.heading-link:focus-visible,
+.heading-link[data-copied] {
+  opacity: 1;
+}
+@media (hover: none) {
+  .heading-link {
+    opacity: 1;
+  }
+}
+.heading-copied-icon,
+.heading-link[data-copied] .heading-link-icon {
+  display: none;
+}
+.heading-link[data-copied] .heading-copied-icon {
+  display: inline;
+}
 /* A heading drawn smaller than its level (markdoc.config.mjs, size="small"). */
 .wp-content-rendered .heading-small {
   font-size: 1.3rem;
@@ -546,6 +575,7 @@
    the components; these rules cover the content. Collapsed explanations print as they are on
    screen, so a lesson prints as a worksheet, or with its answers after opening them. */
 @media print {
+  .heading-link,
   .wp-content-rendered .inline-audio-btn:not(.audio-tile),
   .wp-content-rendered td .inline-audio-btn:not(.audio-tile),
   .wp-content-rendered .audio-tile svg,

@@ -122,7 +122,11 @@ const WIDGETS = {
     audio: '.compact_audio_player_wrapper',
     noise: 'input, script, style, .sharedaddy, .jp-relatedposts',
   },
-  ours: { collapses: '.collapse-toggle-btn', audio: '.inline-audio-btn', noise: 'script, style' },
+  ours: {
+    collapses: '.collapse-toggle-btn',
+    audio: '.inline-audio-btn',
+    noise: 'script, style, .heading-link',
+  },
 };
 
 /** Colour of a text run: inline style, WordPress palette class, or this site's mark classes. */

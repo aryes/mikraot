@@ -4,6 +4,7 @@
  * produces (scripts/content/wp-to-markdoc.ts) and the Keystatic editor offers (keystatic.config.tsx).
  */
 import { Markdoc, component, defineMarkdocConfig, nodes } from '@astrojs/markdoc/config';
+import { headingId, headingLink } from './src/lib/markdoc-headings.mjs';
 import { td, thead } from './src/lib/markdoc-tables.mjs';
 
 /** A tag rendered as a plain element with a fixed class. */
@@ -21,20 +22,6 @@ const collapse = (/** @type {boolean} */ inline) => ({
   },
 });
 
-/**
- * An exercise heading's id, so each exercise can be linked to: its words joined by dashes. A heading
- * with a tag in it (a trope name, say) has no plain words to use and needs an explicit anchor.
- */
-const exerciseId = (/** @type {import('@markdoc/markdoc').Node} */ node) => {
-  const parts = [...node.walk()];
-  if (parts.some((part) => part.type === 'tag')) return undefined;
-  const text = parts
-    .filter((part) => part.type === 'text')
-    .map((part) => part.attributes.content)
-    .join('');
-  return text.startsWith('תרגול') ? text.trim().replace(/[\s–]+/g, '-') : undefined;
-};
-
 export default defineMarkdocConfig({
   nodes: {
     heading: {
@@ -46,14 +33,16 @@ export default defineMarkdocConfig({
         // heading smaller than its level, so the outline can be right without changing the look.
         size: { type: String, matches: ['', 'small'] },
       },
-      // An explicit anchor (the target of in-page links) becomes the heading's id.
+      // An explicit anchor (the target of in-page links) wins over the id made from the words.
+      // Small headings are the front page's topics, not sections of a text.
       transform(node, config) {
         const { level, anchor, size } = node.transformAttributes(config);
-        const id = anchor ?? exerciseId(node);
+        const id = anchor ?? headingId(node);
+        const children = node.transformChildren(config);
         return new Markdoc.Tag(
           `h${level}`,
           { ...(id && { id }), ...(size === 'small' && { class: 'heading-small' }) },
-          node.transformChildren(config),
+          id && size !== 'small' ? [...children, headingLink(id)] : children,
         );
       },
     },

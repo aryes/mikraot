@@ -243,11 +243,26 @@ test('heading anchors from WordPress survive (Hebrew ones included)', async ({ p
   await expect(page.locator('[id="הגיה"]')).toHaveCount(1);
 });
 
-test('exercise titles can be linked to', async ({ page }) => {
+test('section titles can be linked to, and their link copies the address', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/רשימת-הטעמים/תביר/');
-  await expect(page.locator('[id="תרגול-2-הטעם-ברצף"]')).toHaveText('תרגול 2 – הטעם ברצף');
+  const title = page.locator('[id="תרגול-2-הטעם-ברצף"]');
+  await expect(title).toHaveText('תרגול 2 – הטעם ברצף');
+  await title.hover();
+  const link = title.locator('.heading-link');
+  await link.click();
+  await expect(link).toHaveAttribute('data-copied', '');
+  await expect(page).toHaveURL(/#/);
+  expect(decodeURI(await page.evaluate(() => navigator.clipboard.readText()))).toContain(
+    '#תרגול-2-הטעם-ברצף',
+  );
+  // A title with a trope name in it, and a heading of an ordinary page.
   await page.goto('/רשימת-הטעמים/פסק/');
-  await expect(page.locator('[id="מונח-לגרמיה-עם-פסק"]')).toHaveCount(1);
+  await expect(page.locator('[id="מונח-לגרמיה-עם-פסק"] .heading-link')).toHaveCount(1);
+  await expect(page.locator('[id="שמות-הטעם"] .heading-link')).toHaveCount(1);
 });
 
 test('the home page shows the newest post, as the first one in the news feed', async ({
@@ -445,7 +460,7 @@ test('a printed lesson keeps the content and drops navigation, comments and play
   await page.locator('.collapse-toggle-btn').first().click();
   await page.emulateMedia({ media: 'print' });
   const layoutParts = page.locator(
-    'header, footer, aside, .banner-photo, .inline-audio-btn:not(.audio-tile), .audio-tile svg, [data-pagefind-ignore], dialog',
+    'header, footer, aside, .banner-photo, .inline-audio-btn:not(.audio-tile), .audio-tile svg, .heading-link, [data-pagefind-ignore], dialog',
   );
   expect(await layoutParts.count()).toBeGreaterThan(5);
   const visible = await layoutParts.evaluateAll((parts) =>

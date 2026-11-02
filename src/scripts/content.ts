@@ -1,6 +1,7 @@
 /**
  * Browser behaviour for page content (components in src/components/content/): audio buttons,
- * collapsible explanations, and YouTube links (videos, playlists) in lists opening a popup.
+ * collapsible explanations, links to section titles, and YouTube links (videos, playlists) in
+ * lists opening a popup.
  */
 import { track } from './analytics';
 
@@ -15,6 +16,23 @@ function youtubeEmbed(url: string): string | null {
   if (video) return video;
   const list = YOUTUBE_PLAYLIST.exec(url)?.[1];
   return list ? `videoseries?list=${list}` : null;
+}
+
+/** Copies a section title's address; the link itself still moves the page there. */
+function copyHeadingLink(link: HTMLAnchorElement): void {
+  const label = link.getAttribute('aria-label') ?? '';
+  navigator.clipboard
+    ?.writeText(link.href)
+    .then(() => {
+      link.dataset['copied'] = '';
+      link.setAttribute('aria-label', 'הקישור הועתק');
+      setTimeout(() => {
+        delete link.dataset['copied'];
+        link.setAttribute('aria-label', label);
+      }, 2000);
+    })
+    // Refused: the address bar still has the link, since the page moved there.
+    .catch(() => undefined);
 }
 
 let audio: HTMLAudioElement | null = null;
@@ -210,6 +228,12 @@ document.addEventListener('click', (event) => {
   if (collapseBtn) {
     event.preventDefault();
     toggleCollapse(collapseBtn);
+    return;
+  }
+
+  const headingLink = event.target.closest<HTMLAnchorElement>('.heading-link');
+  if (headingLink) {
+    copyHeadingLink(headingLink);
     return;
   }
 
