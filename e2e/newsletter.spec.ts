@@ -128,11 +128,12 @@ test('the privacy policy is published and linked from the footer and both forms'
   const policy = await page.goto('/privacy-policy/');
   expect(policy?.status()).toBe(200);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('מדיניות הפרטיות');
+  // Listening from before the page opens: on a short page the comments may load right away.
+  const loaded = page.waitForResponse((r) => r.url().includes('/api/comments/') && r.ok());
   await page.goto('/about/');
   await expect(page.locator('footer a[href="/privacy-policy/"]')).toHaveCount(1); // bottom line
   // The comment form's link (the page's content has none of its own). First, as opening the
   // footer form below scrolls past the comments, which load on the way.
-  const loaded = page.waitForResponse((r) => r.url().includes('/api/comments/') && r.ok());
   await page.getByRole('heading', { name: /תגובות ושאלות/ }).scrollIntoViewIfNeeded();
   await loaded;
   await page.getByRole('button', { name: 'כתבו תגובה או שאלה' }).click();
