@@ -73,6 +73,16 @@ export default defineMarkdocConfig({
       attributes: { videoId: { type: String, required: true } },
       selfClosing: true,
     },
+    // A picture from src/assets/posts/, with an optional dark-mode version.
+    screenshot: {
+      render: component('./src/components/content/Screenshot.astro'),
+      attributes: {
+        light: { type: String, required: true },
+        dark: { type: String },
+        alt: { type: String, required: true },
+      },
+      selfClosing: true,
+    },
     // A nested list of links shown as rows of choices (book, then parasha, then reading).
     picker: {
       render: component('./src/components/content/ListPicker.astro'),
