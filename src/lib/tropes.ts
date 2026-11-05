@@ -31,7 +31,7 @@ export function trope(id: string): Trope & { href: string } {
 /** The sign whose line (׀) is drawn hollow (mark-paseq), unlike the line of מונח לגרמיה. */
 export const PASEQ = 'פסק';
 
-/** A name without the alternative the table adds in brackets ("רְבִ֗יעַ (רְבִיעִי)"). */
+/** A name without the alternative the table adds in brackets ("רְבִיעִ֗י (רְבִ֗יעַ)"). */
 export const shortName = (name: string) => name.replace(/\s*\(.*\)$/, '');
 
 /** A name without vowels, cantillation, maqaf or colon, for the tab title ("זקף גדול"). */
