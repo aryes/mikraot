@@ -261,18 +261,15 @@
   color: var(--content-link-hover);
 }
 
-/* Pictures in content (Markdoc images, each in its own paragraph; not the video posters): framed,
-   so a white one doesn't merge with the card; a little dimmer in dark mode, where a light
-   screenshot would otherwise be the brightest thing on the page. */
-.wp-content-rendered p > img {
+/* Pictures in content (the screenshot tag; a dark version replaces it in dark mode): framed, so a
+   white one doesn't merge with the card. */
+.content-picture {
+  display: block;
+}
+.content-picture img {
   margin-block: 1.5rem;
   border: 1px solid var(--table-border);
   border-radius: 0.5rem;
-}
-@media screen and (prefers-color-scheme: dark) {
-  .wp-content-rendered p > img {
-    filter: brightness(0.85);
-  }
 }
 
 /* Table styling matching Kahuna clean table */

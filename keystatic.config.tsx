@@ -9,6 +9,7 @@ import {
   Eye,
   EyeOff,
   Highlighter,
+  Image,
   Keyboard,
   ListTree,
   Minus,
@@ -102,6 +103,21 @@ const content = fields.markdoc({
       label: 'סרטון YouTube',
       icon: <Video />,
       schema: { videoId: fields.text({ label: 'מזהה הסרטון (11 תווים)' }) },
+    }),
+    screenshot: block({
+      label: 'תמונה (בהיר וכהה)',
+      icon: <Image />,
+      schema: {
+        light: fields.text({
+          label: 'קובץ לתצוגה בהירה (בתיקייה src/assets/posts/)',
+          validation: { length: { min: 1 } },
+        }),
+        dark: fields.text({ label: 'קובץ לתצוגה כהה (רשות)' }),
+        alt: fields.text({
+          label: 'תיאור התמונה (לקוראי מסך)',
+          validation: { length: { min: 1 } },
+        }),
+      },
     }),
     picker: wrapper({
       label: 'בורר (רשימה מקוננת)',
