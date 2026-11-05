@@ -1,0 +1,11 @@
+---
+/** The content tag `{% trope-quiz /%}`: the trope quiz, run in the browser (TropeQuiz.tsx). */
+import { TropeQuiz } from '../TropeQuiz';
+---
+
+<div class="my-6">
+  <TropeQuiz client:visible />
+  <noscript>
+    <p>החידון פועל רק כש־JavaScript מופעל בדפדפן.</p>
+  </noscript>
+</div>

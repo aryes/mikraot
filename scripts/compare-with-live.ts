@@ -103,6 +103,8 @@ const NEW_HERE = new Set([
   '/רשימת-הטעמים/תלישא-קטנה/',
   '/רשימת-הטעמים/מרכא-כפולה/',
   '/רשימת-הטעמים/ירח-בן-יומו/',
+  // The trope quiz (2026-11-05).
+  '/זיהוי-טעמים/',
 ]);
 const pageUrls = [
   ...readFileSync('dist/client/sitemap-0.xml', 'utf8').matchAll(
