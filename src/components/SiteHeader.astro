@@ -62,12 +62,19 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
         data-open-search
         class="flex cursor-pointer items-center gap-2 rounded-xl bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-200/80 dark:hover:bg-slate-700/80"
         aria-label="חיפוש באתר"
+        aria-keyshortcuts="Control+K Meta+K"
       >
         <Search size={15} />
         <span class="hidden sm:inline">חיפוש...</span>
-        <kbd class="hidden rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-1.5 py-0.5 text-[10px] text-slate-600 dark:text-slate-300 md:inline">
-          Ctrl+K
-        </kbd>
+        {/*
+          The shortcut is drawn by CSS and exposed by aria-keyshortcuts: as text, it would count
+          as visible words the spoken name lacks (WCAG 2.5.3, axe's label-content-name-mismatch).
+        */}
+        <kbd
+          aria-hidden="true"
+          data-keys="Ctrl+K"
+          class="hidden rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-1.5 py-0.5 text-[10px] text-slate-600 dark:text-slate-300 after:content-[attr(data-keys)] md:inline"
+        ></kbd>
       </button>
 
       <!-- Mobile menu: a native disclosure, so it works without JavaScript. -->
