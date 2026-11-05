@@ -15,6 +15,7 @@ import {
   Minus,
   Music,
   Newspaper,
+  SquareCheck,
   Video,
   Volume2,
 } from 'lucide-react';
@@ -118,6 +119,11 @@ const content = fields.markdoc({
           validation: { length: { min: 1 } },
         }),
       },
+    }),
+    'trope-quiz': block({
+      label: 'חידון זיהוי טעמים',
+      icon: <SquareCheck />,
+      schema: {},
     }),
     picker: wrapper({
       label: 'בורר (רשימה מקוננת)',

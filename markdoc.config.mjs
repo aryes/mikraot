@@ -83,6 +83,11 @@ export default defineMarkdocConfig({
       },
       selfClosing: true,
     },
+    // The trope quiz (src/components/TropeQuiz.tsx), on the page "זיהוי טעמים".
+    'trope-quiz': {
+      render: component('./src/components/content/TropeQuiz.astro'),
+      selfClosing: true,
+    },
     // A nested list of links shown as rows of choices (book, then parasha, then reading).
     picker: {
       render: component('./src/components/content/ListPicker.astro'),
