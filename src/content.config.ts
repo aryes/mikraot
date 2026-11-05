@@ -15,8 +15,9 @@ const pages = defineCollection({
     /** WordPress post ID: kept so old comments and links can be matched. */
     wpId: z.number().int().nullish(),
     /**
-     * A trope page's trope (src/data/tropes.json): its heading and tab title show the name in the
-     * reader's tradition; `title` is the Ashkenazi name.
+     * A trope page's trope, or the tropes a page's title names, as ids separated by spaces
+     * (src/data/tropes.json): its heading and tab title show the names in the reader's tradition;
+     * `title` is the Ashkenazi one.
      */
     trope: z.string().nullish(),
     kind: z.enum(['page', 'post']).default('page'),

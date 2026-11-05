@@ -2,6 +2,7 @@
 import { ChevronDown, Home, Menu, Search } from 'lucide-react';
 import { menuTree, pointedTitle, site } from '../lib/site';
 import { NUSACH_LABELS, SWITCHABLE } from '../lib/tropes';
+import MenuTitle from './layout/MenuTitle.astro';
 import YadMark from './YadMark.astro';
 
 const current = decodeURI(Astro.url.pathname);
@@ -106,7 +107,7 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
                     item.url && 'hover:bg-slate-50 dark:hover:bg-slate-800',
                   ]}
                 >
-                  {item.title}
+                  <MenuTitle item={item} />
                 </Item>
                 {hasChildren(item) && (
                   <div class="mr-4 border-r-2 border-slate-200 dark:border-slate-700 pr-3">
@@ -122,7 +123,7 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
                                 'hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-strong dark:hover:text-brand',
                             ]}
                           >
-                            {sub.title}
+                            <MenuTitle item={sub} />
                           </Sub>
                           {hasChildren(sub) && (
                             <div class="mr-3 border-r border-slate-200 dark:border-slate-700 pr-2">
@@ -131,7 +132,7 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
                                   href={subSub.url ?? undefined}
                                   class="flex min-h-11 items-center px-2 text-sm text-slate-500 dark:text-slate-400 hover:text-brand-strong dark:hover:text-brand"
                                 >
-                                  {subSub.title}
+                                  <MenuTitle item={subSub} />
                                 </a>
                               ))}
                             </div>
@@ -171,7 +172,7 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
                   href={item.url}
                   class:list={[navLink, isActive(item.url) ? activeLink : idleLink]}
                 >
-                  {item.title}
+                  <MenuTitle item={item} />
                 </a>
               )}
               {hasChildren(item) && (
@@ -185,7 +186,7 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
                   aria-label={item.url ? `תפריט: ${item.title}` : undefined}
                   class:list={['peer cursor-pointer', navLink, idleLink]}
                 >
-                  {!item.url && item.title}
+                  {!item.url && <MenuTitle item={item} />}
                   <ChevronDown
                     size={14}
                     className="text-slate-400 transition-transform group-hover:rotate-180 in-aria-expanded:rotate-180"
@@ -205,7 +206,7 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
                       <div class="group/sub relative flex" data-menu-item>
                         {sub.url && (
                           <a href={sub.url} class={subLink}>
-                            {sub.title}
+                            <MenuTitle item={sub} />
                           </a>
                         )}
                         {hasChildren(sub) && (
@@ -224,7 +225,11 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
                                 : subLink,
                             ]}
                           >
-                            {!sub.url && <span>{sub.title}</span>}
+                            {!sub.url && (
+                              <span>
+                                <MenuTitle item={sub} />
+                              </span>
+                            )}
                             <ChevronDown size={12} className="-rotate-90 text-slate-400" />
                           </button>
                         )}
@@ -238,7 +243,7 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
                                 href={subSub.url ?? undefined}
                                 class="block w-full px-4 py-2 text-right text-sm font-medium text-slate-700 dark:text-slate-200 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-strong dark:hover:text-brand"
                               >
-                                {subSub.title}
+                                <MenuTitle item={subSub} />
                               </a>
                             ))}
                           </div>

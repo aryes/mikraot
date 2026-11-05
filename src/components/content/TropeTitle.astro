@@ -1,0 +1,17 @@
+---
+/**
+ * A title made of trope names in the reader's tradition: a trope page's heading, or the title of
+ * a page or menu entry that names a run of tropes. `trope` is one id or several separated by
+ * spaces (src/data/tropes.json).
+ */
+import { PASEQ, switchTitle } from '../../lib/tropes';
+import NusachText from './NusachText.astro';
+
+interface Props {
+  trope: string;
+}
+
+const { trope } = Astro.props;
+---
+
+<NusachText names={switchTitle(trope)} paseq={trope === PASEQ} />
