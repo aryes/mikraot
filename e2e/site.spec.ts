@@ -250,15 +250,15 @@ test('section titles can be linked to, and their link copies the address', async
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/רשימת-הטעמים/תביר/');
-  const title = page.locator('[id="תרגול-2-הטעם-ברצף"]');
-  await expect(title).toHaveText('תרגול 2 – הטעם ברצף');
+  const title = page.locator('[id="תרגול-3-הטעם-ברצף"]');
+  await expect(title).toHaveText('תרגול 3 – הטעם ברצף');
   await title.hover();
   const link = title.locator('.heading-link');
   await link.click();
   await expect(link).toHaveAttribute('data-copied', '');
   await expect(page).toHaveURL(/#/);
   expect(decodeURI(await page.evaluate(() => navigator.clipboard.readText()))).toContain(
-    '#תרגול-2-הטעם-ברצף',
+    '#תרגול-3-הטעם-ברצף',
   );
   // A title with a trope name in it, and a heading of an ordinary page.
   await page.goto('/רשימת-הטעמים/פסק/');
