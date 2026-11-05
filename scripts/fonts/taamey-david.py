@@ -17,7 +17,9 @@ didn't (a mark before the letter's vowel, two marks on one letter, a mark beside
 3. Vertical metrics: the font reserves more room below its letters than above (for niqqud), so
    text centred in a box (a button, a menu item) sat ~0.1em high (Arye, 2026-10-15). The ascent
    and descent are rebalanced around the letters' middle, their sum unchanged.
-4. Size: its letters are about 7% shorter than Noto's at the same font size. Both weights are
+4. Segolta: the font centres it on the letter's left edge, half of it past the letter; a rule
+   moves it in over the letter (Arye, 2026-11-05).
+5. Size: its letters are about 7% shorter than Noto's at the same font size. Both weights are
    enlarged by that much (a smaller unitsPerEm draws every glyph larger, outlines unchanged), so
    the site's sizes stay as they were designed.
 
@@ -43,7 +45,8 @@ OUTPUT = Path("src/assets/fonts/taamey-david")
 ENLARGE = 1.07
 CHANGE = (
     "modified 2026-10-14 for mikraot.net: enlarged 7%, bold rebuilt from medium,"
-    " telisha and gershayim on one letter brought together, vertical metrics centred on the letters"
+    " telisha and gershayim on one letter brought together, segolta over the letter,"
+    " vertical metrics centred on the letters"
 )
 
 
@@ -99,6 +102,41 @@ lookup telishaGershayim {
 } telishaGershayim;
 feature mkmk { lookup telishaGershayim; } mkmk;
 """
+
+
+# Segolta (סגול): on most letters the font centres it on the letter's left edge, so half of it
+# stands past the letter, after it rather than above it (Arye, 2026-11-05). Its anchor on each
+# letter moves in until the whole mark is over the letter's left end; never outward (alef already
+# has it over the letter), and not on lamed, whose ascender it would hit.
+SEGOLTA_HALF = 220  # half its 440-unit width
+
+
+def segolta_over(font: TTFont) -> None:
+    """Moves the segolta's anchors in the 'mark' lookup where it has a class of its own."""
+    glyphs = font.getGlyphSet()
+    marks = set()
+    for record in font["GPOS"].table.FeatureList.FeatureRecord:
+        if record.FeatureTag == "mark":
+            marks.update(record.Feature.LookupListIndex)
+    for index in marks:
+        for wrapper in font["GPOS"].table.LookupList.Lookup[index].SubTable:
+            subtable = getattr(wrapper, "ExtSubTable", wrapper)
+            if type(subtable).__name__ != "MarkBasePos" or "segolta" not in subtable.MarkCoverage.glyphs:
+                continue
+            records = subtable.MarkArray.MarkRecord
+            mark = records[subtable.MarkCoverage.glyphs.index("segolta")]
+            if sum(record.Class == mark.Class for record in records) != 1:
+                continue  # shared with other marks: moving it would move them too
+            for name, base in zip(subtable.BaseCoverage.glyphs, subtable.BaseArray.BaseRecord):
+                anchor = base.BaseAnchor[mark.Class]
+                if anchor is None or name.startswith("lamed"):
+                    continue
+                pen = BoundsPen(glyphs)
+                glyphs[name].draw(pen)
+                if pen.bounds is None:
+                    continue
+                inside = round(pen.bounds[0] + SEGOLTA_HALF + mark.MarkAnchor.XCoordinate)
+                anchor.XCoordinate = max(anchor.XCoordinate, inside)
 
 
 def bring_together(font: TTFont) -> None:
@@ -180,6 +218,7 @@ def main() -> None:
     middle = letters_middle(medium)
     for font in (medium, bold):
         bring_together(font)
+        segolta_over(font)
         centre_letters(font, middle)
     save(medium, "TaameyDavidCLM-Medium.woff2")
     save(bold, "TaameyDavidCLM-Bold.woff2")
