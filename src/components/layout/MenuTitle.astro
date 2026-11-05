@@ -1,0 +1,13 @@
+---
+/** A menu entry's title; an entry naming tropes (`trope` in src/data/menu.json) follows the reader's tradition. */
+import type { MenuItem } from '../../types';
+import TropeTitle from '../content/TropeTitle.astro';
+
+interface Props {
+  item: MenuItem;
+}
+
+const { item } = Astro.props;
+---
+
+{item.trope ? <TropeTitle trope={item.trope} /> : item.title}

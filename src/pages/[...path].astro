@@ -17,7 +17,7 @@ import {
   site,
   type SitePage,
 } from '../lib/site';
-import { mapValues, plainName, switchNames } from '../lib/tropes';
+import { mapValues, plainName, switchTitle } from '../lib/tropes';
 
 export const getStaticPaths = (async () => {
   const pages = await getSitePages();
@@ -35,12 +35,13 @@ interface Props {
 const { page, pages } = Astro.props;
 const { entry, path } = page;
 const { title, seo, kind, categories, trope } = entry.data;
-// A trope page's tab title names the trope in the reader's tradition (its heading: titleTrope).
+// A page titled by tropes (a trope page, or one naming a run of them) has a tab title naming
+// them in the reader's tradition (its heading: titleTrope).
 const documentTitle = seo?.title || `${title} - ${site.title}`;
 // The Ashkenazi tab title is the page's own, so switching back restores it.
 const documentTitles = trope
   ? {
-      ...mapValues(switchNames(trope, plainName), (name) => `${name} - ${site.title}`),
+      ...mapValues(switchTitle(trope, plainName), (name) => `${name} - ${site.title}`),
       ashkenazi: documentTitle,
     }
   : undefined;

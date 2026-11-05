@@ -1071,6 +1071,14 @@ test('the tradition switch names the tropes in the chosen tradition, and remembe
     useInnerText: true,
   });
   await expect(page.getByRole('combobox', { name: 'נוסח' })).toHaveValue('sephardi');
+  // A link and a page titled by a run of tropes follow it too.
+  const exercises = page.getByRole('link', { name: /קריאת פסוקים בטעמים/ });
+  await expect(exercises).toContainText('מַאֲרִ֥יךְ טַרְחָ֖א', { useInnerText: true });
+  await exercises.click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'מַאֲרִ֥יךְ טַרְחָ֖א אַתְנָ֑ח סוֹף־פָּסֽוּק:',
+    { useInnerText: true },
+  );
   // On the 404 page, which gets its CSP as a header that covers the whole page.
   await page.goto('/no-such-page/');
   await expect(page.locator('html')).toHaveAttribute('data-nusach', 'sephardi');

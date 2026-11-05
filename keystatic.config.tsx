@@ -155,7 +155,8 @@ export default config({
           slug: { label: 'כתובת (slug)', generate: slugFromTitle },
         }),
         trope: fields.text({
-          label: 'טעם (בעמוד של טעם: הכותרת היא שמו לפי הנוסח; src/data/tropes.json)',
+          label:
+            'טעמים (כשהכותרת היא שמות טעמים: הכותרת לפי הנוסח; מזהים מ-src/data/tropes.json, מופרדים ברווח)',
         }),
         kind: fields.select({
           label: 'סוג',

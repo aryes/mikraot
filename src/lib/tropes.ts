@@ -54,5 +54,18 @@ export const mapValues = (
 export const switchNames = (id: string, form: (name: string) => string = shortName) =>
   mapValues(trope(id), form);
 
+/**
+ * The names of a run of tropes, by their ids separated by spaces ("מרכא טפחא אתנחתא"), joined
+ * with spaces: the title of a page or menu entry that names several (frontmatter or menu `trope`).
+ */
+export const switchTitle = (
+  ids: string,
+  form: (name: string) => string = shortName,
+): Record<Nusach, string> => {
+  const each = ids.split(/\s+/).map((id) => switchNames(id, form));
+  const joined = (nusach: Nusach) => each.map((names) => names[nusach]).join(' ');
+  return { ashkenazi: joined('ashkenazi'), sephardi: joined('sephardi') };
+};
+
 /** The switch's labels. */
 export const NUSACH_LABELS: Record<Nusach, string> = { ashkenazi: 'אשכנזי', sephardi: 'ספרדי' };
