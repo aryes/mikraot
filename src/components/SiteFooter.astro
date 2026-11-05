@@ -133,6 +133,35 @@ const footerLink = 'inline-block py-1 transition-colors hover:text-brand';
             התוכן ברישיון CC BY-NC-SA 4.0
           </a>
         </span>
+        {/* The verses quoted on the site (exercises, quizzes) are from Miqra according to the
+            Masorah via Sefaria, under CC BY-SA, which asks for credit wherever it is used. The
+            licence may go to the next line on narrow phones, the name and its source may not. */}
+        <span class="whitespace-nowrap">
+          <span aria-hidden="true" class="mx-2">
+            ·
+          </span>
+          נוסח המקרא:{' '}
+          <a
+            href="https://he.wikisource.org/wiki/מקרא_על_פי_המסורה"
+            rel="noopener"
+            target="_blank"
+            class={footerLink}
+          >
+            מקרא על פי המסורה
+          </a>
+        </span>{' '}
+        <span class="whitespace-nowrap">
+          (
+          <a
+            href="https://creativecommons.org/licenses/by-sa/4.0/"
+            rel="noopener"
+            target="_blank"
+            class={footerLink}
+          >
+            CC BY-SA
+          </a>
+          )
+        </span>
         {legalLinks.map((link) => (
           <span class="whitespace-nowrap">
             <span aria-hidden="true" class="mx-2">
