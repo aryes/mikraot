@@ -1,6 +1,7 @@
 /**
- * Trope names in the reading traditions (src/data/tropes.json, from the "טבלת שמות הטעמים" of
- * "תיקון קוראים סימנים"). The reader chooses a tradition in the header (src/scripts/nusach.ts);
+ * Trope names in the reading traditions (src/data/tropes.json, based on the "טבלת שמות הטעמים" of
+ * "תיקון קוראים סימנים"; מאילא, which it lacks, and קדמא־זקף קטן's composed names from Arye). The
+ * reader chooses a tradition in the header (src/scripts/nusach.ts);
  * names written with the `trope` tag, and the titles of trope pages, follow that choice.
  */
 import tropes from '../data/tropes.json';
@@ -49,17 +50,9 @@ export const mapValues = (
   sephardi: change(texts.sephardi),
 });
 
-/**
- * The names the header switch chooses between; a tradition the table has no name for (מאילא is
- * not in it) shows the Ashkenazi one.
- */
-export const switchNames = (id: string, form: (name: string) => string = shortName) => {
-  const names = trope(id);
-  return mapValues(
-    { ashkenazi: names.ashkenazi, sephardi: names.sephardi || names.ashkenazi },
-    form,
-  );
-};
+/** The names the header switch chooses between. */
+export const switchNames = (id: string, form: (name: string) => string = shortName) =>
+  mapValues(trope(id), form);
 
 /** The switch's labels. */
 export const NUSACH_LABELS: Record<Nusach, string> = { ashkenazi: 'אשכנזי', sephardi: 'ספרדי' };
