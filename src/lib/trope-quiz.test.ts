@@ -118,11 +118,13 @@ describe('nextLevel', () => {
 });
 
 describe('buildRound', () => {
-  it('makes ten different questions, two of them prepared', () => {
-    const round = buildRound(list, questions, new Set(), { random: seeded(4) });
-    expect(round).toHaveLength(10);
-    expect(new Set(round.map((q) => q.key)).size).toBe(10);
-    expect(round.filter((q) => q.why).length).toBe(2);
+  it('makes ten questions on ten different tropes, two of them prepared', () => {
+    for (let seed = 1; seed <= 50; seed++) {
+      const round = buildRound(list, questions, new Set(), { random: seeded(seed) });
+      expect(round).toHaveLength(10);
+      expect(new Set(round.map((q) => q.trope)).size).toBe(10);
+      expect(round.filter((q) => q.why).length).toBe(2);
+    }
   });
 
   it('skips recently asked questions', () => {
@@ -137,5 +139,8 @@ describe('buildRound', () => {
     const round = buildRound(list, [], new Set(), { size: 200, random: seeded(6) });
     for (const q of round)
       expect(list.items[q.trope]?.length ?? 0).toBeGreaterThanOrEqual(MIN_RANDOM);
+    // Each trope once: a round can't be longer than the tropes it draws from.
+    const drawn = Object.values(list.items).filter((items) => items.length >= MIN_RANDOM);
+    expect(round).toHaveLength(drawn.length);
   });
 });
