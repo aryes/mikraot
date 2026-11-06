@@ -1,10 +1,13 @@
+import { Check, Flame, X } from 'lucide-react';
 import React, { useEffect, useId, useRef, useState } from 'react';
 import prepared from '../data/quiz/prepared.json';
 import {
   buildRound,
+  cheer,
   chooseOptions,
   MAX_LEVEL,
   nextLevel,
+  rankOf,
   shuffle,
   type Question,
   type QuizItem,
@@ -14,6 +17,8 @@ import { switchNames, trope, unmarkedName } from '../lib/tropes';
 import { track } from '../scripts/analytics';
 
 const WORD_LIST = '/quiz/trope-words.json';
+/** The page whose sections the ranks are named after. */
+const HIERARCHY = '/trope-hierarchy/';
 /** What the browser remembers between visits. */
 const RECENT_KEY = 'trope-quiz-recent';
 const LEVEL_KEY = 'trope-quiz-level';
@@ -118,6 +123,25 @@ interface Round {
   options: string[];
   chosen: string | null;
   score: number;
+  /** Right answers in a row, shown from three on. */
+  run: number;
+  /** The feedback's first words (cheer). */
+  cheer: string;
+}
+
+/** Confetti for a perfect round, loaded only then (canvas-confetti, about 6 KB). */
+function celebrate(): void {
+  import('canvas-confetti')
+    .then(({ default: confetti }) =>
+      // Its own canvas drawn on the page, not in a Web Worker, which the CSP doesn't allow;
+      // nothing for those whose system asks for less motion.
+      confetti.create(undefined, { resize: true, useWorker: false, disableForReducedMotion: true })(
+        { particleCount: 150, spread: 80, origin: { y: 0.6 } },
+      ),
+    )
+    .catch(() => {
+      // No confetti: the score says it all.
+    });
 }
 
 const optionsFor = (question: Question | undefined, level: number) =>
@@ -130,7 +154,15 @@ const optionsFor = (question: Question | undefined, level: number) =>
 /** A new round, its questions avoiding those asked recently. */
 function newRound(words: WordList, level: number): Round {
   const questions = buildRound(words, prepared, new Set(recentKeys()));
-  return { questions, index: 0, options: optionsFor(questions[0], level), chosen: null, score: 0 };
+  return {
+    questions,
+    index: 0,
+    options: optionsFor(questions[0], level),
+    chosen: null,
+    score: 0,
+    run: 0,
+    cheer: '',
+  };
 }
 
 /**
@@ -181,7 +213,14 @@ export const TropeQuiz: React.FC = () => {
     if (!round || !question || round.chosen) return;
     const correct = id === question.trope;
     moved.current = true;
-    setRound({ ...round, chosen: id, score: round.score + (correct ? 1 : 0) });
+    setRound({
+      ...round,
+      chosen: id,
+      score: round.score + (correct ? 1 : 0),
+      // A mistake starts the count again, without saying so.
+      run: correct ? round.run + 1 : 0,
+      cheer: cheer(question.trope, id),
+    });
     const updated = nextLevel(progress.level, progress.streak, correct);
     setProgress(updated);
     store(LEVEL_KEY, updated.level);
@@ -191,7 +230,10 @@ export const TropeQuiz: React.FC = () => {
   function goOn(): void {
     if (!round) return;
     const following = round.index + 1;
-    if (following >= round.questions.length) track('trope-quiz', { score: String(round.score) });
+    if (following >= round.questions.length) {
+      track('trope-quiz', { score: String(round.score) });
+      if (round.score === round.questions.length) celebrate();
+    }
     setRound({
       ...round,
       index: following,
@@ -205,10 +247,21 @@ export const TropeQuiz: React.FC = () => {
 
   // Divs where a size is set: the content's paragraph style (.wp-content-rendered p) would win.
   if (!question) {
+    const rank = rankOf(round.score, round.questions.length);
     return (
       <div className="not-prose rounded-2xl border border-slate-200 p-6 text-center dark:border-slate-700">
-        <div ref={result} tabIndex={-1} className="text-xl font-bold outline-none" role="status">
-          זיהיתם נכון {round.score} מתוך {round.questions.length}
+        <div ref={result} tabIndex={-1} className="space-y-2 outline-none" role="status">
+          <div className="text-xl font-bold">
+            זיהיתם נכון {round.score} מתוך {round.questions.length}
+          </div>
+          {/* The rank links to its place in the trope hierarchy: the score teaches too. */}
+          <div className="text-lg">
+            הדרגה שלכם:{' '}
+            <a href={`${HIERARCHY}#${rank.anchor}`} className="font-bold">
+              {rank.name}
+            </a>
+          </div>
+          <div>{rank.line}</div>
         </div>
         <button
           type="button"
@@ -224,8 +277,16 @@ export const TropeQuiz: React.FC = () => {
   const { chosen } = round;
   return (
     <div className="not-prose rounded-2xl border border-slate-200 p-6 dark:border-slate-700">
-      <div className="text-center text-sm text-(--text-faint)">
-        שאלה {round.index + 1} מתוך {round.questions.length}
+      <div className="flex justify-center gap-3 text-sm">
+        <span className="text-(--text-faint)">
+          שאלה {round.index + 1} מתוך {round.questions.length}
+        </span>
+        {round.run >= 3 && (
+          <span className="inline-flex items-center gap-1 font-bold">
+            <Flame size={14} aria-hidden="true" />
+            {round.run} ברצף
+          </span>
+        )}
       </div>
       <div id={prompt} className="mt-1 text-center text-lg">
         {question.item.m === undefined ? 'איזה טעם יש כאן?' : 'איזה טעם יש במילה המסומנת?'}
@@ -244,20 +305,25 @@ export const TropeQuiz: React.FC = () => {
           const state = !chosen
             ? 'border-slate-300 hover:border-brand-strong hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-800'
             : id === question.trope
-              ? 'border-green-700 bg-green-50 dark:border-green-400 dark:bg-green-950/40'
+              ? 'quiz-pop border-green-700 bg-green-50 dark:border-green-400 dark:bg-green-950/40'
               : id === chosen
-                ? 'border-red-700 bg-red-50 dark:border-red-400 dark:bg-red-950/40'
+                ? 'quiz-shake border-red-700 bg-red-50 dark:border-red-400 dark:bg-red-950/40'
                 : 'border-slate-200 text-slate-500 dark:border-slate-700 dark:text-slate-400';
+          // An icon as well as the colour, for those who can't tell green from red.
+          const Icon = !chosen ? null : id === question.trope ? Check : id === chosen ? X : null;
           return (
             <button
               key={id}
               type="button"
               aria-disabled={chosen ? true : undefined}
               onClick={() => answer(id)}
-              className={`cursor-pointer rounded-xl border-2 px-3 py-3 text-xl transition-colors ${state}`}
+              className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 px-3 py-3 text-xl transition-colors ${state}`}
             >
+              {Icon && <Icon size={18} aria-hidden="true" className="shrink-0" />}
               {/* Only the name: the sign on it would give the answer away (Arye, 2026-11-06). */}
-              <Name id={id} unmarked />
+              <span>
+                <Name id={id} unmarked />
+              </span>
             </button>
           );
         })}
@@ -269,10 +335,10 @@ export const TropeQuiz: React.FC = () => {
           <>
             <p className="font-bold">
               {chosen === question.trope ? (
-                'נכון!'
+                round.cheer
               ) : (
                 <>
-                  לא נכון. הטעם כאן: <Name id={question.trope} />
+                  {round.cheer} הטעם כאן: <Name id={question.trope} />
                 </>
               )}
             </p>

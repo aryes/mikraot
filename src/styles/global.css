@@ -467,6 +467,31 @@
     opacity: 1;
   }
 }
+/* The trope quiz's answers: the right one pops, a wrong choice shakes (TropeQuiz.tsx). Only
+   where the system doesn't ask for less motion. */
+@keyframes quiz-pop {
+  40% {
+    transform: scale(1.06);
+  }
+}
+@keyframes quiz-shake {
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .quiz-pop {
+    animation: quiz-pop 0.35s ease-out;
+  }
+  .quiz-shake {
+    animation: quiz-shake 0.4s ease-in-out;
+  }
+}
 .wp-content-rendered .audio-tile:focus-visible {
   outline: 2px solid var(--content-link);
   outline-offset: 2px;

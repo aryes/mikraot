@@ -197,3 +197,45 @@ export function buildRound(
   }
   return shuffle(round, random);
 }
+
+/** The cheers after a right answer, one at random so it doesn't repeat itself. */
+export const CHEERS = ['נכון!', 'בדיוק!', 'יפה מאוד!', 'קלעתם!', 'מצוין!'];
+
+/**
+ * What the feedback opens with: a cheer, or after a mistake a kinder word when the two tropes
+ * really are alike.
+ */
+export function cheer(answer: string, chosen: string, random: () => number = Math.random): string {
+  if (chosen === answer) return CHEERS[Math.floor(random() * CHEERS.length)] ?? 'נכון!';
+  return lookAlikes(answer).includes(chosen) ? 'כמעט – הם באמת דומים.' : 'לא הפעם.';
+}
+
+/** Ranks are pointed: without vowels מִשְׁנֶה reads as משנה, the Mishnah. */
+export interface Rank {
+  /** The share of right answers it takes. */
+  min: number;
+  name: string;
+  /** Its section on the page of the trope hierarchy (/trope-hierarchy/). */
+  anchor: string;
+  line: string;
+}
+
+const LOWEST: Rank = {
+  min: 0,
+  name: 'מְשָׁרֵת',
+  anchor: 'servants',
+  line: 'בלעדיו אין מלך. עוד סבב?',
+};
+
+/** The ranks of the trope hierarchy, highest first. */
+export const RANKS: readonly Rank[] = [
+  { min: 1, name: 'קֵיסָר', anchor: 'emperors', line: 'סוף פסוק לטעויות!' },
+  { min: 0.8, name: 'מֶלֶךְ', anchor: 'kings', line: 'עוד קצת, והכתר של הקיסר שלכם.' },
+  { min: 0.6, name: 'מִשְׁנֶה', anchor: 'dukes', line: 'משנה למלך: המלוכה כבר קרובה.' },
+  { min: 0.4, name: 'שָׁלִישׁ', anchor: 'counts', line: 'עולים במדרג. עוד סבב?' },
+  LOWEST,
+];
+
+/** The rank a round's score earns (Arye, 2026-11-06): out of ten, 10 קיסר down to 0–3 משרת. */
+export const rankOf = (score: number, size: number): Rank =>
+  RANKS.find((rank) => score >= rank.min * size) ?? LOWEST;
