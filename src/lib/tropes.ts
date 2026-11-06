@@ -41,6 +41,15 @@ export const plainName = (name: string) =>
     .replace(/[֑-ׇ:]/gu, '')
     .trim();
 
+/**
+ * A name with its vowels but without the sign it names (cantillation, meteg, ׀, ׃ or :), as the
+ * trope quiz offers it: the sign on the name would give the answer away ("יְתִיב").
+ */
+export const unmarkedName = (name: string) =>
+  shortName(name)
+    .replace(/[\u0591-\u05AF\u05BD\u05C0\u05C3:]/gu, '')
+    .trim();
+
 /** Each tradition's text, changed the same way. */
 export const mapValues = (
   texts: Record<Nusach, string>,

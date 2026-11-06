@@ -14,7 +14,7 @@ import {
   type PreparedQuestion,
   type WordList,
 } from './trope-quiz';
-import { SWITCHABLE, plainName, trope } from './tropes';
+import { SWITCHABLE, plainName, trope, unmarkedName } from './tropes';
 
 /** A repeatable stand-in for Math.random. */
 function seeded(seed: number): () => number {
@@ -46,6 +46,16 @@ describe('the quiz data', () => {
     for (const nusach of SWITCHABLE) {
       const names = ids.map((id) => plainName(trope(id)[nusach]));
       expect(new Set(names).size, nusach).toBe(names.length);
+    }
+  });
+
+  it('offers names without the sign they name', () => {
+    for (const nusach of SWITCHABLE) {
+      for (const id of ids) {
+        const name = unmarkedName(trope(id)[nusach]);
+        expect(name, id).not.toMatch(/[\u0591-\u05AF\u05BD\u05C0\u05C3:]/u);
+        expect(name, id).toMatch(/^[\u05B0-\u05EA\u05BE ]+$/u);
+      }
     }
   });
 
