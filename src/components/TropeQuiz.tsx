@@ -10,7 +10,7 @@ import {
   type QuizItem,
   type WordList,
 } from '../lib/trope-quiz';
-import { switchNames, trope } from '../lib/tropes';
+import { switchNames, trope, unmarkedName } from '../lib/tropes';
 import { track } from '../scripts/analytics';
 
 const WORD_LIST = '/quiz/trope-words.json';
@@ -51,9 +51,12 @@ function isWordList(data: unknown): data is WordList {
   return Boolean(items) && typeof items === 'object';
 }
 
-/** A trope's name in every tradition, CSS showing the reader's (as NusachText.astro does). */
-const Name: React.FC<{ id: string }> = ({ id }) => {
-  const { ashkenazi, sephardi } = switchNames(id);
+/**
+ * A trope's name in every tradition, CSS showing the reader's (as NusachText.astro does); with
+ * its sign on it unless `unmarked`.
+ */
+const Name: React.FC<{ id: string; unmarked?: boolean }> = ({ id, unmarked }) => {
+  const { ashkenazi, sephardi } = switchNames(id, unmarked ? unmarkedName : undefined);
   if (ashkenazi === sephardi) return <>{ashkenazi}</>;
   return (
     <>
@@ -253,7 +256,8 @@ export const TropeQuiz: React.FC = () => {
               onClick={() => answer(id)}
               className={`cursor-pointer rounded-xl border-2 px-3 py-3 text-xl transition-colors ${state}`}
             >
-              <Name id={id} />
+              {/* Only the name: the sign on it would give the answer away (Arye, 2026-11-06). */}
+              <Name id={id} unmarked />
             </button>
           );
         })}
