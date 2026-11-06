@@ -159,8 +159,8 @@ export function nextLevel(
 const keyOf = (trope: string, item: QuizItem) => `${trope}|${item.w}`;
 
 /**
- * A round: `prepared` prepared questions and the rest random, in random order, none asked
- * recently if that can be helped. Random questions take each trope once before any trope twice.
+ * A round: `preparedCount` prepared questions and the rest random, in random order, none asked
+ * recently if that can be helped, and no trope twice.
  */
 export function buildRound(
   list: WordList,
@@ -169,8 +169,9 @@ export function buildRound(
   { size = 10, preparedCount = 2, random = Math.random } = {},
 ): Question[] {
   const round: Question[] = [];
-  const fresh = <T extends { key: string }>(candidates: T[]) => {
-    const unused = candidates.filter((c) => !round.some((q) => q.key === c.key));
+  // Each trope once a round (Arye, 2026-11-06): a question about a trope already asked is skipped.
+  const fresh = <T extends { key: string; trope: string }>(candidates: T[]) => {
+    const unused = candidates.filter((c) => !round.some((q) => q.trope === c.trope));
     return unused.find((c) => !recent.has(c.key)) ?? unused[0];
   };
   const preparedQuestions = shuffle(
@@ -184,20 +185,15 @@ export function buildRound(
   const tropes = Object.keys(list.items).filter(
     (id) => (list.items[id]?.length ?? 0) >= MIN_RANDOM,
   );
-  // Rounds through the tropes, until the round is full or a whole pass finds nothing new.
-  while (round.length < size) {
-    const before = round.length;
-    for (const trope of shuffle(tropes, random)) {
-      if (round.length === size) break;
-      const items = (list.items[trope] ?? []).map((item) => ({
-        trope,
-        item,
-        key: keyOf(trope, item),
-      }));
-      const question = fresh(shuffle(items, random));
-      if (question) round.push(question);
-    }
-    if (round.length === before) break;
+  for (const trope of shuffle(tropes, random)) {
+    if (round.length === size) break;
+    const items = (list.items[trope] ?? []).map((item) => ({
+      trope,
+      item,
+      key: keyOf(trope, item),
+    }));
+    const question = fresh(shuffle(items, random));
+    if (question) round.push(question);
   }
   return shuffle(round, random);
 }
