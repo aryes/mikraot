@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import prepared from '../data/quiz/prepared.json';
 import wordList from '../../public/quiz/trope-words.json';
@@ -7,10 +7,14 @@ import {
   MAX_LEVEL,
   MIN_RANDOM,
   QUIZ_TROPES,
+  CHEERS,
+  RANKS,
   buildRound,
+  cheer,
   chooseOptions,
   lookAlikes,
   nextLevel,
+  rankOf,
   type PreparedQuestion,
   type WordList,
 } from './trope-quiz';
@@ -142,5 +146,35 @@ describe('buildRound', () => {
     // Each trope once: a round can't be longer than the tropes it draws from.
     const drawn = Object.values(list.items).filter((items) => items.length >= MIN_RANDOM);
     expect(round).toHaveLength(drawn.length);
+  });
+});
+
+describe('rankOf', () => {
+  it('names the rank of a round of ten', () => {
+    const ranks = [0, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => rankOf(score, 10).anchor);
+    expect(ranks).toEqual([
+      'servants',
+      'servants',
+      'counts',
+      'counts',
+      'dukes',
+      'dukes',
+      'kings',
+      'kings',
+      'emperors',
+    ]);
+  });
+
+  it('links each rank to a section of the hierarchy page', () => {
+    const page = readFileSync('src/content/pages/trope-hierarchy.mdoc', 'utf8');
+    for (const rank of RANKS) expect(page, rank.name).toContain(`{% #${rank.anchor} %}`);
+  });
+});
+
+describe('cheer', () => {
+  it('cheers a right answer and is kinder to a look-alike than to a wild guess', () => {
+    expect(CHEERS).toContain(cheer('מונח', 'מונח', seeded(1)));
+    expect(cheer('מונח', 'מהפך')).toContain('דומים');
+    expect(cheer('מונח', 'זקף-גדול')).toBe('לא הפעם.');
   });
 });
