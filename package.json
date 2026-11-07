@@ -32,6 +32,7 @@
     "prepare": "git config core.hooksPath .githooks",
     "test:deployed": "tsx scripts/test-deployed.ts",
     "search:misses": "tsx scripts/search-misses.ts",
+    "quiz:words": "tsx scripts/quiz/build-word-list.ts",
     "db:restore": "tsx scripts/db-restore.ts",
     "lighthouse": "lhci autorun",
     "db:dev:reset": "wrangler d1 migrations apply mikraot-db --local --persist-to .wrangler/state-dev && wrangler d1 execute mikraot-db --local --persist-to .wrangler/state-dev --file e2e/fixtures/comments.sql",
@@ -47,6 +48,7 @@
     "@sentry/browser": "^11.7.0",
     "@sentry/cloudflare": "^11.7.0",
     "astro": "^7.3.5",
+    "canvas-confetti": "^1.9.4",
     "ipaddr.js": "^2.5.0",
     "lucide-react": "^1.49.0",
     "preact": "^10.29.8"
@@ -66,6 +68,7 @@
     "@markdoc/markdoc": "^0.5.10",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^26.6.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
