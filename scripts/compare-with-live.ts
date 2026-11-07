@@ -48,7 +48,7 @@ const CHANGED_ON_PURPOSE: Readonly<Record<string, string>> = {
   '/הגיית-שם-יהוה/': 'a footnote on the Aleppo Codex',
   '/silent-letters/': '"הי׳ והה׳"',
   '/about/':
-    'the contact address as a (hidden) link (the licences, added here at first, moved to /licenses/ on 2026-11-07)',
+    'the contact address as a (hidden) link (the licences, added here at first, moved to /terms/ on 2026-11-07)',
   '/סמיכות/': 'one more link',
   '/קמץ-קטן/': 'one more link',
   '/משה-מוציא-וכלב-מכניס/': 'one more link',
@@ -109,7 +109,7 @@ const NEW_HERE = new Set([
   // The trope quiz (2026-11-05).
   '/זיהוי-טעמים/',
   // All the licences and credits on one page (2026-11-07).
-  '/licenses/',
+  '/terms/',
 ]);
 const pageUrls = [
   ...readFileSync('dist/client/sitemap-0.xml', 'utf8').matchAll(

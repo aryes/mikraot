@@ -17,10 +17,10 @@ const thisYear = new Date().getFullYear(); // the build's year: updated by the n
 const firstYear = Math.min(thisYear, ...posts.map(({ entry }) => entry.data.date.getFullYear()));
 const years = firstYear < thisYear ? `${firstYear}–${thisYear}` : String(thisYear);
 const pageUrl = new Map((await getSitePages()).map(({ entry, url }) => [entry.id, url]));
-// The licences page holds the content licence and the credit for the Bible text (CC BY-SA asks
+// The terms of use page holds the content licence and the credit for the Bible text (CC BY-SA asks
 // for credit wherever the text is used: a link on every page to the credit meets it) and fonts.
 const legalLinks = [
-  { title: 'רישיונות ומקורות', url: pageUrl.get('licenses') },
+  { title: 'תנאי שימוש', url: pageUrl.get('terms') },
   { title: 'מדיניות הפרטיות', url: pageUrl.get('privacy-policy') },
   { title: 'אודות', url: pageUrl.get('about') },
 ].filter((link): link is { title: string; url: string } => link.url !== undefined);
