@@ -132,7 +132,7 @@ Open questions, for later:
 - **Recording helper:** Arye records (Audacity, a good microphone); Claude trims, evens the volume,
   reduces noise, converts and places the files. Agreed in principle, later.
 - **Read-along** (skipped for now): <https://www.ben13.co.il/> has it; look at how before building.
-- **Content licence:** CC BY-NC-SA 4.0, chosen 2026-10-20 (on the licences page, linked from the footer, since 2026-11-07).
+- **Content licence:** CC BY-NC-SA 4.0, chosen 2026-10-20 (on the terms of use page, linked from the footer, since 2026-11-07).
 
 Skipped for now: previous/next links, self-check exercises, the landing home page, the teaching
 audio player and read-along (good ideas), the verse practice view, the weekly parasha box (not

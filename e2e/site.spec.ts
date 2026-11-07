@@ -205,7 +205,7 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
   // 39 pages and posts (the privacy policy since 2026-10-13, the launch post since the switch,
   // קרי וכתיב since 2026-10-22, the trope list and its 29 pages since 2026-10-24, פסק since 2026-10-28, קדמא־זקף קטן since 2026-10-31,
-  // the post on the tradition switch and the trope quiz since 2026-11-05, the licences since 2026-11-07), the three month archives and the
+  // the post on the tradition switch and the trope quiz since 2026-11-05, the terms of use since 2026-11-07), the three month archives and the
   // category archive, "What's new" (the author archive is noindex).
   expect(sitemap.match(/<loc>/g)).toHaveLength(77);
   expect(sitemap).not.toContain('/author/');
@@ -969,12 +969,12 @@ test('an audio button shows loading at once, then says "עצירה" while playin
   await expect(tile).toHaveAttribute('aria-label', name);
 });
 
-test('every page links to the licences, where the content licence and the Bible text are', async ({
+test('every page links to the terms of use, where the content licence and the Bible text are', async ({
   page,
 }) => {
   await page.goto('/about/');
-  await page.locator('footer').getByRole('link', { name: 'רישיונות ומקורות' }).click();
-  await expect(page).toHaveURL(/\/licenses\/$/);
+  await page.locator('footer').getByRole('link', { name: 'תנאי שימוש' }).click();
+  await expect(page).toHaveURL(/\/terms\/$/);
   const main = page.locator('main');
   await expect(
     main.locator('a[href="https://creativecommons.org/licenses/by-nc-sa/4.0/"]'),
