@@ -8,6 +8,7 @@ originals in `scripts/fonts/taamey-david/` (the corresponding source):
 
 - both weights enlarged 7% (a smaller units-per-em), to match the letter size of the site's
   earlier font;
+- their ascent and descent rebalanced, so text centred in a button really is centred;
 - the bold rebuilt from the medium weight with the bold's letters, because the original bold
   has no cantillation marks.
 

@@ -203,11 +203,11 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
   const index = await request.get('/sitemap-index.xml');
   expect(index.status()).toBe(200);
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
-  // 38 pages and posts (the privacy policy since 2026-10-13, the launch post since the switch,
+  // 39 pages and posts (the privacy policy since 2026-10-13, the launch post since the switch,
   // קרי וכתיב since 2026-10-22, the trope list and its 29 pages since 2026-10-24, פסק since 2026-10-28, קדמא־זקף קטן since 2026-10-31,
-  // the post on the tradition switch and the trope quiz since 2026-11-05), the three month archives and the
+  // the post on the tradition switch and the trope quiz since 2026-11-05, the licences since 2026-11-07), the three month archives and the
   // category archive, "What's new" (the author archive is noindex).
-  expect(sitemap.match(/<loc>/g)).toHaveLength(76);
+  expect(sitemap.match(/<loc>/g)).toHaveLength(77);
   expect(sitemap).not.toContain('/author/');
 
   const old = await request.get('/sitemap.xml', { maxRedirects: 0 });
@@ -969,14 +969,19 @@ test('an audio button shows loading at once, then says "עצירה" while playin
   await expect(tile).toHaveAttribute('aria-label', name);
 });
 
-test('the footer states the content licence', async ({ page }) => {
+test('every page links to the licences, where the content licence and the Bible text are', async ({
+  page,
+}) => {
   await page.goto('/about/');
-  const licence = page.locator('footer a[rel~="license"]');
-  await expect(licence).toHaveText('התוכן ברישיון CC BY-NC-SA 4.0');
-  await expect(licence).toHaveAttribute(
-    'href',
-    'https://creativecommons.org/licenses/by-nc-sa/4.0/',
-  );
+  await page.locator('footer').getByRole('link', { name: 'רישיונות ומקורות' }).click();
+  await expect(page).toHaveURL(/\/licenses\/$/);
+  const main = page.locator('main');
+  await expect(
+    main.locator('a[href="https://creativecommons.org/licenses/by-nc-sa/4.0/"]'),
+  ).toHaveCount(1);
+  await expect(
+    main.locator('a[href="https://creativecommons.org/licenses/by-sa/4.0/"]'),
+  ).toHaveCount(1);
 });
 
 test('a footnote is a raised number linked both ways, shown beside it on hover', async ({
