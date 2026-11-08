@@ -293,7 +293,7 @@ export const TropeQuiz: React.FC = () => {
         )}
       </div>
       <div id={prompt} className="mt-1 text-center text-lg">
-        {question.item.m === undefined ? 'איזה טעם יש כאן?' : 'איזה טעם יש במילה המסומנת?'}
+        {question.item.m === undefined ? 'איזה טעם מופיע כאן?' : 'איזה טעם מופיע במילה המסומנת?'}
       </div>
       <div
         ref={word}
