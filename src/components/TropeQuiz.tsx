@@ -7,6 +7,7 @@ import {
   chooseOptions,
   MAX_LEVEL,
   nextLevel,
+  pickStreakLabel,
   rankOf,
   shuffle,
   type Question,
@@ -125,6 +126,8 @@ interface Round {
   score: number;
   /** Right answers in a row, shown from three on. */
   run: number;
+  /** How this round words the run ("רצף של 3"). */
+  streakLabel: (run: number) => string;
   /** The feedback's first words (cheer). */
   cheer: string;
 }
@@ -161,6 +164,7 @@ function newRound(words: WordList, level: number): Round {
     chosen: null,
     score: 0,
     run: 0,
+    streakLabel: pickStreakLabel(),
     cheer: '',
   };
 }
@@ -284,7 +288,7 @@ export const TropeQuiz: React.FC = () => {
         {round.run >= 3 && (
           <span className="inline-flex items-center gap-1 font-bold">
             <Flame size={14} aria-hidden="true" />
-            {round.run} ברצף
+            {round.streakLabel(round.run)}
           </span>
         )}
       </div>

@@ -11,6 +11,8 @@ import {
   MISSES,
   NEAR_MISSES,
   RANKS,
+  STREAK_LABELS,
+  pickStreakLabel,
   buildRound,
   cheer,
   chooseOptions,
@@ -181,5 +183,16 @@ describe('cheer', () => {
       expect(NEAR_MISSES).toContain(cheer('מונח', 'מהפך', random));
       expect(MISSES).toContain(cheer('מונח', 'זקף-גדול', random));
     }
+  });
+});
+
+describe('pickStreakLabel', () => {
+  it('words a run of right answers in one of the approved ways, with its number', () => {
+    const random = seeded(4);
+    const words = new Set<string>();
+    for (let i = 0; i < 50; i++) words.add(pickStreakLabel(random)(7));
+    // Every wording turns up, each with its number, and none other.
+    expect([...words].toSorted()).toEqual(STREAK_LABELS.map((label) => label(7)).toSorted());
+    expect(pickStreakLabel(() => 0.999_999)(3)).toBe(STREAK_LABELS.at(-1)?.(3));
   });
 });

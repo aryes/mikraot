@@ -209,6 +209,22 @@ const pick = (lines: readonly string[], random: () => number) =>
   lines[Math.floor(random() * lines.length)] ?? '';
 
 /**
+ * Ways to say how many right answers in a row; one per round, so the label doesn't change its
+ * wording under the reader's eyes (Arye, 2026-11-08).
+ */
+export const STREAK_LABELS: readonly ((run: number) => string)[] = [
+  (run) => `${run} נכונות ברצף`,
+  (run) => `${run} ברצף`,
+  (run) => `רצף של ${run}`,
+  (run) => `${run} בלי טעות`,
+  (run) => `${run} רצופות`,
+];
+
+/** A round's way of saying it, at random. */
+export const pickStreakLabel = (random: () => number = Math.random) =>
+  STREAK_LABELS[Math.floor(random() * STREAK_LABELS.length)] ?? ((run: number) => `${run} ברצף`);
+
+/**
  * What the feedback opens with: a cheer, or after a mistake a kinder word when the two tropes
  * really are alike; each one of its kind at random.
  */
