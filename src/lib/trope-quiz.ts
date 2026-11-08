@@ -8,10 +8,14 @@
  * 2026-11-05). Random options pair up too, so the odd one out doesn't give the answer away.
  */
 
-/** A word or maqaf chain from the Torah; `m`: the index of the chain's word to mark. */
+/**
+ * A word or maqaf chain from the Torah; `m`: the index of the chain's word to mark; `p`: its ׀ is
+ * a פסק, drawn hollow as elsewhere on the site, not the solid line of a מונח לגרמיה.
+ */
 export interface QuizItem {
   w: string;
   m?: number;
+  p?: boolean;
 }
 
 /** public/quiz/trope-words.json. */
