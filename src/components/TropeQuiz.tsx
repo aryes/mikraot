@@ -167,7 +167,7 @@ function newRound(words: WordList, level: number): Round {
 
 /**
  * The trope quiz (src/lib/trope-quiz.ts): rounds of ten words from the Torah, four names to
- * choose from for each. Shown on the page "זיהוי טעמים" through the Markdoc tag `trope-quiz`.
+ * choose from for each. Shown on the page "מה הטעם?" through the Markdoc tag `trope-quiz`.
  */
 export const TropeQuiz: React.FC = () => {
   const prompt = useId();

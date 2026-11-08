@@ -83,7 +83,7 @@ export default defineMarkdocConfig({
       },
       selfClosing: true,
     },
-    // The trope quiz (src/components/TropeQuiz.tsx), on the page "זיהוי טעמים".
+    // The trope quiz (src/components/TropeQuiz.tsx), on the page "מה הטעם?".
     'trope-quiz': {
       render: component('./src/components/content/TropeQuiz.astro'),
       selfClosing: true,
