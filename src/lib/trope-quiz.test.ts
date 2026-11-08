@@ -82,7 +82,17 @@ describe('the quiz data', () => {
     for (const q of questions) {
       if (q.options)
         expect(new Set(q.options).size === 4 && q.options.includes(q.trope), q.item.w).toBe(true);
-      for (const [, id] of q.why.matchAll(/\{([^}]+)\}/g)) expect(ids, q.item.w).toContain(id);
+      for (const [, id] of (q.why ?? '').matchAll(/\{([^}]+)\}/g))
+        expect(ids, q.item.w).toContain(id);
+    }
+  });
+});
+
+describe('the prepared questions', () => {
+  it('explain the look-alikes, not the rare tropes, whose sign is on the screen', () => {
+    for (const q of questions) {
+      const rare = (list.items[q.trope]?.length ?? 0) < MIN_RANDOM;
+      expect(q.why === undefined, q.item.w).toBe(rare);
     }
   });
 });
@@ -126,12 +136,15 @@ describe('nextLevel', () => {
 });
 
 describe('buildRound', () => {
+  const preparedKeys = new Set(questions.map((q) => `${q.trope}|${q.item.w}`));
+
   it('makes ten questions on ten different tropes, two of them prepared', () => {
     for (let seed = 1; seed <= 50; seed++) {
       const round = buildRound(list, questions, new Set(), { random: seeded(seed) });
       expect(round).toHaveLength(10);
       expect(new Set(round.map((q) => q.trope)).size).toBe(10);
-      expect(round.filter((q) => q.why).length).toBe(2);
+      // At least: a random word can be one a prepared question also uses (צֹ֣הַר ׀).
+      expect(round.filter((q) => preparedKeys.has(q.key)).length).toBeGreaterThanOrEqual(2);
     }
   });
 
