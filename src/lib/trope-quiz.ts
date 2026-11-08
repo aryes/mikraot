@@ -21,12 +21,16 @@ export interface WordList {
   items: Record<string, QuizItem[]>;
 }
 
-/** A hand-made question: its own wrong options (optional) and an explanation. */
+/**
+ * A hand-made question: for a trope too rare to draw at random, or for telling look-alikes apart,
+ * with its own wrong options (optional) and, for look-alikes, an explanation of the difference.
+ * The rare ones have none: the sign itself is on the screen (Arye, 2026-11-08).
+ */
 export interface PreparedQuestion {
   trope: string;
   item: QuizItem;
   options?: string[];
-  why: string;
+  why?: string;
 }
 
 export interface Question {

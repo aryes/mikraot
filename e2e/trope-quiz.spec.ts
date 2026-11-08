@@ -3,7 +3,7 @@ import { CHEERS, MISSES, NEAR_MISSES } from '../src/lib/trope-quiz';
 
 const QUIZ = `/${encodeURI('זיהוי-טעמים')}/`;
 
-test('the trope quiz runs a round of ten tropes, explains each answer, ranks the score and remembers what it asked', async ({
+test('the trope quiz runs a round of ten tropes, tells each answer, ranks the score and remembers what it asked', async ({
   page,
 }) => {
   await page.goto(QUIZ);
