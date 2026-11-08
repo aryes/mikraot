@@ -8,6 +8,8 @@ import {
   MIN_RANDOM,
   QUIZ_TROPES,
   CHEERS,
+  MISSES,
+  NEAR_MISSES,
   RANKS,
   buildRound,
   cheer,
@@ -174,7 +176,10 @@ describe('rankOf', () => {
 describe('cheer', () => {
   it('cheers a right answer and is kinder to a look-alike than to a wild guess', () => {
     expect(CHEERS).toContain(cheer('מונח', 'מונח', seeded(1)));
-    expect(cheer('מונח', 'מהפך')).toContain('דומים');
-    expect(cheer('מונח', 'זקף-גדול')).toBe('לא הפעם.');
+    const random = seeded(2);
+    for (let i = 0; i < 20; i++) {
+      expect(NEAR_MISSES).toContain(cheer('מונח', 'מהפך', random));
+      expect(MISSES).toContain(cheer('מונח', 'זקף-גדול', random));
+    }
   });
 });
