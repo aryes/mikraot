@@ -95,8 +95,21 @@ const Why: React.FC<{ text: string }> = ({ text }) => (
   </>
 );
 
+/** Text whose ׀ is a פסק, drawn hollow (global.css, mark-paseq). */
+const WithPaseq: React.FC<{ text: string }> = ({ text }) => (
+  <>
+    {pieces(text.split('׀'), 1).map((piece) => (
+      <React.Fragment key={piece.at}>
+        {piece.index > 0 && <span className="mark-paseq">׀</span>}
+        {piece.text}
+      </React.Fragment>
+    ))}
+  </>
+);
+
 /** The word or chain asked about, the marked word of a chain highlighted. */
 const Word: React.FC<{ item: QuizItem }> = ({ item }) => {
+  if (item.p) return <WithPaseq text={item.w} />;
   if (item.m === undefined) return <>{item.w}</>;
   return (
     <>

@@ -95,6 +95,11 @@ describe('the prepared questions', () => {
       expect(q.why === undefined, q.item.w).toBe(rare);
     }
   });
+
+  it('mark a פסק only on a word that has its line, not on a chain with a marked word', () => {
+    for (const q of questions.filter((question) => question.item.p))
+      expect(q.item.w.includes('׀') && q.item.m === undefined, q.item.w).toBe(true);
+  });
 });
 
 describe('chooseOptions', () => {
