@@ -247,7 +247,7 @@ const LOWEST: Rank = {
   min: 0,
   name: 'מְשָׁרֵת',
   anchor: 'servants',
-  line: 'בלעדיו אין מלך. עוד סבב?',
+  line: 'בלי משרתים אין מלכים. עוד סבב?',
 };
 
 /** The ranks of the trope hierarchy, highest first. */
