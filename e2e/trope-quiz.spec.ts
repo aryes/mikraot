@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { CHEERS } from '../src/lib/trope-quiz';
+import { CHEERS, MISSES, NEAR_MISSES } from '../src/lib/trope-quiz';
 
 const QUIZ = `/${encodeURI('זיהוי-טעמים')}/`;
 
@@ -19,8 +19,8 @@ test('the trope quiz runs a round of ten tropes, explains each answer, ranks the
     await options.first().click();
     // Right: a cheer; wrong: a kind word and the right name. Either way, a link to its page.
     const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
-    if (feedback.includes('הטעם כאן:')) expect(feedback).toMatch(/^(לא הפעם\.|כמעט)/);
-    else expect(CHEERS).toContain(feedback);
+    const [opening = '', rest] = feedback.split(' הטעם כאן: ');
+    expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
     await expect(quiz.getByRole('link', { name: /לדף הטעם/ })).toHaveAttribute('href', /^\//);
     await expect(next).toBeFocused();
     await next.click();

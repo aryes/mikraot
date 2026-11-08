@@ -200,14 +200,21 @@ export function buildRound(
 
 /** The cheers after a right answer, one at random so it doesn't repeat itself. */
 export const CHEERS = ['נכון!', 'בדיוק!', 'יפה מאוד!', 'קלעתם!', 'מצוין!'];
+/** After choosing a look-alike of the answer: a kinder word (Arye, 2026-11-08). */
+export const NEAR_MISSES = ['כמעט – הם באמת דומים.', 'קרוב מאוד.', 'מבלבל, נכון?', 'ההבדל דק.'];
+/** After any other mistake. */
+export const MISSES = ['לא הפעם.', 'לא בדיוק.', 'הפעם לא.'];
+
+const pick = (lines: readonly string[], random: () => number) =>
+  lines[Math.floor(random() * lines.length)] ?? '';
 
 /**
  * What the feedback opens with: a cheer, or after a mistake a kinder word when the two tropes
- * really are alike.
+ * really are alike; each one of its kind at random.
  */
 export function cheer(answer: string, chosen: string, random: () => number = Math.random): string {
-  if (chosen === answer) return CHEERS[Math.floor(random() * CHEERS.length)] ?? 'נכון!';
-  return lookAlikes(answer).includes(chosen) ? 'כמעט – הם באמת דומים.' : 'לא הפעם.';
+  if (chosen === answer) return pick(CHEERS, random);
+  return pick(lookAlikes(answer).includes(chosen) ? NEAR_MISSES : MISSES, random);
 }
 
 /** Ranks are pointed: without vowels מִשְׁנֶה reads as משנה, the Mishnah. */
