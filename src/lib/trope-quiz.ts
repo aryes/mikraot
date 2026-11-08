@@ -254,7 +254,7 @@ const LOWEST: Rank = {
 export const RANKS: readonly Rank[] = [
   { min: 1, name: 'קֵיסָר', anchor: 'emperors', line: 'סוף פסוק לטעויות!' },
   { min: 0.8, name: 'מֶלֶךְ', anchor: 'kings', line: 'עוד קצת, והכתר של הקיסר שלכם.' },
-  { min: 0.6, name: 'מִשְׁנֶה', anchor: 'dukes', line: 'משנה למלך: המלוכה כבר קרובה.' },
+  { min: 0.6, name: 'מִשְׁנֶה', anchor: 'dukes', line: 'מִשְׁנֶה: המלוכה כבר קרובה.' },
   { min: 0.4, name: 'שָׁלִישׁ', anchor: 'counts', line: 'עולים במדרג. עוד סבב?' },
   LOWEST,
 ];
