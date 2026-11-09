@@ -32,6 +32,8 @@ const pages = defineCollection({
     draft: z.boolean().default(false),
     /** Show "last updated" with the date this file last changed (src/lib/last-changed.ts). */
     showLastUpdated: z.boolean().default(false),
+    /** Comments below the page; off for the legal pages (Arye, 2026-11-09). */
+    comments: z.boolean().default(true),
     /**
      * Announcements of new or changed content on this page, for the "What's new" page and feed
      * (which the newsletter sends). New posts are announced without one.

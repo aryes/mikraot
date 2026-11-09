@@ -201,6 +201,7 @@ export default config({
           label: 'להציג ״עודכן לאחרונה״ (התאריך מתעדכן מעצמו כשהעמוד משתנה)',
           defaultValue: false,
         }),
+        comments: fields.checkbox({ label: 'תגובות בתחתית העמוד', defaultValue: true }),
         updates: fields.array(
           fields.object({
             date: fields.date({ label: 'תאריך', defaultValue: { kind: 'today' } }),
