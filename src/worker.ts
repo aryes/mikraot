@@ -40,16 +40,6 @@ const alert = (context: Context, kind: AlertKind, detail: string) => {
   );
 };
 
-/**
- * Reads a request body the site answered without reading (a refused or oversized post). Since
- * wrangler 4.149 (2026-10-12) the local server fails the next request on the same connection
- * otherwise (docs/ROADMAP.md); Cloudflare itself doesn't need it. In the background, after the
- * answer, so a refusal stays as quick as before.
- */
-const drainUnreadBody = (request: Request, context: Context) => {
-  if (request.body && !request.bodyUsed) context.waitUntil(request.arrayBuffer().catch(() => null));
-};
-
 export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
   async fetch(...args: Parameters<typeof handle>) {
     const [request, , context] = args;
@@ -76,14 +66,12 @@ export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
           // A Brevo failure throws: a 500 (and an alert to Arye) for that valid token only.
           await unsubscribeNewsletter({ apiKey, secret, token });
         }
-        drainUnreadBody(request, context); // only a clone was read
         // The same answer for any token: nothing to learn about which tokens exist.
         return withSecurityHeaders(
           new Response('Unsubscribed', { headers: { 'Cache-Control': 'no-store' } }),
         );
       }
       const response = await handle(...args);
-      drainUnreadBody(request, context);
       if (response.status >= 500) {
         // Astro answers an error thrown in a page or API route with a 500 (logging it), so the
         // error itself never reaches Sentry's wrapper: record which request failed.
