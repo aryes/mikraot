@@ -203,13 +203,6 @@
     "order": 28
   },
   {
-    "id": 659,
-    "title": "זיהוי טעמים",
-    "url": "/זיהוי-טעמים/",
-    "parentId": 348,
-    "order": 29
-  },
-  {
     "id": 405,
     "title": "פסוקים לפי טעם",
     "url": null,
@@ -289,10 +282,24 @@
     "order": 39
   },
   {
+    "id": 660,
+    "title": "חידונים",
+    "url": null,
+    "parentId": 0,
+    "order": 40
+  },
+  {
+    "id": 659,
+    "title": "זיהוי טעמים",
+    "url": "/זיהוי-טעמים/",
+    "parentId": 660,
+    "order": 41
+  },
+  {
     "id": 44,
     "title": "אודות",
     "url": "/about/",
     "parentId": 0,
-    "order": 40
+    "order": 42
   }
 ]
