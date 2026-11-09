@@ -14,7 +14,7 @@ import {
   type QuizItem,
   type WordList,
 } from '../lib/trope-quiz';
-import { switchNames, trope, unmarkedName } from '../lib/tropes';
+import { PASEQ, switchNames, trope, unmarkedName } from '../lib/tropes';
 import { track } from '../scripts/analytics';
 
 const WORD_LIST = '/quiz/trope-words.json';
@@ -61,7 +61,7 @@ function isWordList(data: unknown): data is WordList {
  * A trope's name in every tradition, CSS showing the reader's (as NusachText.astro does); with
  * its sign on it unless `unmarked`.
  */
-const Name: React.FC<{ id: string; unmarked?: boolean }> = ({ id, unmarked }) => {
+const Name: React.FC<{ id: string; unmarked?: boolean | undefined }> = ({ id, unmarked }) => {
   const { ashkenazi, sephardi } = switchNames(id, unmarked ? unmarkedName : undefined);
   if (ashkenazi === sephardi) return <>{ashkenazi}</>;
   return (
@@ -71,6 +71,27 @@ const Name: React.FC<{ id: string; unmarked?: boolean }> = ({ id, unmarked }) =>
     </>
   );
 };
+
+/**
+ * An option's name, and the right answer's in the feedback. Where the word's line is a פסק, the
+ * answer says so ("מונח עם פסיק"; Arye, 2026-11-09): the trope alone would leave the line
+ * unexplained. The פסק without its line, so it can't be read as a מונח לגרמיה's.
+ */
+const AnswerName: React.FC<{ id: string; question: Question; unmarked?: boolean | undefined }> = ({
+  id,
+  question,
+  unmarked,
+}) => (
+  <>
+    <Name id={id} unmarked={unmarked} />
+    {question.item.p && id === question.trope && (
+      <>
+        {' עם '}
+        <Name id={PASEQ} unmarked />
+      </>
+    )}
+  </>
+);
 
 /** Text cut into pieces, each with its place in the text as a stable key. */
 function pieces(parts: string[], separator: number): { text: string; at: number; index: number }[] {
@@ -339,7 +360,7 @@ export const TropeQuiz: React.FC = () => {
               {Icon && <Icon size={18} aria-hidden="true" className="shrink-0" />}
               {/* Only the name: the sign on it would give the answer away (Arye, 2026-11-06). */}
               <span>
-                <Name id={id} unmarked />
+                <AnswerName id={id} question={question} unmarked />
               </span>
             </button>
           );
@@ -355,7 +376,7 @@ export const TropeQuiz: React.FC = () => {
                 round.cheer
               ) : (
                 <>
-                  {round.cheer} הטעם כאן: <Name id={question.trope} />
+                  {round.cheer} הטעם כאן: <AnswerName id={question.trope} question={question} />
                 </>
               )}
             </p>
