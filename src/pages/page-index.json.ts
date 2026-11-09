@@ -9,8 +9,10 @@ import type { PageIndex } from '../server/page-index';
 export const GET: APIRoute = async () => {
   const index: PageIndex = {};
   for (const page of await getSitePages()) {
+    const { title, comments } = page.entry.data;
+    // A page without comments stays in the index (old ?p= links) but refuses new ones.
     for (const key of commentKeys(page))
-      index[key] = { title: page.entry.data.title, url: page.url };
+      index[key] = comments ? { title, url: page.url } : { title, url: page.url, noComments: true };
   }
   return Response.json(index);
 };

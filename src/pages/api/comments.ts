@@ -53,6 +53,7 @@ export const POST: APIRoute = async ({ request, url, clientAddress, locals }) =>
     const index = await getPageIndex(env.ASSETS, url.origin);
     const page = findPage(index, comment.page_slug);
     if (!page) return json({ error: 'Unknown page' }, 400);
+    if (page.noComments) return json({ error: 'Comments are closed on this page' }, 400);
     // A reply must answer an approved comment on the same page (old comments may be stored
     // under another key of the same page).
     if (comment.parent_id !== null) {

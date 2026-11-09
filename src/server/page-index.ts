@@ -4,7 +4,7 @@
  * The comments API, the comments feed and old ?p= links use it. Read once per Worker instance.
  */
 
-export type PageIndex = Record<string, { title: string; url: string }>;
+export type PageIndex = Record<string, { title: string; url: string; noComments?: true }>;
 
 interface Assets {
   fetch(input: string | URL): Promise<Response>;

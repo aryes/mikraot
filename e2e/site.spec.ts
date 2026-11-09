@@ -984,6 +984,19 @@ test('every page links to the terms of use, where the content licence and the Bi
   ).toHaveCount(1);
 });
 
+test('the terms of use and the privacy policy have no comments; other pages do', async ({
+  page,
+}) => {
+  // The comments island itself, which hydrates only when scrolled near: not its button.
+  const comments = page.locator('astro-island[component-export="Comments"]');
+  /* oxlint-disable no-await-in-loop -- one page after another */
+  for (const path of ['/terms/', '/privacy-policy/', '/about/']) {
+    await page.goto(path);
+    await expect(comments).toHaveCount(path === '/about/' ? 1 : 0);
+  }
+  /* oxlint-enable no-await-in-loop */
+});
+
 test('a footnote is a raised number linked both ways, shown beside it on hover', async ({
   page,
   isMobile,
