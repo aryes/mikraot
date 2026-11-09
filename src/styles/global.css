@@ -347,13 +347,21 @@
   width: 0.165em;
   border: 0.03em solid currentColor;
 }
-/* High-contrast modes may ignore the hidden fill: draw the font's solid line, not both. */
+/* High-contrast modes would replace the hidden fill with the system's text colour, showing the
+   solid glyph inside the frame: the paseq keeps its own colours there (forced-color-adjust), so
+   it stays hollow (Arye, 2026-11-09: the quiz tells a paseq from a מונח לגרמיה by it). Its
+   frame (currentColor) then takes the system colour of what it sits in, set here, since the
+   colour it would inherit is the page's own, not the system's. */
 @media (forced-colors: active) {
   .mark-paseq {
-    -webkit-text-fill-color: currentColor;
+    forced-color-adjust: none;
+    color: CanvasText;
   }
-  .mark-paseq::before {
-    content: none;
+  a .mark-paseq {
+    color: LinkText;
+  }
+  button .mark-paseq {
+    color: ButtonText;
   }
 }
 /* As on the live site, kbd has no frame: the content uses it (with spaces) to indent verses. */
