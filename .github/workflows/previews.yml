@@ -30,7 +30,7 @@ jobs:
         # any other error fails the run.
         run: |
           name="$(printf '%s' "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')"
-          if ! out="$(npx --yes wrangler@4.149.0 preview delete --worker-name mikraot --name "$name" --skip-confirmation 2>&1)"; then
+          if ! out="$(npx --yes wrangler@4.158.0 preview delete --worker-name mikraot --name "$name" --skip-confirmation 2>&1)"; then
             printf '%s\n' "$out"
             grep -q 'code: 10025' <<< "$out" || exit 1
             echo "No Preview named $name"
