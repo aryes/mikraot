@@ -208,6 +208,10 @@
   color: var(--content-link-hover);
   text-decoration: underline;
 }
+/* A licence's name ("CC BY-NC-SA 4.0") is one unit: never broken at its spaces or hyphens. */
+.wp-content-rendered a[href^='https://creativecommons.org/licenses/'] {
+  white-space: nowrap;
+}
 
 /* Numbered lists keep their numbers (Tailwind's reset removes every list marker; only the bullet
    lists below had them back, so "1. 2. 3." in the content showed no numbers; Arye, 2026-10-13). */
