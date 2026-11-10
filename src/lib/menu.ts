@@ -1,4 +1,30 @@
-import type { MenuItem } from '../types';
+import type { MenuEntry, MenuItem } from '../types';
+
+/**
+ * The menu as src/data/menu.json keeps it (nested, as Keystatic edits it; Arye's roadmap,
+ * 2026-11-10) made flat: each entry numbered in order, with its parent's number. Keystatic writes
+ * empty text for a field left blank, read here as absent.
+ */
+export function flattenMenu(entries: readonly MenuEntry[]): MenuItem[] {
+  const items: MenuItem[] = [];
+  const add = (list: readonly MenuEntry[], parentId: number) => {
+    for (const entry of list) {
+      const id = items.length + 1;
+      items.push({
+        id,
+        title: entry.title,
+        url: entry.url || null,
+        parentId,
+        order: id,
+        ...(entry.trope ? { trope: entry.trope } : {}),
+        ...(entry.sephardiUrl ? { sephardiUrl: entry.sephardiUrl } : {}),
+      });
+      add(entry.children ?? [], id);
+    }
+  };
+  add(entries, 0);
+  return items;
+}
 
 const byOrder = (a: MenuItem, b: MenuItem) => a.order - b.order;
 

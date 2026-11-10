@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { MenuItem } from '../types';
-import { menuTrail } from './menu';
+import { flattenMenu, menuTrail } from './menu';
 
 const item = (id: number, title: string, url: string | null, parentId = 0, order = id) => ({
   id,
@@ -17,6 +17,21 @@ const menu: MenuItem[] = [
   item(5, 'נוסח אשכנז', '/x/', 1),
   item(6, 'נוסח אשכנז, שוב', '/x/', 4),
 ];
+
+describe('flattenMenu', () => {
+  it('numbers nested entries in order, each with its parent, blank fields left out', () => {
+    expect(
+      flattenMenu([
+        { title: 'הגיה', url: '', trope: '', children: [{ title: 'מבטא', url: '/מבטא/' }] },
+        { title: 'שיר', url: '/a/', sephardiUrl: '/b/', trope: 'מונח' },
+      ]),
+    ).toEqual([
+      { id: 1, title: 'הגיה', url: null, parentId: 0, order: 1 },
+      { id: 2, title: 'מבטא', url: '/מבטא/', parentId: 1, order: 2 },
+      { id: 3, title: 'שיר', url: '/a/', parentId: 0, order: 3, trope: 'מונח', sephardiUrl: '/b/' },
+    ]);
+  });
+});
 
 describe('menuTrail', () => {
   it('gives the entries above a page, outermost first', () => {

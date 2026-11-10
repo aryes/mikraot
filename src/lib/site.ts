@@ -2,7 +2,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import menu from '../data/menu.json';
 import siteSettings from '../data/site.json';
 import type { MenuItem } from '../types';
-import { buildMenuTree, menuTrail } from './menu';
+import { buildMenuTree, flattenMenu, menuTrail } from './menu';
 import { collectUpdates, type Update } from './updates';
 import { excerptOf, pagePath, urlForPath } from './urls';
 
@@ -13,7 +13,8 @@ export const site = siteSettings;
 /** The name as the logo writes it: pointed, with an etnachta under the alef (Arye, 2026-10-09). */
 export const pointedTitle = 'מִקְרָא֑וֹת';
 
-export const menuTree = buildMenuTree(menu satisfies MenuItem[]);
+const menuItems: MenuItem[] = flattenMenu(menu.items);
+export const menuTree = buildMenuTree(menuItems);
 
 export type PageEntry = CollectionEntry<'pages'>;
 
@@ -72,7 +73,7 @@ export interface Crumb {
  * visitor finds it there; Arye, 2026-10-21), or for pages not in the menu the pages it nests under.
  */
 export function pageCrumbs(page: SitePage, pages: SitePage[]): Crumb[] {
-  const trail = menuTrail(menu, page.url);
+  const trail = menuTrail(menuItems, page.url);
   return trail
     ? trail.map((item) => ({ title: item.title, url: item.url ?? undefined }))
     : parentCrumbs(page, pages);

@@ -17,6 +17,8 @@ import { stringify } from 'yaml';
 import { hebrewTypography } from './typography.ts';
 import { verifyConversion } from './verify-conversion.ts';
 import { wpToMarkdoc } from './wp-to-markdoc.ts';
+import { buildMenuTree } from '../../src/lib/menu.ts';
+import type { MenuEntry, MenuItem } from '../../src/types.ts';
 
 if (!process.argv.includes('--overwrite-edits')) {
   console.error(
@@ -182,20 +184,22 @@ const menuUrl = (url: string) => {
       .replace(/^\//, '')}${u.search}${u.hash}`,
   );
 };
-writeFileSync(
-  'src/data/menu.json',
-  `${JSON.stringify(
-    menu.items.map((i) => ({
-      id: i.id,
-      title: typeset(i.title),
-      url: menuUrl(i.url),
-      parentId: i.parentId,
-      order: i.order,
-    })),
-    null,
-    2,
-  )}\n`,
+// Nested, as src/data/menu.json keeps it (src/lib/menu.ts, flattenMenu).
+const nest = (item: MenuItem): MenuEntry => ({
+  title: item.title,
+  ...(item.url ? { url: item.url } : {}),
+  ...(item.children?.length ? { children: item.children.map(nest) } : {}),
+});
+const menuTree = buildMenuTree(
+  menu.items.map((i) => ({
+    id: i.id,
+    title: typeset(i.title),
+    url: menuUrl(i.url),
+    parentId: i.parentId,
+    order: i.order,
+  })),
 );
+writeFileSync('src/data/menu.json', `${JSON.stringify({ items: menuTree.map(nest) }, null, 2)}\n`);
 
 const drafts = posts.filter((p) => p.status !== 'publish').length;
 console.log(
