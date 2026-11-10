@@ -3,6 +3,36 @@ import { CHEERS, MISSES, NEAR_MISSES } from '../src/lib/trope-quiz';
 
 const QUIZ = `/${encodeURI('זיהוי-טעמים')}/`;
 
+test('a challenge round starts on request, times each question, and remembers the choice', async ({
+  page,
+}) => {
+  await page.clock.install();
+  await page.goto(QUIZ);
+  const quiz = page.locator('astro-island .not-prose');
+  await quiz.scrollIntoViewIfNeeded();
+  await quiz.getByRole('button', { name: 'אתגר' }).click();
+  await expect(quiz.getByRole('button', { name: 'אתגר' })).toHaveAttribute('aria-pressed', 'true');
+  // The clock waits for the learner.
+  await expect(quiz.getByRole('timer')).toHaveCount(0);
+  await quiz.getByRole('button', { name: 'להתחיל' }).click();
+  await expect(quiz.getByRole('timer')).toHaveText('15');
+  // The time runs out: the question counts as wrong, and the answer is shown.
+  await page.clock.fastForward(16_000);
+  await expect(quiz.locator('[aria-live] p').first()).toContainText('נגמר הזמן. הטעם כאן:');
+  // Back on the page later (a new tab: the mocked clock stays with this one), the challenge waits
+  // for the learner before the clock starts.
+  const later = await page.context().newPage();
+  await later.goto(QUIZ);
+  const again = later.locator('astro-island .not-prose');
+  await again.scrollIntoViewIfNeeded(); // the quiz loads when it comes into view
+  await expect(again.getByRole('button', { name: 'להתחיל' })).toBeVisible();
+  await expect(again.locator('.grid button')).toHaveCount(0);
+  await again.getByRole('button', { name: 'להתחיל' }).click();
+  await expect(again.locator('.grid button')).toHaveCount(4);
+  await again.getByRole('button', { name: 'רגילה' }).click();
+  await expect(again.getByRole('timer')).toHaveCount(0);
+});
+
 test('the trope quiz runs a round of ten tropes, tells each answer, ranks the score and remembers what it asked', async ({
   page,
 }) => {
