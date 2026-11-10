@@ -17,7 +17,13 @@ interface CommentsProps {
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
   if (Number.isNaN(date.getTime())) return dateStr;
-  return date.toLocaleDateString('he-IL', { year: 'numeric', month: 'short', day: 'numeric' });
+  // In words, as the site's other dates (src/lib/archive.ts, formatDate).
+  return date.toLocaleDateString('he-IL', {
+    timeZone: 'Asia/Jerusalem',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 }
 
 export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
