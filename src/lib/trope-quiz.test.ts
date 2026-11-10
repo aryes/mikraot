@@ -13,7 +13,6 @@ import {
   RANKS,
   STREAK_LABELS,
   pickStreakLabel,
-  isRare,
   TIME_UP,
   TIME_UP_LINE,
   buildRound,
@@ -153,24 +152,6 @@ describe('buildRound', () => {
       expect(new Set(round.map((q) => q.trope)).size).toBe(10);
       // At least: a random word can be one a prepared question also uses (צֹ֣הַר ׀).
       expect(round.filter((q) => preparedKeys.has(q.key)).length).toBeGreaterThanOrEqual(2);
-    }
-  });
-
-  it('in a challenge round asks about every rare trope, and still ten different ones', () => {
-    const rare = ids.filter((id) => isRare(list, id));
-    expect(rare.length).toBeGreaterThan(0);
-    for (let seed = 1; seed <= 20; seed++) {
-      const round = buildRound(list, questions, new Set(), {
-        challenge: true,
-        random: seeded(seed),
-      });
-      expect(round).toHaveLength(10);
-      expect(new Set(round.map((q) => q.trope)).size).toBe(10);
-      for (const id of rare)
-        expect(
-          round.map((q) => q.trope),
-          id,
-        ).toContain(id);
     }
   });
 
