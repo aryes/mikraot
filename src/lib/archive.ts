@@ -43,5 +43,15 @@ export function archiveMonths(dates: Date[]): ArchiveMonth[] {
 export const categoryUrl = (slug: string) => `/category/${slug}/`;
 export const authorUrl = (slug: string) => `/author/${slug}/`;
 
-/** dd/mm/yyyy, as on WordPress. */
-export const formatDate = (date: Date) => date.toLocaleDateString('en-GB', { timeZone: TIME_ZONE });
+/**
+ * A date in words ("11 באוגוסט 2021"), as the comments show it: one format across the site, and
+ * not ambiguous between day-first and month-first (design review, 2026-11-10; WordPress used
+ * dd/mm/yyyy).
+ */
+export const formatDate = (date: Date) =>
+  date.toLocaleDateString('he-IL', {
+    timeZone: TIME_ZONE,
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });

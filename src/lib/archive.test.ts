@@ -24,8 +24,8 @@ describe('archiveMonths', () => {
 });
 
 describe('helpers', () => {
-  it('builds archive URLs and WordPress-style dates', () => {
+  it('builds archive URLs and dates in words', () => {
     expect(categoryUrl('חדשות-האתר')).toBe('/category/חדשות-האתר/');
-    expect(formatDate(new Date('2021-08-11T16:11:33Z'))).toBe('11/08/2021');
+    expect(formatDate(new Date('2021-08-11T16:11:33Z'))).toBe('11 באוגוסט 2021');
   });
 });

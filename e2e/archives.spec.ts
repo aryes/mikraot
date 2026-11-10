@@ -38,7 +38,7 @@ test('a post links to its author, category and month archives, each listing it',
   };
   await openFromPost('אריה', 'מחבר: אריה');
   await openFromPost('חדשות האתר', 'קטגוריה: חדשות האתר');
-  await openFromPost('11/08/2021', 'חודש: אוגוסט 2021');
+  await openFromPost('11 באוגוסט 2021', 'חודש: אוגוסט 2021');
   // The author archive stays out of search engines, as on the live site.
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
   await page.goto('/author/arye_s/');
