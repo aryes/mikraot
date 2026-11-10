@@ -17,7 +17,10 @@ const toNav = ({ url, entry }: SitePage): NavPost => ({
 const posts = (await getPosts()).map(toNav);
 const current = toNav(Astro.props.page);
 const { previous, next } = adjacentPosts(posts, current.url);
-const related = relatedPosts(posts, current);
+// Without the posts the previous/next links below already name: with few posts, the list only
+// repeated them (design review, 2026-11-10).
+const shown = new Set([previous?.url, next?.url]);
+const related = relatedPosts(posts, current).filter((post) => !shown.has(post.url));
 const link =
   'text-brand-strong dark:text-brand hover:text-brand-deep dark:hover:text-brand-light hover:underline';
 ---
