@@ -1,4 +1,4 @@
-import { Check, Flame, X } from 'lucide-react';
+import { Check, Flame, Timer, X } from 'lucide-react';
 import React, { useEffect, useId, useRef, useState } from 'react';
 import prepared from '../data/quiz/prepared.json';
 import {
@@ -10,6 +10,8 @@ import {
   pickStreakLabel,
   rankOf,
   shuffle,
+  TIME_LIMIT,
+  TIME_UP,
   type Question,
   type QuizItem,
   type WordList,
@@ -23,6 +25,7 @@ const HIERARCHY = '/trope-hierarchy/';
 /** What the browser remembers between visits. */
 const RECENT_KEY = 'trope-quiz-recent';
 const LEVEL_KEY = 'trope-quiz-level';
+const MODE_KEY = 'trope-quiz-challenge';
 /** The questions skipped in later rounds: about ten rounds' worth. */
 const RECENT_MAX = 100;
 
@@ -164,7 +167,59 @@ interface Round {
   streakLabel: (run: number) => string;
   /** The feedback's first words (cheer). */
   cheer: string;
+  /**
+   * When the current question was shown (a challenge round's clock counts from it); null until
+   * the learner starts a challenge round opened on arrival, so the clock doesn't run unseen.
+   */
+  startedAt: number | null;
 }
+
+/**
+ * Plain rounds or challenge rounds, offered between rounds. Two pressed/unpressed buttons: a
+ * choice that applies at once.
+ */
+const ModeSwitch: React.FC<{ challenge: boolean; onChange: (challenge: boolean) => void }> = ({
+  challenge,
+  onChange,
+}) => {
+  const option = (on: boolean) =>
+    `cursor-pointer rounded-lg px-3 py-1 ${
+      on === challenge
+        ? 'bg-brand-strong font-bold text-white'
+        : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+    }`;
+  return (
+    <div className="mb-4 text-center text-sm">
+      <div
+        role="group"
+        aria-label="רמת החידון"
+        className="inline-flex gap-1 rounded-xl border border-slate-200 p-1 dark:border-slate-700"
+      >
+        <button
+          type="button"
+          aria-pressed={!challenge}
+          className={option(false)}
+          onClick={() => onChange(false)}
+        >
+          רגילה
+        </button>
+        <button
+          type="button"
+          aria-pressed={challenge}
+          className={option(true)}
+          onClick={() => onChange(true)}
+        >
+          אתגר
+        </button>
+      </div>
+      {challenge && (
+        <div className="mt-1 text-(--text-faint)">
+          כל הטעמים הנדירים, ו־{TIME_LIMIT} שניות לכל שאלה
+        </div>
+      )}
+    </div>
+  );
+};
 
 /** Confetti for a perfect round, loaded only then (canvas-confetti, about 6 KB). */
 function celebrate(): void {
@@ -189,8 +244,8 @@ const optionsFor = (question: Question | undefined, level: number) =>
       : chooseOptions(question.trope, level);
 
 /** A new round, its questions avoiding those asked recently. */
-function newRound(words: WordList, level: number): Round {
-  const questions = buildRound(words, prepared, new Set(recentKeys()));
+function newRound(words: WordList, level: number, challenge: boolean, waiting = false): Round {
+  const questions = buildRound(words, prepared, new Set(recentKeys()), { challenge });
   return {
     questions,
     index: 0,
@@ -200,6 +255,7 @@ function newRound(words: WordList, level: number): Round {
     run: 0,
     streakLabel: pickStreakLabel(),
     cheer: '',
+    startedAt: waiting ? null : Date.now(),
   };
 }
 
@@ -213,6 +269,10 @@ export const TropeQuiz: React.FC = () => {
   const [failed, setFailed] = useState(false);
   const [round, setRound] = useState<Round | null>(null);
   const [progress, setProgress] = useState({ level: 0, streak: 0 });
+  /** A challenge round: every rare trope, and a time limit (Arye, 2026-11-08). */
+  const [challenge, setChallenge] = useState(false);
+  /** The time now, kept while a challenge question runs, for its clock. */
+  const [now, setNow] = useState(() => Date.now());
   const next = useRef<HTMLButtonElement>(null);
   const word = useRef<HTMLDivElement>(null);
   const result = useRef<HTMLDivElement>(null);
@@ -228,9 +288,11 @@ export const TropeQuiz: React.FC = () => {
       .then((data: unknown) => {
         if (!isWordList(data)) throw new Error(`${WORD_LIST}: not a word list`);
         const level = savedLevel();
+        const savedChallenge = stored(MODE_KEY) === true;
         setList(data);
         setProgress({ level, streak: 0 });
-        setRound(newRound(data, level));
+        setChallenge(savedChallenge);
+        setRound(newRound(data, level, savedChallenge, savedChallenge));
       })
       .catch(() => setFailed(true));
   }, []);
@@ -242,10 +304,22 @@ export const TropeQuiz: React.FC = () => {
   // on the first load, which nobody asked for.
   useEffect(() => {
     if (!round || !moved.current) return;
+    // A time-out leaves focus where the learner is (the result is announced): not moved for them.
+    if (round.chosen === TIME_UP) return;
     if (round.chosen) next.current?.focus();
     else if (round.index < round.questions.length) word.current?.focus();
     else result.current?.focus();
   }, [round]);
+
+  /** Between rounds (before the first answer, or at the score): plain or challenge. */
+  function chooseMode(on: boolean): void {
+    if (!list || !round || on === challenge) return;
+    setChallenge(on);
+    store(MODE_KEY, on);
+    // At the score, the choice waits for "סבב נוסף"; at a round's start, a new round of that
+    // kind, which in a challenge waits for "להתחיל" before its clock runs.
+    if (round.index < round.questions.length) setRound(newRound(list, progress.level, on, on));
+  }
 
   function answer(id: string): void {
     if (!round || !question || round.chosen) return;
@@ -265,11 +339,31 @@ export const TropeQuiz: React.FC = () => {
     store(RECENT_KEY, [...recentKeys(), question.key].slice(-RECENT_MAX));
   }
 
+  // The clock of a challenge round: when it runs out, the question counts as wrong. Counted
+  // from the question's start, so a slow tab doesn't stretch it.
+  const asking =
+    challenge &&
+    question !== undefined &&
+    !round?.chosen &&
+    round?.startedAt !== null &&
+    round?.startedAt !== undefined;
+  const deadline = (round?.startedAt ?? 0) + TIME_LIMIT * 1000;
+  useEffect(() => {
+    if (!asking) return undefined;
+    const tick = setInterval(() => setNow(Date.now()), 250);
+    const out = setTimeout(() => answer(TIME_UP), deadline - Date.now());
+    return () => {
+      clearInterval(tick);
+      clearTimeout(out);
+    };
+  });
+  const left = Math.min(TIME_LIMIT, Math.max(0, Math.ceil((deadline - now) / 1000)));
+
   function goOn(): void {
     if (!round) return;
     const following = round.index + 1;
     if (following >= round.questions.length) {
-      track('trope-quiz', { score: String(round.score) });
+      track('trope-quiz', { score: String(round.score), mode: challenge ? 'challenge' : 'plain' });
       if (round.score === round.questions.length) celebrate();
     }
     setRound({
@@ -277,6 +371,7 @@ export const TropeQuiz: React.FC = () => {
       index: following,
       options: optionsFor(round.questions[following], progress.level),
       chosen: null,
+      startedAt: Date.now(),
     });
   }
 
@@ -304,10 +399,13 @@ export const TropeQuiz: React.FC = () => {
         <button
           type="button"
           className={`${BUTTON} mt-4`}
-          onClick={() => setRound(newRound(list, progress.level))}
+          onClick={() => setRound(newRound(list, progress.level, challenge))}
         >
           סבב נוסף
         </button>
+        <div className="mt-6">
+          <ModeSwitch challenge={challenge} onChange={chooseMode} />
+        </div>
       </div>
     );
   }
@@ -315,10 +413,22 @@ export const TropeQuiz: React.FC = () => {
   const { chosen } = round;
   return (
     <div className="not-prose rounded-2xl border border-slate-200 p-6 dark:border-slate-700">
+      {round.index === 0 && !chosen && <ModeSwitch challenge={challenge} onChange={chooseMode} />}
       <div className="flex justify-center gap-3 text-sm">
         <span className="text-(--text-faint)">
           שאלה {round.index + 1} מתוך {round.questions.length}
         </span>
+        {challenge && !chosen && round.startedAt !== null && (
+          // Not read aloud each second: the time limit was chosen, and is shown.
+          <span
+            role="timer"
+            aria-label={`${left} שניות`}
+            className="inline-flex items-center gap-1 font-bold tabular-nums"
+          >
+            <Timer size={14} aria-hidden="true" />
+            {left}
+          </span>
+        )}
         {round.run >= 3 && (
           <span className="inline-flex items-center gap-1 font-bold">
             <Flame size={14} aria-hidden="true" />
@@ -336,36 +446,52 @@ export const TropeQuiz: React.FC = () => {
         tabIndex={-1}
         className="my-6 text-center text-5xl leading-[1.6] outline-none"
       >
-        <Word item={question.item} />
+        {/* Hidden until the clock starts, so it can't be read for free. */}
+        {round.startedAt === null ? '…' : <Word item={question.item} />}
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        {round.options.map((id) => {
-          const state = !chosen
-            ? 'border-slate-300 hover:border-brand-strong hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-800'
-            : id === question.trope
-              ? 'quiz-pop border-green-700 bg-green-50 dark:border-green-400 dark:bg-green-950/40'
-              : id === chosen
-                ? 'quiz-shake border-red-700 bg-red-50 dark:border-red-400 dark:bg-red-950/40'
-                : 'border-slate-200 text-slate-500 dark:border-slate-700 dark:text-slate-400';
-          // An icon as well as the colour, for those who can't tell green from red.
-          const Icon = !chosen ? null : id === question.trope ? Check : id === chosen ? X : null;
-          return (
-            <button
-              key={id}
-              type="button"
-              aria-disabled={chosen ? true : undefined}
-              onClick={() => answer(id)}
-              className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 px-3 py-3 text-xl transition-colors ${state}`}
-            >
-              {Icon && <Icon size={18} aria-hidden="true" className="shrink-0" />}
-              {/* Only the name: the sign on it would give the answer away (Arye, 2026-11-06). */}
-              <span>
-                <AnswerName id={id} question={question} unmarked />
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      {round.startedAt === null ? (
+        <div className="text-center">
+          <button
+            type="button"
+            className={BUTTON}
+            onClick={() => {
+              moved.current = true;
+              setRound({ ...round, startedAt: Date.now() });
+            }}
+          >
+            להתחיל
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3">
+          {round.options.map((id) => {
+            const state = !chosen
+              ? 'border-slate-300 hover:border-brand-strong hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-800'
+              : id === question.trope
+                ? 'quiz-pop border-green-700 bg-green-50 dark:border-green-400 dark:bg-green-950/40'
+                : id === chosen
+                  ? 'quiz-shake border-red-700 bg-red-50 dark:border-red-400 dark:bg-red-950/40'
+                  : 'border-slate-200 text-slate-500 dark:border-slate-700 dark:text-slate-400';
+            // An icon as well as the colour, for those who can't tell green from red.
+            const Icon = !chosen ? null : id === question.trope ? Check : id === chosen ? X : null;
+            return (
+              <button
+                key={id}
+                type="button"
+                aria-disabled={chosen ? true : undefined}
+                onClick={() => answer(id)}
+                className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 px-3 py-3 text-xl transition-colors ${state}`}
+              >
+                {Icon && <Icon size={18} aria-hidden="true" className="shrink-0" />}
+                {/* Only the name: the sign on it would give the answer away (Arye, 2026-11-06). */}
+                <span>
+                  <AnswerName id={id} question={question} unmarked />
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
       {/* No full stop after a name: some end in a colon (סוף פסוק). The link takes the
           content's link style (.wp-content-rendered a). */}
       <div aria-live="polite" className="mt-4 min-h-6 space-y-2">

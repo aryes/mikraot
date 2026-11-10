@@ -170,11 +170,17 @@ const keyOf = (trope: string, item: QuizItem) => `${trope}|${item.w}`;
  * A round: `preparedCount` prepared questions and the rest random, in random order, none asked
  * recently if that can be helped, and no trope twice.
  */
+/** Seconds for each question in a challenge round. */
+export const TIME_LIMIT = 15;
+
+/** Tropes too rare in the word list to draw at random: only prepared questions ask about them. */
+export const isRare = (list: WordList, id: string) => (list.items[id]?.length ?? 0) < MIN_RANDOM;
+
 export function buildRound(
   list: WordList,
   prepared: readonly PreparedQuestion[],
   recent: ReadonlySet<string>,
-  { size = 10, preparedCount = 2, random = Math.random } = {},
+  { size = 10, preparedCount = 2, challenge = false, random = Math.random } = {},
 ): Question[] {
   const round: Question[] = [];
   // Each trope once a round (Arye, 2026-11-06): a question about a trope already asked is skipped.
@@ -186,13 +192,20 @@ export function buildRound(
     prepared.map((p) => ({ ...p, key: keyOf(p.trope, p.item) })),
     random,
   );
+  // A challenge round asks about every rare trope (Arye, 2026-11-08: "a level with the rare
+  // tropes"), then as many prepared questions as a plain round.
+  if (challenge) {
+    const rare = preparedQuestions.filter((q) => isRare(list, q.trope));
+    for (let question = fresh(rare); question; question = fresh(rare)) round.push(question);
+  }
+  const others = challenge
+    ? preparedQuestions.filter((q) => !isRare(list, q.trope))
+    : preparedQuestions;
   for (let i = 0; i < preparedCount; i++) {
-    const question = fresh(preparedQuestions);
+    const question = fresh(others);
     if (question) round.push(question);
   }
-  const tropes = Object.keys(list.items).filter(
-    (id) => (list.items[id]?.length ?? 0) >= MIN_RANDOM,
-  );
+  const tropes = Object.keys(list.items).filter((id) => !isRare(list, id));
   for (const trope of shuffle(tropes, random)) {
     if (round.length === size) break;
     const items = (list.items[trope] ?? []).map((item) => ({
@@ -236,7 +249,16 @@ export const pickStreakLabel = (random: () => number = Math.random) =>
  * What the feedback opens with: a cheer, or after a mistake a kinder word when the two tropes
  * really are alike; each one of its kind at random.
  */
+/**
+ * What a question whose time ran out counts as chosen (a challenge round): no trope's id, and not
+ * empty, which would read as no answer yet.
+ */
+export const TIME_UP = 'time-up';
+/** The feedback when the time ran out. */
+export const TIME_UP_LINE = 'נגמר הזמן.';
+
 export function cheer(answer: string, chosen: string, random: () => number = Math.random): string {
+  if (chosen === TIME_UP) return TIME_UP_LINE;
   if (chosen === answer) return pick(CHEERS, random);
   return pick(lookAlikes(answer).includes(chosen) ? NEAR_MISSES : MISSES, random);
 }
