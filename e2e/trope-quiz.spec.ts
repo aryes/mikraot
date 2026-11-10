@@ -3,34 +3,35 @@ import { CHEERS, MISSES, NEAR_MISSES } from '../src/lib/trope-quiz';
 
 const QUIZ = `/${encodeURI('זיהוי-טעמים')}/`;
 
-test('a challenge round starts on request, times each question, and remembers the choice', async ({
-  page,
-}) => {
+test('the quiz starts with a time limit for every question, and remembers it', async ({ page }) => {
   await page.clock.install();
   await page.goto(QUIZ);
   const quiz = page.locator('astro-island .not-prose');
   await quiz.scrollIntoViewIfNeeded();
-  await quiz.getByRole('button', { name: 'אתגר' }).click();
-  await expect(quiz.getByRole('button', { name: 'אתגר' })).toHaveAttribute('aria-pressed', 'true');
-  // The clock waits for the learner.
-  await expect(quiz.getByRole('timer')).toHaveCount(0);
+  // No question until the learner starts; no limit unless chosen.
+  await expect(quiz.locator('.grid button')).toHaveCount(0);
+  await expect(quiz.getByRole('button', { name: 'בלי הגבלת זמן' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await quiz.getByRole('button', { name: '10 שניות' }).click();
   await quiz.getByRole('button', { name: 'להתחיל' }).click();
-  await expect(quiz.getByRole('timer')).toHaveText('15');
+  await expect(quiz.getByRole('timer')).toHaveText('10');
   // The time runs out: the question counts as wrong, and the answer is shown.
-  await page.clock.fastForward(16_000);
+  await page.clock.fastForward(11_000);
   await expect(quiz.locator('[aria-live] p').first()).toContainText('נגמר הזמן. הטעם כאן:');
-  // Back on the page later (a new tab: the mocked clock stays with this one), the challenge waits
-  // for the learner before the clock starts.
+  // The next question has its own time.
+  await quiz.getByRole('button', { name: 'לשאלה הבאה' }).click();
+  await expect(quiz.getByRole('timer')).toHaveText('10');
+  // Back later (a new tab: the mocked clock stays with this one): the choice is remembered.
   const later = await page.context().newPage();
   await later.goto(QUIZ);
   const again = later.locator('astro-island .not-prose');
   await again.scrollIntoViewIfNeeded(); // the quiz loads when it comes into view
-  await expect(again.getByRole('button', { name: 'להתחיל' })).toBeVisible();
-  await expect(again.locator('.grid button')).toHaveCount(0);
-  await again.getByRole('button', { name: 'להתחיל' }).click();
-  await expect(again.locator('.grid button')).toHaveCount(4);
-  await again.getByRole('button', { name: 'רגילה' }).click();
-  await expect(again.getByRole('timer')).toHaveCount(0);
+  await expect(again.getByRole('button', { name: '10 שניות' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
 });
 
 test('the trope quiz runs a round of ten tropes, tells each answer, ranks the score and remembers what it asked', async ({
@@ -39,6 +40,8 @@ test('the trope quiz runs a round of ten tropes, tells each answer, ranks the sc
   await page.goto(QUIZ);
   const quiz = page.locator('astro-island .not-prose');
   await quiz.scrollIntoViewIfNeeded();
+  await quiz.getByRole('button', { name: 'להתחיל' }).click();
+  await expect(quiz.getByRole('timer')).toHaveCount(0);
   const options = quiz.locator('.grid button');
   const next = quiz.getByRole('button', { name: /לשאלה הבאה|לתוצאה/ });
 
