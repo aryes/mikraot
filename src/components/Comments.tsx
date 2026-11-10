@@ -256,7 +256,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                   <User className="h-3.5 w-3.5" />
                 )}
               </div>
-              <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
+              <span className="text-base font-bold text-slate-800 dark:text-slate-100">
                 {comment.author_name}
               </span>
               {comment.is_admin_reply ? (
@@ -265,17 +265,17 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
                 </span>
               ) : null}
             </div>
-            <time className="text-xs text-slate-600 dark:text-slate-300">
+            <time className="text-sm text-slate-600 dark:text-slate-300">
               {formatDate(comment.created_at)}
             </time>
           </div>
-          <p className="pr-9 text-sm leading-relaxed whitespace-pre-wrap text-slate-700 dark:text-slate-200">
+          <p className="pr-9 text-base leading-relaxed whitespace-pre-wrap text-slate-700 dark:text-slate-200">
             {comment.content}
           </p>
           <button
             type="button"
             onClick={() => startReply(comment)}
-            className="text-brand-strong dark:text-brand hover:text-brand-deep dark:hover:text-brand-light mt-2 mr-9 inline-flex cursor-pointer items-center gap-1 text-xs font-semibold"
+            className="text-brand-strong dark:text-brand hover:text-brand-deep dark:hover:text-brand-light mt-2 mr-9 inline-flex cursor-pointer items-center gap-1 text-sm font-semibold"
             aria-label={`השיבו ל${comment.author_name}`}
           >
             <Reply className="h-3.5 w-3.5" />
@@ -306,7 +306,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
       {/* Comment List */}
       <div className="mb-8 space-y-4">
         {loading ? (
-          <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-sm text-slate-600 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-300">
+          <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-base text-slate-600 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-300">
             טוען תגובות...
           </div>
         ) : failed ? (
@@ -314,7 +314,7 @@ export const Comments: React.FC<CommentsProps> = ({ pageKey, lookupKeys }) => {
             התגובות לא נטענו. רעננו את העמוד כדי לנסות שוב.
           </div>
         ) : comments.length === 0 ? (
-          <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-sm text-slate-600 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-300">
+          <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-5 text-center text-base text-slate-600 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-300">
             אין תגובות עדיין. היו הראשונים להגיב או לשאול שאלה!
           </div>
         ) : (
