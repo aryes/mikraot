@@ -17,8 +17,12 @@ test('the quiz starts with a time limit for every question, and remembers it', a
   await quiz.getByRole('button', { name: '10 שניות' }).click();
   await quiz.getByRole('button', { name: 'להתחיל' }).click();
   await expect(quiz.getByRole('timer')).toHaveText('10');
+  // The last three seconds are shown in red.
+  await page.clock.fastForward(7_500);
+  await expect(quiz.getByRole('timer')).toHaveText('3');
+  await expect(quiz.getByRole('timer')).toHaveClass(/text-red-700/);
   // The time runs out: the question counts as wrong, and the answer is shown.
-  await page.clock.fastForward(11_000);
+  await page.clock.fastForward(3_500);
   await expect(quiz.locator('[aria-live] p').first()).toContainText('נגמר הזמן. הטעם כאן:');
   // The next question has its own time.
   await quiz.getByRole('button', { name: 'לשאלה הבאה' }).click();

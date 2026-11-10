@@ -1,4 +1,4 @@
-import { Check, Flame, Timer, X } from 'lucide-react';
+import { Check, Flame, X } from 'lucide-react';
 import React, { useEffect, useId, useRef, useState } from 'react';
 import prepared from '../data/quiz/prepared.json';
 import {
@@ -212,6 +212,63 @@ const TimeLimitPicker: React.FC<{
         </button>
       ))}
     </div>
+  );
+};
+
+/** The countdown ring's radius and length, in the SVG's units (a 64-unit square). */
+const RING_RADIUS = 29;
+const RING_LENGTH = 2 * Math.PI * RING_RADIUS;
+
+/**
+ * The clock of a timed question (Arye, 2026-11-10): a ring that empties as the time runs out,
+ * with the seconds left inside it, red for the last three; no clock icon (Arye: the ring says it). Drawn here, not
+ * with react-countdown-circle-timer, which Arye pointed to: that package has had no release
+ * since March 2023, and would add its own animation loop beside the quiz's clock, for a ring
+ * that takes a few lines of SVG.
+ */
+const Countdown: React.FC<{ left: number; share: number; hidden: boolean }> = ({
+  left,
+  share,
+  hidden,
+}) => {
+  const urgent = left <= 3;
+  return (
+    // Not read aloud each second: the time limit was chosen, and is shown. Hidden, not removed,
+    // once answered, so the row keeps its height and the word doesn't move.
+    <span
+      role="timer"
+      aria-label={`${left} שניות`}
+      className={`relative inline-flex size-16 items-center justify-center ${
+        urgent ? 'text-red-700 dark:text-red-400' : ''
+      } ${hidden ? 'invisible' : ''}`}
+    >
+      <svg viewBox="0 0 64 64" aria-hidden="true" className="absolute inset-0 -rotate-90">
+        <circle
+          cx="32"
+          cy="32"
+          r={RING_RADIUS}
+          fill="none"
+          strokeWidth="4"
+          className="stroke-slate-200 dark:stroke-slate-700"
+        />
+        {/* Updated four times a second; the transition smooths the steps between (and refills
+            the ring quickly when the next question starts). */}
+        <circle
+          cx="32"
+          cy="32"
+          r={RING_RADIUS}
+          fill="none"
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeDasharray={RING_LENGTH}
+          strokeDashoffset={RING_LENGTH * (1 - share)}
+          className={`transition-[stroke-dashoffset] duration-250 ease-linear motion-reduce:transition-none ${
+            urgent ? 'stroke-current' : 'stroke-brand-strong dark:stroke-brand-light'
+          }`}
+        />
+      </svg>
+      <span className="relative text-2xl leading-none font-bold tabular-nums">{left}</span>
+    </span>
   );
 };
 
@@ -447,18 +504,11 @@ export const TropeQuiz: React.FC = () => {
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
         <div>
           {limit !== null && (
-            // Not read aloud each second: the time limit was chosen, and is shown. Hidden, not
-            // removed, once answered, so the row keeps its height and the word doesn't move.
-            <span
-              role="timer"
-              aria-label={`${left} שניות`}
-              className={`inline-flex items-center gap-1.5 text-2xl font-bold tabular-nums ${chosen ? 'invisible' : ''}`}
-            >
-              <Timer size={24} aria-hidden="true" className={ICON_ON_TEXT} />
-              {/* A fixed width, two digits' worth, so a narrower number (9 after 10) or a
-                  narrower digit in this font doesn't move the icon. */}
-              <span className="inline-block w-[2ch] text-center">{left}</span>
-            </span>
+            <Countdown
+              left={left}
+              share={Math.max(0, Math.min(1, (deadline - now) / (seconds * 1000)))}
+              hidden={chosen !== null}
+            />
           )}
         </div>
         <div className="flex flex-wrap justify-center gap-x-3 text-sm">
