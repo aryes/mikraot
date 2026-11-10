@@ -37,7 +37,12 @@ const shown = comment?.approved === 1;
 const date = comment ? new Date(`${comment.created_at.replace(' ', 'T')}Z`) : null;
 const when =
   date && !Number.isNaN(date.getTime())
-    ? date.toLocaleDateString('he-IL', { dateStyle: 'medium', timeZone: 'Asia/Jerusalem' })
+    ? date.toLocaleDateString('he-IL', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'Asia/Jerusalem',
+      })
     : comment?.created_at;
 const text = 'text-slate-600 dark:text-slate-300';
 const button =
