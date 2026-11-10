@@ -151,6 +151,11 @@ const Word: React.FC<{ item: QuizItem }> = ({ item }) => {
   );
 };
 
+/**
+ * An icon beside a line of small text, raised a pixel: centred on the line box, it sat below the
+ * middle of the digits beside it (Arye, 2026-11-10).
+ */
+const ICON_ON_TEXT = 'shrink-0 -translate-y-px';
 /** A secondary action, quieter than BUTTON. */
 const QUIET =
   'cursor-pointer rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800';
@@ -446,7 +451,7 @@ export const TropeQuiz: React.FC = () => {
             aria-label={`${left} שניות`}
             className="inline-flex items-center gap-1 font-bold tabular-nums"
           >
-            <Timer size={14} aria-hidden="true" />
+            <Timer size={14} aria-hidden="true" className={ICON_ON_TEXT} />
             {/* A fixed width, two digits' worth: the row is centred, so a narrower number (9
                 after 10) or a narrower digit in this font would move everything. */}
             <span className="inline-block w-[2ch] text-center">{left}</span>
@@ -454,7 +459,7 @@ export const TropeQuiz: React.FC = () => {
         )}
         {round.run >= 3 && (
           <span className="inline-flex items-center gap-1 font-bold">
-            <Flame size={14} aria-hidden="true" />
+            <Flame size={14} aria-hidden="true" className={ICON_ON_TEXT} />
             {round.streakLabel(round.run)}
           </span>
         )}
