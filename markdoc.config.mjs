@@ -88,6 +88,11 @@ export default defineMarkdocConfig({
       render: component('./src/components/content/TropeQuiz.astro'),
       selfClosing: true,
     },
+    // The niqqud quiz (src/components/NiqqudQuiz.tsx), on the page "מה הניקוד?".
+    'niqqud-quiz': {
+      render: component('./src/components/content/NiqqudQuiz.astro'),
+      selfClosing: true,
+    },
     // A nested list of links shown as rows of choices (book, then parasha, then reading).
     picker: {
       render: component('./src/components/content/ListPicker.astro'),

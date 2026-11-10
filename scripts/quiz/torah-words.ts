@@ -4,7 +4,7 @@
  * a לגרמיה line (<b>׀</b>) from a paseq (<small>׀</small>) and writes some signs twice (a sign on
  * an unstressed syllable gets a second copy on the stressed one).
  */
-import type { QuizItem } from '../../src/lib/trope-quiz';
+import type { QuizItem } from '../../src/lib/quiz';
 
 /** A word as written, or a whole maqaf chain, with what follows it. */
 interface Token {
@@ -58,9 +58,10 @@ export const hasTwoSets = (ref: string) => TWO_SETS.some((re) => re.test(ref));
 /**
  * One verse of Sefaria's markup as tokens. Footnotes and section marks go; big and small letters
  * stay as plain letters; a ketiv/qere is kept as a placeholder so the words around it keep their
- * places. The site writes qamats qatan as a qamats and has no combining grapheme joiner.
+ * places. The site writes qamats qatan as a qamats (kept with `qatan`: the niqqud quiz skips
+ * it) and has no combining grapheme joiner.
  */
-export function tokens(html: string): Token[] {
+export function tokens(html: string, { qatan = false } = {}): Token[] {
   const text = html
     .replace(/<sup class="footnote-marker">.*?<\/sup><i class="footnote">.*?<\/i>/g, '')
     .replace(/<span class="mam-spi-[a-z]+">.*?<\/span>/g, '')
@@ -69,7 +70,7 @@ export function tokens(html: string): Token[] {
     .replace(/<small>׀<\/small>/g, ` ${PASEQ} `)
     .replace(/<[^>]+>/g, '')
     .replace(/&[a-z]+;/g, ' ')
-    .replace(/\u05C7/g, '\u05B8')
+    .replace(/\u05C7/g, qatan ? '\u05C7' : '\u05B8')
     .replace(/\u034F/g, '');
   const out: Token[] = [];
   for (const piece of text.split(/\s+/).filter(Boolean)) {
@@ -116,10 +117,10 @@ const same = (set: Set<string>, ...ids: string[]) =>
  * Two words for קדמא ואזלא; the word and its line for מונח לגרמיה; a מאילא with the אתנח or
  * סוף פסוק of its chain, the word carrying it marked when the chain has more than one word.
  */
-export function verseItems(html: string): { trope: string; item: QuizItem }[] {
+export function verseItems(html: string): { answer: string; item: QuizItem }[] {
   const list = tokens(html);
   const signs = list.map(signsOf);
-  const found: { trope: string; item: QuizItem }[] = [];
+  const found: { answer: string; item: QuizItem }[] = [];
   list.forEach((token, i) => {
     const s = signs[i] ?? new Set<string>();
     const next = list[i + 1];
@@ -128,7 +129,7 @@ export function verseItems(html: string): { trope: string; item: QuizItem }[] {
     if (token.line === 'paseq') return;
     if (token.line === 'legarmeh') {
       if (same(s, 'מונח'))
-        found.push({ trope: 'מונח-לגרמיה', item: { w: `${token.text} ${LINE}` } });
+        found.push({ answer: 'מונח-לגרמיה', item: { w: `${token.text} ${LINE}` } });
       return;
     }
     if (s.has('טפחא') && (same(s, 'טפחא', 'אתנחתא') || same(s, 'טפחא', 'סוף-פסוק'))) {
@@ -137,13 +138,13 @@ export function verseItems(html: string): { trope: string; item: QuizItem }[] {
       // The סילוק is on the chain's last word; an earlier meteg is only a meteg.
       const main = token.last ? words.length - 1 : words.findIndex((w) => w.includes('\u0591'));
       found.push({
-        trope: 'מאילא',
+        answer: 'מאילא',
         item: { w: token.text, ...(marked !== main && { m: marked }) },
       });
       return;
     }
     if (same(s, 'קדמא', 'זקף-קטן')) {
-      found.push({ trope: 'קדמא-זקף-קטן', item: { w: token.text } });
+      found.push({ answer: 'קדמא-זקף-קטן', item: { w: token.text } });
       return;
     }
     // Any other word or chain with two signs is left out (a קדמא and its אזלא inside one chain
@@ -152,11 +153,11 @@ export function verseItems(html: string): { trope: string; item: QuizItem }[] {
     const [trope = ''] = s;
     if (trope === 'קדמא' && next && !next.unreadable && nextSigns && same(nextSigns, 'גרש')) {
       if (!next.line)
-        found.push({ trope: 'קדמא-ואזלא', item: { w: `${token.text} ${next.text}` } });
+        found.push({ answer: 'קדמא-ואזלא', item: { w: `${token.text} ${next.text}` } });
       return;
     }
     if (trope === 'גרש' && signs[i - 1] && same(signs[i - 1] ?? new Set(), 'קדמא')) return;
-    found.push({ trope, item: { w: token.text } });
+    found.push({ answer: trope, item: { w: token.text } });
   });
   return found;
 }

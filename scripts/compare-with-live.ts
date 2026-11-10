@@ -106,8 +106,9 @@ const NEW_HERE = new Set([
   '/רשימת-הטעמים/ירח-בן-יומו/',
   // The post on the tradition switch (2026-11-05).
   '/איש-ללשונו/',
-  // The trope quiz (2026-11-05).
+  // The trope quiz (2026-11-05) and the niqqud quiz (2026-11-10).
   '/זיהוי-טעמים/',
+  '/זיהוי-ניקוד/',
   // All the licences and credits on one page (2026-11-07).
   '/terms/',
 ]);

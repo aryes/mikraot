@@ -3,14 +3,11 @@ import { describe, expect, it } from 'vitest';
 import prepared from '../data/quiz/prepared.json';
 import wordList from '../../public/quiz/trope-words.json';
 import {
-  LOOK_ALIKES,
   MAX_LEVEL,
   MIN_RANDOM,
-  QUIZ_TROPES,
   CHEERS,
   MISSES,
   NEAR_MISSES,
-  RANKS,
   STREAK_LABELS,
   pickStreakLabel,
   TIME_UP,
@@ -20,10 +17,10 @@ import {
   chooseOptions,
   lookAlikes,
   nextLevel,
-  rankOf,
   type PreparedQuestion,
   type WordList,
-} from './trope-quiz';
+} from './quiz';
+import { LOOK_ALIKES, QUIZ_TROPES, RANKS, rankOf, TROPE_QUIZ } from './trope-quiz';
 import { SWITCHABLE, plainName, trope, unmarkedName } from './tropes';
 
 /** A repeatable stand-in for Math.random. */
@@ -44,7 +41,7 @@ describe('the quiz data', () => {
     for (const id of [
       ...ids,
       ...LOOK_ALIKES.flat(),
-      ...questions.flatMap((q) => [q.trope, ...(q.options ?? [])]),
+      ...questions.flatMap((q) => [q.answer, ...(q.options ?? [])]),
     ]) {
       expect(ids, id).toContain(id);
       expect(existsSync(`src/content/pages/${id}.mdoc`), id).toBe(true);
@@ -74,7 +71,7 @@ describe('the quiz data', () => {
       const random = list.items[id]?.length ?? 0;
       if (random < MIN_RANDOM)
         expect(
-          questions.some((q) => q.trope === id),
+          questions.some((q) => q.answer === id),
           id,
         ).toBe(true);
     }
@@ -83,7 +80,7 @@ describe('the quiz data', () => {
   it('writes prepared options with the answer among four, and explanations with known names', () => {
     for (const q of questions) {
       if (q.options)
-        expect(new Set(q.options).size === 4 && q.options.includes(q.trope), q.item.w).toBe(true);
+        expect(new Set(q.options).size === 4 && q.options.includes(q.answer), q.item.w).toBe(true);
       for (const [, id] of (q.why ?? '').matchAll(/\{([^}]+)\}/g))
         expect(ids, q.item.w).toContain(id);
     }
@@ -93,7 +90,7 @@ describe('the quiz data', () => {
 describe('the prepared questions', () => {
   it('explain the look-alikes, not the rare tropes, whose sign is on the screen', () => {
     for (const q of questions) {
-      const rare = (list.items[q.trope]?.length ?? 0) < MIN_RANDOM;
+      const rare = (list.items[q.answer]?.length ?? 0) < MIN_RANDOM;
       expect(q.why === undefined, q.item.w).toBe(rare);
     }
   });
@@ -109,7 +106,7 @@ describe('chooseOptions', () => {
     const random = seeded(1);
     for (const id of ids) {
       for (let level = 0; level <= MAX_LEVEL; level++) {
-        const options = chooseOptions(id, level, random);
+        const options = chooseOptions(TROPE_QUIZ, id, level, random);
         expect(options).toHaveLength(4);
         expect(new Set(options).size).toBe(4);
         expect(options).toContain(id);
@@ -118,14 +115,14 @@ describe('chooseOptions', () => {
   });
 
   it('at the highest level, offers look-alikes of the answer', () => {
-    const options = chooseOptions('זקף-קטן', MAX_LEVEL, seeded(2));
-    expect(options.filter((id) => lookAlikes('זקף-קטן').includes(id)).length).toBe(3);
+    const options = chooseOptions(TROPE_QUIZ, 'זקף-קטן', MAX_LEVEL, seeded(2));
+    expect(options.filter((id) => lookAlikes(TROPE_QUIZ, 'זקף-קטן').includes(id)).length).toBe(3);
   });
 
   it('never offers a name that is also shown (the אתנח beside a מאילא)', () => {
     const random = seeded(3);
     for (let i = 0; i < 50; i++) {
-      const options = chooseOptions('מאילא', MAX_LEVEL, random);
+      const options = chooseOptions(TROPE_QUIZ, 'מאילא', MAX_LEVEL, random);
       expect(options).not.toContain('אתנחתא');
       expect(options).not.toContain('סוף-פסוק');
     }
@@ -143,13 +140,13 @@ describe('nextLevel', () => {
 });
 
 describe('buildRound', () => {
-  const preparedKeys = new Set(questions.map((q) => `${q.trope}|${q.item.w}`));
+  const preparedKeys = new Set(questions.map((q) => `${q.answer}|${q.item.w}`));
 
   it('makes ten questions on ten different tropes, two of them prepared', () => {
     for (let seed = 1; seed <= 50; seed++) {
       const round = buildRound(list, questions, new Set(), { random: seeded(seed) });
       expect(round).toHaveLength(10);
-      expect(new Set(round.map((q) => q.trope)).size).toBe(10);
+      expect(new Set(round.map((q) => q.answer)).size).toBe(10);
       // At least: a random word can be one a prepared question also uses (צֹ֣הַר ׀).
       expect(round.filter((q) => preparedKeys.has(q.key)).length).toBeGreaterThanOrEqual(2);
     }
@@ -166,7 +163,7 @@ describe('buildRound', () => {
   it('draws random questions only for tropes with enough words', () => {
     const round = buildRound(list, [], new Set(), { size: 200, random: seeded(6) });
     for (const q of round)
-      expect(list.items[q.trope]?.length ?? 0).toBeGreaterThanOrEqual(MIN_RANDOM);
+      expect(list.items[q.answer]?.length ?? 0).toBeGreaterThanOrEqual(MIN_RANDOM);
     // Each trope once: a round can't be longer than the tropes it draws from.
     const drawn = Object.values(list.items).filter((items) => items.length >= MIN_RANDOM);
     expect(round).toHaveLength(drawn.length);
@@ -197,12 +194,12 @@ describe('rankOf', () => {
 
 describe('cheer', () => {
   it('cheers a right answer and is kinder to a look-alike than to a wild guess', () => {
-    expect(CHEERS).toContain(cheer('מונח', 'מונח', seeded(1)));
-    expect(cheer('מונח', TIME_UP)).toBe(TIME_UP_LINE);
+    expect(CHEERS).toContain(cheer(TROPE_QUIZ, 'מונח', 'מונח', seeded(1)));
+    expect(cheer(TROPE_QUIZ, 'מונח', TIME_UP)).toBe(TIME_UP_LINE);
     const random = seeded(2);
     for (let i = 0; i < 20; i++) {
-      expect(NEAR_MISSES).toContain(cheer('מונח', 'מהפך', random));
-      expect(MISSES).toContain(cheer('מונח', 'זקף-גדול', random));
+      expect(NEAR_MISSES).toContain(cheer(TROPE_QUIZ, 'מונח', 'מהפך', random));
+      expect(MISSES).toContain(cheer(TROPE_QUIZ, 'מונח', 'זקף-גדול', random));
     }
   });
 });

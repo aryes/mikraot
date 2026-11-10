@@ -1,18 +1,20 @@
 /**
- * Makes the trope quiz's word list, public/quiz/trope-words.json, from the Torah as Sefaria gives
- * Miqra according to the Masorah: `npm run quiz:words`. The list is committed, so building the
- * site doesn't depend on Sefaria; run this again only to change what the list holds. Prints how
- * many words each trope has, the rare ones (below MIN_RANDOM) being asked only in prepared
- * questions (src/data/quiz/prepared.json).
+ * Makes the quizzes' word lists, public/quiz/trope-words.json and niqqud-words.json, from the
+ * Torah as Sefaria gives Miqra according to the Masorah: `npm run quiz:words`. The lists are
+ * committed, so building the site doesn't depend on Sefaria; run this again only to change what
+ * they hold. Prints how many words each answer has, the rare ones (below MIN_RANDOM) being asked
+ * only in prepared questions (src/data/quiz/prepared.json).
  */
 import { writeFileSync } from 'node:fs';
-import { MIN_RANDOM, QUIZ_TROPES, type QuizItem, type WordList } from '../../src/lib/trope-quiz';
+import { QUIZ_VOWELS } from '../../src/lib/niqqud-quiz';
+import { MIN_RANDOM, type QuizItem, type WordList } from '../../src/lib/quiz';
+import { QUIZ_TROPES } from '../../src/lib/trope-quiz';
+import { verseNiqqudItems } from './niqqud-words';
 import { hasTwoSets, spread, verseItems } from './torah-words';
 
 const BOOKS = { Genesis: 50, Exodus: 40, Leviticus: 27, Numbers: 36, Deuteronomy: 34 };
 /** Enough that a learner rarely meets a word twice, small enough to load quickly. */
-const PER_TROPE = 200;
-const OUT = 'public/quiz/trope-words.json';
+const PER_ANSWER = 200;
 
 interface Version {
   versionTitle: string;
@@ -38,7 +40,20 @@ function versionOf(body: unknown, url: string): Version {
   return { versionTitle, license, text };
 }
 
-const found = new Map<string, QuizItem[]>();
+/** The words found for each quiz, by answer. */
+const tropes = new Map<string, QuizItem[]>();
+const niqqud = new Map<string, QuizItem[]>();
+const collect = (
+  found: Map<string, QuizItem[]>,
+  items: readonly { answer: string; item: QuizItem }[],
+) => {
+  for (const { answer, item } of items) {
+    const list = found.get(answer) ?? [];
+    // The same word shown twice would be the same question.
+    if (!list.some((other) => other.w === item.w)) list.push(item);
+    found.set(answer, list);
+  }
+};
 let version = { title: '', license: '' };
 for (const [book, chapters] of Object.entries(BOOKS)) {
   for (let chapter = 1; chapter <= chapters; chapter++) {
@@ -48,13 +63,10 @@ for (const [book, chapters] of Object.entries(BOOKS)) {
     const text = versionOf(await res.json(), url);
     version = { title: text.versionTitle, license: text.license };
     text.text.forEach((html, i) => {
+      // Two sets of tropes, and in some words two vowels on a letter (one for each set).
       if (hasTwoSets(`${book} ${chapter}:${i + 1}`)) return;
-      for (const { trope, item } of verseItems(html)) {
-        const items = found.get(trope) ?? [];
-        // The same word shown twice would be the same question.
-        if (!items.some((other) => other.w === item.w)) items.push(item);
-        found.set(trope, items);
-      }
+      collect(tropes, verseItems(html));
+      collect(niqqud, verseNiqqudItems(html));
     });
   }
 }
@@ -64,14 +76,18 @@ if (version.title !== 'Miqra according to the Masorah') {
 
 // Sefaria gives the licence without its version; Wikisource, where MAM is edited, has published
 // its text under CC BY-SA 4.0 since 2023.
-const list: WordList = {
-  source: 'מקרא על פי המסורה (Miqra according to the Masorah), via Sefaria',
-  license: `${version.license} 4.0, https://creativecommons.org/licenses/by-sa/4.0/`,
-  items: Object.fromEntries(QUIZ_TROPES.map((id) => [id, spread(found.get(id) ?? [], PER_TROPE)])),
-};
-writeFileSync(OUT, `${JSON.stringify(list)}\n`);
-for (const id of QUIZ_TROPES) {
-  const count = found.get(id)?.length ?? 0;
-  console.log(`${id}: ${count}${count < MIN_RANDOM ? ' (prepared questions only)' : ''}`);
+function write(out: string, ids: readonly string[], found: Map<string, QuizItem[]>): void {
+  const list: WordList = {
+    source: 'מקרא על פי המסורה (Miqra according to the Masorah), via Sefaria',
+    license: `${version.license} 4.0, https://creativecommons.org/licenses/by-sa/4.0/`,
+    items: Object.fromEntries(ids.map((id) => [id, spread(found.get(id) ?? [], PER_ANSWER)])),
+  };
+  writeFileSync(out, `${JSON.stringify(list)}\n`);
+  for (const id of ids) {
+    const count = found.get(id)?.length ?? 0;
+    console.log(`${id}: ${count}${count < MIN_RANDOM ? ' (prepared questions only)' : ''}`);
+  }
+  console.log(`Wrote ${out}`);
 }
-console.log(`Wrote ${OUT}`);
+write('public/quiz/trope-words.json', QUIZ_TROPES, tropes);
+write('public/quiz/niqqud-words.json', QUIZ_VOWELS, niqqud);
