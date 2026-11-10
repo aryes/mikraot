@@ -71,4 +71,7 @@ test('the trope quiz runs a round of ten tropes, tells each answer, ranks the sc
   expect(new Set(recent.map((key: string) => key.split('|')[0])).size).toBe(10);
   await quiz.getByRole('button', { name: 'סבב נוסף' }).click();
   await expect(quiz).toContainText('שאלה 1 מתוך 10');
+  // Back to the start at any point, to choose again or to stop.
+  await quiz.getByRole('button', { name: 'לחזור להתחלה' }).click();
+  await expect(quiz.getByRole('button', { name: 'להתחיל' })).toBeFocused();
 });

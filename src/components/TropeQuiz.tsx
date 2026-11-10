@@ -151,6 +151,9 @@ const Word: React.FC<{ item: QuizItem }> = ({ item }) => {
   );
 };
 
+/** A secondary action, quieter than BUTTON. */
+const QUIET =
+  'cursor-pointer rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800';
 const BUTTON =
   'bg-brand-strong hover:bg-brand-deep inline-flex cursor-pointer items-center justify-center rounded-xl px-5 py-2.5 text-base font-bold text-white shadow-xs transition-all';
 
@@ -264,6 +267,7 @@ export const TropeQuiz: React.FC = () => {
   const next = useRef<HTMLButtonElement>(null);
   const word = useRef<HTMLDivElement>(null);
   const result = useRef<HTMLDivElement>(null);
+  const begin = useRef<HTMLButtonElement>(null);
   /** Whether the learner has started: only then does focus follow the quiz. */
   const moved = useRef(false);
 
@@ -292,12 +296,17 @@ export const TropeQuiz: React.FC = () => {
   // on the first load, which nobody asked for.
   useEffect(() => {
     if (!round || !moved.current) return;
+    // Back at the start: to the button that starts again.
+    if (!started) {
+      begin.current?.focus();
+      return;
+    }
     // A time-out leaves focus where the learner is (the result is announced): not moved for them.
     if (round.chosen === TIME_UP) return;
     if (round.chosen) next.current?.focus();
     else if (round.index < round.questions.length) word.current?.focus();
     else result.current?.focus();
-  }, [round]);
+  }, [round, started]);
 
   function chooseLimit(value: number | null): void {
     setLimit(value);
@@ -310,6 +319,13 @@ export const TropeQuiz: React.FC = () => {
     setStarted(true);
     // The first question's clock runs from now, not from when the page loaded.
     setRound({ ...round, startedAt: Date.now() });
+  }
+
+  /** Back to the start (Arye, 2026-11-10: a way to restart or quit): the round is dropped. */
+  function restart(): void {
+    if (!list) return;
+    setStarted(false);
+    setRound(newRound(list, progress.level));
   }
 
   function answer(id: string): void {
@@ -393,6 +409,11 @@ export const TropeQuiz: React.FC = () => {
         >
           סבב נוסף
         </button>
+        <div>
+          <button type="button" className={`${QUIET} mt-3`} onClick={restart}>
+            לחזור להתחלה
+          </button>
+        </div>
       </div>
     );
   }
@@ -403,7 +424,7 @@ export const TropeQuiz: React.FC = () => {
         <div className="text-lg">זמן לכל שאלה:</div>
         <TimeLimitPicker limit={limit} onChange={chooseLimit} />
         <div>
-          <button type="button" className={BUTTON} onClick={start}>
+          <button ref={begin} type="button" className={BUTTON} onClick={start}>
             להתחיל
           </button>
         </div>
@@ -426,7 +447,9 @@ export const TropeQuiz: React.FC = () => {
             className="inline-flex items-center gap-1 font-bold tabular-nums"
           >
             <Timer size={14} aria-hidden="true" />
-            {left}
+            {/* A fixed width, two digits' worth: the row is centred, so a narrower number (9
+                after 10) or a narrower digit in this font would move everything. */}
+            <span className="inline-block w-[2ch] text-center">{left}</span>
           </span>
         )}
         {round.run >= 3 && (
@@ -503,11 +526,18 @@ export const TropeQuiz: React.FC = () => {
           </>
         )}
       </div>
-      {chosen && (
-        <button ref={next} type="button" className={`${BUTTON} mt-6`} onClick={goOn}>
-          {round.index + 1 < round.questions.length ? 'לשאלה הבאה' : 'לתוצאה'}
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+        {chosen ? (
+          <button ref={next} type="button" className={BUTTON} onClick={goOn}>
+            {round.index + 1 < round.questions.length ? 'לשאלה הבאה' : 'לתוצאה'}
+          </button>
+        ) : (
+          <span />
+        )}
+        <button type="button" className={QUIET} onClick={restart}>
+          לחזור להתחלה
         </button>
-      )}
+      </div>
     </div>
   );
 };
