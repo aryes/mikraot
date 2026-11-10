@@ -29,6 +29,10 @@ describe('menuTrail', () => {
   it('uses the first entry in menu order when a page is linked twice', () => {
     expect(menuTrail(menu, '/x/')?.map((entry) => entry.title)).toEqual(['הגיה']);
   });
+  it('finds a page an entry leads to in the Sephardi tradition', () => {
+    const song = [item(1, 'טעמים', null), { ...item(2, 'שיר', '/a/', 1), sephardiUrl: '/b/' }];
+    expect(menuTrail(song, '/b/')?.map((entry) => entry.title)).toEqual(['טעמים']);
+  });
   it('stops at a loop instead of hanging', () => {
     const looped = [item(1, 'a', null, 2), item(2, 'b', null, 1), item(3, 'c', '/c/', 1)];
     expect(menuTrail(looped, '/c/')?.map((entry) => entry.title)).toEqual(['b', 'a']);
