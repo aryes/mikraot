@@ -19,6 +19,22 @@ function applyLinks(nusach: string): void {
   }
 }
 
+/**
+ * On a page a menu entry leads to in one tradition (the trope song's Ashkenazi recording), a
+ * change of tradition opens the entry's page for the new one (the Babylonian/Iraqi recording),
+ * and back (Arye, 2026-11-10). Only on a change: a link to either page still opens it.
+ */
+function followOnPage(nusach: string): void {
+  const here = decodeURI(location.pathname);
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-sephardi-href]')) {
+    const { ashkenaziHref, sephardiHref } = link.dataset;
+    if (here !== ashkenaziHref && here !== sephardiHref) continue;
+    const target = nusach === 'sephardi' ? sephardiHref : ashkenaziHref;
+    if (target && target !== here) location.assign(target);
+    return;
+  }
+}
+
 function apply(nusach: string): void {
   if (nusach === DEFAULT) delete root.dataset['nusach'];
   else root.dataset['nusach'] = nusach;
@@ -41,6 +57,7 @@ for (const control of document.querySelectorAll<HTMLElement>('[data-nusach-switc
     } catch {
       // Storage blocked: the choice lasts for this page only.
     }
+    followOnPage(select.value); // after saving the choice, which the next page reads
   });
   control.hidden = false;
 }

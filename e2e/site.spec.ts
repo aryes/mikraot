@@ -1064,6 +1064,19 @@ test('in the trope list the last column opens the trope page like the rest of th
   await expect(page).toHaveURL(/\/%D7%98%D7%A4%D7%97%D7%90\/$/);
 });
 
+test("on the trope song's page, the tradition switch opens the other recording", async ({
+  page,
+}) => {
+  await page.goto('/טעמים/נוסח-אשכנז/');
+  const nusach = page.getByRole('combobox', { name: 'נוסח' });
+  await nusach.selectOption('sephardi');
+  // A page of videos: the next one can take a while to load on a slow phone.
+  const loaded = { timeout: 15_000 };
+  await expect(page).toHaveURL(new RegExp(`${encodeURI('/טעמים-בנוסח-בבלי-עירקי/')}$`), loaded);
+  await page.getByRole('combobox', { name: 'נוסח' }).selectOption('ashkenazi');
+  await expect(page).toHaveURL(new RegExp(`${encodeURI('/טעמים/נוסח-אשכנז/')}$`), loaded);
+});
+
 test('the tradition switch names the tropes in the chosen tradition, and remembers it', async ({
   page,
 }) => {
