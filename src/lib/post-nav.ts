@@ -18,10 +18,17 @@ export function adjacentPosts<T extends NavPost>(
   return { previous: byDate[i - 1], next: byDate[i + 1] };
 }
 
-/** Other posts sharing a category with this one, newest first (Jetpack's "קשור"). */
-export function relatedPosts<T extends NavPost>(posts: T[], post: NavPost, limit = 3): T[] {
+/**
+ * Other posts sharing a category with this one, newest first (Jetpack's "קשור"), leaving out
+ * `exclude` (the previous and next posts, linked anyway) before taking `limit`.
+ */
+export function relatedPosts<T extends NavPost>(
+  posts: T[],
+  post: NavPost,
+  { limit = 3, exclude = [] }: { limit?: number; exclude?: (string | undefined)[] } = {},
+): T[] {
   return posts
-    .filter((other) => other.url !== post.url)
+    .filter((other) => other.url !== post.url && !exclude.includes(other.url))
     .filter((other) => other.categories.some((c) => post.categories.includes(c)))
     .toSorted((a, b) => b.date.getTime() - a.date.getTime())
     .slice(0, limit);

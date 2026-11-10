@@ -27,6 +27,13 @@ describe('relatedPosts', () => {
     expect(relatedPosts(posts, post(3)).map((p) => p.url)).toEqual(['/p4/', '/p1/']);
   });
 
+  it('leaves out the given posts before taking the limit', () => {
+    const many = [1, 2, 3, 4, 5].map((n) => post(n));
+    expect(
+      relatedPosts(many, post(3), { limit: 2, exclude: ['/p4/', undefined] }).map((p) => p.url),
+    ).toEqual(['/p5/', '/p2/']);
+  });
+
   it('is empty when no other post shares a category', () => {
     expect(relatedPosts(posts, post(2, ['other']))).toEqual([]);
   });
