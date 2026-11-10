@@ -10,7 +10,8 @@ const MEAYLA = 'וַיֵּ֖צֵא־נֹ֑חַ וּבָנָ֛יו וְאִשְׁ
 const KETIV =
   'עַל־הָאָ֖רֶץ <span class="mam-kq"><span class="mam-kq-k">(הוצא)</span> <span class="mam-kq-q">[הַיְצֵ֣א]</span></span> אִתָּ֑ךְ';
 
-const tropesOf = (html: string) => verseItems(html).map(({ trope, item }) => `${trope}: ${item.w}`);
+const tropesOf = (html: string) =>
+  verseItems(html).map(({ answer, item }) => `${answer}: ${item.w}`);
 
 describe('tokens', () => {
   it('drops section marks and footnotes, and writes qamats qatan as a qamats', () => {
@@ -43,14 +44,19 @@ describe('verseItems', () => {
   });
 
   it('marks the word of a מאילא in its chain, and tells it from a טפחא', () => {
-    expect(verseItems(MEAYLA)[0]).toEqual({ trope: 'מאילא', item: { w: 'וַיֵּ֖צֵא־נֹ֑חַ', m: 0 } });
+    expect(verseItems(MEAYLA)[0]).toEqual({
+      answer: 'מאילא',
+      item: { w: 'וַיֵּ֖צֵא־נֹ֑חַ', m: 0 },
+    });
     expect(tropesOf(MEAYLA).slice(1)).toEqual([
       'תביר: וּבָנָ֛יו',
       'מרכא: וְאִשְׁתּ֥וֹ',
       'טפחא: וּנְשֵֽׁי־בָנָ֖יו',
       'סוף-פסוק: אִתּֽוֹ׃',
     ]);
-    expect(verseItems('לְהֵ֖חַלּֽוֹ׃')).toEqual([{ trope: 'מאילא', item: { w: 'לְהֵ֖חַלּֽוֹ׃' } }]);
+    expect(verseItems('לְהֵ֖חַלּֽוֹ׃')).toEqual([
+      { answer: 'מאילא', item: { w: 'לְהֵ֖חַלּֽוֹ׃' } },
+    ]);
   });
 
   it('counts a doubled פשטא as שני פשטין, and other doubled signs once', () => {

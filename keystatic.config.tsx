@@ -125,6 +125,11 @@ const content = fields.markdoc({
       icon: <SquareCheck />,
       schema: {},
     }),
+    'niqqud-quiz': block({
+      label: 'חידון זיהוי ניקוד',
+      icon: <SquareCheck />,
+      schema: {},
+    }),
     picker: wrapper({
       label: 'בורר (רשימה מקוננת)',
       icon: <ListTree />,

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { CHEERS, MISSES, NEAR_MISSES } from '../src/lib/trope-quiz';
+import { CHEERS, MISSES, NEAR_MISSES } from '../src/lib/quiz';
 
 const QUIZ = `/${encodeURI('זיהוי-טעמים')}/`;
 

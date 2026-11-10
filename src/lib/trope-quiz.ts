@@ -1,50 +1,10 @@
 /**
- * The trope quiz ("מה הטעם?", src/components/TropeQuiz.tsx): a word from the Torah and four
- * names to choose from. Questions are drawn at random from the word list that
- * scripts/quiz/build-word-list.ts makes from the Torah (public/quiz/trope-words.json), plus a few
- * prepared ones (src/data/quiz/prepared.json) for the rare tropes and the tricky pairs.
- *
- * The wrong options start random and turn into look-alikes as the learner answers well (Arye,
- * 2026-11-05). Random options pair up too, so the odd one out doesn't give the answer away.
+ * The trope quiz ("מה הטעם?", src/components/TropeQuiz.tsx): a word from the Torah and four trope
+ * names to choose from (the shared parts: quiz.ts). Its word list is public/quiz/trope-words.json;
+ * its prepared questions (src/data/quiz/prepared.json) ask about the rare tropes and the tricky
+ * pairs.
  */
-
-/**
- * A word or maqaf chain from the Torah; `m`: the index of the chain's word to mark; `p`: its ׀ is
- * a פסק, drawn hollow as elsewhere on the site, not the solid line of a מונח לגרמיה.
- */
-export interface QuizItem {
-  w: string;
-  m?: number;
-  p?: boolean;
-}
-
-/** public/quiz/trope-words.json. */
-export interface WordList {
-  source: string;
-  license: string;
-  items: Record<string, QuizItem[]>;
-}
-
-/**
- * A hand-made question: for a trope too rare to draw at random, or for telling look-alikes apart,
- * with its own wrong options (optional) and, for look-alikes, an explanation of the difference.
- * The rare ones have none: the sign itself is on the screen (Arye, 2026-11-08).
- */
-export interface PreparedQuestion {
-  trope: string;
-  item: QuizItem;
-  options?: string[];
-  why?: string;
-}
-
-export interface Question {
-  /** Identifies the question across rounds (the recently asked list). */
-  key: string;
-  trope: string;
-  item: QuizItem;
-  options?: string[];
-  why?: string;
-}
+import type { QuizKind } from './quiz';
 
 /** The tropes the quiz asks about and offers: every sign of src/data/tropes.json but פסק and מתג. */
 export const QUIZ_TROPES = [
@@ -111,149 +71,11 @@ const ALSO_SHOWN: Readonly<Record<string, readonly string[]>> = {
   'קדמא-זקף-קטן': ['קדמא', 'זקף-קטן'],
 };
 
-/** Tropes with fewer words than this in the Torah are asked only in prepared questions. */
-export const MIN_RANDOM = 20;
-/** The highest level: all three wrong options look like the answer. */
-export const MAX_LEVEL = 3;
-
-export const lookAlikes = (id: string): string[] =>
-  [...new Set(LOOK_ALIKES.filter((group) => group.includes(id)).flat())].filter(
-    (other) => other !== id,
-  );
-
-/** A copy in random order: each item sorted by a random number of its own. */
-export const shuffle = <T>(items: readonly T[], random: () => number = Math.random): T[] =>
-  items
-    .map((item) => ({ item, at: random() }))
-    // oxlint-disable-next-line unicorn/no-array-sort -- a fresh array; toSorted needs Safari 16
-    .sort((a, b) => a.at - b.at)
-    .map(({ item }) => item);
-
-/**
- * Four options, the answer among them. `level` (0 to MAX_LEVEL) of them look like the answer; the
- * rest are random, each brought with a look-alike of its own once the level is above 0.
- */
-export function chooseOptions(
-  answer: string,
-  level: number,
-  random: () => number = Math.random,
-): string[] {
-  const excluded = new Set([answer, ...(ALSO_SHOWN[answer] ?? [])]);
-  const picked = [answer];
-  const free = (id: string) => !excluded.has(id) && !picked.includes(id);
-  for (const id of shuffle(lookAlikes(answer), random).slice(0, level))
-    if (free(id)) picked.push(id);
-  for (const id of shuffle(QUIZ_TROPES, random)) {
-    if (picked.length === 4) break;
-    if (!free(id)) continue;
-    picked.push(id);
-    const partner = shuffle(lookAlikes(id), random).find(free);
-    if (level > 0 && partner && picked.length < 4) picked.push(partner);
-  }
-  return shuffle(picked, random);
-}
-
-/** Two right answers in a row raise the level; a wrong one lowers it. */
-export function nextLevel(
-  level: number,
-  streak: number,
-  correct: boolean,
-): { level: number; streak: number } {
-  if (!correct) return { level: Math.max(0, level - 1), streak: 0 };
-  if (streak + 1 >= 2) return { level: Math.min(MAX_LEVEL, level + 1), streak: 0 };
-  return { level, streak: streak + 1 };
-}
-
-const keyOf = (trope: string, item: QuizItem) => `${trope}|${item.w}`;
-
-/** The time limits a learner can choose for each question, in seconds (Arye, 2026-11-10). */
-export const TIME_LIMITS = [15, 10, 5] as const;
-
-/** Tropes too rare in the word list to draw at random: only prepared questions ask about them. */
-const isRare = (list: WordList, id: string) => (list.items[id]?.length ?? 0) < MIN_RANDOM;
-
-/**
- * A round: `preparedCount` prepared questions and the rest random, in random order, none asked
- * recently if that can be helped, and no trope twice.
- */
-export function buildRound(
-  list: WordList,
-  prepared: readonly PreparedQuestion[],
-  recent: ReadonlySet<string>,
-  { size = 10, preparedCount = 2, random = Math.random } = {},
-): Question[] {
-  const round: Question[] = [];
-  // Each trope once a round (Arye, 2026-11-06): a question about a trope already asked is skipped.
-  const fresh = <T extends { key: string; trope: string }>(candidates: T[]) => {
-    const unused = candidates.filter((c) => !round.some((q) => q.trope === c.trope));
-    return unused.find((c) => !recent.has(c.key)) ?? unused[0];
-  };
-  const preparedQuestions = shuffle(
-    prepared.map((p) => ({ ...p, key: keyOf(p.trope, p.item) })),
-    random,
-  );
-  for (let i = 0; i < preparedCount; i++) {
-    const question = fresh(preparedQuestions);
-    if (question) round.push(question);
-  }
-  const tropes = Object.keys(list.items).filter((id) => !isRare(list, id));
-  for (const trope of shuffle(tropes, random)) {
-    if (round.length === size) break;
-    const items = (list.items[trope] ?? []).map((item) => ({
-      trope,
-      item,
-      key: keyOf(trope, item),
-    }));
-    const question = fresh(shuffle(items, random));
-    if (question) round.push(question);
-  }
-  return shuffle(round, random);
-}
-
-/** The cheers after a right answer, one at random so it doesn't repeat itself. */
-export const CHEERS = ['נכון!', 'בדיוק!', 'יפה מאוד!', 'קלעתם!', 'מצוין!'];
-/** After choosing a look-alike of the answer: a kinder word (Arye, 2026-11-08). */
-export const NEAR_MISSES = ['כמעט – הם באמת דומים.', 'קרוב מאוד.', 'מבלבל, נכון?', 'ההבדל דק.'];
-/** After any other mistake. */
-export const MISSES = ['לא הפעם.', 'לא בדיוק.', 'הפעם לא.'];
-
-const pick = (lines: readonly string[], random: () => number) =>
-  lines[Math.floor(random() * lines.length)] ?? '';
-
-/**
- * Ways to say how many right answers in a row; one per round, so the label doesn't change its
- * wording under the reader's eyes (Arye, 2026-11-08).
- */
-export const STREAK_LABELS: readonly ((run: number) => string)[] = [
-  (run) => `${run} נכונות ברצף`,
-  (run) => `${run} ברצף`,
-  (run) => `רצף של ${run}`,
-  (run) => `${run} בלי טעות`,
-  (run) => `${run} רצופות`,
-];
-
-/** A round's way of saying it, at random. */
-export const pickStreakLabel = (random: () => number = Math.random) =>
-  STREAK_LABELS[Math.floor(random() * STREAK_LABELS.length)] ?? ((run: number) => `${run} ברצף`);
-
-/**
- * What a question whose time ran out counts as chosen (a timed quiz): no trope's id, and not
- * empty, which would read as no answer yet.
- */
-export const TIME_UP = 'time-up';
-/** The feedback when the time ran out. */
-export const TIME_UP_LINE = 'נגמר הזמן.';
-
-/**
- * What the feedback opens with: a cheer, or after a mistake a kinder word when the two tropes
- * really are alike; each one of its kind at random.
- */
-
-export function cheer(answer: string, chosen: string, random: () => number = Math.random): string {
-  if (chosen === TIME_UP) return TIME_UP_LINE;
-  if (chosen === answer) return pick(CHEERS, random);
-  return pick(lookAlikes(answer).includes(chosen) ? NEAR_MISSES : MISSES, random);
-}
+export const TROPE_QUIZ: QuizKind = {
+  ids: QUIZ_TROPES,
+  lookAlikes: LOOK_ALIKES,
+  alsoShown: ALSO_SHOWN,
+};
 
 /** Ranks are pointed: without vowels מִשְׁנֶה reads as משנה, the Mishnah. */
 export interface Rank {

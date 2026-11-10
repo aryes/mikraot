@@ -1,0 +1,11 @@
+---
+/** The content tag `{% niqqud-quiz /%}`: the niqqud quiz, run in the browser (NiqqudQuiz.tsx). */
+import { NiqqudQuiz } from '../NiqqudQuiz';
+---
+
+<div class="my-6">
+  <NiqqudQuiz client:visible />
+  <noscript>
+    <p>החידון פועל רק כש־JavaScript מופעל בדפדפן.</p>
+  </noscript>
+</div>
