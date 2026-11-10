@@ -1090,6 +1090,11 @@ test('the tradition switch names the tropes in the chosen tradition, and remembe
     useInnerText: true,
   });
   await expect(page.getByRole('combobox', { name: 'נוסח' })).toHaveValue('sephardi');
+  // The trope song's one menu entry leads to the Babylonian/Iraqi recording (Arye, 2026-11-10).
+  await expect(page.locator('a[data-sephardi-href]').first()).toHaveAttribute(
+    'href',
+    '/טעמים-בנוסח-בבלי-עירקי/',
+  );
   // A link and a page titled by a run of tropes follow it too.
   const exercises = page.getByRole('link', { name: /קריאת פסוקים בטעמים/ });
   await expect(exercises).toContainText('מַאֲרִ֥יךְ טַרְחָ֖א', { useInnerText: true });

@@ -13,7 +13,6 @@ test('pages show the photo banner with title and breadcrumb trail', async ({ pag
   await expect(trail.getByRole('listitem')).toHaveText([
     'ראשי',
     /^\/\s*טעמים$/,
-    /^\/\s*שיר הטעמים$/,
     /^\/\s*טעמים בנוסח אשכנז$/,
   ]);
   await expect(trail.getByRole('link')).toHaveText(['ראשי']);

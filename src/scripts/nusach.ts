@@ -9,12 +9,25 @@
 const DEFAULT = 'ashkenazi';
 const root = document.documentElement;
 
+/** Menu entries that lead elsewhere in the Sephardi tradition (the trope song's recording). */
+function applyLinks(nusach: string): void {
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-sephardi-href]')) {
+    link.dataset['ashkenaziHref'] ??= link.getAttribute('href') ?? '';
+    const href =
+      nusach === 'sephardi' ? link.dataset['sephardiHref'] : link.dataset['ashkenaziHref'];
+    if (href) link.setAttribute('href', href);
+  }
+}
+
 function apply(nusach: string): void {
   if (nusach === DEFAULT) delete root.dataset['nusach'];
   else root.dataset['nusach'] = nusach;
   const title = root.getAttribute(`data-title-${nusach}`);
   if (title) document.title = title;
+  applyLinks(nusach);
 }
+
+applyLinks(root.dataset['nusach'] ?? DEFAULT);
 
 for (const control of document.querySelectorAll<HTMLElement>('[data-nusach-switch]')) {
   const select = control.querySelector('select');

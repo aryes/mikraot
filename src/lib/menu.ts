@@ -24,7 +24,9 @@ export function buildMenuTree(items: MenuItem[]): MenuItem[] {
  */
 export function menuTrail(items: MenuItem[], url: string): MenuItem[] | undefined {
   const byId = new Map(items.map((item) => [item.id, item]));
-  let item = items.toSorted(byOrder).find((entry) => entry.url === url);
+  let item = items
+    .toSorted(byOrder)
+    .find((entry) => entry.url === url || entry.sephardiUrl === url);
   if (!item) return undefined;
   const trail: MenuItem[] = [];
   const seen = new Set([item.id]);
