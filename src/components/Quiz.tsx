@@ -133,11 +133,6 @@ const Word: React.FC<{ item: QuizItem }> = ({ item }) => {
   );
 };
 
-/**
- * An icon beside a line of small text, raised a pixel: centred on the line box, it sat below the
- * middle of the digits beside it (Arye, 2026-11-10).
- */
-const ICON_ON_TEXT = 'shrink-0 -translate-y-px';
 /** A secondary action, quieter than BUTTON. */
 const QUIET =
   'cursor-pointer rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800';
@@ -481,10 +476,8 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   const { chosen } = round;
   return (
     <div className="not-prose rounded-2xl border border-slate-200 p-6 dark:border-slate-700">
-      {/* Three columns: the clock in the top right corner (Arye, 2026-11-10), the question's
-          number and the streak centred between two equal columns (on a narrow phone with a long
-          streak, the empty one gives way first, so the centre moves a little but nothing
-          overlaps). */}
+      {/* Three columns (Arye, 2026-11-10): the clock in the top right corner, the question's
+          number in the middle, the streak in the top left corner. */}
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
         <div>
           {limit !== null && (
@@ -495,16 +488,20 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
             />
           )}
         </div>
-        <div className="flex flex-wrap justify-center gap-x-3 text-sm">
-          <span className="text-(--text-faint)">
-            שאלה {round.index + 1} מתוך {round.questions.length}
-          </span>
-          {round.run >= 3 && (
-            <span className="inline-flex items-center gap-1 font-bold">
-              <Flame size={14} aria-hidden="true" className={ICON_ON_TEXT} />
-              {round.streakLabel(round.run)}
-            </span>
-          )}
+        <div className="text-sm text-(--text-faint)">
+          שאלה {round.index + 1} מתוך {round.questions.length}
+        </div>
+        {/* The words under the flame. Hidden, not removed, below three, so the row keeps its
+            height (without a clock, the streak is its tallest) and the word doesn't move; on one
+            line, so a longer label widens its column (moving the question's number a little off
+            centre on a phone) rather than adding a line. */}
+        <div
+          className={`flex flex-col items-center justify-self-end text-center text-sm font-bold whitespace-nowrap ${
+            round.run >= 3 ? '' : 'invisible'
+          }`}
+        >
+          <Flame size={24} aria-hidden="true" className="shrink-0" />
+          {round.streakLabel(Math.max(round.run, 3))}
         </div>
       </div>
       <div id={prompt} className="mt-1 text-center text-lg">
