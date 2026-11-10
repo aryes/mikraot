@@ -1,6 +1,8 @@
 import { createReader } from '@keystatic/core/reader';
 import { describe, expect, it } from 'vitest';
 import keystaticConfig from '../keystatic.config';
+import menuFile from './data/menu.json';
+import { flattenMenu } from './lib/menu';
 
 /** Every content file must open in the editor: read through Keystatic's own schema. */
 describe('Keystatic can read all content', () => {
@@ -19,6 +21,11 @@ describe('Keystatic can read all content', () => {
       // Published pages have content; some WordPress drafts were empty.
       if (!draft) expect(node.children.length, slug).toBeGreaterThan(0);
     }
+  });
+
+  it('reads the menu, as the site reads it', async () => {
+    const menu = await reader.singletons.menu.readOrThrow();
+    expect(flattenMenu(menu.items)).toEqual(flattenMenu(menuFile.items));
   });
 
   it('reads the site settings', async () => {

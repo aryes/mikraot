@@ -1,3 +1,12 @@
+/** A menu entry as src/data/menu.json keeps it: nested, the fields left blank possibly empty. */
+export interface MenuEntry {
+  title: string;
+  trope?: string | undefined;
+  url?: string | undefined;
+  sephardiUrl?: string | undefined;
+  children?: readonly MenuEntry[] | undefined;
+}
+
 export interface MenuItem {
   id: number;
   title: string;

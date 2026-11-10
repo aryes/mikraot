@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import tropes from '../data/tropes.json';
 import menu from '../data/menu.json';
+import { flattenMenu } from './menu';
 import { switchTitle, TRADITIONS, trope } from './tropes';
 
 describe('tropes.json', () => {
@@ -22,7 +23,7 @@ describe('switchTitle', () => {
   });
 
   it('knows every trope the menu names', () => {
-    const ids = menu.flatMap((item) => ('trope' in item ? item.trope.split(/\s+/) : []));
+    const ids = flattenMenu(menu.items).flatMap((item) => item.trope?.split(/\s+/) ?? []);
     expect(ids.length).toBeGreaterThan(0);
     for (const id of ids) expect(() => trope(id)).not.toThrow();
   });

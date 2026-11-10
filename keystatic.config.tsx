@@ -1,9 +1,9 @@
 /**
- * Keystatic: the browser editor for the site's content (src/content/pages/*.mdoc and
- * src/data/site.json). Its components mirror the Markdoc tags in markdoc.config.mjs, so pages
+ * Keystatic: the browser editor for the site's content (src/content/pages/*.mdoc,
+ * src/data/site.json and the menu, src/data/menu.json). Its components mirror the Markdoc tags in markdoc.config.mjs, so pages
  * open and save without losing anything. Locally it edits the files directly (npm run cms).
  */
-import { collection, config, fields, singleton } from '@keystatic/core';
+import { collection, config, fields, singleton, type ComponentSchema } from '@keystatic/core';
 import { block, inline, mark, wrapper } from '@keystatic/core/content-components';
 import {
   Eye,
@@ -157,6 +157,33 @@ const content = fields.markdoc({
   },
 });
 
+/**
+ * The main menu's entries (src/data/menu.json, read by src/lib/menu.ts, flattenMenu): a title and
+ * an address, or a title and the entries under it (`children`); three levels, as the header shows.
+ */
+function menuEntries(label: string, children?: ComponentSchema) {
+  return fields.array(
+    fields.object({
+      title: fields.text({ label: 'כותרת', validation: { length: { min: 1 } } }),
+      url: fields.text({
+        label: 'כתובת',
+        description: 'למשל /מבטא/; ריק לכותרת שרק פותחת תפריט משנה',
+      }),
+      trope: fields.text({
+        label: 'טעמים בכותרת',
+        description: 'מזהי טעמים (מ-tropes.json), כדי שהכותרת תתחלף לפי הנוסח; בדרך כלל ריק',
+      }),
+      sephardiUrl: fields.text({
+        label: 'כתובת בנוסח ספרדי',
+        description:
+          'אם בנוסח ספרדי הכניסה מובילה לעמוד אחר (רק בתת-תפריט הראשון, כמו שיר הטעמים); בדרך כלל ריק',
+      }),
+      ...(children ? { children } : {}),
+    }),
+    { label, itemLabel: (props) => props.fields.title.value },
+  );
+}
+
 export default config({
   storage: { kind: 'local' },
   // Hebrew interface; it also lays the editor out right-to-left.
@@ -226,6 +253,14 @@ export default config({
     }),
   },
   singletons: {
+    menu: singleton({
+      label: 'תפריט ראשי',
+      path: 'src/data/menu',
+      format: { data: 'json' },
+      schema: {
+        items: menuEntries('פריטים', menuEntries('תת-תפריט', menuEntries('תת-תפריט'))),
+      },
+    }),
     site: singleton({
       label: 'הגדרות האתר',
       path: 'src/data/site',
