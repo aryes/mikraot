@@ -440,29 +440,38 @@ export const TropeQuiz: React.FC = () => {
   const { chosen } = round;
   return (
     <div className="not-prose rounded-2xl border border-slate-200 p-6 dark:border-slate-700">
-      <div className="flex justify-center gap-3 text-sm">
-        <span className="text-(--text-faint)">
-          שאלה {round.index + 1} מתוך {round.questions.length}
-        </span>
-        {limit !== null && !chosen && (
-          // Not read aloud each second: the time limit was chosen, and is shown.
-          <span
-            role="timer"
-            aria-label={`${left} שניות`}
-            className="inline-flex items-center gap-1 font-bold tabular-nums"
-          >
-            <Timer size={14} aria-hidden="true" className={ICON_ON_TEXT} />
-            {/* A fixed width, two digits' worth: the row is centred, so a narrower number (9
-                after 10) or a narrower digit in this font would move everything. */}
-            <span className="inline-block w-[2ch] text-center">{left}</span>
+      {/* Three columns: the clock in the top right corner (Arye, 2026-11-10), the question's
+          number and the streak centred between two equal columns (on a narrow phone with a long
+          streak, the empty one gives way first, so the centre moves a little but nothing
+          overlaps). */}
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <div>
+          {limit !== null && (
+            // Not read aloud each second: the time limit was chosen, and is shown. Hidden, not
+            // removed, once answered, so the row keeps its height and the word doesn't move.
+            <span
+              role="timer"
+              aria-label={`${left} שניות`}
+              className={`inline-flex items-center gap-1.5 text-2xl font-bold tabular-nums ${chosen ? 'invisible' : ''}`}
+            >
+              <Timer size={24} aria-hidden="true" className={ICON_ON_TEXT} />
+              {/* A fixed width, two digits' worth, so a narrower number (9 after 10) or a
+                  narrower digit in this font doesn't move the icon. */}
+              <span className="inline-block w-[2ch] text-center">{left}</span>
+            </span>
+          )}
+        </div>
+        <div className="flex flex-wrap justify-center gap-x-3 text-sm">
+          <span className="text-(--text-faint)">
+            שאלה {round.index + 1} מתוך {round.questions.length}
           </span>
-        )}
-        {round.run >= 3 && (
-          <span className="inline-flex items-center gap-1 font-bold">
-            <Flame size={14} aria-hidden="true" className={ICON_ON_TEXT} />
-            {round.streakLabel(round.run)}
-          </span>
-        )}
+          {round.run >= 3 && (
+            <span className="inline-flex items-center gap-1 font-bold">
+              <Flame size={14} aria-hidden="true" className={ICON_ON_TEXT} />
+              {round.streakLabel(round.run)}
+            </span>
+          )}
+        </div>
       </div>
       <div id={prompt} className="mt-1 text-center text-lg">
         {question.item.m === undefined ? 'איזה טעם מופיע כאן?' : 'איזה טעם מופיע במילה המסומנת?'}
