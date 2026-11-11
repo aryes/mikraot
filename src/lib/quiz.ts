@@ -1,9 +1,10 @@
 /**
  * What the site's quizzes share (src/components/Quiz.tsx): a word from the Torah and four names
- * to choose from. Questions are drawn at random from a word list that scripts/quiz/build-word-list.ts
+ * to choose from (or a few fixed ones). Questions are drawn at random from a word list that scripts/quiz/build-word-list.ts
  * makes from the Torah (public/quiz/), plus, for some quizzes, a few prepared ones for the rare
  * answers and the tricky pairs. What a quiz asks about (its answers and which of them look alike)
- * is its QuizKind: the trope quiz (trope-quiz.ts) and the niqqud quiz (niqqud-quiz.ts).
+ * is its QuizKind: the trope quiz (trope-quiz.ts), the niqqud and vowel-class quizzes
+ * (niqqud-quiz.ts).
  *
  * The wrong options start random and turn into look-alikes as the learner answers well (Arye,
  * 2026-11-05). Random options pair up too, so the odd one out doesn't give the answer away.
@@ -43,6 +44,11 @@ export interface PreparedQuestion {
 export interface Question extends PreparedQuestion {
   /** Identifies the question across rounds (the recently asked list). */
   key: string;
+  /**
+   * The word list's entry it was drawn from: its answer, unless the quiz asks about something
+   * the entry belongs to (the vowel-class quiz: a קמץ is a long vowel).
+   */
+  group: string;
 }
 
 /** What a quiz asks about. */
@@ -124,36 +130,53 @@ const isRare = (list: WordList, id: string) => (list.items[id]?.length ?? 0) < M
 
 /**
  * A round: `preparedCount` prepared questions and the rest random, in random order, none asked
- * recently if that can be helped, and no answer twice; as long as `size`, or as there are answers.
+ * recently if that can be helped, and no group twice; as long as `size`, or as there are groups.
+ * The groups are the word list's entries (`groups` of them, or all); a question's answer is its
+ * group's (`answerOf`), or the group itself.
  */
 export function buildRound(
   list: WordList,
   prepared: readonly PreparedQuestion[],
   recent: ReadonlySet<string>,
-  { size = 10, preparedCount = 2, random = Math.random } = {},
+  {
+    size = 10,
+    preparedCount = 2,
+    random = Math.random,
+    groups = Object.keys(list.items),
+    answerOf = (group: string) => group,
+  }: {
+    size?: number;
+    preparedCount?: number;
+    random?: () => number;
+    groups?: readonly string[];
+    answerOf?: (group: string) => string;
+  } = {},
 ): Question[] {
   const round: Question[] = [];
-  // Each answer once a round (Arye, 2026-11-06): a question about one already asked is skipped;
-  // so is a word already shown (the niqqud quiz asks about several letters of some words).
-  const fresh = <T extends { key: string; answer: string; item: QuizItem }>(candidates: T[]) => {
+  // Each group once a round (Arye, 2026-11-06: each trope once): a question from one already
+  // asked is skipped; so is a word already shown (the niqqud quiz asks about several letters of
+  // some words).
+  const fresh = (candidates: Question[]) => {
     const unused = candidates.filter(
-      (c) => !round.some((q) => q.answer === c.answer || q.item.w === c.item.w),
+      (c) => !round.some((q) => q.group === c.group || q.item.w === c.item.w),
     );
     return unused.find((c) => !recent.has(c.key)) ?? unused[0];
   };
   const preparedQuestions = shuffle(
-    prepared.map((p) => ({ ...p, key: keyOf(p.answer, p.item) })),
+    prepared.map((p) => ({ ...p, group: p.answer, key: keyOf(p.answer, p.item) })),
     random,
   );
   for (let i = 0; i < preparedCount; i++) {
     const question = fresh(preparedQuestions);
     if (question) round.push(question);
   }
-  const answers = Object.keys(list.items).filter((id) => !isRare(list, id));
-  for (const answer of shuffle(answers, random)) {
+  const drawn = groups.filter((id) => !isRare(list, id));
+  for (const group of shuffle(drawn, random)) {
     if (round.length === size) break;
-    const items = (list.items[answer] ?? []).map((item) => ({
+    const answer = answerOf(group);
+    const items = (list.items[group] ?? []).map((item) => ({
       answer,
+      group,
       item,
       key: keyOf(answer, item),
     }));

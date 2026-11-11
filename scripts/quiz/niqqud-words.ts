@@ -60,7 +60,7 @@ const vowelsOf = (cluster: Cluster | undefined) =>
 
 /**
  * The niqqud shown in one word, each named once, with the letters to mark. Left out: a letter
- * with two vowels or a קמץ קטן (whose sign is a קמץ's), and a ו whose vowel can't be told from
+ * with two vowels, and a ו whose vowel can't be told from
  * what is written (a dagesh or a dot after a letter with a vowel of its own).
  */
 export function wordItems(word: string): { answer: string; item: QuizItem }[] {
@@ -87,7 +87,12 @@ export function wordItems(word: string): { answer: string; item: QuizItem }[] {
     }
     if (vowels.length !== 1) return;
     const [vowel = ''] = vowels;
-    if (vowel === QAMATS_QATAN) return;
+    // Kept apart: the niqqud quiz can't ask about it (its sign is a קמץ's), the vowel-class quiz
+    // can (a short vowel).
+    if (vowel === QAMATS_QATAN) {
+      add('קמץ-קטן', letter, letter);
+      return;
+    }
     const name = VOWELS[vowel];
     if (!name) return;
     // A י with no mark after a חיריק is its vowel letter.
@@ -113,7 +118,7 @@ export function verseNiqqudItems(html: string): { answer: string; item: QuizItem
     .filter((word) => /^[ְ-ׇּׁׂא-ת]+$/.test(word))
     .flatMap((word) => {
       const items = wordItems(word);
-      // The word as the site writes it: its qamats qatan, never asked, as a qamats.
+      // The word as the site writes it: a qamats qatan as a qamats.
       return items.map(({ answer, item }) => ({
         answer,
         item: { ...item, w: item.w.replaceAll(QAMATS_QATAN, 'ָ') },

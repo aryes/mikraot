@@ -109,6 +109,8 @@ const NEW_HERE = new Set([
   // The trope quiz (2026-11-05) and the niqqud quiz (2026-11-10).
   '/זיהוי-טעמים/',
   '/זיהוי-ניקוד/',
+  // The vowel-class quiz (2026-11-11).
+  '/סוג-התנועה/',
   // All the licences and credits on one page (2026-11-07).
   '/terms/',
 ]);
