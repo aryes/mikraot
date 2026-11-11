@@ -6,7 +6,8 @@
  * (src/server/audio-range.ts). Every answer gets public/_headers' security headers, which
  * Cloudflare applies to static files only (src/server/security-headers.ts). Emails Brevo refused
  * are sent again from a queue (src/server/email.ts). Sentry records the errors with their details
- * (src/lib/sentry.ts).
+ * (src/lib/sentry.ts). Quiz duels' rooms are Durable Objects (src/server/quiz-duel.ts), reached
+ * here by WebSocket (src/server/duel-route.ts).
  */
 import { handle } from '@astrojs/cloudflare/handler';
 import * as Sentry from '@sentry/cloudflare';
@@ -21,6 +22,9 @@ import { unsubscribeReplies } from './server/comments';
 import { unsubscribeNewsletter } from './server/newsletter';
 import { oneClickUnsubscribe } from './server/one-click-unsubscribe';
 import { sentryOptions } from './lib/sentry';
+import { duelRoom } from './server/duel-route';
+
+export { QuizDuel } from './server/quiz-duel';
 
 interface Context {
   waitUntil(promise: Promise<unknown>): void;
@@ -57,6 +61,14 @@ export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
           recording.headers.set('Cache-Control', 'public, max-age=604800');
         return withSecurityHeaders(recording);
       }
+      // A quiz duel's room: answered by the room itself (a WebSocket), or refused here.
+      const room = await duelRoom(request, {
+        rooms: env.QUIZ_DUEL,
+        limiter: env.DUEL_RATE_LIMIT,
+        clientAddress: request.headers.get('CF-Connecting-IP') ?? '',
+      });
+      // A 101 hands over the socket as it is; a refusal gets the headers like any answer.
+      if (room) return room.status === 101 ? room : withSecurityHeaders(room);
       const unsubscribe = await oneClickUnsubscribe(request);
       if (unsubscribe !== null) {
         const { stop, token } = unsubscribe;

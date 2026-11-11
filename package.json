@@ -51,6 +51,7 @@
     "canvas-confetti": "^1.9.4",
     "ipaddr.js": "^2.5.0",
     "lucide-react": "^1.49.0",
+    "partysocket": "^1.3.0",
     "preact": "^10.29.8"
   },
   "devDependencies": {
