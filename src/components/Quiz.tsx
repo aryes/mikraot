@@ -16,7 +16,10 @@ import {
   type QuizKind,
   type WordList,
 } from '../lib/quiz';
+import type { DuelRound, DuelView } from '../lib/duel';
 import { track } from '../scripts/analytics';
+import { DuelLobby, DuelResults, DuelScores, NameField } from './duel/DuelPanels';
+import { useDuel } from './duel/useDuel';
 
 /** What makes one quiz differ from another: TropeQuiz.tsx, NiqqudQuiz.tsx. */
 export interface QuizConfig {
@@ -154,6 +157,8 @@ interface Round {
   cheer: string;
   /** When the current question was shown: a time limit counts from it. */
   startedAt: number;
+  /** A duel's options, question by question, the same for every learner in it. */
+  fixed?: string[][];
 }
 
 /**
@@ -278,22 +283,25 @@ const optionsFor = (config: QuizConfig, question: Question | undefined, level: n
       ? shuffle(question.options)
       : chooseOptions(config.kind, question.answer, level);
 
+/** A round of these questions, at its start (its options set by the caller). */
+const newRoundOf = (questions: Question[]): Round => ({
+  questions,
+  index: 0,
+  options: [],
+  chosen: null,
+  score: 0,
+  run: 0,
+  streakLabel: pickStreakLabel(),
+  cheer: '',
+  startedAt: Date.now(),
+});
+
 /** A new round, its questions avoiding those asked recently. */
 function newRound(config: QuizConfig, words: WordList, level: number): Round {
   const questions = buildRound(words, config.prepared, new Set(recentKeys(keysOf(config).recent)), {
     preparedCount: config.preparedCount,
   });
-  return {
-    questions,
-    index: 0,
-    options: optionsFor(config, questions[0], level),
-    chosen: null,
-    score: 0,
-    run: 0,
-    streakLabel: pickStreakLabel(),
-    cheer: '',
-    startedAt: Date.now(),
-  };
+  return { ...newRoundOf(questions), options: optionsFor(config, questions[0], level) };
 }
 
 /**
@@ -319,6 +327,38 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   const begin = useRef<HTMLButtonElement>(null);
   /** Whether the learner has started: only then does focus follow the quiz. */
   const moved = useRef(false);
+  /** The learner's name for a duel, and whether they are opening one (the name asked first). */
+  const [name, setName] = useState('');
+  const [inviting, setInviting] = useState(false);
+
+  /** A duel's round, once its host starts it: every learner in it plays the same. */
+  function beginDuel(view: DuelView): boolean {
+    // A round of this quiz only (a link from another quiz's page names its own), its options
+    // and answers names this quiz knows.
+    const ids: readonly string[] = config.kind.ids;
+    const known = view.round?.questions.every(
+      (entry) =>
+        ids.includes(entry.question.answer) && entry.options.every((id) => ids.includes(id)),
+    );
+    if (!view.round || view.round.quiz !== config.storage || !known) return false;
+    const fixed = view.round.questions.map((entry) => entry.options);
+    // Back after a reload: from the learner's next question, with the score the room has.
+    const done = view.players.find((player) => player.id === view.you)?.results ?? [];
+    moved.current = true;
+    setLimit(view.round.limit);
+    setRound({
+      ...newRoundOf(view.round.questions.map((entry) => entry.question)),
+      index: done.length,
+      score: done.filter(Boolean).length,
+      options: fixed[done.length] ?? [],
+      fixed,
+    });
+    setStarted(true);
+    return true;
+  }
+
+  const duel = useDuel(beginDuel);
+  const inDuel = (duel.view?.startedAt ?? null) !== null;
 
   useEffect(() => {
     fetch(config.wordList)
@@ -370,9 +410,21 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
     setRound({ ...round, startedAt: Date.now() });
   }
 
+  /** A duel for this round: its questions with their options, as every learner will see them. */
+  function openDuel(): void {
+    if (!round) return;
+    const questions: DuelRound['questions'] = round.questions.map((q, i) => ({
+      question: q,
+      options: i === 0 ? round.options : optionsFor(config, q, progress.level),
+    }));
+    setInviting(false);
+    duel.host(name, { quiz: config.storage, questions, limit });
+  }
+
   /** Back to the start (Arye, 2026-11-10: a way to restart or quit): the round is dropped. */
   function restart(): void {
     if (!list) return;
+    if (duel.status !== 'none') duel.leave();
     setStarted(false);
     setRound(newRound(config, list, progress.level));
   }
@@ -389,6 +441,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       run: correct ? round.run + 1 : 0,
       cheer: cheer(config.kind, question.answer, id),
     });
+    if (inDuel) duel.answer(round.index, id);
     const updated = nextLevel(progress.level, progress.streak, correct);
     setProgress(updated);
     store(keys.level, updated.level);
@@ -424,7 +477,8 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
     setRound({
       ...round,
       index: following,
-      options: optionsFor(config, round.questions[following], progress.level),
+      options:
+        round.fixed?.[following] ?? optionsFor(config, round.questions[following], progress.level),
       chosen: null,
       startedAt: Date.now(),
     });
@@ -441,15 +495,21 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
           <div className="text-xl font-bold">
             זיהיתם נכון {round.score} מתוך {round.questions.length}
           </div>
-          {config.result?.(round.score, round.questions.length)}
+          {inDuel && duel.view ? (
+            <DuelResults view={duel.view} size={round.questions.length} />
+          ) : (
+            config.result?.(round.score, round.questions.length)
+          )}
         </div>
-        <button
-          type="button"
-          className={`${BUTTON} mt-4`}
-          onClick={() => setRound(newRound(config, list, progress.level))}
-        >
-          סבב נוסף
-        </button>
+        {!inDuel && (
+          <button
+            type="button"
+            className={`${BUTTON} mt-4`}
+            onClick={() => setRound(newRound(config, list, progress.level))}
+          >
+            סבב נוסף
+          </button>
+        )}
         <div>
           <button type="button" className={`${QUIET} mt-3`} onClick={restart}>
             לחזור להתחלה
@@ -460,8 +520,58 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   }
 
   if (!started) {
+    const card =
+      'not-prose space-y-4 rounded-2xl border border-slate-200 p-6 text-center dark:border-slate-700';
+    // A duel (Arye, 2026-11-11): invited by a link, waiting in the room, or refused by it.
+    if (duel.status === 'invited')
+      return (
+        <div className={card}>
+          <div className="text-lg">הוזמנתם לחידון משותף.</div>
+          <NameField value={name} onChange={setName} />
+          <button type="button" className={BUTTON} onClick={() => duel.join(name)}>
+            להצטרף
+          </button>
+          <div>
+            <button type="button" className={QUIET} onClick={restart}>
+              לחידון לבד
+            </button>
+          </div>
+        </div>
+      );
+    if (['refused', 'gone', 'lost', 'other'].includes(duel.status))
+      return (
+        <div className={card}>
+          <div>
+            {duel.status === 'refused'
+              ? 'החדר מלא, או שהחידון בו כבר התחיל.'
+              : duel.status === 'gone'
+                ? 'החדר הזה כבר לא קיים.'
+                : duel.status === 'other'
+                  ? 'החדר הזה שייך לחידון אחר.'
+                  : 'החיבור לחדר נותק.'}
+          </div>
+          <button type="button" className={QUIET} onClick={restart}>
+            לחידון לבד
+          </button>
+        </div>
+      );
+    if (duel.status !== 'none')
+      return (
+        <div className={card}>
+          {duel.view && duel.link ? (
+            <DuelLobby
+              view={duel.view}
+              link={duel.link}
+              onStart={() => duel.start()}
+              onLeave={restart}
+            />
+          ) : (
+            <div>מתחברים…</div>
+          )}
+        </div>
+      );
     return (
-      <div className="not-prose space-y-4 rounded-2xl border border-slate-200 p-6 text-center dark:border-slate-700">
+      <div className={card}>
         <div className="text-lg">זמן לכל שאלה:</div>
         <TimeLimitPicker limit={limit} onChange={chooseLimit} />
         <div>
@@ -469,6 +579,18 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
             להתחיל
           </button>
         </div>
+        {inviting ? (
+          <div className="space-y-3">
+            <NameField value={name} onChange={setName} />
+            <button type="button" className={BUTTON} onClick={openDuel}>
+              לפתוח חדר
+            </button>
+          </div>
+        ) : (
+          <button type="button" className={QUIET} onClick={() => setInviting(true)}>
+            לשחק עם חברים
+          </button>
+        )}
       </div>
     );
   }
@@ -504,6 +626,14 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
           {round.streakLabel(Math.max(round.run, 3))}
         </div>
       </div>
+      {inDuel && duel.view && (
+        <DuelScores view={duel.view} index={round.index} answered={chosen !== null} />
+      )}
+      {inDuel && duel.status !== 'open' && (
+        <p role="status" className="mt-2 text-center text-sm">
+          {duel.status === 'gone' ? 'זמן החדר נגמר.' : 'החיבור לחדר נותק: ממשיכים לנסות…'}
+        </p>
+      )}
       <div id={prompt} className="mt-1 text-center text-lg">
         {config.prompt(question)}
       </div>
@@ -568,7 +698,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
           <span />
         )}
         <button type="button" className={QUIET} onClick={restart}>
-          לחזור להתחלה
+          {inDuel ? 'לצאת מהחדר' : 'לחזור להתחלה'}
         </button>
       </div>
     </div>
