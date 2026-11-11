@@ -17,7 +17,7 @@ interface Token {
   unreadable: boolean;
 }
 
-const SIGNS: Readonly<Record<string, string>> = {
+export const SIGNS: Readonly<Record<string, string>> = {
   '\u0591': 'אתנחתא',
   '\u0592': 'סגול',
   '\u0593': 'שלשלת',
@@ -94,7 +94,7 @@ export function tokens(html: string, { qatan = false } = {}): Token[] {
 }
 
 /** The trope ids in one word or chain, a sign written twice counted once (except פשטא, below). */
-function signsOf(token: Token): Set<string> {
+export function signsOf(token: Token): Set<string> {
   const found = new Set<string>();
   for (const word of token.text.split('־')) {
     // Two פשטא on one word are שני פשטין; any other doubled sign is MAM's reading aid.

@@ -58,6 +58,8 @@ export interface QuizConfig {
   options?: readonly string[];
   /** Name the answer after a right one too: a guess that was right still teaches. */
   nameRight?: boolean;
+  /** The word's size, if not text-5xl (the servant quiz's two words, smaller on a phone). */
+  wordSize?: string;
 }
 
 /** The questions skipped in later rounds: about ten rounds' worth. */
@@ -120,14 +122,17 @@ const WithPaseq: React.FC<{ text: string }> = ({ text }) => (
 );
 
 /** The word or chain asked about, the marked word of a chain or the marked letters highlighted. */
-const Word: React.FC<{ item: QuizItem }> = ({ item }) => {
+const Word: React.FC<{ item: QuizItem; answered: boolean }> = ({ item, answered }) => {
   if (item.p) return <WithPaseq text={item.w} />;
   if (item.h) {
     const [start = 0, end = 0] = item.h;
     return (
       <>
         {item.w.slice(0, start)}
-        <span className="mark-highlight">{item.w.slice(start, end)}</span>
+        {/* Once answered, the marked letters as written (the servant quiz's sign put back). */}
+        <span className="mark-highlight">
+          {answered && item.o ? item.o : item.w.slice(start, end)}
+        </span>
         {item.w.slice(end)}
       </>
     );
@@ -294,7 +299,7 @@ const optionsFor = (config: QuizConfig, question: Question | undefined, level: n
       ? shuffle(question.options)
       : config.options
         ? [...config.options]
-        : chooseOptions(config.kind, question.answer, level);
+        : chooseOptions(config.kind, question.answer, level, Math.random, question.item.x);
 
 /** A new round, its questions avoiding those asked recently. */
 function newRound(config: QuizConfig, words: WordList, level: number): Round {
@@ -536,9 +541,9 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         // The question is read with the word, which takes the focus after it.
         aria-describedby={prompt}
         tabIndex={-1}
-        className="my-6 text-center text-5xl leading-[1.6] outline-none"
+        className={`my-6 text-center leading-[1.6] outline-none ${config.wordSize ?? 'text-5xl'}`}
       >
-        <Word item={question.item} />
+        <Word item={question.item} answered={chosen !== null} />
       </div>
       {/* Three options side by side (short names: the vowel-class quiz), four two by two. */}
       <div

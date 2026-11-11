@@ -20,6 +20,12 @@ export interface QuizItem {
   m?: number;
   h?: number[];
   p?: boolean;
+  /** The answer, where the word list's entry is something else (the servant quiz: its tropes). */
+  a?: string;
+  /** Names that would also be right here: never offered as wrong options. */
+  x?: string[];
+  /** The marked letters as written, shown once answered (the servant quiz hides a sign). */
+  o?: string;
 }
 
 /** A word list in public/quiz/: the words that show each answer. */
@@ -45,8 +51,8 @@ export interface Question extends PreparedQuestion {
   /** Identifies the question across rounds (the recently asked list). */
   key: string;
   /**
-   * The word list's entry it was drawn from: its answer, unless the quiz asks about something
-   * the entry belongs to (the vowel-class quiz: a קמץ is a long vowel).
+   * The word list's entry it was drawn from: its answer, unless the item names one (`a`) or the
+   * quiz asks about something the entry belongs to (the vowel-class quiz: a קמץ is a long vowel).
    */
   group: string;
 }
@@ -59,6 +65,8 @@ export interface QuizKind {
   lookAlikes: readonly (readonly string[])[];
   /** Names that would also be right for what a question about the key shows: never offered. */
   alsoShown?: Readonly<Record<string, readonly string[]>>;
+  /** False when its look-alikes aren't alike to the eye: no "they really are alike" after one. */
+  nearMiss?: boolean;
 }
 
 /** Answers with fewer words than this in the Torah are asked only in prepared questions. */
@@ -88,8 +96,9 @@ export function chooseOptions(
   answer: string,
   level: number,
   random: () => number = Math.random,
+  alsoRight: readonly string[] = [],
 ): string[] {
-  const excluded = new Set([answer, ...(kind.alsoShown?.[answer] ?? [])]);
+  const excluded = new Set([answer, ...(kind.alsoShown?.[answer] ?? []), ...alsoRight]);
   const picked = [answer];
   const free = (id: string) => !excluded.has(id) && !picked.includes(id);
   for (const id of shuffle(lookAlikes(kind, answer), random).slice(0, level))
@@ -194,10 +203,10 @@ export function buildRound(
     if (round.length === size) break;
     const answer = answerOf(group);
     const items = (list.items[group] ?? []).map((item) => ({
-      answer,
+      answer: item.a ?? answer,
       group,
       item,
-      key: keyOf(answer, item),
+      key: keyOf(item.a ?? answer, item),
     }));
     const question = fresh(shuffle(items, random));
     if (question) round.push(question);
@@ -251,5 +260,6 @@ export function cheer(
 ): string {
   if (chosen === TIME_UP) return TIME_UP_LINE;
   if (chosen === answer) return pick(CHEERS, random);
-  return pick(lookAlikes(kind, answer).includes(chosen) ? NEAR_MISSES : MISSES, random);
+  const near = kind.nearMiss !== false && lookAlikes(kind, answer).includes(chosen);
+  return pick(near ? NEAR_MISSES : MISSES, random);
 }

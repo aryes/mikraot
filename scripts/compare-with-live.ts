@@ -113,6 +113,8 @@ const NEW_HERE = new Set([
   '/סוג-התנועה/',
   // The qamats quiz (2026-11-12).
   '/קמץ-גדול-או-קטן/',
+  // The servant quiz (2026-11-11).
+  '/זיהוי-משרתים/',
   // All the licences and credits on one page (2026-11-07).
   '/terms/',
 ]);
