@@ -98,6 +98,11 @@ export default defineMarkdocConfig({
       render: component('./src/components/content/VowelClassQuiz.astro'),
       selfClosing: true,
     },
+    // The servant quiz (src/components/ServantQuiz.tsx), on the page "איזה משרת?".
+    'servant-quiz': {
+      render: component('./src/components/content/ServantQuiz.astro'),
+      selfClosing: true,
+    },
     // A nested list of links shown as rows of choices (book, then parasha, then reading).
     picker: {
       render: component('./src/components/content/ListPicker.astro'),

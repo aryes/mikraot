@@ -1,0 +1,11 @@
+---
+/** The content tag `{% servant-quiz /%}`: the servant quiz, run in the browser (ServantQuiz.tsx). */
+import { ServantQuiz } from '../ServantQuiz';
+---
+
+<div class="my-6">
+  <ServantQuiz client:visible />
+  <noscript>
+    <p>החידון פועל רק כש־JavaScript מופעל בדפדפן.</p>
+  </noscript>
+</div>
