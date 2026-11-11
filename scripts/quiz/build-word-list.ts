@@ -1,15 +1,17 @@
 /**
  * Makes the quizzes' word lists, public/quiz/trope-words.json, niqqud-words.json and
- * qamats-words.json, from the Torah as Sefaria gives Miqra according to the Masorah:
+ * qamats-words.json and servant-words.json, from the Torah as Sefaria gives Miqra according to the Masorah:
  * `npm run quiz:words`. The lists are committed, so building the site doesn't depend on Sefaria;
  * run this again only to change what they hold. Prints how many words each answer has, the rare ones (below MIN_RANDOM) being asked
- * only in prepared questions (src/data/quiz/prepared.json).
+ * only in prepared questions (src/data/quiz/prepared.json; the servant quiz leaves them out).
  */
 import { writeFileSync } from 'node:fs';
 import { NIQQUD_GROUPS, QAMATS_GROUPS } from '../../src/lib/niqqud-quiz';
 import { MIN_RANDOM, type QuizItem, type WordList } from '../../src/lib/quiz';
+import { DISJUNCTIVES } from '../../src/lib/servant-quiz';
 import { QUIZ_TROPES } from '../../src/lib/trope-quiz';
 import { markedWord, verseNiqqudItems, verseQamatsItems } from './niqqud-words';
+import { servantItems, versePairs, type Pair } from './servant-words';
 import { hasTwoSets, spread, verseItems } from './torah-words';
 
 const BOOKS = { Genesis: 50, Exodus: 40, Leviticus: 27, Numbers: 36, Deuteronomy: 34 };
@@ -47,6 +49,7 @@ const qamats = new Map<string, QuizItem[]>();
 /** The text that makes two items the same question: the word (or chain) shown. */
 const shown = (item: QuizItem) => item.w;
 
+const pairs: Pair[] = [];
 const collect = (
   found: Map<string, QuizItem[]>,
   items: readonly { answer: string; item: QuizItem }[],
@@ -73,6 +76,7 @@ for (const [book, chapters] of Object.entries(BOOKS)) {
       collect(tropes, verseItems(html));
       collect(niqqud, verseNiqqudItems(html));
       collect(qamats, verseQamatsItems(html), markedWord);
+      pairs.push(...versePairs(html));
     });
   }
 }
@@ -100,3 +104,4 @@ function write(out: string, ids: readonly string[], found: Map<string, QuizItem[
 write('public/quiz/trope-words.json', QUIZ_TROPES, tropes);
 write('public/quiz/niqqud-words.json', NIQQUD_GROUPS, niqqud);
 write('public/quiz/qamats-words.json', QAMATS_GROUPS, qamats);
+write('public/quiz/servant-words.json', DISJUNCTIVES, servantItems(pairs));
