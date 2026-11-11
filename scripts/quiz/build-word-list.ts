@@ -6,7 +6,7 @@
  * only in prepared questions (src/data/quiz/prepared.json).
  */
 import { writeFileSync } from 'node:fs';
-import { QUIZ_VOWELS } from '../../src/lib/niqqud-quiz';
+import { NIQQUD_GROUPS } from '../../src/lib/niqqud-quiz';
 import { MIN_RANDOM, type QuizItem, type WordList } from '../../src/lib/quiz';
 import { QUIZ_TROPES } from '../../src/lib/trope-quiz';
 import { verseNiqqudItems } from './niqqud-words';
@@ -90,4 +90,4 @@ function write(out: string, ids: readonly string[], found: Map<string, QuizItem[
   console.log(`Wrote ${out}`);
 }
 write('public/quiz/trope-words.json', QUIZ_TROPES, tropes);
-write('public/quiz/niqqud-words.json', QUIZ_VOWELS, niqqud);
+write('public/quiz/niqqud-words.json', NIQQUD_GROUPS, niqqud);

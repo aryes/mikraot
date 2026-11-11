@@ -130,6 +130,11 @@ const content = fields.markdoc({
       icon: <SquareCheck />,
       schema: {},
     }),
+    'vowel-classes': block({
+      label: 'חידון סוג התנועה',
+      icon: <SquareCheck />,
+      schema: {},
+    }),
     picker: wrapper({
       label: 'בורר (רשימה מקוננת)',
       icon: <ListTree />,

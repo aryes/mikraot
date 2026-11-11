@@ -93,6 +93,11 @@ export default defineMarkdocConfig({
       render: component('./src/components/content/NiqqudQuiz.astro'),
       selfClosing: true,
     },
+    // The vowel-class quiz (src/components/VowelClassQuiz.tsx), on the page "גדולה, קטנה או חטופה?".
+    'vowel-classes': {
+      render: component('./src/components/content/VowelClassQuiz.astro'),
+      selfClosing: true,
+    },
     // A nested list of links shown as rows of choices (book, then parasha, then reading).
     picker: {
       render: component('./src/components/content/ListPicker.astro'),

@@ -2,7 +2,16 @@ import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import wordList from '../../public/quiz/niqqud-words.json';
 import { MIN_RANDOM, buildRound, chooseOptions, type WordList } from './quiz';
-import { NIQQUD_PAGE, NIQQUD_QUIZ, QUIZ_VOWELS, VOWEL_LOOK_ALIKES, vowelName } from './niqqud-quiz';
+import {
+  NIQQUD_GROUPS,
+  NIQQUD_PAGE,
+  NIQQUD_QUIZ,
+  QUIZ_VOWELS,
+  VOWEL_CLASS_OF,
+  VOWEL_CLASSES,
+  VOWEL_LOOK_ALIKES,
+  vowelName,
+} from './niqqud-quiz';
 
 const list = wordList as WordList;
 const ids: readonly string[] = QUIZ_VOWELS;
@@ -36,13 +45,38 @@ describe('the niqqud quiz data', () => {
 
 describe('a niqqud round', () => {
   it('asks ten different niqqud, with four different options each', () => {
-    const round = buildRound(list, [], new Set(), { preparedCount: 0 });
+    const round = buildRound(list, [], new Set(), { preparedCount: 0, groups: QUIZ_VOWELS });
     expect(round).toHaveLength(10);
+    // Never the קמץ קטן, which only the vowel-class quiz asks about.
+    for (const q of round) expect(ids).toContain(q.answer);
     expect(new Set(round.map((q) => q.answer)).size).toBe(10);
     for (const q of round) {
       const options = chooseOptions(NIQQUD_QUIZ, q.answer, 3);
       expect(new Set(options).size).toBe(4);
       expect(options).toContain(q.answer);
     }
+  });
+});
+
+describe('the vowel-class quiz', () => {
+  it('names a class for every niqqud of the list but the שווא, using each class', () => {
+    const groups: readonly string[] = NIQQUD_GROUPS;
+    expect(Object.keys(VOWEL_CLASS_OF).toSorted()).toEqual(
+      groups.filter((id) => id !== 'שווא').toSorted(),
+    );
+    expect(new Set(Object.values(VOWEL_CLASS_OF))).toEqual(new Set(VOWEL_CLASSES));
+  });
+
+  it('asks ten different niqqud, the קמץ קטן among them, each about its class', () => {
+    const groups = Object.keys(VOWEL_CLASS_OF);
+    expect(list.items['קמץ-קטן']?.length ?? 0).toBeGreaterThanOrEqual(MIN_RANDOM);
+    const round = buildRound(list, [], new Set(), {
+      preparedCount: 0,
+      groups,
+      answerOf: (group) => VOWEL_CLASS_OF[group] ?? '',
+    });
+    expect(round).toHaveLength(10);
+    expect(new Set(round.map((q) => q.group)).size).toBe(10);
+    for (const q of round) expect(q.answer).toBe(VOWEL_CLASS_OF[q.group]);
   });
 });
