@@ -19,6 +19,12 @@ export interface QuizItem {
   m?: number;
   h?: number[];
   p?: boolean;
+  /** The answer, where the word list's entry is something else (the servant quiz: its tropes). */
+  a?: string;
+  /** Names that would also be right here: never offered as wrong options. */
+  x?: string[];
+  /** The marked letters as written, shown once answered (the servant quiz hides a sign). */
+  o?: string;
 }
 
 /** A word list in public/quiz/: the words that show each answer. */
@@ -43,6 +49,8 @@ export interface PreparedQuestion {
 export interface Question extends PreparedQuestion {
   /** Identifies the question across rounds (the recently asked list). */
   key: string;
+  /** The word list's entry it was drawn from: its answer, unless the item names one (`a`). */
+  group: string;
 }
 
 /** What a quiz asks about. */
@@ -53,6 +61,8 @@ export interface QuizKind {
   lookAlikes: readonly (readonly string[])[];
   /** Names that would also be right for what a question about the key shows: never offered. */
   alsoShown?: Readonly<Record<string, readonly string[]>>;
+  /** False when its look-alikes aren't alike to the eye: no "they really are alike" after one. */
+  nearMiss?: boolean;
 }
 
 /** Answers with fewer words than this in the Torah are asked only in prepared questions. */
@@ -82,8 +92,9 @@ export function chooseOptions(
   answer: string,
   level: number,
   random: () => number = Math.random,
+  alsoRight: readonly string[] = [],
 ): string[] {
-  const excluded = new Set([answer, ...(kind.alsoShown?.[answer] ?? [])]);
+  const excluded = new Set([answer, ...(kind.alsoShown?.[answer] ?? []), ...alsoRight]);
   const picked = [answer];
   const free = (id: string) => !excluded.has(id) && !picked.includes(id);
   for (const id of shuffle(lookAlikes(kind, answer), random).slice(0, level))
@@ -133,16 +144,17 @@ export function buildRound(
   { size = 10, preparedCount = 2, random = Math.random } = {},
 ): Question[] {
   const round: Question[] = [];
-  // Each answer once a round (Arye, 2026-11-06): a question about one already asked is skipped;
-  // so is a word already shown (the niqqud quiz asks about several letters of some words).
-  const fresh = <T extends { key: string; answer: string; item: QuizItem }>(candidates: T[]) => {
+  // Each list entry once a round (Arye, 2026-11-06: each trope once): a question from one
+  // already asked is skipped; so is a word already shown (the niqqud quiz asks about several
+  // letters of some words).
+  const fresh = (candidates: Question[]) => {
     const unused = candidates.filter(
-      (c) => !round.some((q) => q.answer === c.answer || q.item.w === c.item.w),
+      (c) => !round.some((q) => q.group === c.group || q.item.w === c.item.w),
     );
     return unused.find((c) => !recent.has(c.key)) ?? unused[0];
   };
   const preparedQuestions = shuffle(
-    prepared.map((p) => ({ ...p, key: keyOf(p.answer, p.item) })),
+    prepared.map((p) => ({ ...p, group: p.answer, key: keyOf(p.answer, p.item) })),
     random,
   );
   for (let i = 0; i < preparedCount; i++) {
@@ -150,12 +162,13 @@ export function buildRound(
     if (question) round.push(question);
   }
   const answers = Object.keys(list.items).filter((id) => !isRare(list, id));
-  for (const answer of shuffle(answers, random)) {
+  for (const group of shuffle(answers, random)) {
     if (round.length === size) break;
-    const items = (list.items[answer] ?? []).map((item) => ({
-      answer,
+    const items = (list.items[group] ?? []).map((item) => ({
+      answer: item.a ?? group,
+      group,
       item,
-      key: keyOf(answer, item),
+      key: keyOf(item.a ?? group, item),
     }));
     const question = fresh(shuffle(items, random));
     if (question) round.push(question);
@@ -209,5 +222,6 @@ export function cheer(
 ): string {
   if (chosen === TIME_UP) return TIME_UP_LINE;
   if (chosen === answer) return pick(CHEERS, random);
-  return pick(lookAlikes(kind, answer).includes(chosen) ? NEAR_MISSES : MISSES, random);
+  const near = kind.nearMiss !== false && lookAlikes(kind, answer).includes(chosen);
+  return pick(near ? NEAR_MISSES : MISSES, random);
 }
