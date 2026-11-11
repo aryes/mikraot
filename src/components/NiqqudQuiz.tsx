@@ -1,5 +1,5 @@
 import React from 'react';
-import { NIQQUD_PAGE, NIQQUD_QUIZ, vowelName } from '../lib/niqqud-quiz';
+import { NIQQUD_PAGE, NIQQUD_QUIZ, QUIZ_VOWELS, vowelName } from '../lib/niqqud-quiz';
 import { Quiz, type QuizConfig } from './Quiz';
 
 const CONFIG: QuizConfig = {
@@ -9,6 +9,8 @@ const CONFIG: QuizConfig = {
   prepared: [],
   preparedCount: 0,
   storage: 'niqqud-quiz',
+  // Not the word list's קמץ קטן, which only the vowel-class quiz asks about: its sign is a קמץ's.
+  groups: QUIZ_VOWELS,
   event: 'niqqud-quiz',
   prompt: () => 'איזה ניקוד מסומן כאן?',
   name: (id) => vowelName(id),

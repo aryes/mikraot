@@ -18,7 +18,7 @@ import {
 } from '../lib/quiz';
 import { track } from '../scripts/analytics';
 
-/** What makes one quiz differ from another: TropeQuiz.tsx, NiqqudQuiz.tsx. */
+/** What makes one quiz differ from another: TropeQuiz.tsx, NiqqudQuiz.tsx, VowelClassQuiz.tsx. */
 export interface QuizConfig {
   kind: QuizKind;
   /** Its word list, fetched when the quiz opens. */
@@ -42,6 +42,16 @@ export interface QuizConfig {
   more: (question: Question) => ReactNode;
   /** A line or two under the score, after a round (the trope quiz's rank). */
   result?: (score: number, size: number) => ReactNode;
+  /** The word list's entries to draw from (all if not given), and the answer each one asks. */
+  groups?: readonly string[];
+  answerOf?: (group: string) => string;
+  /**
+   * The same options, in this order, for every question (a quiz with few answers); its level,
+   * which only chooses options, then changes nothing.
+   */
+  options?: readonly string[];
+  /** Name the answer after a right one too: a guess that was right still teaches. */
+  nameRight?: boolean;
 }
 
 /** The questions skipped in later rounds: about ten rounds' worth. */
@@ -276,12 +286,16 @@ const optionsFor = (config: QuizConfig, question: Question | undefined, level: n
     ? []
     : question.options
       ? shuffle(question.options)
-      : chooseOptions(config.kind, question.answer, level);
+      : config.options
+        ? [...config.options]
+        : chooseOptions(config.kind, question.answer, level);
 
 /** A new round, its questions avoiding those asked recently. */
 function newRound(config: QuizConfig, words: WordList, level: number): Round {
   const questions = buildRound(words, config.prepared, new Set(recentKeys(keysOf(config).recent)), {
     preparedCount: config.preparedCount,
+    ...(config.groups && { groups: config.groups }),
+    ...(config.answerOf && { answerOf: config.answerOf }),
   });
   return {
     questions,
@@ -516,7 +530,10 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       >
         <Word item={question.item} />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      {/* Three options side by side (short names: the vowel-class quiz), four two by two. */}
+      <div
+        className={`grid gap-3 ${round.options.length === 3 ? 'mx-auto max-w-xl grid-cols-3' : 'grid-cols-2'}`}
+      >
         {round.options.map((id) => {
           const state = !chosen
             ? 'border-slate-300 hover:border-brand-strong hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-800'
@@ -533,7 +550,10 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
               type="button"
               aria-disabled={chosen ? true : undefined}
               onClick={() => answer(id)}
-              className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 px-3 py-3 text-xl transition-colors ${state}`}
+              // Narrower padding three across, so a name and its icon fit a 320px phone.
+              className={`inline-flex cursor-pointer items-center justify-center rounded-xl border-2 py-3 text-xl transition-colors ${
+                round.options.length === 3 ? 'gap-1 px-1' : 'gap-2 px-3'
+              } ${state}`}
             >
               {Icon && <Icon size={18} aria-hidden="true" className="shrink-0" />}
               <span>{config.name(id, question, true)}</span>
@@ -546,7 +566,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         {chosen && (
           <>
             <p className="font-bold">
-              {chosen === question.answer ? (
+              {chosen === question.answer && !config.nameRight ? (
                 round.cheer
               ) : (
                 <>

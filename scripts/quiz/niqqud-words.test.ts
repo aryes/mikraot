@@ -53,11 +53,11 @@ describe('wordItems', () => {
       'חיריק-חסר: תַּחְ[תִּ]יִּם',
     ]);
     // A קמץ קטן before a vowel letter: a vowel of its own, so the ו is not one.
-    expect(shown('קׇוֹ')).toEqual(['חולם-חסר: קׇ[וֹ]']);
+    expect(shown('קׇוֹ')).toEqual(['קמץ-קטן: [קׇ]וֹ', 'חולם-חסר: קׇ[וֹ]']);
   });
 
-  it('leaves out a qamats qatan and a letter with two vowels', () => {
-    expect(shown('חׇכְמָה')).toEqual(['שווא: חׇ[כְ]מָה', 'קמץ: חׇכְ[מָ]ה']);
+  it('keeps a qamats qatan apart, and leaves out a letter with two vowels', () => {
+    expect(shown('חׇכְמָה')).toEqual(['קמץ-קטן: [חׇ]כְמָה', 'שווא: חׇ[כְ]מָה', 'קמץ: חׇכְ[מָ]ה']);
     expect(shown('יְרוּשָׁלִַם')).toEqual([
       'שווא: [יְ]רוּשָׁלִַם',
       'שורוק: יְ[רוּ]שָׁלִַם',
@@ -70,7 +70,7 @@ describe('verseNiqqudItems', () => {
   it('takes single words without their cantillation, and writes a qamats qatan as a qamats', () => {
     expect(withoutTeamim('הָאָֽרֶץ׃')).toBe('הָאָרֶץ');
     const items = verseNiqqudItems('עַל־הָאָ֖רֶץ חׇ֣כְמָ֔ה');
-    expect(items.map(({ item }) => item.w)).toEqual(['חָכְמָה', 'חָכְמָה']);
+    expect(items.map(({ item }) => item.w)).toEqual(['חָכְמָה', 'חָכְמָה', 'חָכְמָה']);
   });
 
   it('never asks about the divine name, whose vowels are those of another word', () => {
