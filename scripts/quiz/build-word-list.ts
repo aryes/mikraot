@@ -1,15 +1,18 @@
 /**
- * Makes the quizzes' word lists, public/quiz/trope-words.json and niqqud-words.json, from the
- * Torah as Sefaria gives Miqra according to the Masorah: `npm run quiz:words`. The lists are
- * committed, so building the site doesn't depend on Sefaria; run this again only to change what
- * they hold. Prints how many words each answer has, the rare ones (below MIN_RANDOM) being asked
- * only in prepared questions (src/data/quiz/prepared.json).
+ * Makes the quizzes' word lists, public/quiz/trope-words.json, niqqud-words.json and
+ * servant-words.json, from the Torah as Sefaria gives Miqra according to the Masorah:
+ * `npm run quiz:words`. The lists are committed, so building the site doesn't depend on Sefaria;
+ * run this again only to change what they hold. Prints how many words each entry has: one with
+ * fewer than MIN_RANDOM is never drawn at random (the trope quiz asks about those in prepared
+ * questions, src/data/quiz/prepared.json; the servant quiz leaves them out).
  */
 import { writeFileSync } from 'node:fs';
 import { QUIZ_VOWELS } from '../../src/lib/niqqud-quiz';
 import { MIN_RANDOM, type QuizItem, type WordList } from '../../src/lib/quiz';
+import { DISJUNCTIVES } from '../../src/lib/servant-quiz';
 import { QUIZ_TROPES } from '../../src/lib/trope-quiz';
 import { verseNiqqudItems } from './niqqud-words';
+import { servantItems, versePairs, type Pair } from './servant-words';
 import { hasTwoSets, spread, verseItems } from './torah-words';
 
 const BOOKS = { Genesis: 50, Exodus: 40, Leviticus: 27, Numbers: 36, Deuteronomy: 34 };
@@ -43,6 +46,7 @@ function versionOf(body: unknown, url: string): Version {
 /** The words found for each quiz, by answer. */
 const tropes = new Map<string, QuizItem[]>();
 const niqqud = new Map<string, QuizItem[]>();
+const pairs: Pair[] = [];
 const collect = (
   found: Map<string, QuizItem[]>,
   items: readonly { answer: string; item: QuizItem }[],
@@ -67,6 +71,7 @@ for (const [book, chapters] of Object.entries(BOOKS)) {
       if (hasTwoSets(`${book} ${chapter}:${i + 1}`)) return;
       collect(tropes, verseItems(html));
       collect(niqqud, verseNiqqudItems(html));
+      pairs.push(...versePairs(html));
     });
   }
 }
@@ -85,9 +90,10 @@ function write(out: string, ids: readonly string[], found: Map<string, QuizItem[
   writeFileSync(out, `${JSON.stringify(list)}\n`);
   for (const id of ids) {
     const count = found.get(id)?.length ?? 0;
-    console.log(`${id}: ${count}${count < MIN_RANDOM ? ' (prepared questions only)' : ''}`);
+    console.log(`${id}: ${count}${count < MIN_RANDOM ? ' (not drawn at random)' : ''}`);
   }
   console.log(`Wrote ${out}`);
 }
 write('public/quiz/trope-words.json', QUIZ_TROPES, tropes);
 write('public/quiz/niqqud-words.json', QUIZ_VOWELS, niqqud);
+write('public/quiz/servant-words.json', DISJUNCTIVES, servantItems(pairs));

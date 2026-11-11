@@ -12,7 +12,10 @@ const HIERARCHY = '/trope-hierarchy/';
  * A trope's name in every tradition, CSS showing the reader's (as NusachText.astro does); with
  * its sign on it unless `unmarked`.
  */
-const Name: React.FC<{ id: string; unmarked?: boolean | undefined }> = ({ id, unmarked }) => {
+export const Name: React.FC<{ id: string; unmarked?: boolean | undefined }> = ({
+  id,
+  unmarked,
+}) => {
   const { ashkenazi, sephardi } = switchNames(id, unmarked ? unmarkedName : undefined);
   if (ashkenazi === sephardi) return <>{ashkenazi}</>;
   return (
