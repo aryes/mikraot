@@ -4,6 +4,21 @@
  * browser code relies on.
  */
 declare module 'cloudflare:workers' {
+  /** A Durable Object class (src/server/quiz-duel.ts): only what the site uses. */
+  export abstract class DurableObject {
+    protected ctx: DurableObjectState;
+    protected env: unknown;
+    constructor(ctx: DurableObjectState, env: unknown);
+    fetch(request: Request): Promise<Response>;
+    webSocketMessage(socket: WebSocket, message: string | ArrayBuffer): Promise<void>;
+    webSocketClose(
+      socket: WebSocket,
+      code: number,
+      reason: string,
+      clean: boolean,
+    ): void | Promise<void>;
+    alarm(): Promise<void>;
+  }
   // An ambient module can't use a relative `import` statement, so the type is imported inline.
   export const env: {
     // oxlint-disable-next-line typescript/consistent-type-imports
@@ -40,7 +55,45 @@ declare module 'cloudflare:workers' {
     /** When each kind of failure was last emailed (Workers KV; src/server/alerts.ts). */
     // oxlint-disable-next-line typescript/consistent-type-imports
     ALERTS: import('./server/alerts').AlertStore;
+    /** The quiz duels' rooms (Durable Objects; src/server/quiz-duel.ts). */
+    QUIZ_DUEL: {
+      idFromName(name: string): unknown;
+      get(id: unknown): { fetch(request: Request): Promise<Response> };
+    };
+    /** Per-visitor limit on joining quiz duels (src/worker.ts). */
+    DUEL_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
   };
+}
+
+/** A Durable Object's state (Cloudflare's runtime): only what src/server/quiz-duel.ts uses. */
+interface DurableObjectState {
+  blockConcurrencyWhile(callback: () => Promise<void>): Promise<void>;
+  acceptWebSocket(socket: WebSocket): void;
+  getWebSockets(): WebSocket[];
+  storage: {
+    get<T>(key: string): Promise<T | undefined>;
+    put(key: string, value: unknown): Promise<void>;
+    getAlarm(): Promise<number | null>;
+    setAlarm(time: number): Promise<void>;
+    deleteAll(): Promise<void>;
+  };
+}
+
+/** Cloudflare's pair of connected WebSockets: one answered to the browser, one kept. */
+declare class WebSocketPair {
+  0: WebSocket;
+  1: WebSocket;
+}
+
+interface WebSocket {
+  /** Data kept with a hibernating socket (Cloudflare's runtime). */
+  serializeAttachment(value: unknown): void;
+  deserializeAttachment(): unknown;
+}
+
+interface ResponseInit {
+  /** The socket a 101 answer hands to the browser (Cloudflare's runtime). */
+  webSocket?: WebSocket;
 }
 
 declare namespace App {
