@@ -17,9 +17,17 @@ import {
   type WordList,
 } from '../lib/quiz';
 import type { DuelRound, DuelView } from '../lib/duel';
+import {
+  emptyStats,
+  readStats,
+  recordAnswer,
+  recordRound,
+  type QuizStats,
+} from '../lib/quiz-stats';
 import { track } from '../scripts/analytics';
 import { DuelLobby, DuelResults, DuelScores, NameField } from './duel/DuelPanels';
 import { useDuel } from './duel/useDuel';
+import { QuizStatsPanel } from './QuizStatsPanel';
 
 /** What makes one quiz differ from another: TropeQuiz.tsx, NiqqudQuiz.tsx, VowelClassQuiz.tsx. */
 export interface QuizConfig {
@@ -297,6 +305,7 @@ const keysOf = (config: QuizConfig) => ({
   recent: `${config.storage}-recent`,
   level: `${config.storage}-level`,
   time: `${config.storage}-time-limit`,
+  stats: `${config.storage}-stats`,
 });
 
 const optionsFor = (config: QuizConfig, question: Question | undefined, level: number) =>
@@ -350,6 +359,8 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   const [started, setStarted] = useState(false);
   /** The time now, kept while a timed question runs, for its clock. */
   const [now, setNow] = useState(() => Date.now());
+  /** The learner's results so far (Arye, 2026-11-10), shown on the start screen. */
+  const [stats, setStats] = useState<QuizStats>(emptyStats);
   const next = useRef<HTMLButtonElement>(null);
   const word = useRef<HTMLDivElement>(null);
   const result = useRef<HTMLDivElement>(null);
@@ -407,6 +418,8 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
             ? (TIME_LIMITS.find((value) => value === savedLimit) ?? TIME_LIMITS[0])
             : null,
         );
+        const ids: readonly string[] = config.kind.ids;
+        setStats(readStats(stored(keysOf(config).stats), (id) => ids.includes(id)));
         setRound(newRound(config, data, level));
       })
       .catch(() => setFailed(true));
@@ -432,6 +445,15 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
     else if (round.index < round.questions.length) word.current?.focus();
     else result.current?.focus();
   }, [round, started]);
+
+  /** The stats changed from their latest value (two answers in one moment both count once). */
+  function saveStats(change: (stats: QuizStats) => QuizStats): void {
+    setStats((current) => {
+      const updated = change(current);
+      store(keys.stats, updated);
+      return updated;
+    });
+  }
 
   function chooseLimit(value: number | null): void {
     setLimit(value);
@@ -477,6 +499,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       run: correct ? round.run + 1 : 0,
       cheer: cheer(config.kind, question.answer, id),
     });
+    saveStats((current) => recordAnswer(current, question.answer, correct));
     if (inDuel) duel.answer(round.index, id);
     const updated = nextLevel(progress.level, progress.streak, correct);
     setProgress(updated);
@@ -509,6 +532,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         seconds: limit === null ? 'none' : String(limit),
       });
       if (round.score === round.questions.length) celebrate();
+      saveStats((current) => recordRound(current, round.score));
     }
     setRound({
       ...round,
@@ -627,6 +651,17 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
             לשחק עם חברים
           </button>
         )}
+        <QuizStatsPanel
+          stats={stats}
+          size={round.questions.length}
+          // A name as in an option's button; a question of its own (it adds nothing to the name).
+          name={(id) => config.name(id, { answer: '', key: '', group: '', item: { w: '' } }, true)}
+          onReset={() => {
+            saveStats(emptyStats);
+            // The panel goes away with the button pressed: focus to the start.
+            begin.current?.focus();
+          }}
+        />
       </div>
     );
   }
