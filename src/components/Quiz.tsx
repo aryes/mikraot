@@ -45,6 +45,8 @@ export interface QuizConfig {
   /** The word list's entries to draw from (all if not given), and the answer each one asks. */
   groups?: readonly string[];
   answerOf?: (group: string) => string;
+  /** Questions from each entry in a round, at most (one if not given). */
+  perGroup?: number;
   /**
    * The same options, in this order, for every question (a quiz with few answers); its level,
    * which only chooses options, then changes nothing.
@@ -296,6 +298,7 @@ function newRound(config: QuizConfig, words: WordList, level: number): Round {
     preparedCount: config.preparedCount,
     ...(config.groups && { groups: config.groups }),
     ...(config.answerOf && { answerOf: config.answerOf }),
+    ...(config.perGroup && { perGroup: config.perGroup }),
   });
   return {
     questions,

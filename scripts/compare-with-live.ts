@@ -111,6 +111,8 @@ const NEW_HERE = new Set([
   '/זיהוי-ניקוד/',
   // The vowel-class quiz (2026-11-11).
   '/סוג-התנועה/',
+  // The qamats quiz (2026-11-12).
+  '/קמץ-גדול-או-קטן/',
   // All the licences and credits on one page (2026-11-07).
   '/terms/',
 ]);

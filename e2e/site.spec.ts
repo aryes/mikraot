@@ -205,9 +205,9 @@ test('sitemap lists every page; the WordPress sitemap URL redirects to it', asyn
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
   // 39 pages and posts (the privacy policy since 2026-10-13, the launch post since the switch,
   // קרי וכתיב since 2026-10-22, the trope list and its 29 pages since 2026-10-24, פסק since 2026-10-28, קדמא־זקף קטן since 2026-10-31,
-  // the post on the tradition switch and the trope quiz since 2026-11-05, the terms of use since 2026-11-07, the niqqud quiz since 2026-11-10, the vowel-class quiz since 2026-11-11), the three month archives and the
+  // the post on the tradition switch and the trope quiz since 2026-11-05, the terms of use since 2026-11-07, the niqqud quiz since 2026-11-10, the vowel-class quiz since 2026-11-11, the qamats quiz since 2026-11-12), the three month archives and the
   // category archive, "What's new" (the author archive is noindex).
-  expect(sitemap.match(/<loc>/g)).toHaveLength(79);
+  expect(sitemap.match(/<loc>/g)).toHaveLength(80);
   expect(sitemap).not.toContain('/author/');
 
   const old = await request.get('/sitemap.xml', { maxRedirects: 0 });

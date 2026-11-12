@@ -135,6 +135,11 @@ const content = fields.markdoc({
       icon: <SquareCheck />,
       schema: {},
     }),
+    'qamats-quiz': block({
+      label: 'חידון קמץ גדול או קטן',
+      icon: <SquareCheck />,
+      schema: {},
+    }),
     picker: wrapper({
       label: 'בורר (רשימה מקוננת)',
       icon: <ListTree />,

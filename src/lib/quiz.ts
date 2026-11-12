@@ -130,7 +130,8 @@ const isRare = (list: WordList, id: string) => (list.items[id]?.length ?? 0) < M
 
 /**
  * A round: `preparedCount` prepared questions and the rest random, in random order, none asked
- * recently if that can be helped, and no group twice; as long as `size`, or as there are groups.
+ * recently if that can be helped, each group `perGroup` times at most (once, unless a quiz has
+ * few groups: the qamats quiz's two); as long as `size`, or as the groups allow.
  * The groups are the word list's entries (`groups` of them, or all); a question's answer is its
  * group's (`answerOf`), or the group itself.
  */
@@ -144,12 +145,14 @@ export function buildRound(
     random = Math.random,
     groups = Object.keys(list.items),
     answerOf = (group: string) => group,
+    perGroup = 1,
   }: {
     size?: number;
     preparedCount?: number;
     random?: () => number;
     groups?: readonly string[];
     answerOf?: (group: string) => string;
+    perGroup?: number;
   } = {},
 ): Question[] {
   const round: Question[] = [];
@@ -158,7 +161,9 @@ export function buildRound(
   // some words).
   const fresh = (candidates: Question[]) => {
     const unused = candidates.filter(
-      (c) => !round.some((q) => q.group === c.group || q.item.w === c.item.w),
+      (c) =>
+        round.filter((q) => q.group === c.group).length < perGroup &&
+        !round.some((q) => q.item.w === c.item.w),
     );
     return unused.find((c) => !recent.has(c.key)) ?? unused[0];
   };
@@ -171,7 +176,9 @@ export function buildRound(
     if (question) round.push(question);
   }
   const drawn = groups.filter((id) => !isRare(list, id));
-  for (const group of shuffle(drawn, random)) {
+  // Group after group, each pass in a new order, until the round is full or no group adds more.
+  const passes = Array.from({ length: perGroup }, () => shuffle(drawn, random)).flat();
+  for (const group of passes) {
     if (round.length === size) break;
     const answer = answerOf(group);
     const items = (list.items[group] ?? []).map((item) => ({
