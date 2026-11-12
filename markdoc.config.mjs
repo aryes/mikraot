@@ -98,6 +98,11 @@ export default defineMarkdocConfig({
       render: component('./src/components/content/VowelClassQuiz.astro'),
       selfClosing: true,
     },
+    // The qamats quiz (src/components/QamatsQuiz.tsx), on the page "קמץ גדול או קטן?".
+    'qamats-quiz': {
+      render: component('./src/components/content/QamatsQuiz.astro'),
+      selfClosing: true,
+    },
     // A nested list of links shown as rows of choices (book, then parasha, then reading).
     picker: {
       render: component('./src/components/content/ListPicker.astro'),

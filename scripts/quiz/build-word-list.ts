@@ -1,15 +1,15 @@
 /**
- * Makes the quizzes' word lists, public/quiz/trope-words.json and niqqud-words.json, from the
- * Torah as Sefaria gives Miqra according to the Masorah: `npm run quiz:words`. The lists are
- * committed, so building the site doesn't depend on Sefaria; run this again only to change what
- * they hold. Prints how many words each answer has, the rare ones (below MIN_RANDOM) being asked
+ * Makes the quizzes' word lists, public/quiz/trope-words.json, niqqud-words.json and
+ * qamats-words.json, from the Torah as Sefaria gives Miqra according to the Masorah:
+ * `npm run quiz:words`. The lists are committed, so building the site doesn't depend on Sefaria;
+ * run this again only to change what they hold. Prints how many words each answer has, the rare ones (below MIN_RANDOM) being asked
  * only in prepared questions (src/data/quiz/prepared.json).
  */
 import { writeFileSync } from 'node:fs';
-import { NIQQUD_GROUPS } from '../../src/lib/niqqud-quiz';
+import { NIQQUD_GROUPS, QAMATS_KINDS } from '../../src/lib/niqqud-quiz';
 import { MIN_RANDOM, type QuizItem, type WordList } from '../../src/lib/quiz';
 import { QUIZ_TROPES } from '../../src/lib/trope-quiz';
-import { verseNiqqudItems } from './niqqud-words';
+import { markedWord, verseNiqqudItems, verseQamatsItems } from './niqqud-words';
 import { hasTwoSets, spread, verseItems } from './torah-words';
 
 const BOOKS = { Genesis: 50, Exodus: 40, Leviticus: 27, Numbers: 36, Deuteronomy: 34 };
@@ -43,14 +43,19 @@ function versionOf(body: unknown, url: string): Version {
 /** The words found for each quiz, by answer. */
 const tropes = new Map<string, QuizItem[]>();
 const niqqud = new Map<string, QuizItem[]>();
+const qamats = new Map<string, QuizItem[]>();
+/** The text that makes two items the same question: the word (or chain) shown. */
+const shown = (item: QuizItem) => item.w;
+
 const collect = (
   found: Map<string, QuizItem[]>,
   items: readonly { answer: string; item: QuizItem }[],
+  same = shown,
 ) => {
   for (const { answer, item } of items) {
     const list = found.get(answer) ?? [];
     // The same word shown twice would be the same question.
-    if (!list.some((other) => other.w === item.w)) list.push(item);
+    if (!list.some((other) => same(other) === same(item))) list.push(item);
     found.set(answer, list);
   }
 };
@@ -67,6 +72,7 @@ for (const [book, chapters] of Object.entries(BOOKS)) {
       if (hasTwoSets(`${book} ${chapter}:${i + 1}`)) return;
       collect(tropes, verseItems(html));
       collect(niqqud, verseNiqqudItems(html));
+      collect(qamats, verseQamatsItems(html), markedWord);
     });
   }
 }
@@ -91,3 +97,4 @@ function write(out: string, ids: readonly string[], found: Map<string, QuizItem[
 }
 write('public/quiz/trope-words.json', QUIZ_TROPES, tropes);
 write('public/quiz/niqqud-words.json', NIQQUD_GROUPS, niqqud);
+write('public/quiz/qamats-words.json', QAMATS_KINDS, qamats);

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { verseNiqqudItems, withoutTeamim, wordItems } from './niqqud-words';
+import {
+  markedWord,
+  verseNiqqudItems,
+  verseQamatsItems,
+  withoutTeamim,
+  wordItems,
+} from './niqqud-words';
 
 /** Each item as "answer: the word with its marked letters in brackets". */
 const shown = (word: string) =>
@@ -75,5 +81,33 @@ describe('verseNiqqudItems', () => {
 
   it('never asks about the divine name, whose vowels are those of another word', () => {
     expect(verseNiqqudItems('יְהֹוָ֥ה לַיהֹוָ֖ה יֱהֹוִ֑ה')).toEqual([]);
+  });
+});
+
+/** Each item of a verse as "kind: its marked word". */
+const kinds = (verse: string) =>
+  verseQamatsItems(verse).map(({ answer, item }) => `${answer}: ${markedWord(item)}`);
+
+describe('verseQamatsItems', () => {
+  it('keeps the cantillation, and writes a qamats qatan as a qamats', () => {
+    expect(kinds('כׇּל־נֶ֣פֶשׁ')).toEqual(['קמץ-קטן: [כָּ]ל']);
+  });
+
+  it('leaves out what the rules on the site cannot explain', () => {
+    // A קמץ קטן with a meteg, or before a חטף קמץ; a קמץ גדול before a shva with neither.
+    expect(kinds('קׇֽדָשִׁ֔ים')).toEqual(['קמץ-גדול: קָֽ[דָ]שִׁ֔ים']);
+    expect(kinds('בְּאׇהֳל֔וֹ')).toEqual([]);
+    expect(kinds('עָמְדָה')).toEqual([]);
+    expect(kinds('עָֽמְדָה')).toEqual(['קמץ-גדול: [עָֽ]מְדָה']);
+  });
+});
+
+/** A word marked from its start to `end`. */
+const item = (w: string, end: number) => ({ w, h: [0, end] });
+
+describe('markedWord', () => {
+  it('makes one question of a marked word, whatever the chain around it', () => {
+    expect(markedWord(item('כָּל־נֶפֶשׁ', 3))).toBe(markedWord(item('כָּל־אֲשֶׁר', 3)));
+    expect(markedWord({ w: 'אֶת־קָרְבַּן', h: [4, 6] })).toBe('[קָ]רְבַּן');
   });
 });
