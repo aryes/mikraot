@@ -1,0 +1,11 @@
+---
+/** The content tag `{% qamats-quiz /%}`: the qamats quiz, run in the browser (QamatsQuiz.tsx). */
+import { QamatsQuiz } from '../QamatsQuiz';
+---
+
+<div class="my-6">
+  <QamatsQuiz client:visible />
+  <noscript>
+    <p>החידון פועל רק כש־JavaScript מופעל בדפדפן.</p>
+  </noscript>
+</div>
