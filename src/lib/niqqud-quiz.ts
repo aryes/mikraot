@@ -77,3 +77,16 @@ export const VOWEL_CLASS_OF: Readonly<Record<string, (typeof VOWEL_CLASSES)[numb
 };
 
 export const VOWEL_CLASS_QUIZ: QuizKind = { ids: VOWEL_CLASSES, lookAlikes: [] };
+
+/**
+ * The qamats quiz ("קמץ גדול או קטן?", src/components/QamatsQuiz.tsx; from the list of quiz ideas
+ * of 2026-11-11): a word with a qamats marked, its cantillation kept (the stress tells the kinds
+ * apart); which kind? Its list, public/quiz/qamats-words.json, has both kinds equally, and a round
+ * asks five of each, since a קמץ קטן is rare in the text.
+ */
+export const QAMATS_KINDS = ['קמץ-גדול', 'קמץ-קטן'] as const;
+
+export const QAMATS_QUIZ: QuizKind = { ids: QAMATS_KINDS, lookAlikes: [] };
+
+/** The page on the קמץ קטן, which the feedback links to. */
+export const QAMATS_PAGE = '/קמץ-קטן/';

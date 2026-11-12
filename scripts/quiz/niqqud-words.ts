@@ -125,3 +125,81 @@ export function verseNiqqudItems(html: string): { answer: string; item: QuizItem
       }));
     });
 }
+
+/** A character class of these code point ranges, written by number so it stays readable. */
+const charClass = (ranges: readonly [number, number][]) =>
+  `[${ranges.map(([from, to]) => `${String.fromCodePoint(from)}-${String.fromCodePoint(to)}`).join('')}]`;
+
+/**
+ * A word the qamats quiz shows: letters, cantillation (U+0591-05AF), vowels, dagesh and meteg
+ * (U+05B0-05BD), the shin and sin dots (U+05C1-05C2) and the qamats qatan (U+05C7); nothing else
+ * (no paseq or other rare marks), and maqafs (U+05BE) between words.
+ */
+const QAMATS_WORD = new RegExp(
+  `^${charClass([
+    [0x591, 0x5bd],
+    [0x5be, 0x5be],
+    [0x5c1, 0x5c2],
+    [0x5c7, 0x5c7],
+    [0x5d0, 0x5ea],
+  ])}+$`,
+  'u',
+);
+const STRESS = new RegExp(
+  charClass([
+    [0x591, 0x5af],
+    [0x5bd, 0x5bd],
+  ]),
+  'u',
+);
+const SHVA = String.fromCodePoint(0x5b0);
+const HATAF_QAMATS = String.fromCodePoint(0x5b3);
+
+/**
+ * Whether the site's rules (the page "קמץ קטן") explain an item's kind from what is shown: a
+ * קמץ קטן never with a meteg or a trope on it, nor before a חטף קמץ (which the page doesn't
+ * teach); a קמץ גדול never in what looks like a closed syllable, before a shva with neither a
+ * meteg nor a trope on the qamats. The rest (about one in eight קמץ קטן) would mark a learner
+ * wrong for following the page.
+ */
+function ruleExplains(kind: string, item: QuizItem): boolean {
+  const [start = 0, end = 0] = item.h ?? [];
+  const marked = item.w.slice(start, end);
+  const next = item.w.slice(end).match(/^.[^\u05D0-\u05EA]*/u)?.[0] ?? '';
+  const stressed = STRESS.test(marked);
+  if (kind === 'קמץ-קטן') return !stressed && !next.includes(HATAF_QAMATS);
+  return stressed || !next.includes(SHVA);
+}
+
+/**
+ * The qamats quiz's items in one verse (src/lib/niqqud-quiz.ts, QAMATS_QUIZ): each word's or maqaf
+ * chain's first qamats of each kind, the word as written, cantillation and meteg kept, since they
+ * show where the stress is; only those the site's rules explain (ruleExplains).
+ */
+export function verseQamatsItems(html: string): { answer: string; item: QuizItem }[] {
+  const kinds: Readonly<Record<string, string>> = { קמץ: 'קמץ-גדול', 'קמץ-קטן': 'קמץ-קטן' };
+  return tokens(html, { qatan: true })
+    .filter((token) => !token.unreadable && !THE_NAME.test(token.text))
+    .map((token) => token.text.replace(String.fromCodePoint(0x5c3), ''))
+    .filter((word) => QAMATS_WORD.test(word))
+    .flatMap((word) =>
+      wordItems(word).flatMap(({ answer, item }) => {
+        const kind = kinds[answer];
+        if (!kind || !ruleExplains(kind, item)) return [];
+        // As the site writes it: a qamats qatan as a qamats (what the learner has to tell apart).
+        const w = item.w.replaceAll(QAMATS_QATAN, String.fromCodePoint(0x5b8));
+        return [{ answer: kind, item: { ...item, w } }];
+      }),
+    );
+}
+
+/**
+ * The marked word of a maqaf chain, with its marked letters: the qamats quiz's כָּל־ before a
+ * hundred different words is one question, not a hundred.
+ */
+export const markedWord = (item: QuizItem): string => {
+  const [start = 0, end = 0] = item.h ?? [];
+  const before = item.w.slice(0, start).split('־').at(-1) ?? '';
+  const after = item.w.slice(end).split('־')[0] ?? '';
+  return `${before}[${item.w.slice(start, end)}]${after}`;
+};

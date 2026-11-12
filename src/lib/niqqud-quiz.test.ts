@@ -1,11 +1,13 @@
 import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import wordList from '../../public/quiz/niqqud-words.json';
+import qamatsList from '../../public/quiz/qamats-words.json';
 import { MIN_RANDOM, buildRound, chooseOptions, type WordList } from './quiz';
 import {
   NIQQUD_GROUPS,
   NIQQUD_PAGE,
   NIQQUD_QUIZ,
+  QAMATS_KINDS,
   QUIZ_VOWELS,
   VOWEL_CLASS_OF,
   VOWEL_CLASSES,
@@ -78,5 +80,35 @@ describe('the vowel-class quiz', () => {
     expect(round).toHaveLength(10);
     expect(new Set(round.map((q) => q.group)).size).toBe(10);
     for (const q of round) expect(q.answer).toBe(VOWEL_CLASS_OF[q.group]);
+  });
+});
+
+describe('the qamats quiz', () => {
+  const qamats = qamatsList as WordList;
+
+  it('has both kinds, each marking a qamats in a word with its cantillation', () => {
+    for (const kind of QAMATS_KINDS) {
+      const items = qamats.items[kind] ?? [];
+      expect(items.length, kind).toBeGreaterThanOrEqual(MIN_RANDOM);
+      for (const { w, h = [0, 0] } of items) expect(w.slice(h[0], h[1]), w).toContain('ָ');
+    }
+    // The cantillation is kept: the stress tells the kinds apart.
+    expect(
+      Object.values(qamats.items)
+        .flat()
+        .some(({ w }) => /[֑-֯]/.test(w)),
+    ).toBe(true);
+  });
+
+  it('asks each group once unless told otherwise', () => {
+    const round = buildRound(qamats, [], new Set(), { preparedCount: 0 });
+    expect(round).toHaveLength(2);
+  });
+
+  it('asks five of each kind in a round', () => {
+    const round = buildRound(qamats, [], new Set(), { preparedCount: 0, perGroup: 5 });
+    expect(round).toHaveLength(10);
+    for (const kind of QAMATS_KINDS) expect(round.filter((q) => q.answer === kind)).toHaveLength(5);
+    expect(new Set(round.map((q) => q.item.w)).size).toBe(10);
   });
 });
