@@ -14,8 +14,8 @@ const CONFIG: QuizConfig = {
   prompt: () => 'איזה משרת חסר במילה המסומנת?',
   // Smaller on a phone, so the two words stay side by side: servant, then the disjunctive.
   wordSize: 'text-4xl sm:text-5xl',
-  // In a button only the name: the sign would show what is missing from the word.
-  name: (id, _question, option) => <Name id={id} unmarked={option} />,
+  // Each name with its sign, in the buttons too (Arye, 2026-11-14): the learner matches the sign.
+  name: (id) => <Name id={id} />,
   answerIs: 'המשרת כאן:',
   // The link takes the content's link style (.wp-content-rendered a).
   more: (question) => (
