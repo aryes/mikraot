@@ -140,6 +140,11 @@ const content = fields.markdoc({
       icon: <SquareCheck />,
       schema: {},
     }),
+    'shva-quiz': block({
+      label: 'חידון שווא נע או נח',
+      icon: <SquareCheck />,
+      schema: {},
+    }),
     picker: wrapper({
       label: 'בורר (רשימה מקוננת)',
       icon: <ListTree />,

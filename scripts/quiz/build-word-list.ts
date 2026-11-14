@@ -8,8 +8,10 @@
 import { writeFileSync } from 'node:fs';
 import { NIQQUD_GROUPS, QAMATS_GROUPS } from '../../src/lib/niqqud-quiz';
 import { MIN_RANDOM, type QuizItem, type WordList } from '../../src/lib/quiz';
+import { SHVA_GROUPS } from '../../src/lib/shva-quiz';
 import { QUIZ_TROPES } from '../../src/lib/trope-quiz';
 import { markedWord, verseNiqqudItems, verseQamatsItems } from './niqqud-words';
+import { verseShvaItems } from './shva-words';
 import { hasTwoSets, spread, verseItems } from './torah-words';
 
 const BOOKS = { Genesis: 50, Exodus: 40, Leviticus: 27, Numbers: 36, Deuteronomy: 34 };
@@ -44,6 +46,9 @@ function versionOf(body: unknown, url: string): Version {
 const tropes = new Map<string, QuizItem[]>();
 const niqqud = new Map<string, QuizItem[]>();
 const qamats = new Map<string, QuizItem[]>();
+const shva = new Map<string, QuizItem[]>();
+/** The same word with or without a meteg is the same shva question. */
+const withoutMeteg = (item: QuizItem) => item.w.replaceAll(String.fromCodePoint(0x5bd), '');
 /** The text that makes two items the same question: the word (or chain) shown. */
 const shown = (item: QuizItem) => item.w;
 
@@ -73,6 +78,7 @@ for (const [book, chapters] of Object.entries(BOOKS)) {
       collect(tropes, verseItems(html));
       collect(niqqud, verseNiqqudItems(html));
       collect(qamats, verseQamatsItems(html), markedWord);
+      collect(shva, verseShvaItems(html), withoutMeteg);
     });
   }
 }
@@ -100,3 +106,4 @@ function write(out: string, ids: readonly string[], found: Map<string, QuizItem[
 write('public/quiz/trope-words.json', QUIZ_TROPES, tropes);
 write('public/quiz/niqqud-words.json', NIQQUD_GROUPS, niqqud);
 write('public/quiz/qamats-words.json', QAMATS_GROUPS, qamats);
+write('public/quiz/shva-words.json', SHVA_GROUPS, shva);
