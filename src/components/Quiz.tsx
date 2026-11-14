@@ -51,6 +51,10 @@ export interface QuizConfig {
   fewest?: number;
   /** Why the answer is right, in the feedback of a random question (the qamats quiz's rule). */
   explain?: (question: Question) => ReactNode;
+  /** What is shown in the word's place (the sign quiz: a trope's name). */
+  word?: (question: Question) => ReactNode;
+  /** An option's name read aloud, where its text means nothing then (the sign quiz's signs). */
+  optionLabel?: (index: number) => string;
   /**
    * The same options, in this order, for every question (a quiz with few answers); its level,
    * which only chooses options, then changes nothing.
@@ -538,13 +542,13 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         tabIndex={-1}
         className="my-6 text-center text-5xl leading-[1.6] outline-none"
       >
-        <Word item={question.item} />
+        {config.word ? config.word(question) : <Word item={question.item} />}
       </div>
       {/* Three options side by side (short names: the vowel-class quiz), four two by two. */}
       <div
         className={`grid gap-3 ${round.options.length === 3 ? 'mx-auto max-w-xl grid-cols-3' : 'grid-cols-2'}`}
       >
-        {round.options.map((id) => {
+        {round.options.map((id, index) => {
           const state = !chosen
             ? 'border-slate-300 hover:border-brand-strong hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-800'
             : id === question.answer
@@ -559,6 +563,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
               key={id}
               type="button"
               aria-disabled={chosen ? true : undefined}
+              aria-label={config.optionLabel?.(index)}
               onClick={() => answer(id)}
               // Narrower padding three across, so a name and its icon fit a 320px phone.
               className={`inline-flex cursor-pointer items-center justify-center rounded-xl border-2 py-3 text-xl transition-colors ${
