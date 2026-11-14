@@ -1,0 +1,11 @@
+---
+/** The content tag `{% sign-quiz /%}`: the sign quiz, run in the browser (SignQuiz.tsx). */
+import { SignQuiz } from '../SignQuiz';
+---
+
+<div class="my-6">
+  <SignQuiz client:visible />
+  <noscript>
+    <p>החידון פועל רק כש־JavaScript מופעל בדפדפן.</p>
+  </noscript>
+</div>

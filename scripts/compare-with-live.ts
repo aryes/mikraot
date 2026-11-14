@@ -117,6 +117,8 @@ const NEW_HERE = new Set([
   '/זיהוי-משרתים/',
   // The dagesh quiz (2026-11-15).
   '/דגש-חזק-או-קל/',
+  // The sign quiz (2026-11-15).
+  '/סימן-הטעם/',
   // All the licences and credits on one page (2026-11-07).
   '/terms/',
 ]);
