@@ -10,6 +10,7 @@ import {
   VOWEL_CLASS_OF,
   VOWEL_CLASSES,
   VOWEL_LOOK_ALIKES,
+  pointedName,
   vowelName,
 } from './niqqud-quiz';
 
@@ -39,6 +40,9 @@ describe('the niqqud quiz data', () => {
 
   it('names each niqqud as the table of niqqud does, and links to that table', () => {
     expect(vowelName('חטף-פתח')).toBe('חטף פתח');
+    expect(pointedName('חטף-פתח')).toBe('חֲטַף פַּתָּח');
+    // Every vowel the word list has, with its niqqud.
+    for (const id of NIQQUD_GROUPS) expect(pointedName(id)).not.toBe(vowelName(id));
     expect(existsSync(`src/content/pages${NIQQUD_PAGE.slice(0, -1)}.mdoc`)).toBe(true);
   });
 });
