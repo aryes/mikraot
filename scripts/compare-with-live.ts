@@ -119,6 +119,8 @@ const NEW_HERE = new Set([
   '/דגש-חזק-או-קל/',
   // The shva quiz (2026-11-15).
   '/שווא-נע-או-נח/',
+  // The sign quiz (2026-11-15).
+  '/סימן-הטעם/',
   // All the licences and credits on one page (2026-11-07).
   '/terms/',
 ]);
