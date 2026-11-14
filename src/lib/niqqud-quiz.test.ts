@@ -7,7 +7,11 @@ import {
   NIQQUD_GROUPS,
   NIQQUD_PAGE,
   NIQQUD_QUIZ,
+  QAMATS_GROUPS,
   QAMATS_KINDS,
+  QAMATS_PER_GROUP,
+  QATAN_REASONS,
+  qamatsKind,
   QUIZ_VOWELS,
   VOWEL_CLASS_OF,
   VOWEL_CLASSES,
@@ -90,10 +94,10 @@ describe('the vowel-class quiz', () => {
 describe('the qamats quiz', () => {
   const qamats = qamatsList as WordList;
 
-  it('has both kinds, each marking a qamats in a word with its cantillation', () => {
-    for (const kind of QAMATS_KINDS) {
-      const items = qamats.items[kind] ?? [];
-      expect(items.length, kind).toBeGreaterThanOrEqual(MIN_RANDOM);
+  it('has every group, each marking a qamats in a word with its cantillation', () => {
+    for (const group of QAMATS_GROUPS) {
+      const items = qamats.items[group] ?? [];
+      expect(items.length, group).toBeGreaterThan(0);
       for (const { w, h = [0, 0] } of items) expect(w.slice(h[0], h[1]), w).toContain('ָ');
     }
     // The cantillation is kept: the stress tells the kinds apart.
@@ -104,15 +108,22 @@ describe('the qamats quiz', () => {
     ).toBe(true);
   });
 
-  it('asks each group once unless told otherwise', () => {
-    const round = buildRound(qamats, [], new Set(), { preparedCount: 0 });
-    expect(round).toHaveLength(2);
-  });
-
-  it('asks five of each kind in a round', () => {
-    const round = buildRound(qamats, [], new Set(), { preparedCount: 0, perGroup: 5 });
+  it('asks five of each kind in a round, the קמץ קטן by every rule', () => {
+    const round = buildRound(qamats, [], new Set(), {
+      preparedCount: 0,
+      groups: QAMATS_GROUPS,
+      answerOf: qamatsKind,
+      perGroup: QAMATS_PER_GROUP,
+      fewest: 1,
+    });
     expect(round).toHaveLength(10);
     for (const kind of QAMATS_KINDS) expect(round.filter((q) => q.answer === kind)).toHaveLength(5);
+    for (const reason of Object.keys(QATAN_REASONS)) {
+      expect(
+        round.some((q) => q.group === reason),
+        reason,
+      ).toBe(true);
+    }
     expect(new Set(round.map((q) => q.item.w)).size).toBe(10);
   });
 });

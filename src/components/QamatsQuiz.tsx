@@ -1,5 +1,14 @@
 import React from 'react';
-import { QAMATS_KINDS, QAMATS_PAGE, QAMATS_QUIZ, vowelName } from '../lib/niqqud-quiz';
+import {
+  QAMATS_GROUPS,
+  QAMATS_KINDS,
+  QAMATS_PAGE,
+  QAMATS_PER_GROUP,
+  QAMATS_QUIZ,
+  QATAN_REASONS,
+  qamatsKind,
+  vowelName,
+} from '../lib/niqqud-quiz';
 import { Quiz, type QuizConfig } from './Quiz';
 
 const CONFIG: QuizConfig = {
@@ -9,8 +18,18 @@ const CONFIG: QuizConfig = {
   preparedCount: 0,
   storage: 'qamats-quiz',
   event: 'qamats-quiz',
-  // Two kinds: five of each in a round of ten (the קמץ קטן is rare in the text, not in the quiz).
-  perGroup: 5,
+  // Two kinds: five of each in a round of ten (the קמץ קטן is rare in the text, not in the quiz),
+  // the קמץ קטן by its rules, every rule in every round.
+  groups: QAMATS_GROUPS,
+  answerOf: qamatsKind,
+  perGroup: QAMATS_PER_GROUP,
+  // The rule of the דגש has only a few words in the Torah: they come back more often.
+  fewest: 1,
+  // A קמץ קטן's rule, after the answer: "למה קטן? לפני שווא נח, בלי מתג."
+  explain: (question) => {
+    const reason = QATAN_REASONS[question.group];
+    return reason && `למה קטן? ${reason}`;
+  },
   options: QAMATS_KINDS,
   prompt: () => 'איזה קמץ מסומן כאן?',
   // In the feedback only "גדול" or "קטן", after "הקמץ כאן:".

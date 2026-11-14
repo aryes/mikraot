@@ -106,10 +106,33 @@ export const VOWEL_CLASS_QUIZ: QuizKind = { ids: VOWEL_CLASSES, lookAlikes: [] }
 /**
  * The qamats quiz ("קמץ גדול או קטן?", src/components/QamatsQuiz.tsx; from the list of quiz ideas
  * of 2026-11-11): a word with a qamats marked, its cantillation kept (the stress tells the kinds
- * apart); which kind? Its list, public/quiz/qamats-words.json, has both kinds equally, and a round
- * asks five of each, since a קמץ קטן is rare in the text.
+ * apart); which kind? Its list, public/quiz/qamats-words.json, has the קמץ קטן by the rule that
+ * makes it one (Arye, 2026-11-14: explain why, and ask every kind), and a round asks five of each
+ * kind (QAMATS_PER_GROUP), since a קמץ קטן is rare in the text.
  */
 export const QAMATS_KINDS = ['קמץ-גדול', 'קמץ-קטן'] as const;
+
+/** The rules of the page "קמץ קטן", in its order: each a group of the list, and why. */
+export const QATAN_REASONS: Readonly<Record<string, string>> = {
+  'קטן-דגש': 'לפני אות עם דגש חזק.',
+  'קטן-שווא': 'לפני שווא נח, בלי מתג.',
+  'קטן-מקף': 'התנועה האחרונה במילה, לפני מקף.',
+  'קטן-נחים': 'ו׳ בפתח ואחריה שני קמצים: השני קטן.',
+};
+
+export const QAMATS_GROUPS = ['קמץ-גדול', ...Object.keys(QATAN_REASONS)];
+
+/** A round: five קמץ גדול, and five קמץ קטן with every rule among them. */
+export const QAMATS_PER_GROUP: Readonly<Record<string, number>> = {
+  'קמץ-גדול': 5,
+  'קטן-דגש': 1,
+  'קטן-שווא': 2,
+  'קטן-מקף': 1,
+  'קטן-נחים': 1,
+};
+
+/** A group's answer: the קמץ קטן whatever its rule. */
+export const qamatsKind = (group: string) => (group in QATAN_REASONS ? 'קמץ-קטן' : group);
 
 export const QAMATS_QUIZ: QuizKind = { ids: QAMATS_KINDS, lookAlikes: [] };
 

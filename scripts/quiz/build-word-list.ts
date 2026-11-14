@@ -6,7 +6,7 @@
  * only in prepared questions (src/data/quiz/prepared.json).
  */
 import { writeFileSync } from 'node:fs';
-import { NIQQUD_GROUPS, QAMATS_KINDS } from '../../src/lib/niqqud-quiz';
+import { NIQQUD_GROUPS, QAMATS_GROUPS } from '../../src/lib/niqqud-quiz';
 import { MIN_RANDOM, type QuizItem, type WordList } from '../../src/lib/quiz';
 import { QUIZ_TROPES } from '../../src/lib/trope-quiz';
 import { markedWord, verseNiqqudItems, verseQamatsItems } from './niqqud-words';
@@ -91,10 +91,12 @@ function write(out: string, ids: readonly string[], found: Map<string, QuizItem[
   writeFileSync(out, `${JSON.stringify(list)}\n`);
   for (const id of ids) {
     const count = found.get(id)?.length ?? 0;
-    console.log(`${id}: ${count}${count < MIN_RANDOM ? ' (prepared questions only)' : ''}`);
+    console.log(
+      `${id}: ${count}${count < MIN_RANDOM ? ' (few: only prepared questions, unless the quiz asks for fewer)' : ''}`,
+    );
   }
   console.log(`Wrote ${out}`);
 }
 write('public/quiz/trope-words.json', QUIZ_TROPES, tropes);
 write('public/quiz/niqqud-words.json', NIQQUD_GROUPS, niqqud);
-write('public/quiz/qamats-words.json', QAMATS_KINDS, qamats);
+write('public/quiz/qamats-words.json', QAMATS_GROUPS, qamats);
