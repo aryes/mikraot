@@ -118,6 +118,11 @@ export default defineMarkdocConfig({
       render: component('./src/components/content/ShvaQuiz.astro'),
       selfClosing: true,
     },
+    // The sign quiz (src/components/SignQuiz.tsx), on the page "מה הסימן?".
+    'sign-quiz': {
+      render: component('./src/components/content/SignQuiz.astro'),
+      selfClosing: true,
+    },
     // A nested list of links shown as rows of choices (book, then parasha, then reading).
     picker: {
       render: component('./src/components/content/ListPicker.astro'),
