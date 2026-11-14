@@ -4,6 +4,7 @@ import wordList from '../../public/quiz/niqqud-words.json';
 import qamatsList from '../../public/quiz/qamats-words.json';
 import { MIN_RANDOM, buildRound, chooseOptions, type WordList } from './quiz';
 import {
+  GADOL_REASONS,
   NIQQUD_GROUPS,
   NIQQUD_PAGE,
   NIQQUD_QUIZ,
@@ -118,7 +119,7 @@ describe('the qamats quiz', () => {
     });
     expect(round).toHaveLength(10);
     for (const kind of QAMATS_KINDS) expect(round.filter((q) => q.answer === kind)).toHaveLength(5);
-    for (const reason of Object.keys(QATAN_REASONS)) {
+    for (const reason of [...Object.keys(QATAN_REASONS), ...Object.keys(GADOL_REASONS)]) {
       expect(
         round.some((q) => q.group === reason),
         reason,

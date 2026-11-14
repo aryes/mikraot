@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { QATAN_REASONS } from '../src/lib/niqqud-quiz';
+import { GADOL_REASONS, QATAN_REASONS } from '../src/lib/niqqud-quiz';
 import { CHEERS, MISSES, NEAR_MISSES } from '../src/lib/quiz';
 
 const QUIZ = `/${encodeURI('קמץ-גדול-או-קטן')}/`;
@@ -14,6 +14,7 @@ test('the qamats quiz runs a round of ten, five of each kind, every rule explain
   const options = quiz.locator('.grid button');
   const next = quiz.getByRole('button', { name: /לשאלה הבאה|לתוצאה/ });
   const reasons = new Set<string>();
+  const all = [...Object.values(QATAN_REASONS), ...Object.values(GADOL_REASONS)];
 
   /* oxlint-disable no-await-in-loop -- one question after another */
   for (let i = 1; i <= 10; i++) {
@@ -26,10 +27,11 @@ test('the qamats quiz runs a round of ten, five of each kind, every rule explain
     const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
     const [opening = '', rest] = feedback.split(' הקמץ כאן: ');
     expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
-    // A קמץ קטן's feedback says why: the rule of the page that makes it one.
+    // A קמץ קטן's feedback says why: the rule of the page that makes it one; so does the tricky
+    // קמץ גדול's.
     for (const line of await quiz.locator('[aria-live] p').allInnerTexts()) {
-      const reason = line.trim().replace('למה קטן? ', '');
-      if (Object.values(QATAN_REASONS).includes(reason)) reasons.add(reason);
+      const reason = line.trim().replace(/^למה (קטן|גדול)\? /u, '');
+      if (all.includes(reason)) reasons.add(reason);
     }
     await expect(quiz.getByRole('link', { name: 'לדף על קמץ קטן' })).toHaveAttribute(
       'href',
@@ -41,7 +43,7 @@ test('the qamats quiz runs a round of ten, five of each kind, every rule explain
   /* oxlint-enable no-await-in-loop */
 
   await expect(quiz.getByRole('status')).toContainText(/זיהיתם נכון \d+ מתוך 10/);
-  expect([...reasons].toSorted()).toEqual(Object.values(QATAN_REASONS).toSorted());
+  expect([...reasons].toSorted()).toEqual(all.toSorted());
   // Its own memory: keys are kind|word|letters, five of each kind.
   const recent = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('qamats-quiz-recent') ?? '[]'),
