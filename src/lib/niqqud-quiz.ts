@@ -70,7 +70,7 @@ const POINTED: Readonly<Record<string, string>> = {
   'קמץ-קטן': 'קָמָץ קָטָן',
 };
 
-/** An id with its niqqud: "חטף-פתח" is "חֲטַף פַּתָּח". */
+/** An id with its niqqud, as both quizzes show it: "חטף-פתח" is "חֲטַף פַּתָּח". */
 export const pointedName = (id: string) => POINTED[id] ?? vowelName(id);
 
 /** The word list's entries: the quiz's niqqud, and the קמץ קטן, which only VOWEL_CLASS_OF asks. */
