@@ -8,24 +8,24 @@ import type { QuizItem } from '../../src/lib/quiz';
 import { THE_NAME } from './niqqud-words';
 import { tokens } from './torah-words';
 
-const SHVA = 'ְ';
-const DAGESH = 'ּ';
+export const SHVA = 'ְ';
+export const DAGESH = 'ּ';
 const METEG = 'ֽ';
 const HIRIQ = 'ִ';
-const QAMATS_QATAN = 'ׇ';
+export const QAMATS_QATAN = 'ׇ';
 /** The long vowels of the niqqud table, a חיריק and a שורוק apart (they depend on a letter). */
 const LONG = new Set(['ָ', 'ֵ', 'ֹ', 'ֺ']);
 /** The short ones, the קמץ קטן among them. */
 const SHORT = new Set(['ַ', 'ֶ', 'ֻ', HIRIQ, QAMATS_QATAN]);
 /** A vowel sign other than the shva, the קמץ קטן's included (U+05B1-05BB, U+05C7). */
-const VOWEL = new RegExp(
+export const VOWEL = new RegExp(
   `[${String.fromCodePoint(0x5b1)}-${String.fromCodePoint(0x5bb)}${QAMATS_QATAN}]`,
   'u',
 );
 /** The final forms, as their letters: ךְ and כ are the same letter. */
 const FINAL: Readonly<Record<string, string>> = { ך: 'כ', ם: 'מ', ן: 'נ', ף: 'פ', ץ: 'צ' };
 
-interface Letter {
+export interface Letter {
   letter: string;
   marks: string;
   start: number;
@@ -51,7 +51,7 @@ const base = (letter: string) => FINAL[letter] ?? letter;
 /** A letter with no vowel and no dagesh: a vowel letter (י of a חיריק מלא, א, ה) or a silent one. */
 const bare = (l: Letter | undefined) => !!l && !VOWEL.test(l.marks) && !l.marks.includes(SHVA);
 /** A letter read with a vowel: its own, or a ו that is a שורוק. */
-const sounded = (l: Letter) =>
+export const sounded = (l: Letter) =>
   VOWEL.test(l.marks) || (l.letter === 'ו' && l.marks.includes(DAGESH));
 
 /**
