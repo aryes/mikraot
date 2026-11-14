@@ -113,6 +113,11 @@ export default defineMarkdocConfig({
       render: component('./src/components/content/DageshQuiz.astro'),
       selfClosing: true,
     },
+    // The shva quiz (src/components/ShvaQuiz.tsx), on the page "שווא נע או נח?".
+    'shva-quiz': {
+      render: component('./src/components/content/ShvaQuiz.astro'),
+      selfClosing: true,
+    },
     // A nested list of links shown as rows of choices (book, then parasha, then reading).
     picker: {
       render: component('./src/components/content/ListPicker.astro'),
