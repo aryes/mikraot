@@ -108,6 +108,11 @@ export default defineMarkdocConfig({
       render: component('./src/components/content/ServantQuiz.astro'),
       selfClosing: true,
     },
+    // The dagesh quiz (src/components/DageshQuiz.tsx), on the page "דגש חזק או קל?".
+    'dagesh-quiz': {
+      render: component('./src/components/content/DageshQuiz.astro'),
+      selfClosing: true,
+    },
     // A nested list of links shown as rows of choices (book, then parasha, then reading).
     picker: {
       render: component('./src/components/content/ListPicker.astro'),

@@ -1,0 +1,11 @@
+---
+/** The content tag `{% dagesh-quiz /%}`: the dagesh quiz, run in the browser (DageshQuiz.tsx). */
+import { DageshQuiz } from '../DageshQuiz';
+---
+
+<div class="my-6">
+  <DageshQuiz client:visible />
+  <noscript>
+    <p>החידון פועל רק כש־JavaScript מופעל בדפדפן.</p>
+  </noscript>
+</div>

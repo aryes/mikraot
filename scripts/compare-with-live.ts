@@ -115,6 +115,8 @@ const NEW_HERE = new Set([
   '/קמץ-גדול-או-קטן/',
   // The servant quiz (2026-11-11).
   '/זיהוי-משרתים/',
+  // The dagesh quiz (2026-11-15).
+  '/דגש-חזק-או-קל/',
   // All the licences and credits on one page (2026-11-07).
   '/terms/',
 ]);
