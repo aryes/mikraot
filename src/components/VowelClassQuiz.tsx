@@ -5,13 +5,13 @@ import {
   VOWEL_CLASS_OF,
   VOWEL_CLASS_QUIZ,
   VOWEL_CLASSES,
-  vowelName,
+  pointedName,
 } from '../lib/niqqud-quiz';
 import { Quiz, type QuizConfig } from './Quiz';
 
 /** The vowel the question was drawn from, named after the class in the feedback. */
 const withVowel = (id: string, question: Question) =>
-  id === question.answer ? `${id} (${vowelName(question.group)})` : id;
+  id === question.answer ? `${id} (${pointedName(question.group)})` : id;
 
 const CONFIG: QuizConfig = {
   kind: VOWEL_CLASS_QUIZ,
@@ -26,7 +26,7 @@ const CONFIG: QuizConfig = {
   options: VOWEL_CLASSES,
   prompt: () => 'מה סוג התנועה המסומנת?',
   nameRight: true,
-  // The feedback names the vowel too, after a right answer as well: "גדולה (קמץ)".
+  // The feedback names the vowel too, after a right answer as well: "גדולה (קָמָץ)".
   name: (id, question, option) => (option ? id : withVowel(id, question)),
   answerIs: 'התנועה כאן:',
   more: () => <a href={encodeURI(NIQQUD_PAGE)}>לטבלת הניקוד</a>,

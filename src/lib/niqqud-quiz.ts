@@ -48,6 +48,31 @@ export const NIQQUD_PAGE = '/תנועות-עיצורים-וניקוד/';
 /** An id as it is shown: "חטף-פתח" is "חטף פתח". */
 export const vowelName = (id: string) => id.replaceAll('-', ' ');
 
+/**
+ * Each name with its niqqud (Arye, 2026-11-14), in the forms whose letters carry the vowel they
+ * name (קָמָץ, צֵירֵה, שׁוּרוּק).
+ */
+const POINTED: Readonly<Record<string, string>> = {
+  קמץ: 'קָמָץ',
+  פתח: 'פַּתָּח',
+  'חטף-פתח': 'חֲטַף פַּתָּח',
+  צירה: 'צֵירֵה',
+  סגול: 'סֶגּוֹל',
+  'חטף-סגול': 'חֲטַף סֶגּוֹל',
+  'חיריק-מלא': 'חִירִיק מָלֵא',
+  'חיריק-חסר': 'חִירִיק חָסֵר',
+  'חולם-מלא': 'חוֹלָם מָלֵא',
+  'חולם-חסר': 'חוֹלָם חָסֵר',
+  'חטף-קמץ': 'חֲטַף קָמָץ',
+  שורוק: 'שׁוּרוּק',
+  קבוץ: 'קֻבּוּץ',
+  שווא: 'שְׁוָא',
+  'קמץ-קטן': 'קָמָץ קָטָן',
+};
+
+/** An id with its niqqud: "חטף-פתח" is "חֲטַף פַּתָּח". */
+export const pointedName = (id: string) => POINTED[id] ?? vowelName(id);
+
 /** The word list's entries: the quiz's niqqud, and the קמץ קטן, which only VOWEL_CLASS_OF asks. */
 export const NIQQUD_GROUPS = [...QUIZ_VOWELS, 'קמץ-קטן'] as const;
 

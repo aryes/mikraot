@@ -23,10 +23,10 @@ test('the vowel-class quiz runs a round of ten, three options each, and names th
     await expect(options).toHaveText(['גדולה', 'קטנה', 'חטופה']);
     await options.first().click();
     const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
-    // Right or wrong, the answer is named with its vowel: "קטנה (קמץ קטן)".
+    // Right or wrong, the answer is named with its vowel: "קטנה (קָמָץ קָטָן)".
     const [opening = '', rest = ''] = feedback.split(' התנועה כאן: ');
     expect([...CHEERS, ...NEAR_MISSES, ...MISSES]).toContain(opening);
-    expect(rest).toMatch(/^(גדולה|קטנה|חטופה) \([א-ת ]+\)$/);
+    expect(rest).toMatch(/^(גדולה|קטנה|חטופה) \([ְ-ׇא-ת ]+\)$/);
     await expect(quiz.getByRole('link', { name: 'לטבלת הניקוד' })).toHaveAttribute(
       'href',
       `/${encodeURI('תנועות-עיצורים-וניקוד')}/`,
