@@ -4,6 +4,7 @@ import type { Question } from '../lib/quiz';
 import { rankOf, TROPE_QUIZ } from '../lib/trope-quiz';
 import { PASEQ, switchNames, trope, unmarkedName } from '../lib/tropes';
 import { pieces, Quiz, type QuizConfig } from './Quiz';
+import { SIGN_QUIZ, SIGN_TROPES, SIGNS } from '../lib/sign-quiz';
 
 /** The page whose sections the ranks are named after. */
 const HIERARCHY = '/trope-hierarchy/';
@@ -65,6 +66,12 @@ const CONFIG: QuizConfig = {
   wordList: '/quiz/trope-words.json',
   prepared,
   preparedCount: 2,
+  // The easier level: the sign alone, as the sign quiz draws it (Arye, 2026-11-14); no מאילא.
+  letter: {
+    groups: SIGN_TROPES,
+    kind: SIGN_QUIZ,
+    word: (question) => <span>{SIGNS[question.answer]}</span>,
+  },
   storage: 'trope-quiz',
   event: 'trope-quiz',
   prompt: (question) =>
