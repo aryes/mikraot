@@ -107,7 +107,7 @@ export function wordItems(word: string): { answer: string; item: QuizItem }[] {
  * The divine name, its letters with any marks between them: its vowels are those of another word
  * (אֲדֹנָי, אֱלֹהִים), read in its place, so it isn't asked about.
  */
-const THE_NAME = /י[^א-ת]*ה[^א-ת]*ו[^א-ת]*ה/;
+export const THE_NAME = /י[^א-ת]*ה[^א-ת]*ו[^א-ת]*ה/;
 
 /** The quiz items in one verse of Sefaria's markup: single words, read as written. */
 export function verseNiqqudItems(html: string): { answer: string; item: QuizItem }[] {

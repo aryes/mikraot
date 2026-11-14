@@ -1,0 +1,46 @@
+import { describe, expect, it } from 'vitest';
+import { lettersOf, shvaGroup, verseShvaItems } from './shva-words';
+
+/** Each shva of a word that the rules settle, as "group: its letter". */
+const groups = (word: string) => {
+  const letters = lettersOf(word);
+  return letters.flatMap((letter, i) => {
+    const group = shvaGroup(letters, i);
+    return group ? [`${group}: ${letter.letter}`] : [];
+  });
+};
+
+describe('shvaGroup', () => {
+  it('names the rule of a שווא נע, as the page does (אבגד״ה)', () => {
+    expect(groups('וְלָבָן')).toEqual(['נע-ראש: ו']);
+    expect(groups('וַתִּקְרְבוּן')).toEqual(['נח-קטנה: ק', 'נע-שני: ר']);
+    expect(groups('וַתֹּאמְרוּ')).toEqual(['נע-גדולה: מ']);
+    expect(groups('צֵאתְךָ')).toEqual(['נע-גדולה: ת']);
+    expect(groups('הַדְּבָרִים')).toEqual(['נע-דגש: ד']);
+    expect(groups('מְצַוְּךָ')).toEqual(['נע-ראש: מ', 'נע-דגש: ו']);
+    expect(groups('הַֽלְלוּ')).toEqual(['נע-דומות: ל']);
+  });
+
+  it('names a שווא נח after a short vowel or at the end of a word', () => {
+    expect(groups('יִשְׁמְרוּ')).toEqual(['נח-קטנה: ש', 'נע-שני: מ']);
+    expect(groups('לֶךְ')).toEqual(['נח-סוף: ך']);
+  });
+
+  it("leaves out what the page's rules don't settle", () => {
+    // After ו החיבור (the page's exception); a meteg on a short vowel; two shvas at the end.
+    expect(groups('וּלְאִמּוֹ')).toEqual([]);
+    expect(groups('וַֽיְהִי')).toEqual([]);
+    expect(groups('הָיְתָה')).toEqual([]);
+    expect(groups('חָֽרְבוּ')).toEqual(['נע-גדולה: ר']);
+    expect(groups('וַיֵּשְׁתְּ')).toEqual(['נח-סוף: ת']);
+  });
+});
+
+describe('verseShvaItems', () => {
+  it('takes single words without their cantillation, the meteg kept', () => {
+    expect(verseShvaItems('וַיִּשְׁמְר֥וּ הָֽאֲנָשִׁ֖ים')).toEqual([
+      { answer: 'נח-קטנה', item: { w: 'וַיִּשְׁמְרוּ', h: [5, 8] } },
+      { answer: 'נע-שני', item: { w: 'וַיִּשְׁמְרוּ', h: [8, 10] } },
+    ]);
+  });
+});
