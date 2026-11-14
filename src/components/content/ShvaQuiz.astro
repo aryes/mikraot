@@ -1,0 +1,11 @@
+---
+/** The content tag `{% shva-quiz /%}`: the shva quiz, run in the browser (ShvaQuiz.tsx). */
+import { ShvaQuiz } from '../ShvaQuiz';
+---
+
+<div class="my-6">
+  <ShvaQuiz client:visible />
+  <noscript>
+    <p>החידון פועל רק כש־JavaScript מופעל בדפדפן.</p>
+  </noscript>
+</div>

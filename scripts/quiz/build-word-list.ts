@@ -1,6 +1,6 @@
 /**
  * Makes the quizzes' word lists, public/quiz/trope-words.json, niqqud-words.json,
- * qamats-words.json, servant-words.json and dagesh-words.json, from the Torah as Sefaria gives Miqra according to the Masorah:
+ * qamats-words.json, servant-words.json, dagesh-words.json and shva-words.json, from the Torah as Sefaria gives Miqra according to the Masorah:
  * `npm run quiz:words`. The lists are committed, so building the site doesn't depend on Sefaria;
  * run this again only to change what they hold. Prints how many words each answer has, the rare ones (below MIN_RANDOM) being asked
  * only in prepared questions (src/data/quiz/prepared.json; the servant quiz leaves them out).
@@ -10,10 +10,12 @@ import { DAGESH_GROUPS } from '../../src/lib/dagesh-quiz';
 import { NIQQUD_GROUPS, QAMATS_GROUPS } from '../../src/lib/niqqud-quiz';
 import { MIN_RANDOM, type QuizItem, type WordList } from '../../src/lib/quiz';
 import { DISJUNCTIVES } from '../../src/lib/servant-quiz';
+import { SHVA_GROUPS } from '../../src/lib/shva-quiz';
 import { QUIZ_TROPES } from '../../src/lib/trope-quiz';
 import { verseDageshItems } from './dagesh-words';
 import { markedWord, verseNiqqudItems, verseQamatsItems } from './niqqud-words';
 import { servantItems, versePairs, type Pair } from './servant-words';
+import { verseShvaItems } from './shva-words';
 import { hasTwoSets, spread, verseItems } from './torah-words';
 
 const BOOKS = { Genesis: 50, Exodus: 40, Leviticus: 27, Numbers: 36, Deuteronomy: 34 };
@@ -49,7 +51,8 @@ const tropes = new Map<string, QuizItem[]>();
 const niqqud = new Map<string, QuizItem[]>();
 const qamats = new Map<string, QuizItem[]>();
 const dagesh = new Map<string, QuizItem[]>();
-/** The same word with or without a meteg is the same dagesh question. */
+const shva = new Map<string, QuizItem[]>();
+/** The same word with or without a meteg is the same question (the dagesh and shva quizzes). */
 const withoutMeteg = (item: QuizItem) => item.w.replaceAll(String.fromCodePoint(0x5bd), '');
 /** The text that makes two items the same question: the word (or chain) shown. */
 const shown = (item: QuizItem) => item.w;
@@ -83,6 +86,7 @@ for (const [book, chapters] of Object.entries(BOOKS)) {
       collect(qamats, verseQamatsItems(html), markedWord);
       pairs.push(...versePairs(html));
       collect(dagesh, verseDageshItems(html), withoutMeteg);
+      collect(shva, verseShvaItems(html), withoutMeteg);
     });
   }
 }
@@ -112,3 +116,4 @@ write('public/quiz/niqqud-words.json', NIQQUD_GROUPS, niqqud);
 write('public/quiz/qamats-words.json', QAMATS_GROUPS, qamats);
 write('public/quiz/servant-words.json', DISJUNCTIVES, servantItems(pairs));
 write('public/quiz/dagesh-words.json', DAGESH_GROUPS, dagesh);
+write('public/quiz/shva-words.json', SHVA_GROUPS, shva);
