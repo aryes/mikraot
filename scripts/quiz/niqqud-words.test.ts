@@ -96,7 +96,7 @@ describe('verseQamatsItems', () => {
   it('names the rule that makes each קמץ קטן one', () => {
     expect(kinds('עׇזִּ֤י')).toEqual(['קטן-דגש: [עָ]זִּי']);
     expect(kinds('בְּאׇכְלֵ֥נוּ')).toEqual(['קטן-שווא: בְּ[אָ]כְלֵנוּ']);
-    expect(kinds('וַיָּ֜קׇם')).toContain('קטן-נחים: וַיָּ[קָ]ם');
+    expect(kinds('וַיָּ֜קׇם')).toEqual(['גדול-נחים: וַ[יָּ]קָם', 'קטן-נחים: וַיָּ[קָ]ם']);
   });
 
   it('leaves out what the rules on the site cannot explain', () => {

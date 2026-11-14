@@ -177,7 +177,8 @@ const letters = (text: string): string[] =>
 /**
  * The rule of the page "קמץ קטן" that makes a קמץ קטן one, from what is shown (QATAN_REASONS in
  * src/lib/niqqud-quiz.ts): before a maqaf as its word's last vowel; the second of two qamats after
- * a וַ; before a dagesh (a strong one: after a vowel in the word); before a shva. None when the
+ * a וַ; before a dagesh (a strong one: after a vowel in the word); before a shva; and the first of
+ * those two qamats, a קמץ גדול that looks like a קטן ('גדול-נחים'). None when the
  * page's rules don't explain it: a meteg or a trope on it (they mark a קמץ גדול), or a חטף קמץ
  * after it, which the page doesn't teach (about one in eight; Arye, 2026-11-14: perhaps later). A
  * קמץ גדול is kept unless it looks closed: before a shva with neither a meteg nor a trope on it.
@@ -189,19 +190,21 @@ export function qamatsGroup(kind: string, item: QuizItem): string | undefined {
   const after = item.w.slice(end);
   const next = letters(after)[0] ?? '';
   const stressed = STRESS.test(marked);
-  if (kind !== 'קמץ-קטן') return stressed || !next.includes(SHVA) ? kind : undefined;
-  if (stressed || next.includes(HATAF_QAMATS)) return undefined;
   const [rest = '', ...chained] = after.split(MAQAF);
-  if (chained.length > 0 && !VOWEL.test(rest)) return 'קטן-מקף';
   const before = letters(item.w.slice(0, start).split(MAQAF).at(-1) ?? '');
   const [vav = '', second = ''] = before;
-  if (
-    before.length === 2 &&
-    vav.startsWith('ו') &&
-    vav.includes(PATAH) &&
-    second.includes(QAMATS) &&
-    !VOWEL.test(rest)
-  ) {
+  const afterVav = vav.startsWith('ו') && vav.includes(PATAH);
+  if (kind !== 'קמץ-קטן') {
+    if (!stressed && next.includes(SHVA)) return undefined;
+    // The first of two qamats after a וַ, the second a קמץ קטן and the word's last vowel.
+    const last = letters(rest).slice(1).join('');
+    const tricky =
+      before.length === 1 && afterVav && next.includes(QAMATS_QATAN) && !VOWEL.test(last);
+    return tricky ? 'גדול-נחים' : kind;
+  }
+  if (stressed || next.includes(HATAF_QAMATS)) return undefined;
+  if (chained.length > 0 && !VOWEL.test(rest)) return 'קטן-מקף';
+  if (before.length === 2 && afterVav && second.includes(QAMATS) && !VOWEL.test(rest)) {
     return 'קטן-נחים';
   }
   // A ו with a dagesh and no vowel is a שורוק, and a word's last ה with one has a מפיק: neither

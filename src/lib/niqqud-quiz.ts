@@ -120,11 +120,24 @@ export const QATAN_REASONS: Readonly<Record<string, string>> = {
   'קטן-נחים': 'ו׳ בפתח ואחריה שני קמצים: השני קטן.',
 };
 
-export const QAMATS_GROUPS = ['קמץ-גדול', ...Object.keys(QATAN_REASONS)];
+/**
+ * A קמץ גדול that looks like a קמץ קטן (Arye, 2026-11-14: a tricky question): the first of the two
+ * qamats after a ו with a patah, whose second is the קטן.
+ */
+export const GADOL_REASONS: Readonly<Record<string, string>> = {
+  'גדול-נחים': 'ו׳ בפתח ואחריה שני קמצים: הראשון גדול.',
+};
 
-/** A round: five קמץ גדול, and five קמץ קטן with every rule among them. */
+export const QAMATS_GROUPS = [
+  'קמץ-גדול',
+  ...Object.keys(GADOL_REASONS),
+  ...Object.keys(QATAN_REASONS),
+];
+
+/** A round: five קמץ גדול, one of them tricky, and five קמץ קטן with every rule among them. */
 export const QAMATS_PER_GROUP: Readonly<Record<string, number>> = {
-  'קמץ-גדול': 5,
+  'קמץ-גדול': 4,
+  'גדול-נחים': 1,
   'קטן-דגש': 1,
   'קטן-שווא': 2,
   'קטן-מקף': 1,
@@ -132,7 +145,16 @@ export const QAMATS_PER_GROUP: Readonly<Record<string, number>> = {
 };
 
 /** A group's answer: the קמץ קטן whatever its rule. */
-export const qamatsKind = (group: string) => (group in QATAN_REASONS ? 'קמץ-קטן' : group);
+export const qamatsKind = (group: string) =>
+  group in QATAN_REASONS ? 'קמץ-קטן' : group in GADOL_REASONS ? 'קמץ-גדול' : group;
+
+/** Why a question's קמץ is the kind it is, where the quiz says: "למה קטן? …", "למה גדול? …". */
+export function qamatsReason(group: string): string | undefined {
+  const qatan = QATAN_REASONS[group];
+  if (qatan) return `למה קטן? ${qatan}`;
+  const gadol = GADOL_REASONS[group];
+  return gadol && `למה גדול? ${gadol}`;
+}
 
 export const QAMATS_QUIZ: QuizKind = { ids: QAMATS_KINDS, lookAlikes: [] };
 
