@@ -1,5 +1,5 @@
 import React from 'react';
-import { NIQQUD_PAGE, NIQQUD_QUIZ, QUIZ_VOWELS, vowelName } from '../lib/niqqud-quiz';
+import { NIQQUD_PAGE, NIQQUD_QUIZ, QUIZ_VOWELS, pointedName } from '../lib/niqqud-quiz';
 import { Quiz, type QuizConfig } from './Quiz';
 
 const CONFIG: QuizConfig = {
@@ -13,7 +13,7 @@ const CONFIG: QuizConfig = {
   groups: QUIZ_VOWELS,
   event: 'niqqud-quiz',
   prompt: () => 'איזה ניקוד מסומן כאן?',
-  name: (id) => vowelName(id),
+  name: (id) => pointedName(id),
   answerIs: 'הניקוד כאן:',
   // The link takes the content's link style (.wp-content-rendered a).
   more: () => <a href={encodeURI(NIQQUD_PAGE)}>לטבלת הניקוד</a>,
