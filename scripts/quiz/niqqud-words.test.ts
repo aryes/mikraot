@@ -84,18 +84,24 @@ describe('verseNiqqudItems', () => {
   });
 });
 
-/** Each item of a verse as "kind: its marked word". */
+/** Each item of a verse as "group: its marked word" (without its cantillation). */
 const kinds = (verse: string) =>
   verseQamatsItems(verse).map(({ answer, item }) => `${answer}: ${markedWord(item)}`);
 
 describe('verseQamatsItems', () => {
   it('keeps the cantillation, and writes a qamats qatan as a qamats', () => {
-    expect(kinds('כׇּל־נֶ֣פֶשׁ')).toEqual(['קמץ-קטן: [כָּ]ל']);
+    expect(kinds('כׇּל־נֶ֣פֶשׁ')).toEqual(['קטן-מקף: [כָּ]ל']);
+  });
+
+  it('names the rule that makes each קמץ קטן one', () => {
+    expect(kinds('עׇזִּ֤י')).toEqual(['קטן-דגש: [עָ]זִּי']);
+    expect(kinds('בְּאׇכְלֵ֥נוּ')).toEqual(['קטן-שווא: בְּ[אָ]כְלֵנוּ']);
+    expect(kinds('וַיָּ֜קׇם')).toContain('קטן-נחים: וַיָּ[קָ]ם');
   });
 
   it('leaves out what the rules on the site cannot explain', () => {
     // A קמץ קטן with a meteg, or before a חטף קמץ; a קמץ גדול before a shva with neither.
-    expect(kinds('קׇֽדָשִׁ֔ים')).toEqual(['קמץ-גדול: קָֽ[דָ]שִׁ֔ים']);
+    expect(kinds('קׇֽדָשִׁ֔ים')).toEqual(['קמץ-גדול: קָֽ[דָ]שִׁים']);
     expect(kinds('בְּאׇהֳל֔וֹ')).toEqual([]);
     expect(kinds('עָמְדָה')).toEqual([]);
     expect(kinds('עָֽמְדָה')).toEqual(['קמץ-גדול: [עָֽ]מְדָה']);

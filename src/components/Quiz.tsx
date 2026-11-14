@@ -45,8 +45,12 @@ export interface QuizConfig {
   /** The word list's entries to draw from (all if not given), and the answer each one asks. */
   groups?: readonly string[];
   answerOf?: (group: string) => string;
-  /** Questions from each entry in a round, at most (one if not given). */
-  perGroup?: number;
+  /** Questions from each entry in a round, at most (one if not given): for all, or for each. */
+  perGroup?: number | Readonly<Record<string, number>>;
+  /** A group with fewer words is left to prepared questions (MIN_RANDOM if not given). */
+  fewest?: number;
+  /** Why the answer is right, in the feedback of a random question (the qamats quiz's rule). */
+  explain?: (question: Question) => ReactNode;
   /**
    * The same options, in this order, for every question (a quiz with few answers); its level,
    * which only chooses options, then changes nothing.
@@ -299,6 +303,7 @@ function newRound(config: QuizConfig, words: WordList, level: number): Round {
     ...(config.groups && { groups: config.groups }),
     ...(config.answerOf && { answerOf: config.answerOf }),
     ...(config.perGroup && { perGroup: config.perGroup }),
+    ...(config.fewest !== undefined && { fewest: config.fewest }),
   });
   return {
     questions,
@@ -356,6 +361,8 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   }, [config]);
 
   const question = round?.questions[round.index];
+  /** Why the answer is right, when the quiz says (the qamats quiz, for a קמץ קטן). */
+  const explanation = question && config.explain?.(question);
 
   // The button that was pressed goes away, so focus moves on: after an answer to the button to
   // go on; to the next word (where reading starts), or to the score once the round is over. Not
@@ -578,6 +585,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
               )}
             </p>
             {question.why && config.why && <p>{config.why(question.why)}</p>}
+            {explanation && <p>{explanation}</p>}
             <p>{config.more(question)}</p>
           </>
         )}

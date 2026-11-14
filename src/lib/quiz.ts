@@ -125,13 +125,11 @@ const keyOf = (answer: string, item: QuizItem) =>
 /** The time limits a learner can choose for each question, in seconds (Arye, 2026-11-10). */
 export const TIME_LIMITS = [15, 10, 5] as const;
 
-/** Answers too rare in the word list to draw at random: only prepared questions ask about them. */
-const isRare = (list: WordList, id: string) => (list.items[id]?.length ?? 0) < MIN_RANDOM;
-
 /**
  * A round: `preparedCount` prepared questions and the rest random, in random order, none asked
- * recently if that can be helped, each group `perGroup` times at most (once, unless a quiz has
- * few groups: the qamats quiz's two); as long as `size`, or as the groups allow.
+ * recently if that can be helped, each group `perGroup` times at most (once if not given; the
+ * qamats quiz gives a number for each group); as long as `size`, or as the groups allow. A group
+ * with fewer than `fewest` words is asked only in prepared questions.
  * The groups are the word list's entries (`groups` of them, or all); a question's answer is its
  * group's (`answerOf`), or the group itself.
  */
@@ -146,23 +144,32 @@ export function buildRound(
     groups = Object.keys(list.items),
     answerOf = (group: string) => group,
     perGroup = 1,
+    fewest = MIN_RANDOM,
   }: {
     size?: number;
     preparedCount?: number;
     random?: () => number;
     groups?: readonly string[];
     answerOf?: (group: string) => string;
-    perGroup?: number;
+    /** Each group's most in a round: one number for all, or a number for each. */
+    perGroup?: number | Readonly<Record<string, number>>;
+    /**
+     * Fewer words than this, and a group is asked only in prepared questions (the rarest tropes):
+     * a few words would come back too often. A quiz with no prepared questions sets it lower.
+     */
+    fewest?: number;
   } = {},
 ): Question[] {
   const round: Question[] = [];
+  const most = (group: string) =>
+    typeof perGroup === 'number' ? perGroup : (perGroup[group] ?? 1);
   // Each group once a round (Arye, 2026-11-06: each trope once): a question from one already
   // asked is skipped; so is a word already shown (the niqqud quiz asks about several letters of
   // some words).
   const fresh = (candidates: Question[]) => {
     const unused = candidates.filter(
       (c) =>
-        round.filter((q) => q.group === c.group).length < perGroup &&
+        round.filter((q) => q.group === c.group).length < most(c.group) &&
         !round.some((q) => q.item.w === c.item.w),
     );
     return unused.find((c) => !recent.has(c.key)) ?? unused[0];
@@ -175,9 +182,14 @@ export function buildRound(
     const question = fresh(preparedQuestions);
     if (question) round.push(question);
   }
-  const drawn = groups.filter((id) => !isRare(list, id));
+  const drawn = groups.filter((id) => (list.items[id]?.length ?? 0) >= fewest);
   // Group after group, each pass in a new order, until the round is full or no group adds more.
-  const passes = Array.from({ length: perGroup }, () => shuffle(drawn, random)).flat();
+  const passes = Array.from({ length: Math.max(...drawn.map(most)) }, (_, pass) =>
+    shuffle(
+      drawn.filter((group) => most(group) > pass),
+      random,
+    ),
+  ).flat();
   for (const group of passes) {
     if (round.length === size) break;
     const answer = answerOf(group);
