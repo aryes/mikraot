@@ -117,6 +117,8 @@ const NEW_HERE = new Set([
   '/זיהוי-משרתים/',
   // The dagesh quiz (2026-11-15).
   '/דגש-חזק-או-קל/',
+  // The "why" shva quiz (2026-11-16).
+  '/למה-השווא-נע/',
   // The shva quiz (2026-11-15).
   '/שווא-נע-או-נח/',
   // The sign quiz (2026-11-15).

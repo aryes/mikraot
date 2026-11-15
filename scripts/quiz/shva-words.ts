@@ -120,6 +120,24 @@ export function shvaGroup(letters: readonly Letter[], i: number): string | undef
 }
 
 /**
+ * Every rule of the page "שווא נע" that makes a letter's shva נע, where shvaGroup found one: a
+ * word's first letter may have a dagesh too (בְּכוֹר), the second of two shvas too (וְעַבְדְּךָ),
+ * as the page itself says. The "why" quiz (למה השווא נע?) offers none of the others as wrong.
+ */
+export function naRules(letters: readonly Letter[], i: number): string[] {
+  const letter = letters[i];
+  if (!letter || !shvaGroup(letters, i)?.startsWith('נע-')) return [];
+  const before = i > 0 ? vowelBefore(letters, i) : undefined;
+  return [
+    i === 0 && 'נע-ראש',
+    i > 0 && letters[i - 1]?.marks.includes(SHVA) && 'נע-שני',
+    letter.marks.includes(DAGESH) && 'נע-דגש',
+    base(letter.letter) === base(letters[i + 1]?.letter ?? '') && 'נע-דומות',
+    before?.long && !(before.qamats && !before.meteg) && 'נע-גדולה',
+  ].filter((rule): rule is string => typeof rule === 'string');
+}
+
+/**
  * The quiz items in one verse: each single word's shvas the page's rules settle, one item per
  * rule in a word, the word without its cantillation (the meteg kept).
  */
@@ -133,8 +151,14 @@ export function verseShvaItems(html: string): { answer: string; item: QuizItem }
       const found = new Map<string, QuizItem>();
       letters.forEach((letter, i) => {
         const group = shvaGroup(letters, i);
+        // The other rules that make this shva נע too: never offered as wrong (`x`).
+        const also = naRules(letters, i).filter((rule) => rule !== group);
         if (group && !found.has(group))
-          found.set(group, { w: word, h: [letter.start, letter.end] });
+          found.set(group, {
+            w: word,
+            h: [letter.start, letter.end],
+            ...(also.length > 0 && { x: also }),
+          });
       });
       // As the site writes it: a qamats qatan as a qamats.
       return [...found].map(([answer, item]) => ({

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { lettersOf, shvaGroup, verseShvaItems } from './shva-words';
+import { lettersOf, naRules, shvaGroup, verseShvaItems } from './shva-words';
 
 /** Each shva of a word that the rules settle, as "group: its letter". */
 const groups = (word: string) => {
@@ -42,5 +42,28 @@ describe('verseShvaItems', () => {
       { answer: 'נח-קטנה', item: { w: 'וַיִּשְׁמְרוּ', h: [5, 8] } },
       { answer: 'נע-שני', item: { w: 'וַיִּשְׁמְרוּ', h: [8, 10] } },
     ]);
+  });
+});
+
+/** Every rule of a word's letter whose shva is נע, as "letter: rules". */
+const rules = (word: string) => {
+  const letters = lettersOf(word);
+  return letters.flatMap((letter, i) => {
+    const found = naRules(letters, i);
+    return found.length > 0 ? [`${letter.letter}: ${found.join(' ')}`] : [];
+  });
+};
+
+describe('naRules', () => {
+  it('names every rule that makes a shva נע, as the page does for its examples', () => {
+    // The page's own: בְּכ֥וֹר "בראש מילה ובגלל הדגש", וְעַבְדְּךָ "בגלל הדגש ובגלל שהוא השני".
+    expect(rules('בְּכוֹר')).toEqual(['ב: נע-ראש נע-דגש']);
+    expect(rules('וְעַבְדְּךָ')).toEqual(['ו: נע-ראש', 'ד: נע-שני נע-דגש']);
+    expect(rules('וְלָבָן')).toEqual(['ו: נע-ראש']);
+  });
+
+  it('gives a word asked by one rule the others as answers never offered as wrong', () => {
+    const item = verseShvaItems('בְּכֹ֥ור').find(({ answer }) => answer === 'נע-ראש');
+    expect(item?.item.x).toEqual(['נע-דגש']);
   });
 });

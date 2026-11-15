@@ -1,0 +1,11 @@
+---
+/** The content tag `{% shva-why /%}`: the "why" shva quiz, run in the browser (ShvaWhyQuiz.tsx). */
+import { ShvaWhyQuiz } from '../ShvaWhyQuiz';
+---
+
+<div class="my-6">
+  <ShvaWhyQuiz client:visible />
+  <noscript>
+    <p>החידון פועל רק כש־JavaScript מופעל בדפדפן.</p>
+  </noscript>
+</div>

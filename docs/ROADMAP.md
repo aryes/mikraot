@@ -65,7 +65,7 @@
   - Given a trope's sound, choose the trope: needs a short recording of each trope in each נוסח (cut from the trope-song recordings and checked by Arye, or new ones).
   - A letter with a vowel, choose its sound from five (A, E, I, O, U: vowels that sound alike, such as קמץ, פתח and חטף פתח, share an answer). On א, the niqqud table's five vowel recordings; for the other letters, the מבטא page's recordings cut into one per vowel (Arye; their consonants are the page's original pronunciation). Checked 2026-11-15: each of them holds five syllables, about 0.7 seconds apart, so each can be played from its file by its time (no cutting); Arye to confirm by ear that they are A, E, I, O, U in that order. The vowels as the table says them, not the Ashkenazi way (Arye). Not the קמץ קטן (it looks like a קמץ) or the שווא (נע or נח). Each option needs a button to listen and one to choose.
 - [ ] Quiz ideas of 2026-11-15 (Arye):
-  - Why is this שווא נע? A word with a שווא נע marked; choose its rule from the page's five (אבגד״ה). The shva quiz's list already holds each one's rule.
+  - [x] Why is this שווא נע? A word with a שווא נע marked; choose its rule from the page's five (אבגד״ה). The shva quiz's list already holds each one's rule. Done 2026-11-16, "למה השווא נע?"; a word that fits two rules takes either.
   - Why is this קמץ קטן? The same for the קמץ קטן's rules (the qamats quiz's list holds them too).
   - The sign quiz with real words from the Torah as the answers, not signs on an א.
   - (Claude, from a review) In a duel joined before the word list has loaded, the saved time limit could replace the duel's; check when the duels are next touched.

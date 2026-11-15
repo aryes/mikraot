@@ -42,5 +42,29 @@ export function shvaReason(group: string): string | undefined {
 
 export const SHVA_QUIZ: QuizKind = { ids: SHVA_KINDS, lookAlikes: [] };
 
+/**
+ * The "why" quiz ("למה השווא נע?", src/components/ShvaWhyQuiz.tsx; Arye's idea of 2026-11-15): a
+ * שווא נע marked, which of the page's rules makes it נע? The shva quiz's list holds each word's
+ * rule, and the other rules that apply to it too (`x`, never offered as wrong: the page itself
+ * gives בְּכוֹר two). Each rule's name as an option: NA_REASONS without its full stop.
+ */
+export const NA_RULES: Readonly<Record<string, string>> = Object.fromEntries(
+  Object.entries(NA_REASONS).map(([group, reason]) => [group, reason.replace(/\.$/u, '')]),
+);
+
+export const NA_GROUPS = Object.keys(NA_RULES);
+
+/**
+ * Rules a word often has together, so offered together as the learner answers well: a dagesh
+ * with a word's start or a second shva; a long vowel with identical letters.
+ */
+export const SHVA_WHY_QUIZ: QuizKind = {
+  ids: NA_GROUPS,
+  lookAlikes: [
+    ['נע-ראש', 'נע-שני', 'נע-דגש'],
+    ['נע-גדולה', 'נע-דומות'],
+  ],
+};
+
 /** The page on the שווא נע, which the feedback links to. */
 export const SHVA_PAGE = '/שווא-נע/';
