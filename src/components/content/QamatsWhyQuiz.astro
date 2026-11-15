@@ -1,0 +1,11 @@
+---
+/** The content tag `{% qamats-why /%}`: the "why" qamats quiz, run in the browser (QamatsWhyQuiz.tsx). */
+import { QamatsWhyQuiz } from '../QamatsWhyQuiz';
+---
+
+<div class="my-6">
+  <QamatsWhyQuiz client:visible />
+  <noscript>
+    <p>החידון פועל רק כש־JavaScript מופעל בדפדפן.</p>
+  </noscript>
+</div>

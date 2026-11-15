@@ -185,35 +185,50 @@ const letters = (text: string): string[] =>
  * The rest would mark a learner wrong for following the page.
  */
 export function qamatsGroup(kind: string, item: QuizItem): string | undefined {
+  if (kind === 'קמץ-קטן') return qatanRules(item)[0];
+  const [start = 0, end = 0] = item.h ?? [];
+  const after = item.w.slice(end);
+  const next = letters(after)[0] ?? '';
+  if (!STRESS.test(item.w.slice(start, end)) && next.includes(SHVA)) return undefined;
+  // The first of two qamats after a וַ, the second a קמץ קטן and the word's last vowel.
+  const [rest = ''] = after.split(MAQAF);
+  const before = letters(item.w.slice(0, start).split(MAQAF).at(-1) ?? '');
+  const [vav = ''] = before;
+  const afterVav = vav.startsWith('ו') && vav.includes(PATAH);
+  const last = letters(rest).slice(1).join('');
+  const tricky =
+    before.length === 1 && afterVav && next.includes(QAMATS_QATAN) && !VOWEL.test(last);
+  return tricky ? 'גדול-נחים' : kind;
+}
+
+/**
+ * Every rule of the page "קמץ קטן" that makes an item's קמץ קטן one, in qamatsGroup's order (the
+ * first is the item's group): a קמץ before a maqaf may be before a dagesh or a shva too. The
+ * "why" quiz (למה הקמץ קטן?) offers none of the others as wrong. None if the stress or a חטף קמץ
+ * after it leaves it to rules the page doesn't teach.
+ */
+export function qatanRules(item: QuizItem): string[] {
   const [start = 0, end = 0] = item.h ?? [];
   const marked = item.w.slice(start, end);
   const after = item.w.slice(end);
   const next = letters(after)[0] ?? '';
-  const stressed = STRESS.test(marked);
   const [rest = '', ...chained] = after.split(MAQAF);
   const before = letters(item.w.slice(0, start).split(MAQAF).at(-1) ?? '');
   const [vav = '', second = ''] = before;
   const afterVav = vav.startsWith('ו') && vav.includes(PATAH);
-  if (kind !== 'קמץ-קטן') {
-    if (!stressed && next.includes(SHVA)) return undefined;
-    // The first of two qamats after a וַ, the second a קמץ קטן and the word's last vowel.
-    const last = letters(rest).slice(1).join('');
-    const tricky =
-      before.length === 1 && afterVav && next.includes(QAMATS_QATAN) && !VOWEL.test(last);
-    return tricky ? 'גדול-נחים' : kind;
-  }
-  if (stressed || next.includes(HATAF_QAMATS)) return undefined;
-  if (chained.length > 0 && !VOWEL.test(rest)) return 'קטן-מקף';
-  if (before.length === 2 && afterVav && second.includes(QAMATS) && !VOWEL.test(rest)) {
-    return 'קטן-נחים';
-  }
+  if (STRESS.test(marked) || next.includes(HATAF_QAMATS)) return [];
   // A ו with a dagesh and no vowel is a שורוק, and a word's last ה with one has a מפיק: neither
   // is a doubled letter.
   const shuruq = next.startsWith('ו') && !VOWEL.test(next) && !next.includes(SHVA);
   const mappiq = next.startsWith('ה') && letters(rest).length === 1;
-  if (next.includes(DAGESH) && !shuruq && !mappiq) return 'קטן-דגש';
-  if (next.includes(SHVA)) return 'קטן-שווא';
-  return undefined;
+  const doubled = next.includes(DAGESH) && !shuruq && !mappiq;
+  return [
+    chained.length > 0 && !VOWEL.test(rest) && 'קטן-מקף',
+    before.length === 2 && afterVav && second.includes(QAMATS) && !VOWEL.test(rest) && 'קטן-נחים',
+    doubled && 'קטן-דגש',
+    // A shva under a doubled letter is נע (בְעָזְּךָ): not this rule.
+    next.includes(SHVA) && !doubled && 'קטן-שווא',
+  ].filter((rule): rule is string => typeof rule === 'string');
 }
 
 /**
@@ -230,11 +245,14 @@ export function verseQamatsItems(html: string): { answer: string; item: QuizItem
     .flatMap((word) =>
       wordItems(word).flatMap(({ answer, item }) => {
         const kind = kinds[answer];
-        const group = kind && qamatsGroup(kind, item);
+        const rules = kind === 'קמץ-קטן' ? qatanRules(item) : [];
+        const group = kind && (kind === 'קמץ-קטן' ? rules[0] : qamatsGroup(kind, item));
         if (!group) return [];
         // As the site writes it: a qamats qatan as a qamats (what the learner has to tell apart).
         const w = item.w.replaceAll(QAMATS_QATAN, String.fromCodePoint(0x5b8));
-        return [{ answer: group, item: { ...item, w } }];
+        // The other rules that make it a קמץ קטן too: never offered as wrong (`x`).
+        const also = rules.slice(1);
+        return [{ answer: group, item: { ...item, w, ...(also.length > 0 && { x: also }) } }];
       }),
     );
 }
