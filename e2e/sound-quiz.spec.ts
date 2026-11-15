@@ -38,11 +38,13 @@ test('the sound quiz runs a round of ten, each letter with five syllables to hea
     const [opening = '', rest] = feedback.split(' הנכון: ');
     expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
     // The feedback names the option marked right, by its place.
-    const right = (
-      await quiz.locator('button.border-green-700, button.quiz-pop').innerText()
-    ).trim();
+    const right = (await quiz.locator('button.quiz-pop').innerText()).trim();
     if (rest !== undefined) expect(rest).toBe(right);
     else expect(right).toBe(LABELS[0]);
+    // And its speaker is marked too, to hear it again.
+    await expect(quiz.getByRole('button', { name: `להשמיע את ${right}` })).toHaveClass(
+      /border-green-700/,
+    );
     await expect(quiz.getByRole('link', { name: 'לדף המבטא, ובו כל ההקלטות' })).toBeVisible();
     await expect(next).toBeFocused();
     await next.click();

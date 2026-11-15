@@ -41,10 +41,10 @@ function recording(audio: AudioContext, name: string): Promise<AudioBuffer> {
  * Audio), which starts and stops on the exact sample. An audio element with `#t=start,end` stops
  * only up to a quarter of a second late, into the next syllable: the very sound to tell apart.
  */
-function play(id: string, question: Question): void {
+function play(id: string, question: Question): Promise<void> {
   const name = recordingOf(question.item.w);
   const span = name && TIMES[name]?.[SOUNDS.findIndex((sound) => sound === id)];
-  if (!name || !span) return;
+  if (!name || !span) return Promise.resolve();
   const [from = 0, to = 0] = span;
   context ??= new AudioContext();
   const audio = context;
@@ -52,17 +52,36 @@ function play(id: string, question: Question): void {
   audio.resume().catch(() => undefined);
   playing?.stop();
   playing = null;
-  recording(audio, name)
-    .then((buffer) => {
-      playing?.stop();
-      const source = audio.createBufferSource();
-      source.buffer = buffer;
-      source.connect(audio.destination);
-      source.start(0, from, to - from);
-      playing = source;
-    })
-    // A failed fetch or decode just stays silent: the learner can press again.
-    .catch(() => undefined);
+  return (
+    recording(audio, name)
+      .then(
+        (buffer) =>
+          new Promise<void>((done) => {
+            playing?.stop();
+            const source = audio.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audio.destination);
+            // Ended, or stopped by another press.
+            source.addEventListener('ended', () => done());
+            source.start(0, from, to - from);
+            playing = source;
+          }),
+      )
+      // A failed fetch or decode just stays silent: the learner can press again.
+      .catch(() => undefined)
+  );
+}
+
+/**
+ * The question's recording, fetched and decoded as the question appears (no sound yet, so no
+ * press needed), so the first press plays at once.
+ */
+function prepare(question: Question): void {
+  const name = recordingOf(question.item.w);
+  if (!name || decoded.has(name)) return;
+  // Decoding needs no running context; a suspended one is resumed by the first press.
+  context ??= new AudioContext();
+  recording(context, name).catch(() => undefined);
 }
 
 const CONFIG: QuizConfig = {
@@ -76,7 +95,7 @@ const CONFIG: QuizConfig = {
   groups: SOUNDS,
   perGroup: 2,
   options: SOUNDS,
-  listen: { label: soundLabel, play },
+  listen: { label: soundLabel, play, prepare },
   untimed: true,
   prompt: () => 'איך קוראים את זה?',
   // Not shown: the options are named by their place (listen.label).
