@@ -12,8 +12,12 @@ const GAP = 0.12;
 const SHORTEST = 0.08;
 /** Two syllables run together dip below this share of their loudest between them. */
 const DIP = 0.6;
-/** Played this much before and after a syllable (seconds), as far as halfway to the next. */
-const MARGIN = 0.12;
+/**
+ * Before the first syllable and after the last, played this much (seconds) beyond the loud part.
+ * Between two, the cut is at the quietest point of the gap: a soft start (a ב's voicing, an ע)
+ * is quieter than the loud part but louder than the silence.
+ */
+const EDGE = 0.3;
 
 type Span = [number, number];
 
@@ -63,13 +67,20 @@ export function syllables(
     found.splice(found.indexOf(longest), 1, [longest[0], quietest], [quietest + 1, longest[1]]);
   }
   if (found.length !== count) return undefined;
-  const end = loudness.length * frame;
-  return found.map(([from, to], i) => {
-    const before = i > 0 ? (found[i - 1]?.[1] ?? 0) * frame : 0;
-    const after = i < found.length - 1 ? (found[i + 1]?.[0] ?? 0) * frame : end;
-    return [
-      round(Math.max(from * frame - MARGIN, (before + from * frame) / 2)),
-      round(Math.min(to * frame + MARGIN, (to * frame + after) / 2)),
-    ];
-  });
+  /**
+   * Where to cut a gap from `from` up to `to`: the middle of its quietest frames (up to twice the
+   * quietest), so a silent gap is cut in its middle, not right after the syllable before it.
+   */
+  const cutIn = (from: number, to: number) => {
+    const gap = loudness.slice(from, to);
+    const floor = Math.min(...gap) * 2 + Number.EPSILON;
+    const quiet = gap.flatMap((value, i) => (value <= floor ? [from + i] : []));
+    return quiet[Math.floor(quiet.length / 2)] ?? from;
+  };
+  const edge = Math.round(EDGE / frame);
+  const cuts = found.slice(1).map(([next], i) => cutIn(found[i]?.[1] ?? next, next));
+  return found.map(([from, to], i) => [
+    round((cuts[i - 1] ?? Math.max(0, from - edge)) * frame),
+    round((cuts[i] ?? Math.min(loudness.length, to + edge)) * frame),
+  ]);
 }

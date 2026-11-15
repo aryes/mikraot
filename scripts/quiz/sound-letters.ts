@@ -9,6 +9,7 @@
  */
 import { chromium } from '@playwright/test';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { format } from 'prettier';
 import type { QuizItem, WordList } from '../../src/lib/quiz';
 import {
   RECORDINGS,
@@ -61,6 +62,10 @@ const list: WordList = {
   license: 'CC BY-NC-SA 4.0, https://creativecommons.org/licenses/by-nc-sa/4.0/',
   items,
 };
-writeFileSync('src/data/quiz/sound-times.json', `${JSON.stringify(times, null, 2)}\n`);
+// Formatted as the repository's check wants it.
+writeFileSync(
+  'src/data/quiz/sound-times.json',
+  await format(JSON.stringify(times), { parser: 'json' }),
+);
 writeFileSync('public/quiz/sound-letters.json', JSON.stringify(list));
 for (const sound of SOUNDS) console.log(sound, items[sound].length);
