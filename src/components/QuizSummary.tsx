@@ -79,15 +79,21 @@ export const QuizSummary: React.FC<{ quizzes: readonly QuizLink[] }> = ({ quizze
               {quiz &&
                 (played ? (
                   <>
-                    {/* The content's table style, as in the site's lessons. */}
-                    <div className="table-scroll my-2!">
+                    {/* The content's table style, as in the lessons; its scroll area named and
+                        reachable by keyboard like theirs (ContentTable.astro), its cells smaller
+                        than the quiz's name, and no wider than its four short columns need. */}
+                    <div
+                      className="table-scroll my-2! max-w-lg [&_td]:text-base! [&_th]:text-base!"
+                      tabIndex={0}
+                      aria-label={`התוצאות ב${title}`}
+                    >
                       <table>
                         <thead>
                           <tr>
                             <th scope="col">זמן לשאלה</th>
                             <th scope="col">סבבים</th>
-                            <th scope="col">נכונות</th>
-                            <th scope="col">הסבב הטוב</th>
+                            <th scope="col">תשובות נכונות</th>
+                            <th scope="col">שיא</th>
                           </tr>
                         </thead>
                         <tbody>

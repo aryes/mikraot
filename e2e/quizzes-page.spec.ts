@@ -1,3 +1,4 @@
+import { AxeBuilder } from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 const PAGE = `/${encodeURI('חידונים')}/`;
@@ -47,6 +48,18 @@ test('the quizzes page lists every quiz, with what this browser remembers of eac
   await expect(rows.nth(0).locator('td')).toHaveText(['5 שניות', '2', '75%', '9 מתוך 10']);
   await expect(rows.nth(1).locator('td')).toHaveText(['בלי הגבלה', '1', '70%', '7 מתוך 10']);
   await expect(tropes).toContainText('רמת הקושי: 3 מתוך 4');
+  // The tables appear only with results: checked here, in light and dark (accessibility.spec.ts
+  // sees the page without them).
+  /* oxlint-disable no-await-in-loop -- one colour scheme, then the other */
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme });
+    const results = await new AxeBuilder({ page })
+      .include('astro-island')
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+      .analyze();
+    expect(results.violations.map((v) => `${colorScheme} ${v.id}`)).toEqual([]);
+  } /* oxlint-enable no-await-in-loop */
+
   // A quiz whose options are fixed (two kinds) has no levels.
   const dagesh = list.locator(':scope > li').filter({ hasText: 'דגש חזק או קל' });
   await expect(dagesh.locator('tbody td')).toHaveText(['3 שניות', '1', '100%', '10 מתוך 10']);
