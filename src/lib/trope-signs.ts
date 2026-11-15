@@ -1,8 +1,10 @@
 /**
  * How each trope's sign is drawn on its own, without a word from the Torah: the answers of the
- * sign quiz (src/lib/sign-quiz.ts), and the questions of the trope quiz's one-letter level.
+ * sign quiz (src/components/SignQuiz.tsx), and the questions of the trope quiz's one-letter level.
  * מאילא has none: on one letter its sign is a טפחא's.
  */
+import type { QuizKind } from './quiz';
+import { LOOK_ALIKES, QUIZ_TROPES } from './trope-quiz';
 
 /**
  * Each trope's sign on an א; two words where it takes two (קדמא ואזלא). פשטא and the two תלישות
@@ -40,4 +42,15 @@ export const SIGNS: Readonly<Record<string, string>> = {
   'קדמא-זקף-קטן': 'א֨־א֔',
   'תלישא-קטנה': 'אא֩',
   'ירח-בן-יומו': 'א֪',
+};
+
+/** The trope quiz's tropes that have a sign here (all but מאילא). */
+export const SIGNED_TROPES = QUIZ_TROPES.filter((id) => id in SIGNS);
+
+/** Those tropes, with the trope quiz's look-alikes among them, for a quiz's options. */
+export const SIGN_KIND: QuizKind = {
+  ids: SIGNED_TROPES,
+  lookAlikes: LOOK_ALIKES.map((group) => group.filter((id) => id in SIGNS)).filter(
+    (group) => group.length > 1,
+  ),
 };

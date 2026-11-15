@@ -1,6 +1,5 @@
 import React from 'react';
-import { SIGN_QUIZ, SIGN_TROPES } from '../lib/sign-quiz';
-import { SIGNS } from '../lib/trope-signs';
+import { SIGN_KIND, SIGNED_TROPES, SIGNS } from '../lib/trope-signs';
 import { trope } from '../lib/tropes';
 import { Quiz, type QuizConfig } from './Quiz';
 import { Name } from './TropeQuiz';
@@ -11,13 +10,13 @@ const Sign: React.FC<{ id: string }> = ({ id }) => (
 );
 
 const CONFIG: QuizConfig = {
-  kind: SIGN_QUIZ,
+  kind: SIGN_KIND,
   wordList: '/quiz/trope-names.json',
   prepared: [],
   preparedCount: 0,
   storage: 'sign-quiz',
   event: 'sign-quiz',
-  groups: SIGN_TROPES,
+  groups: SIGNED_TROPES,
   fewest: 1,
   prompt: () => 'מה הסימן של הטעם?',
   // The name without its sign, which would give the answer away.
@@ -41,7 +40,11 @@ const CONFIG: QuizConfig = {
 };
 
 /**
- * The sign quiz (src/lib/sign-quiz.ts): rounds of ten trope names, four signs to choose from.
- * Shown on the page "מה הסימן?" through the Markdoc tag `sign-quiz`.
+ * The sign quiz ("מה הסימן?"; Arye, 2026-11-14: "find the trope sign given the trope name"): the
+ * trope quiz turned around, rounds of ten trope names, four signs to choose from, each on an א
+ * (SIGNS, src/lib/trope-signs.ts); with a קמץ for יתיב and מהפך, which sit on either side of it
+ * (Arye), and for their look-alikes (מונח, מונח לגרמיה, אתנחתא), so the vowel tells nothing. No
+ * מאילא: on one letter its sign is a טפחא's. Shown on the page "מה הסימן?" through the Markdoc tag
+ * `sign-quiz`.
  */
 export const SignQuiz: React.FC = () => <Quiz config={CONFIG} />;
