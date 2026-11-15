@@ -22,9 +22,9 @@ const CONFIG: QuizConfig = {
   letter: {
     groups: QUIZ_VOWELS,
     word: (question) => <span>{ON_ALEF[question.answer]}</span>,
-    // The answer's partner always among the options (Arye, 2026-11-15): מלא or חסר, גדולה or קטנה.
-    partners: VOWEL_PARTNERS,
   },
+  // The answer's partner always among the options (Arye, 2026-11-15): מלא or חסר, גדולה or קטנה.
+  partners: VOWEL_PARTNERS,
   event: 'niqqud-quiz',
   prompt: () => 'איזה ניקוד מסומן כאן?',
   name: (id) => pointedName(id),
