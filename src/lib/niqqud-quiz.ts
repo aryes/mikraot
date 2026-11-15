@@ -197,5 +197,31 @@ export function qamatsReason(group: string): string | undefined {
 
 export const QAMATS_QUIZ: QuizKind = { ids: QAMATS_KINDS, lookAlikes: [] };
 
+/**
+ * The "why" quiz ("למה הקמץ קטן?", src/components/QamatsWhyQuiz.tsx; Arye's idea of 2026-11-15):
+ * a קמץ קטן marked, which of the page's rules makes it קטן? The qamats quiz's list holds each
+ * word's rule, and any other that applies too (`x`, never offered as wrong). Each rule's name as
+ * an option, shortened from QATAN_REASONS.
+ */
+export const QATAN_RULES: Readonly<Record<string, string>> = {
+  'קטן-דגש': 'לפני דגש חזק',
+  'קטן-שווא': 'לפני שווא נח',
+  'קטן-מקף': 'לפני מקף',
+  'קטן-נחים': 'ו׳ בפתח ושני קמצים',
+};
+
+export const QATAN_GROUPS = Object.keys(QATAN_RULES);
+
+/** A round of ten: every rule, the two with few words in the Torah (7 and 17) twice. */
+export const QATAN_PER_GROUP: Readonly<Record<string, number>> = {
+  'קטן-דגש': 2,
+  'קטן-שווא': 3,
+  'קטן-מקף': 3,
+  'קטן-נחים': 2,
+};
+
+/** No look-alikes: rules aren't alike to the eye, and four options show them all anyway. */
+export const QAMATS_WHY_QUIZ: QuizKind = { ids: QATAN_GROUPS, lookAlikes: [] };
+
 /** The page on the קמץ קטן, which the feedback links to. */
 export const QAMATS_PAGE = '/קמץ-קטן/';

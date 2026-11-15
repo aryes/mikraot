@@ -24,4 +24,5 @@ export const QUIZ_STORAGE: Readonly<Record<string, QuizEntry>> = {
   '/דגש-חזק-או-קל/': { storage: 'dagesh-quiz', levels: false },
   '/שווא-נע-או-נח/': { storage: 'shva-quiz', levels: false },
   '/למה-השווא-נע/': { storage: 'shva-why-quiz', levels: true },
+  '/למה-הקמץ-קטן/': { storage: 'qamats-why-quiz', levels: false },
 };
