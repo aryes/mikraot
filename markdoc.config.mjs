@@ -113,6 +113,11 @@ export default defineMarkdocConfig({
       render: component('./src/components/content/DageshQuiz.astro'),
       selfClosing: true,
     },
+    // Every quiz, with the learner's results (src/components/QuizSummary.tsx), on "חידונים".
+    'quiz-summary': {
+      render: component('./src/components/content/QuizSummary.astro'),
+      selfClosing: true,
+    },
     // A nested list of links shown as rows of choices (book, then parasha, then reading).
     picker: {
       render: component('./src/components/content/ListPicker.astro'),

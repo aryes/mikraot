@@ -1,0 +1,21 @@
+---
+/**
+ * The content tag `{% quiz-summary /%}`: every quiz in the menu under "חידונים", with what this
+ * browser remembers of each (QuizSummary.tsx).
+ */
+import menu from '../../data/menu.json';
+import { QUIZ_STORAGE, QUIZZES_PAGE } from '../../lib/quizzes';
+import type { MenuEntry } from '../../types';
+import { QuizSummary, type QuizLink } from '../QuizSummary';
+
+const quizzes: QuizLink[] = (
+  (menu.items as readonly MenuEntry[]).find((entry) => entry.title === 'חידונים')?.children ?? []
+).flatMap(({ title, url }) => {
+  const entry = url && url !== QUIZZES_PAGE ? QUIZ_STORAGE[url] : undefined;
+  return url && entry ? [{ title, url, ...entry }] : [];
+});
+---
+
+<div class="my-6">
+  <QuizSummary quizzes={quizzes} client:visible />
+</div>
