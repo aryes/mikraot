@@ -63,6 +63,11 @@
   - Given a trope's name, choose its sign: the trope quiz turned around (the name is the question, the options are signs).
   - Given a trope's sound, choose the trope: needs a short recording of each trope in each נוסח (cut from the trope-song recordings and checked by Arye, or new ones).
   - A letter with a vowel, choose its sound from five (A, E, I, O, U: vowels that sound alike, such as קמץ, פתח and חטף פתח, share an answer). On א, the niqqud table's five vowel recordings; for the other letters, the מבטא page's recordings cut into one per vowel (Arye; their consonants are the page's original pronunciation). Checked 2026-11-15: each of them holds five syllables, about 0.7 seconds apart, so each can be played from its file by its time (no cutting); Arye to confirm by ear that they are A, E, I, O, U in that order. The vowels as the table says them, not the Ashkenazi way (Arye). Not the קמץ קטן (it looks like a קמץ) or the שווא (נע or נח). Each option needs a button to listen and one to choose.
+- [ ] Quiz ideas of 2026-11-15 (Arye):
+  - Why is this שווא נע? A word with a שווא נע marked; choose its rule from the page's five (אבגד״ה). The shva quiz's list already holds each one's rule.
+  - Why is this קמץ קטן? The same for the קמץ קטן's rules (the qamats quiz's list holds them too).
+  - The sign quiz with real words from the Torah as the answers, not signs on an א.
+  - (Claude, from a review) In a duel joined before the word list has loaded, the saved time limit could replace the duel's; check when the duels are next touched.
 - [x] Servant quiz "איזה משרת?" (Arye, 2026-11-11): two words from the Torah, the first without its servant's sign; which servant goes before the disjunctive on the second? Servants also usual before that disjunctive are never offered as wrong. Most answers are מונח or מרכא, as in the text itself.
 - [ ] Quizzes, later (Arye, 2026-11-05): a quiz on trope sequences (e.g. מונח זקף קטן). They live in a top-level menu of their own, "חידונים" (Arye, 2026-11-09).
 - [x] Trope quiz difficulty levels (Arye, 2026-11-08): e.g. a time limit per question, and a level with the rare tropes. Done 2026-11-10: a time limit for each question, chosen at the start for the whole quiz: none, 15, 10 or 5 seconds; 10, 5 or 3 since 2026-11-15 (Arye: time only, for now; rare tropes perhaps later).
