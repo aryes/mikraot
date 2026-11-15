@@ -26,9 +26,9 @@ export const QuizStatsPanel: React.FC<{
       className="mx-auto max-w-md space-y-1 rounded-xl bg-slate-50 p-4 text-sm dark:bg-slate-800/60"
     >
       {/* Important: the content's heading and list styles (.wp-content-rendered) would win. */}
-      <h3 id={title} className="m-0! text-sm! font-bold text-inherit!">
+      <h2 id={title} className="m-0! text-sm! font-bold text-inherit!">
         הנתונים שלכם
-      </h3>
+      </h2>
       <ul className="m-0! list-none! space-y-0.5 p-0! [&>li]:m-0! [&>li]:text-sm! [&>li]:leading-normal!">
         <li>סבבים שהושלמו: {stats.rounds}</li>
         <li>תשובות נכונות: {share}%</li>

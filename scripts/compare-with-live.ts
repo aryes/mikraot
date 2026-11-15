@@ -121,6 +121,8 @@ const NEW_HERE = new Set([
   '/שווא-נע-או-נח/',
   // The sign quiz (2026-11-15).
   '/סימן-הטעם/',
+  // The page of all the quizzes (2026-11-15).
+  '/חידונים/',
   // All the licences and credits on one page (2026-11-07).
   '/terms/',
 ]);

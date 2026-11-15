@@ -160,6 +160,11 @@ const content = fields.markdoc({
       icon: <SquareCheck />,
       schema: {},
     }),
+    'quiz-summary': block({
+      label: 'כל החידונים והתוצאות',
+      icon: <SquareCheck />,
+      schema: {},
+    }),
     picker: wrapper({
       label: 'בורר (רשימה מקוננת)',
       icon: <ListTree />,
