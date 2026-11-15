@@ -126,8 +126,12 @@ export const cleanName = (name: string): string =>
 /** A question's word as the quiz draws it, rebuilt from only the fields it knows. */
 function itemOf(value: unknown): QuizItem | null {
   if (!value || typeof value !== 'object') return null;
-  const [w, m, h, p] = ['w', 'm', 'h', 'p'].map((name): unknown => Reflect.get(value, name));
+  const [w, m, h, p, o] = ['w', 'm', 'h', 'p', 'o'].map((name): unknown =>
+    Reflect.get(value, name),
+  );
   if (!isString(w, 200)) return null;
+  // The marked letters as written, shown once answered (the servant quiz puts its sign back).
+  if (o !== undefined && !isString(o, 200)) return null;
   if (m !== undefined && !isInteger(m)) return null;
   if (h !== undefined && !(Array.isArray(h) && h.length === 2 && h.every(isInteger))) return null;
   if (p !== undefined && typeof p !== 'boolean') return null;
@@ -136,6 +140,7 @@ function itemOf(value: unknown): QuizItem | null {
     ...(m !== undefined && { m }),
     ...(Array.isArray(h) && { h: h.filter(isInteger) }),
     ...(p !== undefined && { p }),
+    ...(o !== undefined && { o }),
   };
 }
 
