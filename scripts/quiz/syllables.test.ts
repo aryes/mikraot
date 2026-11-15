@@ -44,6 +44,21 @@ describe('syllables', () => {
     expect(found?.[1]?.[0]).toBeLessThanOrEqual(0.95);
   });
 
+  it('cuts noisy silence, as in a real recording, in the middle of its quietest part', () => {
+    const found = syllables(
+      loudness([0.001, 50], [1, 30], [0.0015, 20], [0.001, 20], [0.0015, 20], [1, 30], [0.001, 50]),
+      0.01,
+      2,
+    );
+    // The two share their cut: nothing skipped, nothing heard twice.
+    expect(found?.[0]?.[1]).toBe(found?.[1]?.[0]);
+    expect(found?.[0]?.[1]).toBeGreaterThan(1);
+    expect(found?.[0]?.[1]).toBeLessThan(1.4);
+    // And the first and last keep 0.3 s around them, within the recording.
+    expect(found?.[0]?.[0]).toBeCloseTo(0.2);
+    expect(found?.[1]?.[1]).toBeCloseTo(2);
+  });
+
   it('says so when a recording holds fewer syllables than asked', () => {
     expect(syllables(loudness([0, 50], [1, 30], [0, 50]), 0.01, 2)).toBeUndefined();
   });

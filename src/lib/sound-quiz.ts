@@ -51,7 +51,7 @@ export function soundForms(letter: string): Record<Sound, string[]> {
     e: [with_(TSERE), with_(SEGOL), ...(guttural ? [with_(HATAF_SEGOL)] : [])],
     i: [with_(HIRIQ), with_(HIRIQ) + YOD],
     // A ו with a חולם or a שורוק alone (וֹ, וּ) reads as the vowel without the ו: it takes them
-    // as a vowel letter after it (ווֹ, ווּ).
+    // as a vowel letter after it (ווֹ, ווּ). No קבוץ under a ו (וֻ): it is hardly ever written.
     o: vav
       ? [base + VAV + HOLAM]
       : [with_(HOLAM), base + VAV + HOLAM, ...(guttural ? [with_(HATAF_QAMATS)] : [])],
