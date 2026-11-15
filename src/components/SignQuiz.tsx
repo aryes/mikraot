@@ -64,7 +64,7 @@ const TropeWord: React.FC<{ id: string; seed: string }> = ({ id, seed }) => {
       (list.items[id] ?? []).map((item) => item.w),
       seed,
     );
-  return <span className="text-3xl leading-[1.6]">{word ?? '…'}</span>;
+  return <span className="text-2xl leading-[1.6]">{word ?? '…'}</span>;
 };
 
 const wordOf = (id: string, question: Question) => (
