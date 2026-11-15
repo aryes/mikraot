@@ -108,6 +108,11 @@ export default defineMarkdocConfig({
       render: component('./src/components/content/ServantQuiz.astro'),
       selfClosing: true,
     },
+    // The sound quiz (src/components/SoundQuiz.tsx), on the page "איך זה נשמע?".
+    'sound-quiz': {
+      render: component('./src/components/content/SoundQuiz.astro'),
+      selfClosing: true,
+    },
     // The dagesh quiz (src/components/DageshQuiz.tsx), on the page "דגש חזק או קל?".
     'dagesh-quiz': {
       render: component('./src/components/content/DageshQuiz.astro'),

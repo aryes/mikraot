@@ -18,6 +18,7 @@ export const QUIZ_STORAGE: Readonly<Record<string, QuizEntry>> = {
   '/זיהוי-טעמים/': { storage: 'trope-quiz', levels: true },
   '/סימן-הטעם/': { storage: 'sign-quiz', levels: true },
   '/זיהוי-ניקוד/': { storage: 'niqqud-quiz', levels: true },
+  '/איך-זה-נשמע/': { storage: 'sound-quiz', levels: false },
   '/סוג-התנועה/': { storage: 'vowel-class-quiz', levels: false },
   '/קמץ-גדול-או-קטן/': { storage: 'qamats-quiz', levels: false },
   '/זיהוי-משרתים/': { storage: 'servant-quiz', levels: true },
