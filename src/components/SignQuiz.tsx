@@ -1,5 +1,6 @@
 import React from 'react';
-import { SIGN_QUIZ, SIGN_TROPES, SIGNS } from '../lib/sign-quiz';
+import { SIGN_QUIZ, SIGN_TROPES } from '../lib/sign-quiz';
+import { SIGNS } from '../lib/trope-signs';
 import { trope } from '../lib/tropes';
 import { Quiz, type QuizConfig } from './Quiz';
 import { Name } from './TropeQuiz';
