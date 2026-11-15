@@ -136,6 +136,26 @@ describe('parseMove', () => {
     expect(parseMove(JSON.stringify({ t: 'round', round: extra }))).toEqual({ t: 'round', round });
   });
 
+  it('keeps the marked letters as written, which the servant quiz shows once answered', () => {
+    const withSign = {
+      ...round,
+      questions: round.questions.map((q) => ({
+        ...q,
+        question: { ...q.question, item: { ...q.question.item, h: [0, 2], o: 'וְאֵ֥ת' } },
+      })),
+    };
+    expect(parseMove(JSON.stringify({ t: 'round', round: withSign }))).toEqual({
+      t: 'round',
+      round: withSign,
+    });
+    const [first] = round.questions;
+    const broken = {
+      ...round,
+      questions: [{ ...first, question: { ...first?.question, item: { w: 'א', o: 5 } } }],
+    };
+    expect(parseMove(JSON.stringify({ t: 'round', round: broken }))).toBeNull();
+  });
+
   it('refuses anything else', () => {
     const [first] = round.questions;
     const broken = (change: object) =>
