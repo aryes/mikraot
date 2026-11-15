@@ -119,6 +119,12 @@ export default defineMarkdocConfig({
       render: component('./src/components/content/ShvaWhyQuiz.astro'),
       selfClosing: true,
     },
+    // The "why" qamats quiz (src/components/QamatsWhyQuiz.tsx), on the page "למה הקמץ קטן?" (a
+    // tag name has at most one hyphen).
+    'qamats-why': {
+      render: component('./src/components/content/QamatsWhyQuiz.astro'),
+      selfClosing: true,
+    },
     // The shva quiz (src/components/ShvaQuiz.tsx), on the page "שווא נע או נח?".
     'shva-quiz': {
       render: component('./src/components/content/ShvaQuiz.astro'),

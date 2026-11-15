@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   markedWord,
+  qatanRules,
   verseNiqqudItems,
   verseQamatsItems,
   withoutTeamim,
@@ -115,5 +116,18 @@ describe('markedWord', () => {
   it('makes one question of a marked word, whatever the chain around it', () => {
     expect(markedWord(item('כָּל־נֶפֶשׁ', 3))).toBe(markedWord(item('כָּל־אֲשֶׁר', 3)));
     expect(markedWord({ w: 'אֶת־קָרְבַּן', h: [4, 6] })).toBe('[קָ]רְבַּן');
+  });
+});
+
+describe('qatanRules', () => {
+  it('names every rule that makes a קמץ קטן one, its own rule first', () => {
+    // מְלָךְ־מֶלֶךְ: before a maqaf, and before a word-final שווא נח.
+    const word = 'מְלׇךְ־מֶלֶךְ';
+    const start = word.indexOf('ל');
+    expect(qatanRules({ w: word, h: [start, start + 2] })).toEqual(['קטן-מקף', 'קטן-שווא']);
+    // בְעָזְּךָ: before a doubled letter, whose shva is נע: only the dagesh.
+    const doubled = 'בְעׇזְּךָ';
+    const at = doubled.indexOf('ע');
+    expect(qatanRules({ w: doubled, h: [at, at + 2] })).toEqual(['קטן-דגש']);
   });
 });
