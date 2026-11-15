@@ -4,14 +4,14 @@
  * browser remembers of each (QuizSummary.tsx).
  */
 import menu from '../../data/menu.json';
-import { QUIZ_STORAGE, QUIZZES_PAGE } from '../../lib/quizzes';
+import { QUIZ_STORAGE } from '../../lib/quizzes';
 import type { MenuEntry } from '../../types';
 import { QuizSummary, type QuizLink } from '../QuizSummary';
 
 const quizzes: QuizLink[] = (
   (menu.items as readonly MenuEntry[]).find((entry) => entry.title === 'חידונים')?.children ?? []
 ).flatMap(({ title, url }) => {
-  const entry = url && url !== QUIZZES_PAGE ? QUIZ_STORAGE[url] : undefined;
+  const entry = url ? QUIZ_STORAGE[url] : undefined;
   return url && entry ? [{ title, url, ...entry }] : [];
 });
 ---

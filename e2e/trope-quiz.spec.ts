@@ -96,6 +96,11 @@ test('the trope quiz runs a round of ten tropes, tells each answer, ranks the sc
   expect(recent).toHaveLength(10);
   // Keys are trope|word: no trope twice in a round.
   expect(new Set(recent.map((key: string) => key.split('|')[0])).size).toBe(10);
+  // The round counts under its time limit too (none here), for the page of all the quizzes.
+  const saved = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('trope-quiz-stats') ?? '{}'),
+  );
+  expect(saved.byLimit).toEqual({ none: expect.objectContaining({ rounds: 1, asked: 10 }) });
   await quiz.getByRole('button', { name: 'סבב נוסף' }).click();
   await expect(quiz).toContainText('שאלה 1 מתוך 10');
   // Back to the start at any point, to choose again or to stop.
