@@ -92,7 +92,7 @@ function vowelBefore(
 }
 
 /**
- * The rule of the page "שווא נע" that settles a letter's shva (SHVA_REASONS in
+ * The rule of the page "שווא נע" that settles a letter's shva (NA_REASONS in
  * src/lib/shva-quiz.ts), in the page's order (אבגד״ה), then the shva נח: after a short vowel, or
  * on the word's last letter. None where the page's rules don't settle it: a short vowel with a
  * meteg before it (וַֽיְהִי, read נע by many), a קמץ גדול without one (הָיְתָה, read נח by many),

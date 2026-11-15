@@ -27,7 +27,7 @@ const CONFIG: QuizConfig = {
   // In the feedback only "נע" or "נח", after "השווא כאן:".
   name: (id, _question, option) => (option ? vowelName(id) : vowelName(id).replace('שווא ', '')),
   answerIs: 'השווא כאן:',
-  // Its rule, after every answer: "למה נע? בראש מילה."
+  // A שווא נע's rule, after the answer: "למה נע? בראש מילה." None for a שווא נח (the default).
   explain: (question) => shvaReason(question.group),
   // The link takes the content's link style (.wp-content-rendered a).
   more: () => <a href={encodeURI(SHVA_PAGE)}>לדף על שווא נע</a>,

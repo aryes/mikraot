@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { NACH_REASONS, NA_REASONS } from '../src/lib/shva-quiz';
+import { NA_REASONS } from '../src/lib/shva-quiz';
 import { CHEERS, MISSES, NEAR_MISSES } from '../src/lib/quiz';
 
 const QUIZ = `/${encodeURI('שווא-נע-או-נח')}/`;
 
-test('the shva quiz runs a round of ten, five of each kind, every rule explained', async ({
+test('the shva quiz runs a round of ten, five of each kind, every rule of a שווא נע explained', async ({
   page,
 }) => {
   await page.goto(QUIZ);
@@ -14,7 +14,7 @@ test('the shva quiz runs a round of ten, five of each kind, every rule explained
   const options = quiz.locator('.grid button');
   const next = quiz.getByRole('button', { name: /לשאלה הבאה|לתוצאה/ });
   const reasons = new Set<string>();
-  const all = [...Object.values(NA_REASONS), ...Object.values(NACH_REASONS)];
+  const all = Object.values(NA_REASONS);
 
   /* oxlint-disable no-await-in-loop -- one question after another */
   for (let i = 1; i <= 10; i++) {
@@ -27,9 +27,10 @@ test('the shva quiz runs a round of ten, five of each kind, every rule explained
     const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
     const [opening = '', rest] = feedback.split(' השווא כאן: ');
     expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
-    // The feedback says why: the rule of the page that settles the shva.
+    // The feedback says why a שווא is נע (the page's rule), and nothing for a שווא נח.
     for (const line of await quiz.locator('[aria-live] p').allInnerTexts()) {
-      const reason = line.trim().replace(/^למה (נע|נח)\? /u, '');
+      expect(line).not.toContain('למה נח');
+      const reason = line.trim().replace(/^למה נע\? /u, '');
       if (all.includes(reason)) reasons.add(reason);
     }
     await expect(quiz.getByRole('link', { name: 'לדף על שווא נע' })).toHaveAttribute(
