@@ -1,5 +1,12 @@
 import React from 'react';
-import { NIQQUD_PAGE, NIQQUD_QUIZ, QUIZ_VOWELS, pointedName } from '../lib/niqqud-quiz';
+import {
+  NIQQUD_PAGE,
+  NIQQUD_QUIZ,
+  ON_ALEF,
+  QUIZ_VOWELS,
+  VOWEL_PARTNERS,
+  pointedName,
+} from '../lib/niqqud-quiz';
 import { Quiz, type QuizConfig } from './Quiz';
 
 const CONFIG: QuizConfig = {
@@ -11,6 +18,13 @@ const CONFIG: QuizConfig = {
   storage: 'niqqud-quiz',
   // Not the word list's קמץ קטן, which only the vowel-class quiz asks about: its sign is a קמץ's.
   groups: QUIZ_VOWELS,
+  // The easier level: the vowel alone, on an א (Arye, 2026-11-14).
+  letter: {
+    groups: QUIZ_VOWELS,
+    word: (question) => <span>{ON_ALEF[question.answer]}</span>,
+    // The answer's partner always among the options (Arye, 2026-11-15): מלא or חסר, גדולה or קטנה.
+    partners: VOWEL_PARTNERS,
+  },
   event: 'niqqud-quiz',
   prompt: () => 'איזה ניקוד מסומן כאן?',
   name: (id) => pointedName(id),
