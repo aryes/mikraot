@@ -41,16 +41,15 @@ test('the quizzes page lists every quiz, with what this browser remembers of eac
   const list = page.locator('astro-island ul').first();
   await list.scrollIntoViewIfNeeded();
   const tropes = list.locator(':scope > li').filter({ hasText: 'זיהוי טעמים' });
-  // Each time limit played, on a line of its own (Arye, 2026-11-15).
-  const lines = tropes.locator('li');
-  await expect(lines).toHaveText([
-    '5 שניות לשאלה: סבבים שהושלמו: 2 · תשובות נכונות: 75% · הסבב הטוב ביותר: 9 מתוך 10',
-    'בלי הגבלת זמן: סבבים שהושלמו: 1 · תשובות נכונות: 70% · הסבב הטוב ביותר: 7 מתוך 10',
-    'רמת הקושי: 3 מתוך 4',
-  ]);
+  // Each time limit played, a row of its own (Arye, 2026-11-15), and the options' level.
+  const rows = tropes.locator('tbody tr');
+  await expect(rows).toHaveCount(2);
+  await expect(rows.nth(0).locator('td')).toHaveText(['5 שניות', '2', '75%', '9 מתוך 10']);
+  await expect(rows.nth(1).locator('td')).toHaveText(['בלי הגבלה', '1', '70%', '7 מתוך 10']);
+  await expect(tropes).toContainText('רמת הקושי: 3 מתוך 4');
   // A quiz whose options are fixed (two kinds) has no levels.
   const dagesh = list.locator(':scope > li').filter({ hasText: 'דגש חזק או קל' });
-  await expect(dagesh).toContainText('3 שניות לשאלה: סבבים שהושלמו: 1 · תשובות נכונות: 100%');
+  await expect(dagesh.locator('tbody td')).toHaveText(['3 שניות', '1', '100%', '10 מתוך 10']);
   await expect(dagesh).not.toContainText('רמת הקושי');
   // A quiz not played yet: its link, and no results.
   const niqqud = list.locator(':scope > li').filter({ hasText: 'זיהוי ניקוד' });
