@@ -153,7 +153,8 @@ function questionOf(value: unknown): DuelQuestion | null {
     !item ||
     !Array.isArray(options) ||
     options.length < 2 ||
-    options.length > 4 ||
+    // Four at most, five in the sound quiz (its five sounds).
+    options.length > 5 ||
     !options.every((option) => isString(option, 40)) ||
     !isString(answer, 40) ||
     !options.includes(answer) ||

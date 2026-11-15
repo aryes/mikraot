@@ -145,6 +145,11 @@ const content = fields.markdoc({
       icon: <SquareCheck />,
       schema: {},
     }),
+    'sound-quiz': block({
+      label: 'חידון איך זה נשמע',
+      icon: <SquareCheck />,
+      schema: {},
+    }),
     'dagesh-quiz': block({
       label: 'חידון דגש חזק או קל',
       icon: <SquareCheck />,

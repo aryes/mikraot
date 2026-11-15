@@ -1,0 +1,11 @@
+---
+/** The content tag `{% sound-quiz /%}`: the sound quiz, run in the browser (SoundQuiz.tsx). */
+import { SoundQuiz } from '../SoundQuiz';
+---
+
+<div class="my-6">
+  <SoundQuiz client:visible />
+  <noscript>
+    <p>החידון פועל רק כש־JavaScript מופעל בדפדפן.</p>
+  </noscript>
+</div>
