@@ -131,8 +131,11 @@ export function nextLevel(
 const keyOf = (answer: string, item: QuizItem) =>
   item.h ? `${answer}|${item.w}|${item.h.join('-')}` : `${answer}|${item.w}`;
 
-/** The time limits a learner can choose for each question, in seconds (Arye, 2026-11-10). */
-export const TIME_LIMITS = [15, 10, 5] as const;
+/**
+ * The time limits a learner can choose for each question, in seconds (Arye, 2026-11-10; 10, 5 and 3
+ * since 2026-11-15, Arye: 15 was too easy).
+ */
+export const TIME_LIMITS = [10, 5, 3] as const;
 
 /**
  * A round: `preparedCount` prepared questions and the rest random, in random order, none asked

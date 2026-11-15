@@ -224,17 +224,19 @@ const RING_LENGTH = 2 * Math.PI * RING_RADIUS;
 
 /**
  * The clock of a timed question (Arye, 2026-11-10): a ring that empties as the time runs out,
- * with the seconds left inside it, red for the last three; no clock icon (Arye: the ring says
+ * with the seconds left inside it, red for the last three (two, with a limit of three); no clock icon (Arye: the ring says
  * it). Drawn here, not with react-countdown-circle-timer, which Arye pointed to: that package has
  * had no release since March 2023, and would add its own animation loop beside the quiz's clock,
  * for a ring that takes a few lines of SVG.
  */
-const Countdown: React.FC<{ left: number; share: number; hidden: boolean }> = ({
+const Countdown: React.FC<{ left: number; seconds: number; share: number; hidden: boolean }> = ({
   left,
+  seconds,
   share,
   hidden,
 }) => {
-  const urgent = left <= 3;
+  // Red for the last three seconds; with a limit of three, for the last two.
+  const urgent = left <= Math.min(3, seconds - 1);
   return (
     // Not read aloud each second: the time limit was chosen, and is shown. Hidden, not removed,
     // once answered, so the row keeps its height and the word doesn't move.
@@ -399,7 +401,12 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         const savedLimit = stored(keysOf(config).time);
         setList(data);
         setProgress({ level, streak: 0 });
-        setLimit(TIME_LIMITS.find((value) => value === savedLimit) ?? null);
+        // A limit no longer offered (15, before 2026-11-15) becomes the longest one.
+        setLimit(
+          typeof savedLimit === 'number'
+            ? (TIME_LIMITS.find((value) => value === savedLimit) ?? TIME_LIMITS[0])
+            : null,
+        );
         setRound(newRound(config, data, level));
       })
       .catch(() => setFailed(true));
@@ -634,6 +641,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
           {limit !== null && (
             <Countdown
               left={left}
+              seconds={seconds}
               share={Math.max(0, Math.min(1, (deadline - now) / (seconds * 1000)))}
               hidden={chosen !== null}
             />
