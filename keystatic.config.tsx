@@ -150,6 +150,11 @@ const content = fields.markdoc({
       icon: <SquareCheck />,
       schema: {},
     }),
+    'shva-why': block({
+      label: 'חידון למה השווא נע',
+      icon: <SquareCheck />,
+      schema: {},
+    }),
     'shva-quiz': block({
       label: 'חידון שווא נע או נח',
       icon: <SquareCheck />,

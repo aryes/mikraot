@@ -113,6 +113,12 @@ export default defineMarkdocConfig({
       render: component('./src/components/content/DageshQuiz.astro'),
       selfClosing: true,
     },
+    // The "why" shva quiz (src/components/ShvaWhyQuiz.tsx), on the page "למה השווא נע?" (a tag
+    // name has at most one hyphen).
+    'shva-why': {
+      render: component('./src/components/content/ShvaWhyQuiz.astro'),
+      selfClosing: true,
+    },
     // The shva quiz (src/components/ShvaQuiz.tsx), on the page "שווא נע או נח?".
     'shva-quiz': {
       render: component('./src/components/content/ShvaQuiz.astro'),
