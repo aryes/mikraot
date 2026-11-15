@@ -115,6 +115,8 @@ const NEW_HERE = new Set([
   '/קמץ-גדול-או-קטן/',
   // The servant quiz (2026-11-11).
   '/זיהוי-משרתים/',
+  // The sound quiz (2026-11-15).
+  '/איך-זה-נשמע/',
   // The dagesh quiz (2026-11-15).
   '/דגש-חזק-או-קל/',
   // The shva quiz (2026-11-15).

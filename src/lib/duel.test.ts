@@ -136,6 +136,19 @@ describe('parseMove', () => {
     expect(parseMove(JSON.stringify({ t: 'round', round: extra }))).toEqual({ t: 'round', round });
   });
 
+  it('takes five options (the sound quiz: its five sounds), and no more', () => {
+    const [first] = round.questions;
+    const sounds = ['a', 'e', 'i', 'o', 'u'];
+    const withOptions = (options: string[]) => ({
+      ...round,
+      questions: [{ ...first, question: { ...first?.question, answer: 'a' }, options }],
+    });
+    expect(parseMove(JSON.stringify({ t: 'round', round: withOptions(sounds) }))).not.toBeNull();
+    expect(
+      parseMove(JSON.stringify({ t: 'round', round: withOptions([...sounds, 'y']) })),
+    ).toBeNull();
+  });
+
   it('refuses anything else', () => {
     const [first] = round.questions;
     const broken = (change: object) =>
