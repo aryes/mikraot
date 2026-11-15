@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import names from '../../public/quiz/trope-names.json';
-import { SIGN_QUIZ, SIGN_TROPES, SIGNS } from './sign-quiz';
+import { SIGN_QUIZ, SIGN_TROPES } from './sign-quiz';
+import { SIGNS } from './trope-signs';
 import { QUIZ_TROPES } from './trope-quiz';
 
 describe('the sign quiz', () => {
