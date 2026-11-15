@@ -66,7 +66,7 @@ const EACH_ON_ALEF: Readonly<Record<(typeof QUIZ_VOWELS)[number], string>> = {
 export const ON_ALEF: Readonly<Record<string, string>> = EACH_ON_ALEF;
 
 /**
- * Each vowel's partner, always among the options on one letter (Arye, 2026-11-15): חיריק and חולם
+ * Each vowel's partner, always among the options, on words and on one letter (Arye, 2026-11-15): חיריק and חולם
  * מלא and חסר, and the גדולה and קטנה of the niqqud table's rows (קמץ and פתח, צירה and סגול, שורוק
  * and קבוץ). The חטפים and the שווא have none.
  */

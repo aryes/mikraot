@@ -68,9 +68,12 @@ export interface QuizConfig {
     word: (question: Question) => ReactNode;
     groups: readonly string[];
     kind?: QuizKind;
-    /** An answer's partner, always among its options (the niqqud quiz: מלא and חסר, גדולה and קטנה). */
-    partners?: Readonly<Record<string, string>>;
   };
+  /**
+   * An answer's partner, always among its options, on words and on one letter alike (the niqqud
+   * quiz: מלא and חסר, גדולה and קטנה; Arye, 2026-11-15).
+   */
+  partners?: Readonly<Record<string, string>>;
   /**
    * The same options, in this order, for every question (a quiz with few answers); its level,
    * which only chooses options, then changes nothing.
@@ -359,13 +362,13 @@ const optionsFor = (
       ? shuffle(question.options)
       : config.options
         ? [...config.options]
-        : letter && config.letter
-          ? withPartner(
-              chooseOptions(config.letter.kind ?? config.kind, question.answer, level),
-              question.answer,
-              config.letter.partners?.[question.answer],
-            )
-          : chooseOptions(config.kind, question.answer, level, Math.random, question.item.x);
+        : withPartner(
+            letter && config.letter
+              ? chooseOptions(config.letter.kind ?? config.kind, question.answer, level)
+              : chooseOptions(config.kind, question.answer, level, Math.random, question.item.x),
+            question.answer,
+            config.partners?.[question.answer],
+          );
 
 /** A round of these questions, at its start (its options set by the caller). */
 const newRoundOf = (questions: Question[]): Round => ({
