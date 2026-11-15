@@ -8,9 +8,7 @@ const quizzes = (menu.items as readonly MenuEntry[]).find((entry) => entry.title
 
 describe('the quizzes page', () => {
   it('knows every quiz in the menu, by the storage name its component uses', () => {
-    const urls = (quizzes?.children ?? [])
-      .map((entry) => entry.url)
-      .filter((url) => url !== QUIZZES_PAGE);
+    const urls = (quizzes?.children ?? []).map((entry) => entry.url);
     expect(new Set(urls)).toEqual(new Set(Object.keys(QUIZ_STORAGE)));
     // Each quiz component: its storage name, and whether it fixes its options (then no levels).
     const components = readdirSync('src/components')
@@ -27,7 +25,7 @@ describe('the quizzes page', () => {
     );
   });
 
-  it('comes first in the menu under "חידונים"', () => {
-    expect(quizzes?.children?.[0]?.url).toBe(QUIZZES_PAGE);
+  it('is the page of the menu entry "חידונים" itself', () => {
+    expect(quizzes?.url).toBe(QUIZZES_PAGE);
   });
 });

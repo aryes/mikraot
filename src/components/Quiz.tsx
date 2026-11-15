@@ -561,7 +561,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       run: correct ? round.run + 1 : 0,
       cheer: cheer(config.kind, question.answer, id),
     });
-    saveStats((current) => recordAnswer(current, question.answer, correct));
+    saveStats((current) => recordAnswer(current, question.answer, correct, limit));
     if (inDuel) duel.answer(round.index, id);
     const updated = nextLevel(progress.level, progress.streak, correct);
     setProgress(updated);
@@ -600,7 +600,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         ...(config.letter && { letter: letter && !inDuel ? 'yes' : 'no' }),
       });
       if (round.score === round.questions.length) celebrate();
-      saveStats((current) => recordRound(current, round.score));
+      saveStats((current) => recordRound(current, round.score, limit));
     }
     setRound({
       ...round,
