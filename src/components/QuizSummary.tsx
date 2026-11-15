@@ -28,18 +28,15 @@ function remembered(storage: string): Remembered {
   };
 }
 
-/** One time limit's results, on a line of their own (Arye, 2026-11-15). */
+/** One time limit's results, a row of the quiz's table (Arye, 2026-11-15). */
 const LimitResults: React.FC<{ limitKey: string; tally: Tally }> = ({ limitKey, tally }) => (
-  <li>
-    <span className="font-bold">
-      {limitKey === 'none' ? 'בלי הגבלת זמן' : `${limitKey} שניות לשאלה`}:
-    </span>{' '}
-    סבבים שהושלמו: {tally.rounds} · תשובות נכונות: {Math.round((100 * tally.right) / tally.asked)}%
-    {tally.rounds > 0 && (
-      // Rounds are of ten (buildRound in src/lib/quiz.ts).
-      <> · הסבב הטוב ביותר: {Math.min(tally.best, 10)} מתוך 10</>
-    )}
-  </li>
+  <tr>
+    <td>{limitKey === 'none' ? 'בלי הגבלה' : `${limitKey} שניות`}</td>
+    <td>{tally.rounds}</td>
+    <td>{Math.round((100 * tally.right) / tally.asked)}%</td>
+    {/* Rounds are of ten (buildRound in src/lib/quiz.ts). */}
+    <td>{tally.rounds > 0 ? `${Math.min(tally.best, 10)} מתוך 10` : '–'}</td>
+  </tr>
 );
 
 /** Storage changed in another tab. */
@@ -81,19 +78,34 @@ export const QuizSummary: React.FC<{ quizzes: readonly QuizLink[] }> = ({ quizze
               </a>
               {quiz &&
                 (played ? (
-                  <ul className="m-0! mt-1! list-none! space-y-0.5 border-0! p-0! [&>li]:m-0! [&>li]:text-sm! [&>li]:leading-normal!">
-                    {LIMIT_KEYS.map((key) => {
-                      const tally = quiz.stats.byLimit[key];
-                      return tally && tally.asked > 0 ? (
-                        <LimitResults key={key} limitKey={key} tally={tally} />
-                      ) : null;
-                    })}
+                  <>
+                    {/* The content's table style, as in the site's lessons. */}
+                    <div className="table-scroll my-2!">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th scope="col">זמן לשאלה</th>
+                            <th scope="col">סבבים</th>
+                            <th scope="col">נכונות</th>
+                            <th scope="col">הסבב הטוב</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {LIMIT_KEYS.map((key) => {
+                            const tally = quiz.stats.byLimit[key];
+                            return tally && tally.asked > 0 ? (
+                              <LimitResults key={key} limitKey={key} tally={tally} />
+                            ) : null;
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
                     {levels && (
-                      <li>
+                      <p className="m-0! text-sm!">
                         רמת הקושי: {quiz.level + 1} מתוך {MAX_LEVEL + 1}
-                      </li>
+                      </p>
                     )}
-                  </ul>
+                  </>
                 ) : (
                   <p className="m-0! mt-1! text-sm! text-slate-600 dark:text-slate-300">
                     עוד לא שיחקתם.
