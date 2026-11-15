@@ -7,10 +7,11 @@ import type { QuizKind } from './quiz';
 import { LOOK_ALIKES, QUIZ_TROPES } from './trope-quiz';
 
 /**
- * Each trope's sign on an א; two words where it takes two (קדמא ואזלא). פשטא and the two תלישות
- * on two letters, where the sign's place in the word shows (פשטא and תלישא קטנה on the last,
- * תלישא גדולה on the first). קדמא on one (Arye, 2026-11-15): the site's font draws it over the
- * letter's middle and a פשטא at its left edge, so one letter tells them apart too.
+ * Each trope's sign on one א (Arye, 2026-11-15): the site's font draws each where it sits on a
+ * word, so look-alikes differ by place too (קדמא over the letter's middle, פשטא at its left edge;
+ * תלישא גדולה at its right, תלישא קטנה at its left). More than one letter only where the trope has
+ * signs on more than one: שני פשטין (two letters), קדמא ואזלא (two words), קדמא before a זקף קטן
+ * (two words joined by a מקף); שלשלת and מונח לגרמיה with their פסק.
  */
 export const SIGNS: Readonly<Record<string, string>> = {
   'סוף-פסוק': 'אֽ׃',
@@ -22,14 +23,14 @@ export const SIGNS: Readonly<Record<string, string>> = {
   טפחא: 'א֖',
   רביעי: 'א֗',
   זרקא: 'א֮',
-  פשטא: 'אא֙',
+  פשטא: 'א֙',
   'שני-פשטין': 'א֨א֙',
   יתיב: 'אָ֚',
   תביר: 'א֛',
   גרש: 'א֜',
   גרשיים: 'א֞',
   'קרני-פרה': 'א֟',
-  'תלישא-גדולה': 'א֠א',
+  'תלישא-גדולה': 'א֠',
   פזר: 'א֡',
   מונח: 'אָ֣',
   'מונח-לגרמיה': 'אָ֣ ׀',
@@ -40,7 +41,7 @@ export const SIGNS: Readonly<Record<string, string>> = {
   קדמא: 'א֨',
   'קדמא-ואזלא': 'א֨ א֜',
   'קדמא-זקף-קטן': 'א֨־א֔',
-  'תלישא-קטנה': 'אא֩',
+  'תלישא-קטנה': 'א֩',
   'ירח-בן-יומו': 'א֪',
 };
 
