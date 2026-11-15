@@ -9,9 +9,10 @@ import type { QuizKind } from './quiz';
 import { LOOK_ALIKES, QUIZ_TROPES } from './trope-quiz';
 
 /**
- * Each trope's sign on an א; two words where it takes two (קדמא ואזלא). On two letters where the
- * place tells look-alikes apart, which one letter can't show in the site's font (checked
- * 2026-11-15): קדמא on the first, פשטא on the last, תלישא גדולה on the first, קטנה on the last.
+ * Each trope's sign on an א; two words where it takes two (קדמא ואזלא). פשטא and the two תלישות
+ * on two letters, where the sign's place in the word shows (פשטא and תלישא קטנה on the last,
+ * תלישא גדולה on the first). קדמא on one (Arye, 2026-11-15): the site's font draws it over the
+ * letter's middle and a פשטא at its left edge, so one letter tells them apart too.
  */
 export const SIGNS: Readonly<Record<string, string>> = {
   'סוף-פסוק': 'אֽ׃',
@@ -38,7 +39,7 @@ export const SIGNS: Readonly<Record<string, string>> = {
   מרכא: 'א֥',
   'מרכא-כפולה': 'א֦',
   דרגא: 'א֧',
-  קדמא: 'א֨א',
+  קדמא: 'א֨',
   'קדמא-ואזלא': 'א֨ א֜',
   'קדמא-זקף-קטן': 'א֨־א֔',
   'תלישא-קטנה': 'אא֩',
