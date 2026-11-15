@@ -4,7 +4,6 @@ import {
   buildRound,
   cheer,
   chooseOptions,
-  MAX_LEVEL,
   nextLevel,
   pickStreakLabel,
   shuffle,
@@ -24,6 +23,8 @@ import {
   recordRound,
   type QuizStats,
 } from '../lib/quiz-stats';
+import { quizKeys, savedLevel, store, stored } from '../lib/quiz-storage';
+import { QUIZZES_PAGE } from '../lib/quizzes';
 import { track } from '../scripts/analytics';
 import { DuelLobby, DuelResults, DuelScores, NameField } from './duel/DuelPanels';
 import { useDuel } from './duel/useDuel';
@@ -76,31 +77,9 @@ export interface QuizConfig {
 /** The questions skipped in later rounds: about ten rounds' worth. */
 const RECENT_MAX = 100;
 
-/** A saved value, or null when storage is blocked, empty or holds something else. */
-function stored(key: string): unknown {
-  try {
-    const saved = localStorage.getItem(key);
-    return saved === null ? null : JSON.parse(saved);
-  } catch {
-    return null;
-  }
-}
-function store(key: string, value: unknown): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // Storage blocked: the quiz still works, it just doesn't remember.
-  }
-}
 function recentKeys(key: string): string[] {
   const saved = stored(key);
   return Array.isArray(saved) ? saved.filter((item) => typeof item === 'string') : [];
-}
-function savedLevel(key: string): number {
-  const saved = stored(key);
-  return typeof saved === 'number' && Number.isInteger(saved)
-    ? Math.min(Math.max(saved, 0), MAX_LEVEL)
-    : 0;
 }
 function isWordList(data: unknown): data is WordList {
   const items: unknown = data && typeof data === 'object' ? Reflect.get(data, 'items') : null;
@@ -301,12 +280,7 @@ function celebrate(): void {
 }
 
 /** Where the browser keeps what a quiz remembers. */
-const keysOf = (config: QuizConfig) => ({
-  recent: `${config.storage}-recent`,
-  level: `${config.storage}-level`,
-  time: `${config.storage}-time-limit`,
-  stats: `${config.storage}-stats`,
-});
+const keysOf = (config: QuizConfig) => quizKeys(config.storage);
 
 const optionsFor = (config: QuizConfig, question: Question | undefined, level: number) =>
   !question
@@ -662,6 +636,10 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
             begin.current?.focus();
           }}
         />
+        {/* Every quiz, with the learner's results in each (Arye, 2026-11-15). */}
+        <p className="m-0! text-center text-sm!">
+          <a href={encodeURI(QUIZZES_PAGE)}>לכל החידונים והתוצאות שלכם</a>
+        </p>
       </div>
     );
   }
