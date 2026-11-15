@@ -10,6 +10,7 @@ import {
   shuffle,
   TIME_LIMITS,
   TIME_UP,
+  withPartner,
   type PreparedQuestion,
   type Question,
   type QuizItem,
@@ -54,6 +55,18 @@ export interface QuizConfig {
   fewest?: number;
   /** Why the answer is right, in the feedback of a random question (the qamats quiz's rule). */
   explain?: (question: Question) => ReactNode;
+  /**
+   * An easier level, chosen on the start screen (Arye, 2026-11-14): the answer drawn on one letter
+   * (an א) instead of a word from the Torah; the groups it asks, and the kind its options come from
+   * if not the quiz's (the trope quiz leaves out a מאילא, a טפחא on one letter).
+   */
+  letter?: {
+    word: (question: Question) => ReactNode;
+    groups: readonly string[];
+    kind?: QuizKind;
+    /** An answer's partner, always among its options (the niqqud quiz: מלא and חסר, גדולה and קטנה). */
+    partners?: Readonly<Record<string, string>>;
+  };
   /**
    * The same options, in this order, for every question (a quiz with few answers); its level,
    * which only chooses options, then changes nothing.
@@ -218,6 +231,36 @@ const TimeLimitPicker: React.FC<{
   );
 };
 
+/** A choice of two on the start screen, in the time limit's style. */
+const Choice: React.FC<{
+  label: string;
+  options: readonly { value: boolean; text: string }[];
+  chosen: boolean;
+  onChange: (value: boolean) => void;
+}> = ({ label, options, chosen, onChange }) => (
+  <div
+    role="group"
+    aria-label={label}
+    className="inline-flex gap-1 rounded-xl border border-slate-200 p-1 dark:border-slate-700"
+  >
+    {options.map(({ value, text }) => (
+      <button
+        key={text}
+        type="button"
+        aria-pressed={value === chosen}
+        className={`cursor-pointer rounded-lg px-3 py-1.5 ${
+          value === chosen
+            ? 'bg-brand-strong font-bold text-white'
+            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+        }`}
+        onClick={() => onChange(value)}
+      >
+        {text}
+      </button>
+    ))}
+  </div>
+);
+
 /** The countdown ring's radius and length, in the SVG's units (a 64-unit square). */
 const RING_RADIUS = 29;
 const RING_LENGTH = 2 * Math.PI * RING_RADIUS;
@@ -295,16 +338,28 @@ const keysOf = (config: QuizConfig) => ({
   recent: `${config.storage}-recent`,
   level: `${config.storage}-level`,
   time: `${config.storage}-time-limit`,
+  letter: `${config.storage}-letter`,
 });
 
-const optionsFor = (config: QuizConfig, question: Question | undefined, level: number) =>
+const optionsFor = (
+  config: QuizConfig,
+  question: Question | undefined,
+  level: number,
+  letter: boolean,
+) =>
   !question
     ? []
     : question.options
       ? shuffle(question.options)
       : config.options
         ? [...config.options]
-        : chooseOptions(config.kind, question.answer, level, Math.random, question.item.x);
+        : letter && config.letter
+          ? withPartner(
+              chooseOptions(config.letter.kind ?? config.kind, question.answer, level),
+              question.answer,
+              config.letter.partners?.[question.answer],
+            )
+          : chooseOptions(config.kind, question.answer, level, Math.random, question.item.x);
 
 /** A round of these questions, at its start (its options set by the caller). */
 const newRoundOf = (questions: Question[]): Round => ({
@@ -319,16 +374,25 @@ const newRoundOf = (questions: Question[]): Round => ({
   startedAt: Date.now(),
 });
 
-/** A new round, its questions avoiding those asked recently. */
-function newRound(config: QuizConfig, words: WordList, level: number): Round {
-  const questions = buildRound(words, config.prepared, new Set(recentKeys(keysOf(config).recent)), {
-    preparedCount: config.preparedCount,
-    ...(config.groups && { groups: config.groups }),
+/**
+ * A new round, its questions avoiding those asked recently; at the one-letter level (`letter`)
+ * without prepared questions, which are about words.
+ */
+function newRound(config: QuizConfig, words: WordList, level: number, letter: boolean): Round {
+  const oneLetter = letter ? config.letter : undefined;
+  // One letter shows the answer alone: a question for each, the rarest included, no words needed.
+  const list: WordList = oneLetter
+    ? { ...words, items: Object.fromEntries(oneLetter.groups.map((id) => [id, [{ w: id }]])) }
+    : words;
+  const groups = oneLetter?.groups ?? config.groups;
+  const questions = buildRound(list, config.prepared, new Set(recentKeys(keysOf(config).recent)), {
+    preparedCount: oneLetter ? 0 : config.preparedCount,
+    ...(groups && { groups }),
     ...(config.answerOf && { answerOf: config.answerOf }),
     ...(config.perGroup && { perGroup: config.perGroup }),
-    ...(config.fewest !== undefined && { fewest: config.fewest }),
+    ...(oneLetter ? { fewest: 1 } : config.fewest !== undefined && { fewest: config.fewest }),
   });
-  return { ...newRoundOf(questions), options: optionsFor(config, questions[0], level) };
+  return { ...newRoundOf(questions), options: optionsFor(config, questions[0], level, letter) };
 }
 
 /**
@@ -344,6 +408,8 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   const [progress, setProgress] = useState({ level: 0, streak: 0 });
   /** Seconds for each question, or none (Arye, 2026-11-10: chosen at the start, for the quiz). */
   const [limit, setLimit] = useState<number | null>(null);
+  /** The one-letter level (`config.letter`), chosen on the start screen and remembered. */
+  const [letter, setLetter] = useState(false);
   /** Whether the learner pressed "להתחיל": until then, the time limit is chosen. */
   const [started, setStarted] = useState(false);
   /** The time now, kept while a timed question runs, for its clock. */
@@ -397,10 +463,12 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         if (!isWordList(data)) throw new Error(`${config.wordList}: not a word list`);
         const level = savedLevel(keysOf(config).level);
         const savedLimit = stored(keysOf(config).time);
+        const oneLetter = !!config.letter && stored(keysOf(config).letter) === true;
         setList(data);
         setProgress({ level, streak: 0 });
         setLimit(TIME_LIMITS.find((value) => value === savedLimit) ?? null);
-        setRound(newRound(config, data, level));
+        setLetter(oneLetter);
+        setRound(newRound(config, data, level, oneLetter));
       })
       .catch(() => setFailed(true));
   }, [config]);
@@ -431,6 +499,16 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
     store(keys.time, value);
   }
 
+  function chooseLetter(value: boolean): void {
+    if (!list) return;
+    setLetter(value);
+    store(keys.letter, value);
+    // Back to words: their own level, which the one-letter level doesn't change.
+    const level = value ? progress.level : savedLevel(keys.level);
+    if (!value) setProgress({ level, streak: 0 });
+    setRound(newRound(config, list, level, value));
+  }
+
   function start(): void {
     if (!round) return;
     moved.current = true;
@@ -441,10 +519,14 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
 
   /** A duel for this round: its questions with their options, as every learner will see them. */
   function openDuel(): void {
-    if (!round) return;
-    const questions: DuelRound['questions'] = round.questions.map((q, i) => ({
+    if (!round || !list) return;
+    // A duel plays words from the Torah: the one-letter level is each learner's own choice, and a
+    // friend on the word level would see the answer's name in place of a word.
+    const level = letter ? savedLevel(keys.level) : progress.level;
+    const base = letter ? newRound(config, list, level, false) : round;
+    const questions: DuelRound['questions'] = base.questions.map((q, i) => ({
       question: q,
-      options: i === 0 ? round.options : optionsFor(config, q, progress.level),
+      options: i === 0 ? base.options : optionsFor(config, q, level, false),
     }));
     setInviting(false);
     duel.host(name, { quiz: config.storage, questions, limit });
@@ -455,7 +537,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
     if (!list) return;
     if (duel.status !== 'none') duel.leave();
     setStarted(false);
-    setRound(newRound(config, list, progress.level));
+    setRound(newRound(config, list, progress.level, letter));
   }
 
   function answer(id: string): void {
@@ -473,8 +555,13 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
     if (inDuel) duel.answer(round.index, id);
     const updated = nextLevel(progress.level, progress.streak, correct);
     setProgress(updated);
-    store(keys.level, updated.level);
-    store(keys.recent, [...recentKeys(keys.recent), question.key].slice(-RECENT_MAX));
+    // The one-letter level is easier, and asks every answer each time: it changes neither how
+    // hard the options are with words (only its own, in memory: chooseLetter), nor which words
+    // were asked lately. A duel plays words, whatever the learner's level.
+    if (!letter || inDuel) {
+      store(keys.level, updated.level);
+      store(keys.recent, [...recentKeys(keys.recent), question.key].slice(-RECENT_MAX));
+    }
   }
 
   // The clock of a timed quiz: when it runs out, the question counts as wrong. Counted from the
@@ -500,6 +587,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       track(config.event, {
         score: String(round.score),
         seconds: limit === null ? 'none' : String(limit),
+        ...(config.letter && { letter: letter && !inDuel ? 'yes' : 'no' }),
       });
       if (round.score === round.questions.length) celebrate();
     }
@@ -507,7 +595,8 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       ...round,
       index: following,
       options:
-        round.fixed?.[following] ?? optionsFor(config, round.questions[following], progress.level),
+        round.fixed?.[following] ??
+        optionsFor(config, round.questions[following], progress.level, letter),
       chosen: null,
       startedAt: Date.now(),
     });
@@ -534,7 +623,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
           <button
             type="button"
             className={`${BUTTON} mt-4`}
-            onClick={() => setRound(newRound(config, list, progress.level))}
+            onClick={() => setRound(newRound(config, list, progress.level, letter))}
           >
             סבב נוסף
           </button>
@@ -603,6 +692,20 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       <div className={card}>
         <div className="text-lg">זמן לכל שאלה:</div>
         <TimeLimitPicker limit={limit} onChange={chooseLimit} />
+        {config.letter && (
+          <>
+            <div className="text-lg">בשאלה:</div>
+            <Choice
+              label="מה מופיע בשאלה"
+              options={[
+                { value: false, text: 'מילה מהתורה' },
+                { value: true, text: 'אות אחת' },
+              ]}
+              chosen={letter}
+              onChange={chooseLetter}
+            />
+          </>
+        )}
         <div>
           <button ref={begin} type="button" className={BUTTON} onClick={start}>
             להתחיל
@@ -673,7 +776,11 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         tabIndex={-1}
         className={`my-6 text-center leading-[1.6] outline-none ${config.wordSize ?? 'text-5xl'}`}
       >
-        <Word item={question.item} answered={chosen !== null} />
+        {letter && !inDuel && config.letter ? (
+          config.letter.word(question)
+        ) : (
+          <Word item={question.item} answered={chosen !== null} />
+        )}
       </div>
       {/* Three options side by side (short names: the vowel-class quiz), four two by two. */}
       <div

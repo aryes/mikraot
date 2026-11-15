@@ -45,6 +45,45 @@ export const NIQQUD_QUIZ: QuizKind = { ids: QUIZ_VOWELS, lookAlikes: VOWEL_LOOK_
 /** The page with the table of all the niqqud, which the feedback links to. */
 export const NIQQUD_PAGE = '/תנועות-עיצורים-וניקוד/';
 
+/** Each vowel on an א, as the niqqud table draws it: the quiz's one-letter level. */
+// Typed by the quiz's vowels, so a vowel added without its drawing fails the type check.
+const EACH_ON_ALEF: Readonly<Record<(typeof QUIZ_VOWELS)[number], string>> = {
+  קמץ: 'אָ',
+  פתח: 'אַ',
+  'חטף-פתח': 'אֲ',
+  צירה: 'אֵ',
+  סגול: 'אֶ',
+  'חטף-סגול': 'אֱ',
+  'חיריק-מלא': 'אִי',
+  'חיריק-חסר': 'אִ',
+  'חולם-מלא': 'אוֹ',
+  'חולם-חסר': 'אֹ',
+  'חטף-קמץ': 'אֳ',
+  שורוק: 'אוּ',
+  קבוץ: 'אֻ',
+  שווא: 'אְ',
+};
+export const ON_ALEF: Readonly<Record<string, string>> = EACH_ON_ALEF;
+
+/**
+ * Each vowel's partner, always among the options on one letter (Arye, 2026-11-15): חיריק and חולם
+ * מלא and חסר, and the גדולה and קטנה of the niqqud table's rows (קמץ and פתח, צירה and סגול, שורוק
+ * and קבוץ). The חטפים and the שווא have none.
+ */
+const PAIRS = [
+  ['חיריק-מלא', 'חיריק-חסר'],
+  ['חולם-מלא', 'חולם-חסר'],
+  ['קמץ', 'פתח'],
+  ['צירה', 'סגול'],
+  ['שורוק', 'קבוץ'],
+] as const;
+export const VOWEL_PARTNERS: Readonly<Record<string, string>> = Object.fromEntries(
+  PAIRS.flatMap(([a, b]) => [
+    [a, b],
+    [b, a],
+  ]),
+);
+
 /** An id as it is shown: "חטף-פתח" is "חטף פתח". */
 export const vowelName = (id: string) => id.replaceAll('-', ' ');
 

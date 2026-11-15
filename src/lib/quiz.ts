@@ -113,6 +113,22 @@ export function chooseOptions(
   return shuffle(picked, random);
 }
 
+/**
+ * Options with the answer's partner among them, if it has one and they lack it: it takes the place
+ * of a wrong option, chosen at random.
+ */
+export function withPartner(
+  options: readonly string[],
+  answer: string,
+  partner: string | undefined,
+  random: () => number = Math.random,
+): string[] {
+  if (!partner || options.includes(partner)) return [...options];
+  const wrong = options.filter((id) => id !== answer);
+  const out = wrong[Math.floor(random() * wrong.length)];
+  return options.map((id) => (id === out ? partner : id));
+}
+
 /** Two right answers in a row raise the level; a wrong one lowers it. */
 export function nextLevel(
   level: number,
