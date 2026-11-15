@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import wordList from '../../public/quiz/niqqud-words.json';
 import qamatsList from '../../public/quiz/qamats-words.json';
-import { MIN_RANDOM, buildRound, chooseOptions, type WordList } from './quiz';
+import { MIN_RANDOM, buildRound, chooseOptions, withPartner, type WordList } from './quiz';
 import {
   GADOL_REASONS,
   NIQQUD_GROUPS,
@@ -10,10 +10,11 @@ import {
   NIQQUD_QUIZ,
   QAMATS_GROUPS,
   QAMATS_KINDS,
+  QUIZ_VOWELS,
+  VOWEL_PARTNERS,
   QAMATS_PER_GROUP,
   QATAN_REASONS,
   qamatsKind,
-  QUIZ_VOWELS,
   VOWEL_CLASS_OF,
   VOWEL_CLASSES,
   VOWEL_LOOK_ALIKES,
@@ -126,5 +127,25 @@ describe('the qamats quiz', () => {
       ).toBe(true);
     }
     expect(new Set(round.map((q) => q.item.w)).size).toBe(10);
+  });
+});
+
+describe('VOWEL_PARTNERS and withPartner', () => {
+  it('pairs each vowel with its partner both ways, among the quiz vowels', () => {
+    for (const [vowel, partner] of Object.entries(VOWEL_PARTNERS)) {
+      expect(VOWEL_PARTNERS[partner]).toBe(vowel);
+      expect(QUIZ_VOWELS).toContain(vowel);
+    }
+    expect(VOWEL_PARTNERS['חיריק-מלא']).toBe('חיריק-חסר');
+    expect(VOWEL_PARTNERS['קמץ']).toBe('פתח');
+    expect(VOWEL_PARTNERS['שווא']).toBeUndefined();
+  });
+
+  it('puts the partner among the options in place of a wrong one, keeping the answer', () => {
+    const options = ['קמץ', 'סגול', 'שווא', 'קבוץ'];
+    const withIt = withPartner(options, 'קמץ', 'פתח', () => 0);
+    expect(withIt).toEqual(['קמץ', 'פתח', 'שווא', 'קבוץ']);
+    expect(withPartner(withIt, 'קמץ', 'פתח')).toEqual(withIt);
+    expect(withPartner(options, 'קמץ', undefined)).toEqual(options);
   });
 });
