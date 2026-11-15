@@ -38,6 +38,29 @@ test('the quiz starts with a time limit for every question, and remembers it', a
   );
 });
 
+test('the three-second limit turns red for its last two; a limit no longer offered becomes ten', async ({
+  page,
+}) => {
+  await page.clock.install();
+  // 15 seconds was offered before 2026-11-15.
+  await page.addInitScript(() => localStorage.setItem('trope-quiz-time-limit', '15'));
+  await page.goto(QUIZ);
+  const quiz = page.locator('astro-island .not-prose');
+  await quiz.scrollIntoViewIfNeeded();
+  await expect(quiz.getByRole('button', { name: '10 שניות' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await quiz.getByRole('button', { name: '3 שניות' }).click();
+  await quiz.getByRole('button', { name: 'להתחיל' }).click();
+  await expect(quiz.getByRole('timer')).toHaveText('3');
+  await expect(quiz.getByRole('timer')).not.toHaveClass(/text-red-700/);
+  // 1.5 seconds: up to half a second of the test's own time still shows 2.
+  await page.clock.fastForward(1_500);
+  await expect(quiz.getByRole('timer')).toHaveText('2');
+  await expect(quiz.getByRole('timer')).toHaveClass(/text-red-700/);
+});
+
 test('the trope quiz runs a round of ten tropes, tells each answer, ranks the score and remembers what it asked', async ({
   page,
 }) => {
