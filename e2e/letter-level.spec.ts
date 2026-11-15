@@ -64,3 +64,34 @@ test('on one letter, the partner of a vowel is always among the options', async 
   // Ten of the fourteen vowels have one: a round of ten asks some of them.
   expect(partners).toBeGreaterThan(0);
 });
+
+test('on words too, a vowel with a partner always has it among the options', async ({ page }) => {
+  // Only קמץ words: every question's answer is a קמץ, so every question offers its partner פתח.
+  await page.route('**/quiz/niqqud-words.json', async (route) => {
+    const response = await route.fetch();
+    const list: { items: Record<string, unknown> } = await response.json();
+    await route.fulfill({ response, json: { ...list, items: { קמץ: list.items['קמץ'] } } });
+  });
+  await page.goto(`/${encodeURI('זיהוי-ניקוד')}/`);
+  const quiz = page.locator('astro-island .not-prose');
+  await quiz.scrollIntoViewIfNeeded();
+  await expect(
+    quiz
+      .getByRole('group', { name: 'מה מופיע בשאלה' })
+      .getByRole('button', { name: 'מילה מהתורה' }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await quiz.getByRole('button', { name: 'להתחיל' }).click();
+  // A round of one question (one קמץ group): several rounds, since without the rule a random
+  // three of thirteen wrong options would include פתח now and then.
+  /* oxlint-disable no-await-in-loop -- one round after another */
+  for (let i = 0; i < 5; i++) {
+    await expect(quiz).toContainText('שאלה 1 מתוך');
+    expect(await quiz.locator('.grid button').allInnerTexts()).toEqual(
+      expect.arrayContaining([pointedName('קמץ'), pointedName(VOWEL_PARTNERS['קמץ'] ?? '')]),
+    );
+    await quiz.locator('.grid button').first().click();
+    await quiz.getByRole('button', { name: /לשאלה הבאה|לתוצאה/ }).click();
+    await quiz.getByRole('button', { name: 'סבב נוסף' }).click();
+  }
+  /* oxlint-enable no-await-in-loop */
+});
