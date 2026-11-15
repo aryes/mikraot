@@ -69,14 +69,27 @@ export interface QuizConfig {
   /** An option's name read aloud, where its text means nothing then (the sign quiz's signs). */
   optionLabel?: (index: number) => string;
   /**
-   * An easier level, chosen on the start screen (Arye, 2026-11-14): the answer drawn on one letter
-   * (an א) instead of a word from the Torah; the groups it asks, and the kind its options come from
-   * if not the quiz's (the trope quiz leaves out a מאילא, a טפחא on one letter).
+   * A second level, chosen on the start screen (Arye, 2026-11-14), its progress kept only in
+   * memory and never played in a duel: in the trope and niqqud quizzes, an easier one, the answer
+   * drawn on one letter (an א) instead of a word from the Torah (`word`); in the sign quiz, words
+   * from the Torah as the answers instead of signs (`name`). The groups it asks, and the kind its
+   * options come from if not the quiz's (the trope quiz leaves out a מאילא, a טפחא on one letter).
    */
   letter?: {
-    word: (question: Question) => ReactNode;
+    /** The question at this level, if the quiz has no `word` of its own. */
+    word?: (question: Question) => ReactNode;
     groups: readonly string[];
     kind?: QuizKind;
+    /**
+     * An answer's name at this level, if not `name` (the sign quiz: its options are signs on an
+     * א, and on this level words from the Torah).
+     */
+    name?: (id: string, question: Question, option: boolean) => ReactNode;
+    /**
+     * The start screen's choice, if not of the question ("בשאלה: מילה מהתורה / אות אחת"): its
+     * heading, its name, and each level's (the sign quiz: "בתשובות: סימן על א / מילה מהתורה").
+     */
+    choice?: { heading: string; label: string; base: string; letter: string };
   };
   /**
    * An answer's partner, always among its options, on words and on one letter alike (the niqqud
@@ -101,7 +114,7 @@ function recentKeys(key: string): string[] {
   const saved = stored(key);
   return Array.isArray(saved) ? saved.filter((item) => typeof item === 'string') : [];
 }
-function isWordList(data: unknown): data is WordList {
+export function isWordList(data: unknown): data is WordList {
   const items: unknown = data && typeof data === 'object' ? Reflect.get(data, 'items') : null;
   return Boolean(items) && typeof items === 'object';
 }
@@ -445,6 +458,13 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
 
   const duel = useDuel(beginDuel);
   const inDuel = (duel.view?.startedAt ?? null) !== null;
+  /** An answer's name at the level played (a duel plays words). */
+  const nameOf = (id: string, question: Question, option: boolean) =>
+    (letter && !inDuel && config.letter?.name ? config.letter.name : config.name)(
+      id,
+      question,
+      option,
+    );
 
   useEffect(() => {
     fetch(config.wordList)
@@ -565,9 +585,9 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
     if (inDuel) duel.answer(round.index, id);
     const updated = nextLevel(progress.level, progress.streak, correct);
     setProgress(updated);
-    // The one-letter level is easier, and asks every answer each time: it changes neither how
-    // hard the options are with words (only its own, in memory: chooseLetter), nor which words
-    // were asked lately. A duel plays words, whatever the learner's level.
+    // The second level (`letter`) asks every answer each time: it changes neither how hard the
+    // options are at the first (only its own, in memory: chooseLetter), nor which questions were
+    // asked lately. A duel plays the first level, whatever the learner's.
     if (!letter || inDuel) {
       store(keys.level, updated.level);
       store(keys.recent, [...recentKeys(keys.recent), question.key].slice(-RECENT_MAX));
@@ -705,12 +725,12 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         <TimeLimitPicker limit={limit} onChange={chooseLimit} />
         {config.letter && (
           <>
-            <div className="text-lg">בשאלה:</div>
+            <div className="text-lg">{config.letter.choice?.heading ?? 'בשאלה:'}</div>
             <Choice
-              label="מה מופיע בשאלה"
+              label={config.letter.choice?.label ?? 'מה מופיע בשאלה'}
               options={[
-                { value: false, text: 'מילה מהתורה' },
-                { value: true, text: 'אות אחת' },
+                { value: false, text: config.letter.choice?.base ?? 'מילה מהתורה' },
+                { value: true, text: config.letter.choice?.letter ?? 'אות אחת' },
               ]}
               chosen={letter}
               onChange={chooseLetter}
@@ -805,7 +825,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       >
         {config.word ? (
           config.word(question)
-        ) : letter && !inDuel && config.letter ? (
+        ) : letter && !inDuel && config.letter?.word ? (
           config.letter.word(question)
         ) : (
           <Word item={question.item} answered={chosen !== null} />
@@ -838,7 +858,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
               } ${state}`}
             >
               {Icon && <Icon size={18} aria-hidden="true" className="shrink-0" />}
-              <span>{config.name(id, question, true)}</span>
+              <span>{nameOf(id, question, true)}</span>
             </button>
           );
         })}
@@ -852,7 +872,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
                 round.cheer
               ) : (
                 <>
-                  {round.cheer} {config.answerIs} {config.name(question.answer, question, false)}
+                  {round.cheer} {config.answerIs} {nameOf(question.answer, question, false)}
                 </>
               )}
             </p>

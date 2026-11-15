@@ -67,7 +67,7 @@
 - [ ] Quiz ideas of 2026-11-15 (Arye):
   - [x] Why is this שווא נע? A word with a שווא נע marked; choose its rule from the page's five (אבגד״ה). The shva quiz's list already holds each one's rule. Done 2026-11-16, "למה השווא נע?"; a word that fits two rules takes either.
   - Why is this קמץ קטן? The same for the קמץ קטן's rules (the qamats quiz's list holds them too).
-  - The sign quiz with real words from the Torah as the answers, not signs on an א.
+  - [x] The sign quiz with real words from the Torah as the answers, not signs on an א. Done 2026-11-16: a choice on its start screen, signs first.
   - (Claude, from a review) In a duel joined before the word list has loaded, the saved time limit could replace the duel's; check when the duels are next touched.
 - [x] Servant quiz "איזה משרת?" (Arye, 2026-11-11): two words from the Torah, the first without its servant's sign; which servant goes before the disjunctive on the second? Servants also usual before that disjunctive are never offered as wrong. Most answers are מונח or מרכא, as in the text itself.
 - [ ] Quizzes, later (Arye, 2026-11-05): a quiz on trope sequences (e.g. מונח זקף קטן). They live in a top-level menu of their own, "חידונים" (Arye, 2026-11-09).
