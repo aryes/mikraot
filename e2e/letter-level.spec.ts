@@ -29,6 +29,8 @@ for (const [page_, signs] of [
     }
     /* oxlint-enable no-await-in-loop */
     await page.reload();
+    // The quiz loads once it is on the screen (client:visible): on a phone, after scrolling.
+    await page.locator('astro-island').first().scrollIntoViewIfNeeded();
     await expect(
       page
         .locator('astro-island .not-prose')
