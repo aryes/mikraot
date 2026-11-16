@@ -4,7 +4,6 @@ import {
   QAMATS_WHY_QUIZ,
   QATAN_GROUPS,
   QATAN_PER_GROUP,
-  QATAN_REASONS,
   QATAN_RULES,
 } from '../lib/niqqud-quiz';
 import { Quiz, type QuizConfig } from './Quiz';
@@ -26,11 +25,11 @@ const CONFIG: QuizConfig = {
   prompt: () => 'למה הקמץ המסומן קטן?',
   name: (id) => QATAN_RULES[id] ?? id,
   answerIs: 'הכלל כאן:',
-  // The rule in full, as the page and the qamats quiz say it; and any other that applies too.
+  // Any other rule that applies too (the rule itself is in the feedback already; Arye, 2026-11-16:
+  // its full wording again was repetitive).
   explain: (question) => {
     const also = (question.item.x ?? []).map((rule) => QATAN_RULES[rule]).filter(Boolean);
-    const reason = QATAN_REASONS[question.answer] ?? '';
-    return also.length > 0 ? `${reason} וקטן גם מפני שהוא: ${also.join('; ')}.` : reason;
+    return also.length > 0 ? `וקטן גם מפני שהוא: ${also.join('; ')}.` : undefined;
   },
   // The link takes the content's link style (.wp-content-rendered a).
   more: () => <a href={encodeURI(QAMATS_PAGE)}>לכללי הקמץ הקטן</a>,
