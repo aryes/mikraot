@@ -90,19 +90,38 @@ test('the trope quiz runs a round of ten tropes, tells each answer, ranks the sc
   /* oxlint-enable no-await-in-loop */
 
   await expect(quiz.getByRole('status')).toContainText(/זיהיתם נכון \d+ מתוך 10/);
-  // A mark for each question, and the right answer to each one missed.
+  // A mark for each question; a click shows it with its right answer, and a miss the learner's.
   const score = Number(/(\d+) מתוך/.exec(await quiz.getByRole('status').innerText())?.[1]);
-  const marks = quiz.getByRole('list', { name: 'התשובות בסבב' }).getByRole('listitem');
+  const marks = quiz.getByRole('list', { name: 'התשובות בסבב' }).getByRole('button');
   await expect(marks).toHaveCount(10);
   await expect(marks.filter({ hasText: ': נכון' })).toHaveCount(score);
-  // Each missed question beside its right answer, in order.
-  const rows = quiz.getByRole('list', { name: /התשובות הנכונות/ }).getByRole('listitem');
-  await expect(rows).toHaveCount(10 - score);
   expect(missed).toHaveLength(10 - score);
-  // As shown: each name is in the page in every tradition's spelling, CSS showing the chosen one.
-  await Promise.all(
-    missed.map((name, i) => expect(rows.nth(i)).toContainText(name, { useInnerText: true })),
-  );
+  // The question opened shows in the place the marks control, a hint there until then.
+  const panel = page.locator(`[id="${await marks.first().getAttribute('aria-controls')}"]`);
+  await expect(panel).toContainText('לחצו על אחת התשובות');
+  const wrong = marks.filter({ hasText: ': לא נכון' });
+  /* oxlint-disable no-await-in-loop -- one mark after another, each opening its question */
+  for (const [i, name] of missed.entries()) {
+    await wrong.nth(i).click();
+    await expect(wrong.nth(i)).toHaveAttribute('aria-expanded', 'true');
+    // Focus stays on the mark, for the next one.
+    await expect(wrong.nth(i)).toBeFocused();
+    // As shown: each name is in the page in every tradition's spelling, CSS showing the chosen one.
+    await expect(panel).toContainText(`התשובה הנכונה: ${name}`, { useInnerText: true });
+    await expect(panel).toContainText(/עניתם: \S/u);
+  }
+  /* oxlint-enable no-await-in-loop */
+  if (score > 0) {
+    await marks.filter({ hasText: ': נכון' }).first().click();
+    await expect(panel).toContainText('התשובה הנכונה:');
+    await expect(panel).not.toContainText('עניתם');
+  }
+  // A second click closes it.
+  const last = marks.last();
+  await last.click();
+  await last.click();
+  await expect(last).toHaveAttribute('aria-expanded', 'false');
+  await expect(panel).toContainText('לחצו על אחת התשובות');
   // The rank, linked to its place in the trope hierarchy.
   await expect(quiz.getByRole('status').locator('a[href^="/trope-hierarchy/#"]')).toHaveCount(1);
   const recent = await page.evaluate(() =>
@@ -119,7 +138,7 @@ test('the trope quiz runs a round of ten tropes, tells each answer, ranks the sc
   await quiz.getByRole('button', { name: 'סבב נוסף' }).click();
   await expect(quiz).toContainText('שאלה 1 מתוך 10');
   // Back to the start at any point, to choose again or to stop.
-  await quiz.getByRole('button', { name: 'לחזור להתחלה' }).click();
+  await quiz.getByRole('button', { name: 'למסך הפתיחה' }).click();
   await expect(quiz.getByRole('button', { name: 'להתחיל' })).toBeFocused();
   // The learner's results so far, on the start screen; and a way to clear them.
   const stats = quiz.getByRole('region', { name: 'הנתונים שלכם' });

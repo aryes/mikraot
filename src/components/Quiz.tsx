@@ -9,6 +9,7 @@ import {
   shuffle,
   TIME_LIMITS,
   TIME_UP,
+  TIME_UP_LINE,
   withPartner,
   type PreparedQuestion,
   type Question,
@@ -194,6 +195,8 @@ interface Round {
   score: number;
   /** Each question answered so far, right or not: the round's summary shows them. */
   results: boolean[];
+  /** The learner's answer to each (TIME_UP if time ran out; unknown back in a duel's room). */
+  picks: (string | null)[];
   /** Right answers in a row, shown from three on. */
   run: number;
   /** How this round words the run ("רצף של 3"). */
@@ -377,6 +380,7 @@ const newRoundOf = (questions: Question[]): Round => ({
   chosen: null,
   score: 0,
   results: [],
+  picks: [],
   run: 0,
   streakLabel: pickStreakLabel(),
   cheer: '',
@@ -428,7 +432,12 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   const next = useRef<HTMLButtonElement>(null);
   const word = useRef<HTMLDivElement>(null);
   const result = useRef<HTMLDivElement>(null);
-  const missedList = useId();
+  const reviewPanel = useId();
+  /**
+   * The summary's question opened by its mark (Arye, 2026-11-16), for the round it was opened in.
+   * Not in the round: a change there would move focus to the score, as the round's end does.
+   */
+  const [opened, setOpened] = useState<{ of: Question[]; index: number } | null>(null);
   const begin = useRef<HTMLButtonElement>(null);
   /** Whether the learner has started: only then does focus follow the quiz. */
   const moved = useRef(false);
@@ -456,6 +465,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       index: done.length,
       score: done.filter(Boolean).length,
       results: done,
+      picks: done.map(() => null),
       options: fixed[done.length] ?? [],
       fixed,
     });
@@ -592,6 +602,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       chosen: id,
       score: round.score + (correct ? 1 : 0),
       results: [...round.results, correct],
+      picks: [...round.picks, id],
       // A mistake starts the count again, without saying so.
       run: correct ? round.run + 1 : 0,
       cheer: cheer(config.kind, question.answer, id),
@@ -654,7 +665,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   // Divs where a size is set: the content's paragraph style (.wp-content-rendered p) would win.
   if (!question) {
     const size = round.questions.length;
-    const missed = round.questions.filter((_, i) => round.results[i] === false);
+    const reviewed = opened?.of === round.questions ? opened.index : null;
     return (
       <div className="not-prose rounded-2xl border border-slate-200 p-6 text-center dark:border-slate-700">
         {/* Read aloud on arrival: the score and the rank, not every question's mark. */}
@@ -672,26 +683,87 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
             config.result?.(round.score, size)
           )}
         </div>
-        {/* The round at a glance: a mark for each question, in order. */}
+        {/* The round at a glance: a mark for each question, in order; a click shows the question,
+            its answer and the learner's (Arye, 2026-11-16). */}
         <ol
-          className="mx-0! mt-4! mb-0! flex list-none! flex-wrap justify-center gap-1 p-0! sm:gap-1.5 [&>li]:m-0!"
+          className="mx-0! mt-4! mb-0! flex list-none! flex-wrap justify-center gap-0 p-0! sm:gap-1.5 [&>li]:m-0!"
           aria-label="התשובות בסבב"
         >
           {round.results.map((right, i) => (
-            <li
-              // oxlint-disable-next-line no-array-index-key -- the questions' order is fixed
-              key={i}
-              className={`flex size-6 items-center justify-center rounded-full sm:size-7 ${
-                right
-                  ? 'bg-green-100 text-green-800! dark:bg-green-950 dark:text-green-300!'
-                  : 'bg-red-100 text-red-800! dark:bg-red-950 dark:text-red-300!'
-              }`}
-            >
-              {right ? <Check size={16} aria-hidden="true" /> : <X size={16} aria-hidden="true" />}
-              <span className="sr-only">{`שאלה ${i + 1}: ${right ? 'נכון' : 'לא נכון'}`}</span>
+            // oxlint-disable-next-line no-array-index-key -- the questions' order is fixed
+            <li key={i}>
+              <button
+                type="button"
+                aria-expanded={reviewed === i}
+                aria-controls={reviewPanel}
+                onClick={() => setOpened(reviewed === i ? null : { of: round.questions, index: i })}
+                // On a phone, a 24px circle in a 32px button: easier to tap, ten still in a line.
+                className="group block cursor-pointer rounded-full p-1 sm:p-0"
+              >
+                <span
+                  className={`flex size-6 items-center justify-center rounded-full ring-offset-2 ring-offset-white sm:size-8 dark:ring-offset-slate-900 ${
+                    right
+                      ? 'bg-green-100 text-green-800! ring-green-700 group-hover:bg-green-200 dark:bg-green-950 dark:text-green-300! dark:ring-green-400 dark:group-hover:bg-green-900'
+                      : 'bg-red-100 text-red-800! ring-red-700 group-hover:bg-red-200 dark:bg-red-950 dark:text-red-300! dark:ring-red-400 dark:group-hover:bg-red-900'
+                  } ${reviewed === i ? 'ring-2' : ''}`}
+                >
+                  {right ? (
+                    <Check size={16} aria-hidden="true" />
+                  ) : (
+                    <X size={16} aria-hidden="true" />
+                  )}
+                </span>
+                <span className="sr-only">{`שאלה ${i + 1}: ${right ? 'נכון' : 'לא נכון'}`}</span>
+              </button>
             </li>
           ))}
         </ol>
+        <div id={reviewPanel} aria-live="polite">
+          {reviewed === null
+            ? // Not "סימן": on this site that is a trope's sign.
+              round.results.length > 0 && (
+                <div className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                  לחצו על אחת התשובות כדי לראות את השאלה.
+                </div>
+              )
+            : (() => {
+                const asked = round.questions[reviewed];
+                const pick = round.picks[reviewed];
+                if (!asked) return null;
+                // A quiz that asks a name (the sign quiz) shows the answers as its options were.
+                const option = config.word !== undefined;
+                return (
+                  <div className="mx-auto mt-3 max-w-md space-y-1 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800/60">
+                    <div className="text-sm text-slate-600 dark:text-slate-300">
+                      שאלה {reviewed + 1}
+                    </div>
+                    {/* As asked, a sign or a vowel on one letter drawn larger. */}
+                    <div
+                      className={`leading-[1.6] ${atLetter && config.letter?.word ? 'text-4xl' : 'text-2xl'}`}
+                    >
+                      {shown(asked, true)}
+                    </div>
+                    <div>
+                      התשובה הנכונה:{' '}
+                      <span className="font-bold">{nameOf(asked.answer, asked, option)}</span>
+                    </div>
+                    {!round.results[reviewed] &&
+                      (pick === TIME_UP ? (
+                        <div>{TIME_UP_LINE}</div>
+                      ) : (
+                        pick && (
+                          <div>
+                            עניתם:{' '}
+                            <span className="font-bold text-red-800 dark:text-red-300">
+                              {nameOf(pick, asked, option)}
+                            </span>
+                          </div>
+                        )
+                      ))}
+                  </div>
+                );
+              })()}
+        </div>
         {/* The next step before the review, so a phone shows it without scrolling. */}
         {!inDuel && (
           <button
@@ -704,38 +776,9 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         )}
         <div>
           <button type="button" className={`${QUIET} mt-3`} onClick={restart}>
-            לחזור להתחלה
+            למסך הפתיחה
           </button>
         </div>
-        {missed.length > 0 && (
-          <div className="mt-5 border-t border-slate-200 pt-4 dark:border-slate-700">
-            <div id={missedList} className="mb-2 font-bold">
-              התשובות הנכונות לשאלות שפספסתם:
-            </div>
-            <ul
-              aria-labelledby={missedList}
-              className="m-0! grid list-none! gap-2 p-0! sm:grid-cols-2 [&>li]:m-0!"
-            >
-              {missed.map((asked) => (
-                <li
-                  key={asked.key}
-                  className="flex flex-wrap items-center justify-center gap-x-4 rounded-xl bg-slate-50 px-3 py-1 dark:bg-slate-800/60"
-                >
-                  {/* As asked, a sign or a vowel on one letter drawn larger, and its answer. A
-                      quiz that asks a name (the sign quiz) shows the answer as its option was. */}
-                  <span
-                    className={`leading-[1.6] ${atLetter && config.letter?.word ? 'text-4xl' : 'text-2xl'}`}
-                  >
-                    {shown(asked, true)}
-                  </span>
-                  <span className="font-bold">
-                    {nameOf(asked.answer, asked, config.word !== undefined)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
     );
   }
@@ -957,7 +1000,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
           <span />
         )}
         <button type="button" className={QUIET} onClick={restart}>
-          {inDuel ? 'לצאת מהחדר' : 'לחזור להתחלה'}
+          {inDuel ? 'לצאת מהחדר' : 'למסך הפתיחה'}
         </button>
       </div>
     </div>
