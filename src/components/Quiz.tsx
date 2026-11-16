@@ -1,4 +1,4 @@
-import { Check, Flame, X } from 'lucide-react';
+import { Check, Flame, Volume2, X } from 'lucide-react';
 import React, { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import {
   buildRound,
@@ -92,6 +92,19 @@ export interface QuizConfig {
   nameRight?: boolean;
   /** The word's size, if not text-5xl (the servant quiz's two words, smaller on a phone). */
   wordSize?: string;
+  /**
+   * Options heard, not read (the sound quiz): each named by its place (`label`), in a new order
+   * for each question, one under the other with a button beside each that plays it (`play`).
+   */
+  listen?: {
+    label: (index: number) => string;
+    /** Plays an option; settles when it has played (or failed to). */
+    play: (id: string, question: Question) => Promise<void>;
+    /** Gets a question's sounds ready, as it appears, so the first press plays at once. */
+    prepare?: (question: Question) => void;
+  };
+  /** No time limit to choose (the sound quiz: hearing five syllables takes longer than any). */
+  untimed?: boolean;
 }
 
 /** The questions skipped in later rounds: about ten rounds' worth. */
@@ -343,7 +356,9 @@ const optionsFor = (
     : question.options
       ? shuffle(question.options)
       : config.options
-        ? [...config.options]
+        ? config.listen
+          ? shuffle(config.options)
+          : [...config.options]
         : withPartner(
             letter && config.letter
               ? chooseOptions(config.letter.kind ?? config.kind, question.answer, level)
@@ -415,6 +430,8 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   const moved = useRef(false);
   /** The learner's name for a duel, and whether they are opening one (the name asked first). */
   const [name, setName] = useState('');
+  /** The option being heard (loading or playing), shown on its listen button. */
+  const [hearing, setHearing] = useState<string | null>(null);
   const [inviting, setInviting] = useState(false);
 
   /** A duel's round, once its host starts it: every learner in it plays the same. */
@@ -461,7 +478,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         setProgress({ level, streak: 0 });
         // A limit no longer offered (15, before 2026-11-15) becomes the longest one.
         setLimit(
-          typeof savedLimit === 'number'
+          typeof savedLimit === 'number' && !config.untimed
             ? (TIME_LIMITS.find((value) => value === savedLimit) ?? TIME_LIMITS[0])
             : null,
         );
@@ -474,6 +491,10 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   }, [config]);
 
   const question = round?.questions[round.index];
+  const prepare = config.listen?.prepare;
+  useEffect(() => {
+    if (question && started) prepare?.(question);
+  }, [question, started, prepare]);
   /** Why the answer is right, when the quiz says (the qamats quiz, for a קמץ קטן). */
   const explanation = question && config.explain?.(question);
 
@@ -701,8 +722,12 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       );
     return (
       <div className={card}>
-        <div className="text-lg">זמן לכל שאלה:</div>
-        <TimeLimitPicker limit={limit} onChange={chooseLimit} />
+        {!config.untimed && (
+          <>
+            <div className="text-lg">זמן לכל שאלה:</div>
+            <TimeLimitPicker limit={limit} onChange={chooseLimit} />
+          </>
+        )}
         {config.letter && (
           <>
             <div className="text-lg">בשאלה:</div>
@@ -811,9 +836,16 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
           <Word item={question.item} answered={chosen !== null} />
         )}
       </div>
-      {/* Three options side by side (short names: the vowel-class quiz), four two by two. */}
+      {/* Three options side by side (short names: the vowel-class quiz), four two by two; heard
+          ones one under the other, each with its listen button. */}
       <div
-        className={`grid gap-3 ${round.options.length === 3 ? 'mx-auto max-w-xl grid-cols-3' : 'grid-cols-2'}`}
+        className={`grid gap-3 ${
+          config.listen
+            ? 'mx-auto max-w-sm grid-cols-[auto_1fr]'
+            : round.options.length === 3
+              ? 'mx-auto max-w-xl grid-cols-3'
+              : 'grid-cols-2'
+        }`}
       >
         {round.options.map((id, index) => {
           const state = !chosen
@@ -825,7 +857,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
                 : 'border-slate-200 text-slate-500 dark:border-slate-700 dark:text-slate-400';
           // An icon as well as the colour, for those who can't tell green from red.
           const Icon = !chosen ? null : id === question.answer ? Check : id === chosen ? X : null;
-          return (
+          const option = (
             <button
               key={id}
               type="button"
@@ -838,8 +870,39 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
               } ${state}`}
             >
               {Icon && <Icon size={18} aria-hidden="true" className="shrink-0" />}
-              <span>{config.name(id, question, true)}</span>
+              <span>
+                {config.listen ? config.listen.label(index) : config.name(id, question, true)}
+              </span>
             </button>
+          );
+          if (!config.listen) return option;
+          const { label, play } = config.listen;
+          const heard = hearing === id;
+          // Once answered, the right one's speaker is marked too: to hear it again.
+          const ring = heard
+            ? 'border-brand-strong bg-slate-100 dark:border-brand dark:bg-slate-800'
+            : chosen && id === question.answer
+              ? 'border-green-700 dark:border-green-400'
+              : 'border-slate-300 dark:border-slate-600';
+          return (
+            <React.Fragment key={id}>
+              {/* Listening stays open after the answer: to hear the right one again. */}
+              <button
+                type="button"
+                aria-pressed={heard}
+                onClick={() => {
+                  setHearing(id);
+                  void play(id, question).finally(() =>
+                    setHearing((current) => (current === id ? null : current)),
+                  );
+                }}
+                aria-label={`להשמיע את ${label(index)}`}
+                className={`text-brand-strong hover:border-brand-strong dark:text-brand inline-flex size-14 cursor-pointer items-center justify-center rounded-full border-2 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 ${ring}`}
+              >
+                <Volume2 size={24} aria-hidden="true" />
+              </button>
+              {option}
+            </React.Fragment>
           );
         })}
       </div>
@@ -852,7 +915,10 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
                 round.cheer
               ) : (
                 <>
-                  {round.cheer} {config.answerIs} {config.name(question.answer, question, false)}
+                  {round.cheer} {config.answerIs}{' '}
+                  {config.listen
+                    ? config.listen.label(round.options.indexOf(question.answer))
+                    : config.name(question.answer, question, false)}
                 </>
               )}
             </p>
