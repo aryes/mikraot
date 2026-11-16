@@ -36,10 +36,7 @@ export const shortName = (name: string) => name.replace(/\s*\(.*\)$/, '');
 
 /** A name without vowels, cantillation, maqaf or colon, for the tab title ("זקף גדול"). */
 export const plainName = (name: string) =>
-  shortName(name)
-    .replaceAll('־', ' ')
-    .replace(/[֑-ׇ:]/gu, '')
-    .trim();
+  shortName(name).replaceAll('־', ' ').replace(/[֑-ׇ:]/gu, '').trim();
 
 /**
  * A name with its vowels but without the sign it names (cantillation, meteg, ׀, ׃ or :), as the

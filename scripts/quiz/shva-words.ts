@@ -69,11 +69,7 @@ function vowelBefore(
   if (previous.letter === 'ו' && previous.marks.replace(METEG, '') === DAGESH) {
     return j === 0 ? undefined : { long: true, meteg: previous.marks.includes(METEG) };
   }
-  if (
-    previous.letter === 'ו' &&
-    previous.marks.replace(METEG, '') === 'ֹ' &&
-    bare(letters[j - 1])
-  ) {
+  if (previous.letter === 'ו' && previous.marks.replace(METEG, '') === 'ֹ' && bare(letters[j - 1])) {
     return { long: true, meteg: previous.marks.includes(METEG) };
   }
   // A silent letter after a vowel (צֵאתְךָ, the י of a חיריק מלא): the vowel before it.

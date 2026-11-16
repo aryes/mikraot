@@ -36,10 +36,7 @@ describe('dageshGroup', () => {
 
 describe('verseDageshItems', () => {
   it('starts a verse after a closed syllable, and looks at the word before', () => {
-    const answers = verseDageshItems('בְּרֵאשִׁ֖ית בָּרָ֣א').map(({ answer, item }) => [
-      answer,
-      item.w,
-    ]);
+    const answers = verseDageshItems('בְּרֵאשִׁ֖ית בָּרָ֣א').map(({ answer, item }) => [answer, item.w]);
     expect(answers).toEqual([
       ['קל-ראש', 'בְּרֵאשִׁית'],
       ['קל-ראש', 'בָּרָא'],
