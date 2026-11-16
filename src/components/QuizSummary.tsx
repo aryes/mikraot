@@ -1,8 +1,9 @@
 import React, { useRef, useSyncExternalStore } from 'react';
 import { MAX_LEVEL } from '../lib/quiz';
-import { LIMIT_KEYS, readStats, type QuizStats, type Tally } from '../lib/quiz-stats';
+import { readStats, type QuizStats } from '../lib/quiz-stats';
 import { quizKeys, savedLevel, stored } from '../lib/quiz-storage';
 import type { QuizEntry } from '../lib/quizzes';
+import { QuizResultsTable } from './QuizResultsTable';
 
 export interface QuizLink extends QuizEntry {
   title: string;
@@ -27,17 +28,6 @@ function remembered(storage: string): Remembered {
     level: savedLevel(keys.level),
   };
 }
-
-/** One time limit's results, a row of the quiz's table (Arye, 2026-11-15). */
-const LimitResults: React.FC<{ limitKey: string; tally: Tally }> = ({ limitKey, tally }) => (
-  <tr>
-    <td>{limitKey === 'none' ? 'בלי הגבלה' : `${limitKey} שניות`}</td>
-    <td>{tally.rounds}</td>
-    <td>{Math.round((100 * tally.right) / tally.asked)}%</td>
-    {/* Rounds are of ten (buildRound in src/lib/quiz.ts). */}
-    <td>{tally.rounds > 0 ? `${Math.min(tally.best, 10)} מתוך 10` : '–'}</td>
-  </tr>
-);
 
 /** Storage changed in another tab. */
 function subscribe(changed: () => void): () => void {
@@ -79,33 +69,13 @@ export const QuizSummary: React.FC<{ quizzes: readonly QuizLink[] }> = ({ quizze
               {quiz &&
                 (played ? (
                   <>
-                    {/* The content's table style, as in the lessons; its scroll area named and
-                        reachable by keyboard like theirs (ContentTable.astro), its cells smaller
-                        than the quiz's name, and no wider than its four short columns need. */}
-                    <div
-                      className="table-scroll my-2! max-w-lg [&_td]:text-base! [&_th]:text-base!"
-                      tabIndex={0}
-                      aria-label={`התוצאות ב${title}`}
-                    >
-                      <table>
-                        <thead>
-                          <tr>
-                            <th scope="col">זמן לשאלה</th>
-                            <th scope="col">סבבים</th>
-                            <th scope="col">תשובות נכונות</th>
-                            <th scope="col">שיא</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {LIMIT_KEYS.map((key) => {
-                            const tally = quiz.stats.byLimit[key];
-                            return tally && tally.asked > 0 ? (
-                              <LimitResults key={key} limitKey={key} tally={tally} />
-                            ) : null;
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
+                    {/* Rounds are of ten (buildRound in src/lib/quiz.ts). */}
+                    <QuizResultsTable
+                      stats={quiz.stats}
+                      size={10}
+                      label={`התוצאות ב${title}`}
+                      cells="[&_td]:text-base! [&_th]:text-base!"
+                    />
                     {levels && (
                       <p className="m-0! text-sm!">
                         רמת הקושי: {quiz.level + 1} מתוך {MAX_LEVEL + 1}
