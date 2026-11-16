@@ -18,7 +18,7 @@ export default defineConfig({
   // Two workers locally: about a third faster than one. GitHub's Linux machines have four cores,
   // so CI runs four, except against a deployed site: four from one machine tripped mikraot.net's
   // flood guard (Cloudflare error 1015; docs/OPERATIONS.md, Zone protections) three times on
-  // 2026-11-15/16, so that run is split over three machines instead (deployed.yml). The tests that
+  // 2026-11-15/16, so that run is split over five machines instead (deployed.yml). The tests that
   // write data are few and touch separate pages; the cold-start stall is avoided by warming the
   // server up first.
   workers: ci && !deployed ? 4 : 2,

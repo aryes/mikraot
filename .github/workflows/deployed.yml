@@ -26,7 +26,7 @@ env:
 
 jobs:
   test:
-    name: Tests ${{ matrix.shard }}
+    name: Tests, ${{ matrix.tests }} ${{ matrix.shard }}
     # Only Cloudflare's own app reports deploys (any app could name a check run the same).
     if: >-
       github.event_name == 'workflow_dispatch' ||
@@ -34,14 +34,21 @@ jobs:
       github.event.check_run.name == 'Workers Builds: mikraot' &&
       github.event.check_run.conclusion == 'success')
     runs-on: ubuntu-latest
-    # Three machines, each a third of the tests with two workers (playwright.config.ts): mikraot.net's
-    # flood guard counts requests per address (docs/OPERATIONS.md, Zone protections), and four
-    # workers from one machine tripped it three times on 2026-11-15/16. Three machines with two
-    # each finish sooner than that one did, and each sends half its rate.
+    # Five machines with two workers each (playwright.config.ts): mikraot.net's flood guard counts
+    # requests per address (docs/OPERATIONS.md, Zone protections), and four workers from one machine
+    # tripped it three times on 2026-11-15/16. Split by kind, not by Playwright's --shard alone,
+    # which gives each shard as many tests in file order: the accessibility tests (a page each, 60%
+    # of the time, measured 2026-11-16) all went to the first of three shards, 307 s against 199 and
+    # 140. The accessibility tests on three machines, the rest on two: each about a fifth of the time.
     strategy:
       fail-fast: false
       matrix:
-        shard: ['1/3', '2/3', '3/3']
+        include:
+          - { tests: accessibility, shard: 1/3 }
+          - { tests: accessibility, shard: 2/3 }
+          - { tests: accessibility, shard: 3/3 }
+          - { tests: rest, shard: 1/2 }
+          - { tests: rest, shard: 2/2 }
     # A hang (e.g. a stalled package download) fails here instead of after GitHub's 6 hours.
     timeout-minutes: 30
     # One run per deployed commit. Branch previews (e.g. Renovate's) post the same check for other
@@ -100,8 +107,16 @@ jobs:
       # A newer deploy can also land while the tests run; a failure then counts only if this commit
       # is still the latest.
       - if: steps.main.outputs.deployed == 'true'
+        env:
+          TESTS: ${{ matrix.tests }}
+          SHARD: ${{ matrix.shard }}
         run: |
-          npm run test:deployed -- "$DEPLOYED_URL" --shard=${{ matrix.shard }} && exit 0
+          if [ "$TESTS" = accessibility ]; then
+            files=(e2e/accessibility.spec.ts)
+          else
+            mapfile -t files < <(ls e2e/*.spec.ts | grep -v '/accessibility\.spec\.ts$')
+          fi
+          npm run test:deployed -- "$DEPLOYED_URL" "${files[@]}" --shard="$SHARD" && exit 0
           if bash "$RUNNER_TEMP/superseded.sh"; then
             echo "::notice::Failed, but a newer commit was deployed meanwhile: its run tests the site."
             exit 0
