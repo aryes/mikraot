@@ -142,7 +142,15 @@ test('the trope quiz runs a round of ten tropes, tells each answer, ranks the sc
   await expect(quiz.getByRole('button', { name: 'להתחיל' })).toBeFocused();
   // The learner's results so far, on the start screen; and a way to clear them.
   const stats = quiz.getByRole('region', { name: 'הנתונים שלכם' });
-  await expect(stats).toContainText('סבבים שהושלמו: 1');
+  // As on the page of all the quizzes: a row for each time limit played (only בלי הגבלה here).
+  const rows = stats.getByRole('row');
+  await expect(rows).toHaveCount(2);
+  await expect(rows.nth(1).getByRole('cell')).toHaveText([
+    'בלי הגבלה',
+    '1',
+    /^\d+%$/u,
+    /^\d+ מתוך 10$/u,
+  ]);
   await stats.getByRole('button', { name: 'לאפס את הנתונים' }).click();
   await expect(stats.getByRole('button', { name: 'לא' })).toBeFocused();
   await stats.getByRole('button', { name: 'למחוק' }).click();
