@@ -3,8 +3,7 @@ import { hasTwoSets, spread, tokens, verseItems } from './torah-words';
 
 // Verses as Sefaria gives them (Genesis 1:29, 8:18; Leviticus 21:4 shortened; Genesis 8:17's
 // ketiv/qere).
-const LEGARMEH =
-  'וַיֹּ֣אמֶר אֱלֹהִ֗ים הִנֵּה֩ נָתַ֨תִּי לָכֶ֜ם אֶת־כׇּל־עֵ֣שֶׂב&thinsp;<b>׀</b> זֹרֵ֣עַ זֶ֗רַע';
+const LEGARMEH = 'וַיֹּ֣אמֶר אֱלֹהִ֗ים הִנֵּה֩ נָתַ֨תִּי לָכֶ֜ם אֶת־כׇּל־עֵ֣שֶׂב&thinsp;<b>׀</b> זֹרֵ֣עַ זֶ֗רַע';
 const PASEQ = 'וַיִּקְרָ֨א אֱלֹהִ֤ים&thinsp;<small>׀</small>&thinsp;לָאוֹר֙ י֔וֹם';
 const MEAYLA = 'וַיֵּ֖צֵא־נֹ֑חַ וּבָנָ֛יו וְאִשְׁתּ֥וֹ וּנְשֵֽׁי־בָנָ֖יו אִתּֽוֹ׃';
 const KETIV =
@@ -54,16 +53,11 @@ describe('verseItems', () => {
       'טפחא: וּנְשֵֽׁי־בָנָ֖יו',
       'סוף-פסוק: אִתּֽוֹ׃',
     ]);
-    expect(verseItems('לְהֵ֖חַלּֽוֹ׃')).toEqual([
-      { answer: 'מאילא', item: { w: 'לְהֵ֖חַלּֽוֹ׃' } },
-    ]);
+    expect(verseItems('לְהֵ֖חַלּֽוֹ׃')).toEqual([{ answer: 'מאילא', item: { w: 'לְהֵ֖חַלּֽוֹ׃' } }]);
   });
 
   it('counts a doubled פשטא as שני פשטין, and other doubled signs once', () => {
-    expect(tropesOf('תֹ֙הוּ֙ וּסְקָל֩וּהָ֩')).toEqual([
-      'שני-פשטין: תֹ֙הוּ֙',
-      'תלישא-קטנה: וּסְקָל֩וּהָ֩',
-    ]);
+    expect(tropesOf('תֹ֙הוּ֙ וּסְקָל֩וּהָ֩')).toEqual(['שני-פשטין: תֹ֙הוּ֙', 'תלישא-קטנה: וּסְקָל֩וּהָ֩']);
   });
 
   it('skips a ketiv/qere and the chain it cuts', () => {

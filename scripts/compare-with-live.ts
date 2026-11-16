@@ -58,10 +58,8 @@ const CHANGED_ON_PURPOSE: Readonly<Record<string, string>> = {
   '/טעמים-דומים/':
     'trope names follow the reader’s נוסח and link to their pages (2026-10-27); legarmeh before revia "almost always", not "only", and "almost all" the rest are paseq (2026-10-29)',
   '/טעמים/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
-  '/פַּשְׁטָא֙-זָקֵף-קָטָ֔ן/':
-    'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
-  '/רְבִיעִ֗י-דַּרְגָּ֧א-תְּבִ֛יר/':
-    'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
+  '/פַּשְׁטָא֙-זָקֵף-קָטָ֔ן/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
+  '/רְבִיעִ֗י-דַּרְגָּ֧א-תְּבִ֛יר/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
   '/שילוב-הטעמים-בכתוב/':
     'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
   '/trope-hierarchy/': 'trope names follow the reader’s נוסח and link to their pages (2026-10-27)',
