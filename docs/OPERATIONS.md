@@ -205,7 +205,9 @@ Zone protections for mikraot.net (set at the switch, 2026-10-21, with Arye's app
   rule): more than 1,000 requests in 10 seconds from one address (per Cloudflare data centre) is
   blocked for 10 seconds. First set at 300; raised the same day because the live-site tests (four
   workers from one GitHub machine) tripped it, and mobile carriers and schools put many visitors
-  behind one address. The link check runs 10 requests at a time for the same reason.
+  behind one address. The link check runs 10 requests at a time for the same reason, and the
+  live-site tests run with two workers (`playwright.config.ts`; since 2026-11-16, after four tripped
+  it again three times).
 - **Bot Fight Mode off.** It challenged every request from a data centre, which blocked Brevo's
   newsletter webhook, RSS readers and the live-site tests, and the free plan allows no exceptions
   to it. The forms keep Turnstile and their own rate limits; Browser Integrity Check stays on.
