@@ -22,6 +22,17 @@ describe('the quizzes page', () => {
     );
   });
 
+  it('has every quiz linked from a page it practises (`quizzes` in its frontmatter)', () => {
+    const linked = new Set(
+      readdirSync('src/content/pages').flatMap((file) => {
+        const text = readFileSync(`src/content/pages/${file}`, 'utf8');
+        const list = /^quizzes:\n((?: {2}- .+\n)+)/mu.exec(text)?.[1] ?? '';
+        return [...list.matchAll(/- (.+)/gu)].map((match) => `/${match[1]}/`);
+      }),
+    );
+    for (const url of Object.keys(QUIZ_STORAGE)) expect(linked, url).toContain(url);
+  });
+
   it('is the page of the menu entry "חידונים" itself', () => {
     expect(quizzes?.url).toBe(QUIZZES_PAGE);
   });

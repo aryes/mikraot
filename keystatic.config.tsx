@@ -278,6 +278,10 @@ export default config({
           label: 'להציג ״עודכן לאחרונה״ (התאריך מתעדכן מעצמו כשהעמוד משתנה)',
           defaultValue: false,
         }),
+        quizzes: fields.multiRelationship({
+          label: 'חידונים לתרגול (תיבה בסוף העמוד; רק עמודי חידון)',
+          collection: 'pages',
+        }),
         comments: fields.checkbox({ label: 'תגובות בתחתית העמוד', defaultValue: true }),
         updates: fields.array(
           fields.object({

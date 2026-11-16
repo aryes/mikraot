@@ -1,0 +1,32 @@
+---
+/**
+ * The quizzes that practise a page's subject, in a box at the end of its text (Arye, 2026-11-16:
+ * "link to quizzes from relevant pages"; a box the same on every page, chosen in the page's
+ * frontmatter, `quizzes`). The box is the front page's newsletter box's light green
+ * (NewsletterSignup.tsx); the links are the content's.
+ */
+interface Props {
+  quizzes: { title: string; url: string }[];
+}
+
+const { quizzes } = Astro.props;
+---
+
+{quizzes.length > 0 && (
+  <aside
+    aria-labelledby="practice-title"
+    data-pagefind-ignore
+    class="wp-content-rendered prose prose-slate mt-8 max-w-none rounded-2xl border border-brand/50 bg-brand/10 p-5 text-right dark:border-brand/40 dark:bg-brand/15 print:hidden"
+  >
+    <div id="practice-title" class="font-bold text-slate-800 dark:text-slate-100">
+      לתרגול:
+    </div>
+    <ul class="my-1">
+      {quizzes.map(({ title, url }) => (
+        <li class="my-0">
+          <a href={url}>{title}</a>
+        </li>
+      ))}
+    </ul>
+  </aside>
+)}
