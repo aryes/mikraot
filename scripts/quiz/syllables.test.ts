@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { syllables } from './syllables';
+import { gainOf, syllables } from './syllables';
 
 /** Loudness in frames of 0.01 s: silence (0) and syllables (1), each `[loud, frames]`. */
 const loudness = (...parts: [number, number][]) =>
@@ -61,5 +61,24 @@ describe('syllables', () => {
 
   it('says so when a recording holds fewer syllables than asked', () => {
     expect(syllables(loudness([0, 50], [1, 30], [0, 50]), 0.01, 2)).toBeUndefined();
+  });
+});
+
+describe('gainOf', () => {
+  // Two syllables, the second a fifth as loud: [loudness, frames], the samples' peaks twice that.
+  const quiet = loudness([0, 10], [1, 10], [0, 10], [0.2, 10], [0, 10]);
+  const peaks = quiet.map((value) => value * 2);
+
+  it('brings a quiet syllable up to the loudest, and leaves the loudest as it is', () => {
+    expect(gainOf(quiet, peaks, 0.01, [0.3, 0.5])).toBe(5);
+    expect(gainOf(quiet, peaks, 0.01, [0, 0.3])).toBe(1);
+  });
+
+  it('never clips, nor goes past six times', () => {
+    // A sharp click in the quiet syllable: its samples already near the highest.
+    const clicked = peaks.map((value, i) => (i === 35 ? 1.6 : value));
+    expect(gainOf(quiet, clicked, 0.01, [0.3, 0.5])).toBe(1.25);
+    const faint = loudness([0, 10], [1, 10], [0, 10], [0.01, 10], [0, 10]);
+    expect(gainOf(faint, faint, 0.01, [0.3, 0.5])).toBe(6);
   });
 });

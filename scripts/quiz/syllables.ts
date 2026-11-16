@@ -84,3 +84,28 @@ export function syllables(
     round((cuts[i] ?? Math.min(loudness.length, to + edge)) * frame),
   ]);
 }
+
+/** A quiet syllable is made louder up to this many times, no more (its noise grows too). */
+const MOST_GAIN = 6;
+
+/**
+ * How much louder to play a syllable, `span` seconds, so it sounds as loud as the recording's
+ * loudest (some were recorded much more quietly: the שורוק of ב, ג and ח at a fifth): its loudest
+ * frame brought to the recording's, but never past the recording's highest sample (`peaks`, each
+ * frame's), which would clip, nor more than MOST_GAIN; never quieter. To the hundredth.
+ */
+export function gainOf(
+  loudness: readonly number[],
+  peaks: readonly number[],
+  frame: number,
+  [from, to]: readonly [number, number],
+): number {
+  const inSpan = (values: readonly number[]) =>
+    Math.max(...values.slice(Math.round(from / frame), Math.round(to / frame)));
+  const gain = Math.min(
+    Math.max(...loudness) / inSpan(loudness),
+    Math.max(...peaks) / inSpan(peaks),
+    MOST_GAIN,
+  );
+  return Math.max(1, Math.floor(gain * 100) / 100);
+}

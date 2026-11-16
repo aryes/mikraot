@@ -37,8 +37,10 @@ describe('the sound quiz', () => {
     expect(Object.keys(found).toSorted()).toEqual(Object.keys(RECORDINGS).toSorted());
     for (const spans of Object.values(found)) {
       expect(spans).toHaveLength(SOUNDS.length);
-      const flat = spans.flat();
+      // In order, each with how much louder to play it.
+      const flat = spans.flatMap((span) => span.slice(0, 2));
       expect(flat.toSorted((a, b) => a - b)).toEqual(flat);
+      for (const span of spans) expect(span[2]).toBeGreaterThanOrEqual(1);
     }
   });
 });

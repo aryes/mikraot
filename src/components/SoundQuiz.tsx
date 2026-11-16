@@ -45,7 +45,7 @@ function play(id: string, question: Question): Promise<void> {
   const name = recordingOf(question.item.w);
   const span = name && TIMES[name]?.[SOUNDS.findIndex((sound) => sound === id)];
   if (!name || !span) return Promise.resolve();
-  const [from = 0, to = 0] = span;
+  const [from = 0, to = 0, louder = 1] = span;
   context ??= new AudioContext();
   const audio = context;
   // Resumed in the press itself: Safari keeps a context made earlier suspended.
@@ -60,7 +60,10 @@ function play(id: string, question: Question): Promise<void> {
             playing?.stop();
             const source = audio.createBufferSource();
             source.buffer = buffer;
-            source.connect(audio.destination);
+            // Some syllables were recorded more quietly than the rest: each as loud as the others.
+            const gain = audio.createGain();
+            gain.gain.value = louder;
+            source.connect(gain).connect(audio.destination);
             // Ended, or stopped by another press.
             source.addEventListener('ended', () => done());
             source.start(0, from, to - from);
