@@ -76,3 +76,47 @@ test('the quizzes page lists every quiz, with what this browser remembers of eac
   await quiz.getByRole('link', { name: 'לכל החידונים והתוצאות שלכם' }).click();
   await expect(page).toHaveURL(new RegExp(`${PAGE}$`, 'u'));
 });
+
+test('the quizzes page clears every quiz’s results at once, asking first', async ({ page }) => {
+  await page.goto(PAGE);
+  // Set once (not on every load), so a reload shows what the reset left.
+  await page.evaluate(() => {
+    // oxlint-disable-next-line unicorn/consistent-function-scoping -- runs in the page, alone
+    const stats = (asked: number) =>
+      JSON.stringify({
+        rounds: 1,
+        asked,
+        right: 5,
+        best: 5,
+        answers: {},
+        byLimit: { none: { rounds: 1, asked, right: 5, best: 5 } },
+      });
+    localStorage.setItem('trope-quiz-stats', stats(10));
+    localStorage.setItem('dagesh-quiz-stats', stats(10));
+    localStorage.setItem('trope-quiz-level', '2');
+  });
+  await page.reload();
+  const island = page.locator('astro-island').first();
+  await island.scrollIntoViewIfNeeded();
+  await expect(island.locator('tbody tr')).toHaveCount(2);
+  const reset = page.getByRole('button', { name: 'לאפס את הנתונים של כל החידונים' });
+  await reset.click();
+  // Asked once more; "לא" keeps them.
+  await expect(page.getByRole('button', { name: 'לא' })).toBeFocused();
+  await page.getByRole('button', { name: 'לא' }).click();
+  await expect(island.locator('tbody tr')).toHaveCount(2);
+  await reset.click();
+  await page.getByRole('button', { name: 'למחוק' }).click();
+  const done = island.getByRole('status');
+  await expect(done).toHaveText('הנתונים של כל החידונים נמחקו.');
+  await expect(done).toBeFocused();
+  await expect(island.locator('tbody tr')).toHaveCount(0);
+  await expect(reset).toHaveCount(0);
+  // The results only: the level stays, as with each quiz's own reset.
+  await page.reload();
+  await island.scrollIntoViewIfNeeded();
+  await expect(island.locator(':scope li').filter({ hasText: 'זיהוי טעמים' })).toContainText(
+    'עוד לא שיחקתם.',
+  );
+  expect(await page.evaluate(() => localStorage.getItem('trope-quiz-level'))).toBe('2');
+});
