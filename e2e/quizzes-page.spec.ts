@@ -33,7 +33,6 @@ test('the quizzes page lists every quiz, with what this browser remembers of eac
         byLimit: { '3': { rounds: 1, asked: 10, right: 10, best: 10 } },
       }),
     );
-    localStorage.setItem('dagesh-quiz-level', '3');
   });
   // The built page has only the links: what was played is this browser's to say.
   const built = await (await page.request.get(PAGE)).text();
@@ -42,12 +41,13 @@ test('the quizzes page lists every quiz, with what this browser remembers of eac
   const list = page.locator('astro-island ul').first();
   await list.scrollIntoViewIfNeeded();
   const tropes = list.locator(':scope > li').filter({ hasText: 'זיהוי טעמים' });
-  // Each time limit played, a row of its own (Arye, 2026-11-15), and the options' level.
+  // Each time limit played, a row of its own (Arye, 2026-11-15); not the options' level (Arye,
+  // 2026-11-16: not for the learner to see).
   const rows = tropes.locator('tbody tr');
   await expect(rows).toHaveCount(2);
   await expect(rows.nth(0).locator('td')).toHaveText(['5 שניות', '2', '75%', '9 מתוך 10']);
   await expect(rows.nth(1).locator('td')).toHaveText(['בלי הגבלה', '1', '70%', '7 מתוך 10']);
-  await expect(tropes).toContainText('רמת הקושי: 3 מתוך 4');
+  await expect(tropes).not.toContainText('רמת הקושי');
   // The tables appear only with results: checked here, in light and dark (accessibility.spec.ts
   // sees the page without them).
   /* oxlint-disable no-await-in-loop -- one colour scheme, then the other */
@@ -60,10 +60,8 @@ test('the quizzes page lists every quiz, with what this browser remembers of eac
     expect(results.violations.map((v) => `${colorScheme} ${v.id}`)).toEqual([]);
   } /* oxlint-enable no-await-in-loop */
 
-  // A quiz whose options are fixed (two kinds) has no levels.
   const dagesh = list.locator(':scope > li').filter({ hasText: 'דגש חזק או קל' });
   await expect(dagesh.locator('tbody td')).toHaveText(['3 שניות', '1', '100%', '10 מתוך 10']);
-  await expect(dagesh).not.toContainText('רמת הקושי');
   // A quiz not played yet: its link, and no results.
   const niqqud = list.locator(':scope > li').filter({ hasText: 'זיהוי ניקוד' });
   await expect(niqqud).toContainText('עוד לא שיחקתם.');
