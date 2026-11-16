@@ -32,6 +32,12 @@ const pages = defineCollection({
     draft: z.boolean().default(false),
     /** Show "last updated" with the date this file last changed (src/lib/last-changed.ts). */
     showLastUpdated: z.boolean().default(false),
+    /**
+     * Quizzes that practise this page's subject, as their pages' slugs: a box at the end of the
+     * text links to them (PracticeQuizzes.astro; Arye, 2026-11-16). Each must be a quiz
+     * (src/lib/quizzes.ts), or the build fails.
+     */
+    quizzes: z.array(z.string()).default([]),
     /** Comments below the page; off for the legal pages (Arye, 2026-11-09). */
     comments: z.boolean().default(true),
     /**

@@ -4,10 +4,12 @@ import { render } from 'astro:content';
 import { Comments } from '../components/Comments';
 import PostMeta from '../components/PostMeta.astro';
 import PostNav from '../components/PostNav.astro';
+import PracticeQuizzes from '../components/PracticeQuizzes.astro';
 import ContentLayout from '../layouts/ContentLayout.astro';
 import { ogImagePath } from '../lib/og';
 import { categoryUrl, formatDate } from '../lib/archive';
 import { lastChanged } from '../lib/last-changed';
+import { QUIZ_STORAGE } from '../lib/quizzes';
 import {
   categoryName,
   commentKey,
@@ -48,6 +50,14 @@ const documentTitles = trope
 const { Content } = await render(entry);
 const lastUpdated =
   entry.data.showLastUpdated && entry.filePath ? lastChanged(entry.filePath) : undefined;
+// The quizzes to practise on (PracticeQuizzes.astro): each one's page, which must be a quiz.
+const quizzes = entry.data.quizzes.map((slug) => {
+  const quiz = pages.find((other) => other.entry.id === slug);
+  if (!quiz || !(quiz.url in QUIZ_STORAGE)) {
+    throw new Error(`${entry.id}: "${slug}" in quizzes is not a quiz (src/lib/quizzes.ts)`);
+  }
+  return { title: quiz.entry.data.title, url: quiz.url };
+});
 const isFrontPage = path === '';
 const isPost = kind === 'post';
 // A post's trail runs through its category, as on WordPress; a page's through the menu.
@@ -81,6 +91,7 @@ const crumbs = isPost
   >
     <Content />
   </div>
+  <PracticeQuizzes quizzes={quizzes} />
   {/* At the end, in small print (Arye, 2026-11-09): outside the content, whose rules set its size. */}
   {lastUpdated && (
     <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
