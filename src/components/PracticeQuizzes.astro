@@ -3,7 +3,8 @@
  * The quizzes that practise a page's subject, in a box at the end of its text (Arye, 2026-11-16:
  * "link to quizzes from relevant pages"; a box the same on every page, chosen in the page's
  * frontmatter, `quizzes`). The box is the front page's newsletter box's light green
- * (NewsletterSignup.tsx); the links are the content's.
+ * (NewsletterSignup.tsx); the links are coloured as the content's (global.css), whose list rules
+ * it doesn't take: one line, no bullets.
  */
 interface Props {
   quizzes: { title: string; url: string }[];
@@ -16,15 +17,21 @@ const { quizzes } = Astro.props;
   <aside
     aria-labelledby="practice-title"
     data-pagefind-ignore
-    class="wp-content-rendered prose prose-slate mt-8 max-w-none rounded-2xl border border-brand/50 bg-brand/10 p-5 text-right dark:border-brand/40 dark:bg-brand/15 print:hidden"
+    class="mt-8 flex flex-wrap items-baseline gap-x-6 gap-y-2 rounded-2xl border border-brand/50 bg-brand/10 px-5 py-4 text-(length:--content-size) dark:border-brand/40 dark:bg-brand/15 print:hidden"
   >
     <div id="practice-title" class="font-bold text-slate-800 dark:text-slate-100">
       לתרגול:
     </div>
-    <ul class="my-1">
+    {/* One line on a wide screen, wrapping on a phone (design review, 2026-11-16). */}
+    <ul class="m-0 flex list-none flex-wrap gap-x-6 gap-y-2 p-0">
       {quizzes.map(({ title, url }) => (
-        <li class="my-0">
-          <a href={url}>{title}</a>
+        <li class="m-0 p-0">
+          <a
+            href={url}
+            class="font-semibold text-(--content-link) no-underline transition-colors hover:text-(--content-link-hover) hover:underline"
+          >
+            {title}
+          </a>
         </li>
       ))}
     </ul>
