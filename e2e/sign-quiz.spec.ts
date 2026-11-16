@@ -36,6 +36,12 @@ test('the sign quiz runs a round of ten names, four signs each', async ({ page }
   /* oxlint-enable no-await-in-loop */
 
   await expect(quiz.getByRole('status')).toContainText(/זיהיתם נכון \d+ מתוך 10/);
+  // A missed name shows once, beside its sign: the question is the name.
+  const rows = quiz.getByRole('list', { name: /התשובות הנכונות/ }).getByRole('listitem');
+  for (const text of await rows.allInnerTexts()) {
+    const words = text.replaceAll(/\p{M}/gu, '').split(/\s+/u).filter(Boolean);
+    expect(new Set(words).size).toBe(words.length);
+  }
 });
 
 test('the sign quiz can show words from the Torah as its answers, and remembers the choice', async ({

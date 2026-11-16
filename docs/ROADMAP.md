@@ -69,6 +69,7 @@
   - [x] Why is this קמץ קטן? The same for the קמץ קטן's rules (the qamats quiz's list holds them too). Done 2026-11-16, "למה הקמץ קטן?".
   - [x] The sign quiz with real words from the Torah as the answers, not signs on an א. Done 2026-11-16: a choice on its start screen, signs first.
   - (Claude, from a review) In a duel joined before the word list has loaded, the saved time limit could replace the duel's; check when the duels are next touched.
+  - [x] The end-of-round summary of every quiz (the score, the rank, the buttons after it), styled better (Arye, 2026-11-15). Done 2026-11-16: the score large, a mark for each question, and below the buttons the right answer to each one missed.
 - [x] Servant quiz "איזה משרת?" (Arye, 2026-11-11): two words from the Torah, the first without its servant's sign; which servant goes before the disjunctive on the second? Servants also usual before that disjunctive are never offered as wrong. Most answers are מונח or מרכא, as in the text itself.
 - [ ] Quizzes, later (Arye, 2026-11-05): a quiz on trope sequences (e.g. מונח זקף קטן). They live in a top-level menu of their own, "חידונים" (Arye, 2026-11-09).
 - [x] Trope quiz difficulty levels (Arye, 2026-11-08): e.g. a time limit per question, and a level with the rare tropes. Done 2026-11-10: a time limit for each question, chosen at the start for the whole quiz: none, 15, 10 or 5 seconds; 10, 5 or 3 since 2026-11-15 (Arye: time only, for now; rare tropes perhaps later).

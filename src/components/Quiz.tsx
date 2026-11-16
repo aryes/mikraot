@@ -192,6 +192,8 @@ interface Round {
   options: string[];
   chosen: string | null;
   score: number;
+  /** Each question answered so far, right or not: the round's summary shows them. */
+  results: boolean[];
   /** Right answers in a row, shown from three on. */
   run: number;
   /** How this round words the run ("רצף של 3"). */
@@ -374,6 +376,7 @@ const newRoundOf = (questions: Question[]): Round => ({
   options: [],
   chosen: null,
   score: 0,
+  results: [],
   run: 0,
   streakLabel: pickStreakLabel(),
   cheer: '',
@@ -425,6 +428,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   const next = useRef<HTMLButtonElement>(null);
   const word = useRef<HTMLDivElement>(null);
   const result = useRef<HTMLDivElement>(null);
+  const missedList = useId();
   const begin = useRef<HTMLButtonElement>(null);
   /** Whether the learner has started: only then does focus follow the quiz. */
   const moved = useRef(false);
@@ -451,6 +455,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       ...newRoundOf(view.round.questions.map((entry) => entry.question)),
       index: done.length,
       score: done.filter(Boolean).length,
+      results: done,
       options: fixed[done.length] ?? [],
       fixed,
     });
@@ -465,6 +470,15 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   const nameOf = (id: string, question: Question, option: boolean) =>
     (atLetter && config.letter?.name ? config.letter.name : config.name)(id, question, option);
   const answerIs = (atLetter && config.letter?.answerIs) || config.answerIs;
+  /** A question as asked: its word, or what the quiz or its level shows instead. */
+  const shown = (asked: Question, answered: boolean) =>
+    config.word ? (
+      config.word(asked)
+    ) : atLetter && config.letter?.word ? (
+      config.letter.word(asked)
+    ) : (
+      <Word item={asked.item} answered={answered} />
+    );
 
   useEffect(() => {
     fetch(config.wordList)
@@ -577,6 +591,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       ...round,
       chosen: id,
       score: round.score + (correct ? 1 : 0),
+      results: [...round.results, correct],
       // A mistake starts the count again, without saying so.
       run: correct ? round.run + 1 : 0,
       cheer: cheer(config.kind, question.answer, id),
@@ -638,22 +653,50 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
 
   // Divs where a size is set: the content's paragraph style (.wp-content-rendered p) would win.
   if (!question) {
+    const size = round.questions.length;
+    const missed = round.questions.filter((_, i) => round.results[i] === false);
     return (
       <div className="not-prose rounded-2xl border border-slate-200 p-6 text-center dark:border-slate-700">
-        <div ref={result} tabIndex={-1} className="space-y-2 outline-none" role="status">
-          <div className="text-xl font-bold">
-            זיהיתם נכון {round.score} מתוך {round.questions.length}
+        {/* Read aloud on arrival: the score and the rank, not every question's mark. */}
+        <div ref={result} tabIndex={-1} className="space-y-3 outline-none" role="status">
+          {/* One line read aloud ("זיהיתם נכון 2 מתוך 10"), the score large below its words. */}
+          <div className="text-lg">
+            זיהיתם נכון{' '}
+            <span className="block text-4xl leading-tight font-bold text-(--content-link) sm:text-5xl">
+              {round.score} מתוך {size}
+            </span>
           </div>
           {inDuel && duel.view ? (
-            <DuelResults view={duel.view} size={round.questions.length} />
+            <DuelResults view={duel.view} size={size} />
           ) : (
-            config.result?.(round.score, round.questions.length)
+            config.result?.(round.score, size)
           )}
         </div>
+        {/* The round at a glance: a mark for each question, in order. */}
+        <ol
+          className="mx-0! mt-4! mb-0! flex list-none! flex-wrap justify-center gap-1 p-0! sm:gap-1.5 [&>li]:m-0!"
+          aria-label="התשובות בסבב"
+        >
+          {round.results.map((right, i) => (
+            <li
+              // oxlint-disable-next-line no-array-index-key -- the questions' order is fixed
+              key={i}
+              className={`flex size-6 items-center justify-center rounded-full sm:size-7 ${
+                right
+                  ? 'bg-green-100 text-green-800! dark:bg-green-950 dark:text-green-300!'
+                  : 'bg-red-100 text-red-800! dark:bg-red-950 dark:text-red-300!'
+              }`}
+            >
+              {right ? <Check size={16} aria-hidden="true" /> : <X size={16} aria-hidden="true" />}
+              <span className="sr-only">{`שאלה ${i + 1}: ${right ? 'נכון' : 'לא נכון'}`}</span>
+            </li>
+          ))}
+        </ol>
+        {/* The next step before the review, so a phone shows it without scrolling. */}
         {!inDuel && (
           <button
             type="button"
-            className={`${BUTTON} mt-4`}
+            className={`${BUTTON} mt-5`}
             onClick={() => setRound(newRound(config, list, progress.level, letter))}
           >
             סבב נוסף
@@ -664,6 +707,35 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
             לחזור להתחלה
           </button>
         </div>
+        {missed.length > 0 && (
+          <div className="mt-5 border-t border-slate-200 pt-4 dark:border-slate-700">
+            <div id={missedList} className="mb-2 font-bold">
+              התשובות הנכונות לשאלות שפספסתם:
+            </div>
+            <ul
+              aria-labelledby={missedList}
+              className="m-0! grid list-none! gap-2 p-0! sm:grid-cols-2 [&>li]:m-0!"
+            >
+              {missed.map((asked) => (
+                <li
+                  key={asked.key}
+                  className="flex flex-wrap items-center justify-center gap-x-4 rounded-xl bg-slate-50 px-3 py-1 dark:bg-slate-800/60"
+                >
+                  {/* As asked, a sign or a vowel on one letter drawn larger, and its answer. A
+                      quiz that asks a name (the sign quiz) shows the answer as its option was. */}
+                  <span
+                    className={`leading-[1.6] ${atLetter && config.letter?.word ? 'text-4xl' : 'text-2xl'}`}
+                  >
+                    {shown(asked, true)}
+                  </span>
+                  <span className="font-bold">
+                    {nameOf(asked.answer, asked, config.word !== undefined)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     );
   }
@@ -823,13 +895,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         tabIndex={-1}
         className={`my-6 text-center leading-[1.6] outline-none ${config.wordSize ?? 'text-5xl'}`}
       >
-        {config.word ? (
-          config.word(question)
-        ) : atLetter && config.letter?.word ? (
-          config.letter.word(question)
-        ) : (
-          <Word item={question.item} answered={chosen !== null} />
-        )}
+        {shown(question, chosen !== null)}
       </div>
       {/* Three options side by side (short names: the vowel-class quiz), four two by two. */}
       <div
