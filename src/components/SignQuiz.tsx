@@ -98,14 +98,9 @@ const CONFIG: QuizConfig = {
   letter: {
     groups: WORD_TROPES,
     kind: WORD_SIGN_KIND,
-    name: (id, question, option) =>
-      option ? (
-        wordOf(id, question)
-      ) : (
-        <>
-          <Name id={id} /> {wordOf(id, question)}
-        </>
-      ),
+    // The feedback names the trope, its sign on the name, without another word (Arye, 2026-11-16).
+    name: (id, question, option) => (option ? wordOf(id, question) : <Name id={id} />),
+    answerIs: 'הסימן הוא',
     choice: {
       heading: 'בתשובות:',
       label: 'מה מופיע בתשובות',
