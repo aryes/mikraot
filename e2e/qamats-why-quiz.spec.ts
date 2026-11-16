@@ -29,9 +29,9 @@ test('the "why" qamats quiz asks for the rule of a קמץ קטן, every rule in 
     expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
     const rule = rest ?? first;
     answers.push(rule);
-    // The rule in full, as the page says it.
+    // The rule named once, not again in full (Arye, 2026-11-16: repetitive).
     const id = Object.entries(QATAN_RULES).find(([, name]) => name === rule)?.[0] ?? '';
-    await expect(quiz.locator('[aria-live]')).toContainText(QATAN_REASONS[id] ?? '-');
+    await expect(quiz.locator('[aria-live]')).not.toContainText(QATAN_REASONS[id] ?? '-');
     await expect(next).toBeFocused();
     await next.click();
   }
