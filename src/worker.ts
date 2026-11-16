@@ -83,7 +83,16 @@ export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
           new Response('Unsubscribed', { headers: { 'Cache-Control': 'no-store' } }),
         );
       }
-      const response = await handle(...args);
+      // Finished even if the visitor leaves first. Astro keeps some promises for the whole
+      // instance (its middleware, its logger: `createAsyncManifestMemo`), made by the first
+      // request that needs them and awaited by any that come meanwhile. When a visitor leaves,
+      // Workers cancels that request's work, so such a promise would never settle: the likely
+      // cause of "This promise was created by a request that has since ended" (2026-11-16, just
+      // after cancelled requests; not reproduced; docs/ROADMAP.md, Known issues). waitUntil keeps
+      // the request's work going, up to 30 seconds after the visitor leaves.
+      const answering = handle(...args);
+      context.waitUntil(answering.catch(() => undefined));
+      const response = await answering;
       if (response.status >= 500) {
         // Astro answers an error thrown in a page or API route with a 500 (logging it), so the
         // error itself never reaches Sentry's wrapper: record which request failed.
