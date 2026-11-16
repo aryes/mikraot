@@ -63,6 +63,11 @@ test('the sign quiz can show words from the Torah as its answers, and remembers 
   await options.first().click();
   await expect(quiz.getByRole('button', { name: /לשאלה הבאה|לתוצאה/ })).toBeVisible();
   expect(await options.allInnerTexts()).toEqual(shown);
+  // The feedback names the trope alone, no word (Arye, 2026-11-16).
+  const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
+  const [opening = '', rest] = feedback.split(' הסימן הוא ');
+  expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
+  for (const text of shown) expect(feedback).not.toContain(text.trim());
   // Remembered: words again after a reload.
   await page.reload();
   // The quiz loads once it is on the screen (client:visible).

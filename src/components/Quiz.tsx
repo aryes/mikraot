@@ -85,6 +85,8 @@ export interface QuizConfig {
      * א, and on this level words from the Torah).
      */
     name?: (id: string, question: Question, option: boolean) => ReactNode;
+    /** The feedback's words before the answer's name at this level, if not `answerIs`. */
+    answerIs?: string;
     /**
      * The start screen's choice, if not of the question ("בשאלה: מילה מהתורה / אות אחת"): its
      * heading, its name, and each level's (the sign quiz: "בתשובות: סימן על א / מילה מהתורה").
@@ -459,12 +461,10 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   const duel = useDuel(beginDuel);
   const inDuel = (duel.view?.startedAt ?? null) !== null;
   /** An answer's name at the level played (a duel plays words). */
+  const atLetter = letter && !inDuel;
   const nameOf = (id: string, question: Question, option: boolean) =>
-    (letter && !inDuel && config.letter?.name ? config.letter.name : config.name)(
-      id,
-      question,
-      option,
-    );
+    (atLetter && config.letter?.name ? config.letter.name : config.name)(id, question, option);
+  const answerIs = (atLetter && config.letter?.answerIs) || config.answerIs;
 
   useEffect(() => {
     fetch(config.wordList)
@@ -617,7 +617,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       track(config.event, {
         score: String(round.score),
         seconds: limit === null ? 'none' : String(limit),
-        ...(config.letter && { letter: letter && !inDuel ? 'yes' : 'no' }),
+        ...(config.letter && { letter: atLetter ? 'yes' : 'no' }),
       });
       if (round.score === round.questions.length) celebrate();
       saveStats((current) => recordRound(current, round.score, limit));
@@ -825,7 +825,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       >
         {config.word ? (
           config.word(question)
-        ) : letter && !inDuel && config.letter?.word ? (
+        ) : atLetter && config.letter?.word ? (
           config.letter.word(question)
         ) : (
           <Word item={question.item} answered={chosen !== null} />
@@ -872,7 +872,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
                 round.cheer
               ) : (
                 <>
-                  {round.cheer} {config.answerIs} {nameOf(question.answer, question, false)}
+                  {round.cheer} {answerIs} {nameOf(question.answer, question, false)}
                 </>
               )}
             </p>
