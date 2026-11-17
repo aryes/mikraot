@@ -75,6 +75,20 @@ describe('letter table cells', () => {
     }
   });
 
+  it('marks a vowel named above its bold letters, so they are drawn large', () => {
+    for (const vowel of [
+      'קמץ\\\n  \\\n  **אָ**',
+      'חולם\\\n  \\\n  **אֹ / אוֹ**',
+      'חטף\\\n  **אֱ** / **אְ**',
+    ]) {
+      expect(cell(vowel)).toMatch(/^<td class="cell-vowel">/);
+    }
+    // Bold words (short ones too), or bold letters without a name above them, stay text.
+    for (const other of ['קמץ\\\n  **גדול**', 'מילה\\\n  **מִי**', '**אָ**', 'קמץ **אָ**']) {
+      expect(cell(other)).toMatch(/^<td>/);
+    }
+  });
+
   it('puts an English example under its letters, its English words marked', () => {
     expect(cell('th כמו במילה the')).toBe(
       '<td class="cell-letter">th <span class="cell-example">כמו במילה <span class="latin">the</span></span></td>',
