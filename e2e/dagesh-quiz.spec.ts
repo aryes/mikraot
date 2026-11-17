@@ -24,11 +24,11 @@ test('the dagesh quiz runs a round of ten, five of each kind, every rule explain
     await expect(quiz.locator('.mark-highlight')).toContainText('ּ');
     await expect(options).toHaveText(['דגש חזק', 'דגש קל']);
     await options.first().click();
-    const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
+    const feedback = (await quiz.locator('[aria-live] > div').first().innerText()).trim();
     const [opening = '', rest] = feedback.split(' הדגש כאן: ');
     expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
     // The feedback says why: the rule that settles the dagesh.
-    for (const line of await quiz.locator('[aria-live] p').allInnerTexts()) {
+    for (const line of await quiz.locator('[aria-live] > div').allInnerTexts()) {
       const reason = line.trim();
       if (all.includes(reason)) reasons.add(reason);
     }

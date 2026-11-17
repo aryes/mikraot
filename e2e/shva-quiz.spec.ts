@@ -24,11 +24,11 @@ test('the shva quiz runs a round of ten, five of each kind, every rule of a שו
     await expect(quiz.locator('.mark-highlight')).toContainText('ְ');
     await expect(options).toHaveText(['שווא נע', 'שווא נח']);
     await options.first().click();
-    const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
+    const feedback = (await quiz.locator('[aria-live] > div').first().innerText()).trim();
     const [opening = '', rest] = feedback.split(' השווא כאן: ');
     expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
     // The feedback says why a שווא is נע (the page's rule), and nothing for a שווא נח.
-    for (const line of await quiz.locator('[aria-live] p').allInnerTexts()) {
+    for (const line of await quiz.locator('[aria-live] > div').allInnerTexts()) {
       expect(line).not.toContain('למה נח');
       const reason = line.trim().replace(/^למה נע\? /u, '');
       if (all.includes(reason)) reasons.add(reason);

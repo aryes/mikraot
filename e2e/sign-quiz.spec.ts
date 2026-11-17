@@ -26,7 +26,7 @@ test('the sign quiz runs a round of ten names, four signs each', async ({ page }
     await expect(options).toHaveCount(4);
     await expect(options.first()).toHaveAccessibleName(/^סימן [1-4]$/);
     await options.first().click();
-    const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
+    const feedback = (await quiz.locator('[aria-live] > div').first().innerText()).trim();
     const [opening = '', rest] = feedback.split(' הסימן של ');
     expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
     await expect(quiz.getByRole('link', { name: /^לדף הטעם/ })).toBeVisible();
@@ -70,7 +70,7 @@ test('the sign quiz can show words from the Torah as its answers, and remembers 
   await expect(quiz.getByRole('button', { name: /לשאלה הבאה|לתוצאה/ })).toBeVisible();
   expect(await options.allInnerTexts()).toEqual(shown);
   // The feedback names the trope alone, no word (Arye, 2026-11-16).
-  const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
+  const feedback = (await quiz.locator('[aria-live] > div').first().innerText()).trim();
   const [opening = '', rest] = feedback.split(' הסימן הוא ');
   expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
   for (const text of shown) expect(feedback).not.toContain(text.trim());

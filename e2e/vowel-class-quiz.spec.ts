@@ -22,7 +22,7 @@ test('the vowel-class quiz runs a round of ten, three options each, and names th
     expect(marked).toMatch(/^[ְ-ּׁׂא-ת]{1,6}$/u);
     await expect(options).toHaveText(['גדולה', 'קטנה', 'חטופה']);
     await options.first().click();
-    const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
+    const feedback = (await quiz.locator('[aria-live] > div').first().innerText()).trim();
     // Right or wrong, the answer is named with its vowel: "קטנה (קָמָץ קָטָן)".
     const [opening = '', rest = ''] = feedback.split(' התנועה כאן: ');
     expect([...CHEERS, ...NEAR_MISSES, ...MISSES]).toContain(opening);
