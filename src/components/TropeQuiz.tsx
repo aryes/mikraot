@@ -71,6 +71,8 @@ const CONFIG: QuizConfig = {
     groups: SIGNED_TROPES,
     kind: SIGN_KIND,
     word: (question) => <span>{SIGNS[question.answer]}</span>,
+    // One letter's small sign: 72px, not a word's 48 (Arye, 2026-11-17).
+    wordSize: 'text-[4.5rem]',
   },
   storage: 'trope-quiz',
   event: 'trope-quiz',

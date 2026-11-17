@@ -6,9 +6,12 @@ import { trope } from '../lib/tropes';
 import { isWordList, Quiz, type QuizConfig } from './Quiz';
 import { Name } from './TropeQuiz';
 
-/** A trope's sign, large: what the learner chooses at the signs level. */
+/**
+ * A trope's sign, large: what the learner chooses at the signs level. Kept on one line (קדמא ואזלא,
+ * a פסק after its sign). The `sign` class sizes it in the options (`optionClass` below).
+ */
 const Sign: React.FC<{ id: string }> = ({ id }) => (
-  <span className="text-4xl leading-[1.6]">{SIGNS[id]}</span>
+  <span className="sign text-4xl leading-[1.6] whitespace-nowrap">{SIGNS[id]}</span>
 );
 
 /** The trope quiz's words, fetched once for every option (the browser caches the file too). */
@@ -85,6 +88,10 @@ const CONFIG: QuizConfig = {
   fewest: 1,
   prompt: () => 'מה הסימן של הטעם?',
   word: asked,
+  // The options' signs 56px, so small marks (פשטא's, the תלישות', a פסק) tell apart (Arye,
+  // 2026-11-17); 48px under 400px wide, where קדמא ואזלא and its ✓ or ✗ would overflow the button;
+  // 36px elsewhere, beside words.
+  optionClass: '[&_.sign]:text-5xl min-[25rem]:[&_.sign]:text-[3.5rem]',
   name: (id, _question, option) =>
     option ? (
       <Sign id={id} />

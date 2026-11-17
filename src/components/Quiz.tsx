@@ -88,6 +88,8 @@ export interface QuizConfig {
     name?: (id: string, question: Question, option: boolean) => ReactNode;
     /** The feedback's words before the answer's name at this level, if not `answerIs`. */
     answerIs?: string;
+    /** The question's size at this level, if not `wordSize` (the trope quiz: one sign, larger). */
+    wordSize?: string;
     /**
      * The start screen's choice, if not of the question ("בשאלה", then "מילה מהתורה / אות אחת"): its
      * heading, its name, and each level's (the sign quiz: "בתשובות", then "סימן על א / מילה מהתורה").
@@ -108,6 +110,11 @@ export interface QuizConfig {
   nameRight?: boolean;
   /** The word's size, if not text-5xl (the servant quiz's two words, smaller on a phone). */
   wordSize?: string;
+  /**
+   * Classes for each option's name, in its button only (the sign quiz: its signs larger there than
+   * in the feedback and the round's review).
+   */
+  optionClass?: string;
 }
 
 /** The questions skipped in later rounds: about ten rounds' worth. */
@@ -959,7 +966,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         // The question is read with the word, which takes the focus after it.
         aria-describedby={prompt}
         tabIndex={-1}
-        className={`my-6 text-center leading-[1.6] outline-none ${config.wordSize ?? 'text-5xl'}`}
+        className={`my-6 text-center leading-[1.6] outline-none ${(atLetter && config.letter?.wordSize) || config.wordSize || 'text-5xl'}`}
       >
         {shown(question, chosen !== null)}
       </div>
@@ -990,7 +997,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
               } ${state}`}
             >
               {Icon && <Icon size={18} aria-hidden="true" className="shrink-0" />}
-              <span>{nameOf(id, question, true)}</span>
+              <span className={config.optionClass}>{nameOf(id, question, true)}</span>
             </button>
           );
         })}
