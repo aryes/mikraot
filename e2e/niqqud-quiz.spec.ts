@@ -22,7 +22,7 @@ test('the niqqud quiz runs a round of ten, a letter marked in each word, and tel
     expect(marked).toMatch(/^[ְ-ּׁׂא-ת]{1,6}$/u);
     await expect(options).toHaveCount(4);
     await options.first().click();
-    const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
+    const feedback = (await quiz.locator('[aria-live] > div').first().innerText()).trim();
     const [opening = '', rest] = feedback.split(' הניקוד כאן: ');
     expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
     await expect(quiz.getByRole('link', { name: 'לטבלת הניקוד' })).toHaveAttribute(

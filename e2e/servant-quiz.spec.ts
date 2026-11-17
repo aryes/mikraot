@@ -22,7 +22,7 @@ test('the servant quiz runs a round of ten, the first of two words marked, and t
     expect(marked).not.toMatch(/[֑-֯]/u);
     await expect(options).toHaveCount(4);
     await options.first().click();
-    const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
+    const feedback = (await quiz.locator('[aria-live] > div').first().innerText()).trim();
     const [opening = '', rest] = feedback.split(' המשרת כאן: ');
     expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
     await expect(quiz.getByRole('link', { name: /לדף הטעם/ })).toHaveAttribute('href', /^\//);

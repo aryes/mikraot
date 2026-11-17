@@ -23,7 +23,7 @@ test('the quiz starts with a time limit for every question, and remembers it', a
   await expect(quiz.getByRole('timer')).toHaveClass(/text-red-700/);
   // The time runs out: the question counts as wrong, and the answer is shown.
   await page.clock.fastForward(3_500);
-  await expect(quiz.locator('[aria-live] p').first()).toContainText('נגמר הזמן. הטעם כאן:');
+  await expect(quiz.locator('[aria-live] > div').first()).toContainText('נגמר הזמן. הטעם כאן:');
   // The next question has its own time.
   await quiz.getByRole('button', { name: 'לשאלה הבאה' }).click();
   await expect(quiz.getByRole('timer')).toHaveText('10');
@@ -79,7 +79,7 @@ test('the trope quiz runs a round of ten tropes, tells each answer, ranks the sc
     await expect(options).toHaveCount(4);
     await options.first().click();
     // Right: a cheer; wrong: a kind word and the right name. Either way, a link to its page.
-    const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
+    const feedback = (await quiz.locator('[aria-live] > div').first().innerText()).trim();
     const [opening = '', rest] = feedback.split(' הטעם כאן: ');
     expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
     if (rest !== undefined) missed.push(rest);

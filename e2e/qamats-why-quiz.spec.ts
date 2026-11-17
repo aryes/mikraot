@@ -24,7 +24,7 @@ test('the "why" qamats quiz asks for the rule of a קמץ קטן, every rule in 
     for (const text of await options.allInnerTexts()) expect(RULES).toContain(text.trim());
     const first = (await options.first().innerText()).trim();
     await options.first().click();
-    const feedback = (await quiz.locator('[aria-live] p').first().innerText()).trim();
+    const feedback = (await quiz.locator('[aria-live] > div').first().innerText()).trim();
     const [opening = '', rest] = feedback.split(' הכלל כאן: ');
     expect(rest === undefined ? CHEERS : [...NEAR_MISSES, ...MISSES]).toContain(opening);
     const rule = rest ?? first;
