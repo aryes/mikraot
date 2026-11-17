@@ -102,7 +102,7 @@ const CONFIG: QuizConfig = {
     name: (id, question, option) => (option ? wordOf(id, question) : <Name id={id} />),
     answerIs: 'הסימן הוא',
     choice: {
-      heading: 'בתשובות:',
+      heading: 'בתשובות',
       label: 'מה מופיע בתשובות',
       base: 'סימן על א',
       letter: 'מילה מהתורה',
