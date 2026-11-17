@@ -1,0 +1,57 @@
+---
+/**
+ * A photo with its dark-mode version (scripts/images/dark-photos.py), shown to readers whose system
+ * is dark (screens only: print stays light, like the rest of the site). As Astro's <Picture>, which
+ * can't choose by colour scheme: AVIF and WebP at the widths given, the original's format as the
+ * fallback; the browser downloads only the one it shows.
+ */
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends Omit<
+  HTMLAttributes<'img'>,
+  'src' | 'srcset' | 'sizes' | 'width' | 'height'
+> {
+  light: ImageMetadata;
+  dark: ImageMetadata;
+  widths: number[];
+  sizes: string;
+  /** Required, as for Astro's <Picture>: empty for a photo that only decorates. */
+  alt: string;
+}
+
+const { light, dark, widths, sizes, ...attributes } = Astro.props;
+const FORMATS = ['avif', 'webp'] as const;
+const DARK = 'screen and (prefers-color-scheme: dark)';
+const srcset = async (src: ImageMetadata, format: (typeof FORMATS)[number]) =>
+  (await getImage({ src, format, widths })).srcSet.attribute;
+const sources = [
+  ...(await Promise.all(
+    FORMATS.map(async (format) => ({ media: DARK, format, srcset: await srcset(dark, format) })),
+  )),
+  ...(await Promise.all(
+    FORMATS.map(async (format) => ({
+      media: undefined,
+      format,
+      srcset: await srcset(light, format),
+    })),
+  )),
+];
+const fallback = await getImage({ src: light, format: light.format, widths });
+---
+
+<picture>
+  {sources.map(({ media, format, srcset }) => (
+    <source media={media} type={`image/${format}`} srcset={srcset} sizes={sizes} />
+  ))}
+  <img
+    {...attributes}
+    src={fallback.src}
+    srcset={fallback.srcSet.attribute}
+    sizes={sizes}
+    width={fallback.attributes.width}
+    height={fallback.attributes.height}
+    decoding="async"
+  />
+</picture>

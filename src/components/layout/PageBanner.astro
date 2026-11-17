@@ -21,12 +21,15 @@ interface Props {
 }
 
 const { title, titleTrope, crumbs } = Astro.props;
-import { Picture } from 'astro:assets';
 // The WordPress banner photo (also kept at its old URLs in public/wp-content/uploads/), resized
-// and converted to AVIF/WebP at build time; the banner shows only a strip of it.
+// and converted to AVIF/WebP at build time; the banner shows only a strip of it. Each with its
+// dark-mode version (ThemedPicture).
 import banner from '../../assets/banner-cottonbro.jpg';
+import bannerDark from '../../assets/banner-cottonbro-dark.jpg';
 // The same photo cropped around the yad's tip (aspect 1.9), shown 120 px wide.
 import bannerYad from '../../assets/banner-yad.jpg';
+import bannerYadDark from '../../assets/banner-yad-dark.jpg';
+import ThemedPicture from './ThemedPicture.astro';
 ---
 
 {crumbs ? (
@@ -66,9 +69,9 @@ import bannerYad from '../../assets/banner-yad.jpg';
         </ol>
       </nav>
       <div class="flex items-center sm:gap-5">
-        <Picture
-          src={bannerYad}
-          formats={['avif', 'webp']}
+        <ThemedPicture
+          light={bannerYad}
+          dark={bannerYadDark}
           widths={[120, 240]}
           sizes="120px"
           alt=""
@@ -83,9 +86,9 @@ import bannerYad from '../../assets/banner-yad.jpg';
   </div>
 ) : (
   <div class="relative isolate overflow-hidden bg-slate-700 print:bg-transparent">
-    <Picture
-      src={banner}
-      formats={['avif', 'webp']}
+    <ThemedPicture
+      light={banner}
+      dark={bannerDark}
       widths={[768, 1024, 1536, 2048]}
       sizes="(min-width: 640px) 120vw, 160vw"
       alt=""
