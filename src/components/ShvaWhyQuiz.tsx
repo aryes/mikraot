@@ -28,6 +28,6 @@ const CONFIG: QuizConfig = {
 /**
  * The "why" shva quiz (NA_RULES in src/lib/shva-quiz.ts): rounds of ten words from the Torah, a
  * שווא נע marked in each; which of the five rules of the page "שווא נע" makes it נע? Shown on the
- * page "למה השווא נע?" through the Markdoc tag `shva-why`.
+ * page "למה השווא נע" through the Markdoc tag `shva-why`.
  */
 export const ShvaWhyQuiz: React.FC = () => <Quiz config={CONFIG} />;

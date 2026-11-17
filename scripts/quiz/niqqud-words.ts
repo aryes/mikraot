@@ -204,7 +204,7 @@ export function qamatsGroup(kind: string, item: QuizItem): string | undefined {
 /**
  * Every rule of the page "קמץ קטן" that makes an item's קמץ קטן one, in qamatsGroup's order (the
  * first is the item's group): a קמץ before a maqaf may be before a dagesh or a shva too. The
- * "why" quiz (למה הקמץ קטן?) offers none of the others as wrong. None if the stress or a חטף קמץ
+ * "why" quiz (למה הקמץ קטן) offers none of the others as wrong. None if the stress or a חטף קמץ
  * after it leaves it to rules the page doesn't teach.
  */
 export function qatanRules(item: QuizItem): string[] {

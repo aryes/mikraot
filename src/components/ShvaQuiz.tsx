@@ -35,6 +35,6 @@ const CONFIG: QuizConfig = {
 
 /**
  * The shva quiz (src/lib/shva-quiz.ts): rounds of ten words from the Torah, a shva marked in each;
- * נע or נח? Shown on the page "שווא נע או נח?" through the Markdoc tag `shva-quiz`.
+ * נע or נח? Shown on the page "שווא נע או נח" through the Markdoc tag `shva-quiz`.
  */
 export const ShvaQuiz: React.FC = () => <Quiz config={CONFIG} />;

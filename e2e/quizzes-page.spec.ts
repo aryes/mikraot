@@ -122,7 +122,7 @@ test('the quizzes page clears every quiz’s results at once, asking first', asy
 test('a page links at its end to the quizzes that practise it', async ({ page }) => {
   await page.goto(`/${encodeURI('שווא-נע')}/`);
   const box = page.getByRole('complementary', { name: 'לתרגול:' });
-  await expect(box.getByRole('link')).toHaveText(['שווא נע או נח?', 'למה השווא נע?']);
-  await box.getByRole('link', { name: 'למה השווא נע?' }).click();
+  await expect(box.getByRole('link')).toHaveText(['שווא נע או נח', 'למה השווא נע']);
+  await box.getByRole('link', { name: 'למה השווא נע' }).click();
   await expect(page).toHaveURL(new RegExp(`/${encodeURI('למה-השווא-נע')}/$`, 'u'));
 });

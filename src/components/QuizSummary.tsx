@@ -32,12 +32,12 @@ function subscribe(changed: () => void): () => void {
 }
 
 /**
- * The page of all the quizzes ("חידונים"; Arye, 2026-11-15): each one with the learner's results
- * so far, for each time limit played apart. Read from this browser once the page loads; before
- * that, and for a quiz not yet played, only its link. Below them, that the results stay in this
- * browser, and a way to clear every quiz's results at once (Arye, 2026-11-16), asked once more
- * first, as each quiz's own reset is: the same results (not the levels or the choices made on the
- * start screens).
+ * The page of all the quizzes ("חידונים"; Arye, 2026-11-15): each one's name, what it asks, and the
+ * learner's results so far, for each time limit played apart. Read from this browser once the page
+ * loads; before that, and for a quiz not yet played, only its link and description. Below them,
+ * that the results stay in this browser, and a way to clear every quiz's results at once (Arye,
+ * 2026-11-16), asked once more first, as each quiz's own reset is: the same results (not the
+ * levels or the choices made on the start screens).
  */
 export const QuizSummary: React.FC<{ quizzes: readonly QuizLink[] }> = ({ quizzes }) => {
   // Read as an outside store: this browser's memory, and again if another tab changes it; the same
@@ -69,14 +69,15 @@ export const QuizSummary: React.FC<{ quizzes: readonly QuizLink[] }> = ({ quizze
   return (
     <>
       {/* Important: the content's list styles (.wp-content-rendered) would win. */}
-      <ul className="m-0! flex list-none! flex-col gap-3 p-0!">
-        {quizzes.map(({ title, url }, i) => {
+      <ul className="m-0! flex list-none! flex-col gap-2 p-0!">
+        {quizzes.map(({ title, url, description }, i) => {
           const stats = memory[i];
           return (
-            <li key={url} className="m-0! rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
+            <li key={url} className="m-0! rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800/60">
               <a href={encodeURI(url)} className={LINK}>
                 {title}
               </a>
+              <p className="m-0! text-base!">{description}</p>
               {stats &&
                 (played[i] ? (
                   // Rounds are of ten (buildRound in src/lib/quiz.ts).

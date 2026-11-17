@@ -40,6 +40,6 @@ const CONFIG: QuizConfig = {
 
 /**
  * The dagesh quiz (src/lib/dagesh-quiz.ts): rounds of ten words from the Torah, a dagesh marked
- * in each; חזק or קל? Shown on the page "דגש חזק או קל?" through the Markdoc tag `dagesh-quiz`.
+ * in each; חזק or קל? Shown on the page "דגש חזק או קל" through the Markdoc tag `dagesh-quiz`.
  */
 export const DageshQuiz: React.FC = () => <Quiz config={CONFIG} />;

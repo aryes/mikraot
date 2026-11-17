@@ -35,7 +35,7 @@ const CONFIG: QuizConfig = {
 
 /**
  * The niqqud quiz (src/lib/niqqud-quiz.ts): rounds of ten words from the Torah, one letter of
- * each marked, four niqqud names to choose from. Shown on the page "מה הניקוד?" through the
+ * each marked, four niqqud names to choose from. Shown on the page "זיהוי ניקוד" through the
  * Markdoc tag `niqqud-quiz`.
  */
 export const NiqqudQuiz: React.FC = () => <Quiz config={CONFIG} />;
