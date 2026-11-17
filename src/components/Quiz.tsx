@@ -89,8 +89,8 @@ export interface QuizConfig {
     /** The feedback's words before the answer's name at this level, if not `answerIs`. */
     answerIs?: string;
     /**
-     * The start screen's choice, if not of the question ("בשאלה: מילה מהתורה / אות אחת"): its
-     * heading, its name, and each level's (the sign quiz: "בתשובות: סימן על א / מילה מהתורה").
+     * The start screen's choice, if not of the question ("בשאלה", then "מילה מהתורה / אות אחת"): its
+     * heading, its name, and each level's (the sign quiz: "בתשובות", then "סימן על א / מילה מהתורה").
      */
     choice?: { heading: string; label: string; base: string; letter: string };
   };
@@ -228,13 +228,15 @@ interface Round {
  * quiz (Arye, 2026-11-10). Pressed/unpressed buttons: the choice shows at once.
  */
 const TimeLimitPicker: React.FC<{
+  /** The id of its visible name above it, which names the group for screen readers too. */
+  labelledBy: string;
   limit: number | null;
   onChange: (limit: number | null) => void;
-}> = ({ limit, onChange }) => {
+}> = ({ labelledBy, limit, onChange }) => {
   return (
     <div
       role="group"
-      aria-label="זמן לכל שאלה"
+      aria-labelledby={labelledBy}
       // Two by two on phones, one row from sm.
       className={`inline-grid grid-cols-2 sm:inline-flex ${SEGMENTS}`}
     >
@@ -439,6 +441,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
    */
   const [opened, setOpened] = useState<{ of: Question[]; index: number } | null>(null);
   const begin = useRef<HTMLButtonElement>(null);
+  const limitLabel = useId();
   /** Whether the learner has started: only then does focus follow the quiz. */
   const moved = useRef(false);
   /** The learner's name for a duel, and whether they are opening one (the name asked first). */
@@ -837,8 +840,10 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
     return (
       <div className={card}>
         <div className="space-y-1.5">
-          <div className={CHOICE_LABEL}>זמן לכל שאלה</div>
-          <TimeLimitPicker limit={limit} onChange={chooseLimit} />
+          <div id={limitLabel} className={CHOICE_LABEL}>
+            זמן לכל שאלה
+          </div>
+          <TimeLimitPicker labelledBy={limitLabel} limit={limit} onChange={chooseLimit} />
         </div>
         {config.letter && (
           <div className="space-y-1.5">
