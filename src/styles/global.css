@@ -153,6 +153,11 @@
 .wp-content-rendered h4 {
   font-size: 1.3rem;
 }
+/* A page whose text opens with a heading: the card's padding is its space. The content sits in an
+   <article>, so prose's own first-child rule (direct children only) misses it. */
+.wp-content-rendered article > :first-child {
+  margin-top: 0;
+}
 /* The link beside a section title: shown on hover or focus, always on touch screens. */
 .heading-link {
   display: inline-block;
