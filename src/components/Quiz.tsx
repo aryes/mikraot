@@ -701,7 +701,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
                 aria-controls={reviewPanel}
                 onClick={() => setOpened(reviewed === i ? null : { of: round.questions, index: i })}
                 // On a phone, a 24px circle in a 32px-wide button: easier to tap, ten still in a line.
-                className="group flex cursor-pointer flex-col items-center gap-0.5 rounded-md px-1 pt-1 sm:px-0"
+                className="group flex cursor-pointer flex-col items-center gap-1.5 rounded-md px-1 pt-1 sm:px-0"
               >
                 {/* Each ✓ or ✗ with its question's number under it, so the order reads plainly
                     (Arye, 2026-11-17: with marks alone it wasn't clear which end was first). */}
@@ -717,7 +717,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
                 </span>
                 <span
                   aria-hidden="true"
-                  className={`text-xs leading-none text-slate-600 dark:text-slate-300 ${reviewed === i ? 'font-bold' : ''}`}
+                  className={`text-xs leading-none text-slate-600 sm:text-sm dark:text-slate-300 ${reviewed === i ? 'font-bold' : ''}`}
                 >
                   {i + 1}
                 </span>
