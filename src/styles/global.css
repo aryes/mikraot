@@ -146,6 +146,13 @@
   border-bottom: 2px solid var(--heading-rule);
   padding-bottom: 0.5rem;
 }
+/* On a phone the page title is 28px too: the section headings smaller there, so it stays the
+   largest (design review, 2026-11-17). */
+@media (width < 40rem) {
+  .wp-content-rendered h2 {
+    font-size: 1.4rem;
+  }
+}
 .wp-content-rendered h3 {
   font-size: 1.3rem; /* bold and grey, below the regular green h2 (1.75rem) */
   color: var(--content-subheading);
