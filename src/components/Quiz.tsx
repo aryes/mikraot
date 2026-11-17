@@ -1,4 +1,4 @@
-import { Check, Flame, X } from 'lucide-react';
+import { Check, Flame, Users, X } from 'lucide-react';
 import React, { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import {
   buildRound,
@@ -185,6 +185,20 @@ const QUIET =
   'cursor-pointer rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800';
 const BUTTON =
   'bg-brand-strong hover:bg-brand-deep inline-flex cursor-pointer items-center justify-center rounded-xl px-5 py-2.5 text-base font-bold text-white shadow-xs transition-all';
+/**
+ * The start screen's choices, a row of segments on a grey track (Arye, 2026-11-17: the chosen ones
+ * were the start button's solid green, three green blocks competing): the chosen segment white and
+ * raised, in the links' green, so the start button is the screen's only solid one.
+ */
+const SEGMENTS = 'gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800';
+const segment = (chosen: boolean) =>
+  `cursor-pointer rounded-lg px-3 py-1.5 transition-colors ${
+    chosen
+      ? 'bg-white font-bold text-(--content-link) shadow-sm ring-1 ring-slate-200 dark:bg-slate-600 dark:text-white dark:ring-slate-500'
+      : 'text-slate-600 hover:bg-white/60 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white'
+  }`;
+/** A choice's name above it: smaller than the question, a label rather than a heading. */
+const CHOICE_LABEL = 'text-sm font-semibold text-slate-600 dark:text-slate-300';
 
 interface Round {
   questions: Question[];
@@ -217,25 +231,19 @@ const TimeLimitPicker: React.FC<{
   limit: number | null;
   onChange: (limit: number | null) => void;
 }> = ({ limit, onChange }) => {
-  const option = (value: number | null) =>
-    `cursor-pointer rounded-lg px-3 py-1.5 ${
-      value === limit
-        ? 'bg-brand-strong font-bold text-white'
-        : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
-    }`;
   return (
     <div
       role="group"
       aria-label="זמן לכל שאלה"
       // Two by two on phones, one row from sm.
-      className="inline-grid grid-cols-2 gap-1 rounded-xl border border-slate-200 p-1 sm:inline-flex dark:border-slate-700"
+      className={`inline-grid grid-cols-2 sm:inline-flex ${SEGMENTS}`}
     >
       {[null, ...TIME_LIMITS].map((value) => (
         <button
           key={value ?? 'none'}
           type="button"
           aria-pressed={value === limit}
-          className={option(value)}
+          className={segment(value === limit)}
           onClick={() => onChange(value)}
         >
           {value === null ? 'בלי הגבלת זמן' : `${value} שניות`}
@@ -252,21 +260,13 @@ const Choice: React.FC<{
   chosen: boolean;
   onChange: (value: boolean) => void;
 }> = ({ label, options, chosen, onChange }) => (
-  <div
-    role="group"
-    aria-label={label}
-    className="inline-flex gap-1 rounded-xl border border-slate-200 p-1 dark:border-slate-700"
-  >
+  <div role="group" aria-label={label} className={`inline-flex ${SEGMENTS}`}>
     {options.map(({ value, text }) => (
       <button
         key={text}
         type="button"
         aria-pressed={value === chosen}
-        className={`cursor-pointer rounded-lg px-3 py-1.5 ${
-          value === chosen
-            ? 'bg-brand-strong font-bold text-white'
-            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
-        }`}
+        className={segment(value === chosen)}
         onClick={() => onChange(value)}
       >
         {text}
@@ -836,11 +836,13 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       );
     return (
       <div className={card}>
-        <div className="text-lg">זמן לכל שאלה:</div>
-        <TimeLimitPicker limit={limit} onChange={chooseLimit} />
+        <div className="space-y-1.5">
+          <div className={CHOICE_LABEL}>זמן לכל שאלה</div>
+          <TimeLimitPicker limit={limit} onChange={chooseLimit} />
+        </div>
         {config.letter && (
-          <>
-            <div className="text-lg">{config.letter.choice?.heading ?? 'בשאלה:'}</div>
+          <div className="space-y-1.5">
+            <div className={CHOICE_LABEL}>{config.letter.choice?.heading ?? 'בשאלה'}</div>
             <Choice
               label={config.letter.choice?.label ?? 'מה מופיע בשאלה'}
               options={[
@@ -850,10 +852,15 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
               chosen={letter}
               onChange={chooseLetter}
             />
-          </>
+          </div>
         )}
-        <div>
-          <button ref={begin} type="button" className={BUTTON} onClick={start}>
+        <div className="pt-2">
+          <button
+            ref={begin}
+            type="button"
+            className={`${BUTTON} px-10! py-3! text-lg!`}
+            onClick={start}
+          >
             להתחיל
           </button>
         </div>
@@ -865,7 +872,13 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
             </button>
           </div>
         ) : (
-          <button type="button" className={QUIET} onClick={() => setInviting(true)}>
+          // A button that looks like one, below the start (it was plain grey text).
+          <button
+            type="button"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-xl border-2 border-slate-300 px-4 py-2 font-semibold text-slate-700 transition-colors hover:border-(--content-link) hover:text-(--content-link) dark:border-slate-600 dark:text-slate-200"
+            onClick={() => setInviting(true)}
+          >
+            <Users size={18} aria-hidden="true" />
             לשחק עם חברים
           </button>
         )}
