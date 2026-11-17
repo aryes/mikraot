@@ -697,21 +697,21 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
                 aria-expanded={reviewed === i}
                 aria-controls={reviewPanel}
                 onClick={() => setOpened(reviewed === i ? null : { of: round.questions, index: i })}
-                // On a phone, a 24px circle in a 32px button: easier to tap, ten still in a line.
-                className="group block cursor-pointer rounded-full p-1 sm:p-0"
+                // On a phone, a 28px mark in a 32px button: easier to tap, ten still in a line.
+                className="group block cursor-pointer rounded-full p-0.5 sm:p-0"
               >
+                {/* The question's number, so the order reads plainly (Arye, 2026-11-17: with marks
+                    alone it wasn't clear which end was first), its ✓ or ✗ under it. */}
                 <span
-                  className={`flex size-6 items-center justify-center rounded-full ring-offset-2 ring-offset-white sm:size-8 dark:ring-offset-slate-900 ${
+                  aria-hidden="true"
+                  className={`flex w-7 flex-col items-center rounded-full pt-0.5 pb-1 text-sm leading-tight font-bold ring-offset-2 ring-offset-white sm:w-8 sm:text-base dark:ring-offset-slate-900 ${
                     right
                       ? 'bg-green-100 text-green-800! ring-green-700 group-hover:bg-green-200 dark:bg-green-950 dark:text-green-300! dark:ring-green-400 dark:group-hover:bg-green-900'
                       : 'bg-red-100 text-red-800! ring-red-700 group-hover:bg-red-200 dark:bg-red-950 dark:text-red-300! dark:ring-red-400 dark:group-hover:bg-red-900'
                   } ${reviewed === i ? 'ring-2' : ''}`}
                 >
-                  {right ? (
-                    <Check size={16} aria-hidden="true" />
-                  ) : (
-                    <X size={16} aria-hidden="true" />
-                  )}
+                  {i + 1}
+                  {right ? <Check size={14} strokeWidth={3} /> : <X size={14} strokeWidth={3} />}
                 </span>
                 <span className="sr-only">{`שאלה ${i + 1}: ${right ? 'נכון' : 'לא נכון'}`}</span>
               </button>
@@ -720,10 +720,10 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         </ol>
         <div id={reviewPanel} aria-live="polite">
           {reviewed === null
-            ? // Not "סימן": on this site that is a trope's sign.
+            ? // Not "סימן": on this site that is a trope's sign (Arye's wording, 2026-11-17).
               round.results.length > 0 && (
                 <div className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                  לחצו על אחת התשובות כדי לראות את השאלה.
+                  לחצו על מספר השאלה כדי לראות את הפרטים שלה.
                 </div>
               )
             : (() => {
