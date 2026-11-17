@@ -98,7 +98,7 @@ test('the trope quiz runs a round of ten tropes, tells each answer, ranks the sc
   expect(missed).toHaveLength(10 - score);
   // The question opened shows in the place the marks control, a hint there until then.
   const panel = page.locator(`[id="${await marks.first().getAttribute('aria-controls')}"]`);
-  await expect(panel).toContainText('לחצו על אחת התשובות');
+  await expect(panel).toContainText('לחצו על מספר השאלה');
   const wrong = marks.filter({ hasText: ': לא נכון' });
   /* oxlint-disable no-await-in-loop -- one mark after another, each opening its question */
   for (const [i, name] of missed.entries()) {
@@ -121,7 +121,7 @@ test('the trope quiz runs a round of ten tropes, tells each answer, ranks the sc
   await last.click();
   await last.click();
   await expect(last).toHaveAttribute('aria-expanded', 'false');
-  await expect(panel).toContainText('לחצו על אחת התשובות');
+  await expect(panel).toContainText('לחצו על מספר השאלה');
   // The rank, linked to its place in the trope hierarchy.
   await expect(quiz.getByRole('status').locator('a[href^="/trope-hierarchy/#"]')).toHaveCount(1);
   const recent = await page.evaluate(() =>
