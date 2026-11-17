@@ -100,6 +100,47 @@ const isLetters = (/** @type {string} */ text) =>
     .split(/\s*\/\s*|\s+/)
     .every((part) => LETTER.test(part));
 
+/**
+ * A vowel shown on א, as the niqqud table writes it: the א with its marks, maybe with a
+ * vowel letter after it ("אִי", "אוֹ", "אוּ").
+ */
+const POINTED = /^א\p{M}*(?:[וי]\p{M}*)?$/u;
+
+/**
+ * The text of a content node and its children.
+ * @param {import('@markdoc/markdoc').Node} node
+ * @returns {string}
+ */
+function contentOf(node) {
+  return node.type === 'text'
+    ? String(node.attributes['content'])
+    : node.children.map((child) => contentOf(child)).join('');
+}
+
+/**
+ * A cell that names a vowel and shows it in bold under the name ("קמץ", a break, "**אָ**"; maybe
+ * two, "**אֱ** / **אְ**"): its bold letters are drawn as large as the letters of the other tables
+ * (Arye, 2026-11-17).
+ * @param {import('@markdoc/markdoc').Node[]} parts
+ */
+const namesAVowel = (parts) => {
+  const bold = parts.filter((part) => part.type === 'strong');
+  return (
+    bold.length > 0 &&
+    bold.every((part) =>
+      contentOf(part)
+        .trim()
+        .split(/\s*\/\s*|\s+/)
+        .every((/** @type {string} */ piece) => POINTED.test(piece)),
+    ) &&
+    parts.some((part) => part.type === 'hardbreak') &&
+    // After the last break, only the letters and the "/" between them.
+    parts
+      .slice(parts.findLastIndex((part) => part.type === 'hardbreak') + 1)
+      .every((part) => part.type === 'strong' || contentOf(part).trim() === '/')
+  );
+};
+
 /** A hollow paseq ({% paseq %}׀{% /paseq %}, the sign in the trope list): read as the character ׀. */
 const isPaseq = (/** @type {import('@markdoc/markdoc').Node} */ part) =>
   part.type === 'tag' && part.tag === 'paseq';
@@ -141,6 +182,13 @@ export const td = {
       return new Markdoc.Tag(
         'td',
         { ...attributes, class: 'cell-letter' },
+        node.transformChildren(config),
+      );
+    }
+    if (audio.length === 0 && namesAVowel(parts)) {
+      return new Markdoc.Tag(
+        'td',
+        { ...attributes, class: 'cell-vowel' },
         node.transformChildren(config),
       );
     }
