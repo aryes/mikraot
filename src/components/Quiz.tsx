@@ -992,7 +992,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         {chosen && (
           <>
             <div
-              className={`text-lg font-bold ${
+              className={`text-lg font-bold sm:text-xl ${
                 chosen === question.answer
                   ? 'text-green-800 dark:text-green-300'
                   : 'text-red-800 dark:text-red-300'
