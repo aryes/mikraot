@@ -972,11 +972,19 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
           );
         })}
       </div>
-      {/* No full stop after a name: it may end in a colon (the trope quiz's סוף פסוק). */}
-      <div aria-live="polite" className="mt-4 min-h-6 space-y-2">
+      {/* No full stop after a name: it may end in a colon (the trope quiz's סוף פסוק). Centred
+          like the rest of the card, the verdict in green or red (Arye, 2026-11-17); divs, since
+          the content's paragraph margins would widen the gaps. */}
+      <div aria-live="polite" className="mt-4 min-h-6 space-y-1 text-center">
         {chosen && (
           <>
-            <p className="font-bold">
+            <div
+              className={`text-lg font-bold ${
+                chosen === question.answer
+                  ? 'text-green-800 dark:text-green-300'
+                  : 'text-red-800 dark:text-red-300'
+              }`}
+            >
               {chosen === question.answer && !config.nameRight ? (
                 round.cheer
               ) : (
@@ -984,20 +992,19 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
                   {round.cheer} {answerIs} {nameOf(question.answer, question, false)}
                 </>
               )}
-            </p>
-            {question.why && config.why && <p>{config.why(question.why)}</p>}
-            {explanation && <p>{explanation}</p>}
-            <p>{config.more(question)}</p>
+            </div>
+            {question.why && config.why && <div>{config.why(question.why)}</div>}
+            {explanation && <div>{explanation}</div>}
+            <div>{config.more(question)}</div>
           </>
         )}
       </div>
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        {chosen ? (
+      {/* The next step under the feedback, the way back under it, as at the round's end. */}
+      <div className="mt-5 flex flex-col items-center gap-3">
+        {chosen && (
           <button ref={next} type="button" className={BUTTON} onClick={goOn}>
             {round.index + 1 < round.questions.length ? 'לשאלה הבאה' : 'לתוצאה'}
           </button>
-        ) : (
-          <span />
         )}
         <button type="button" className={QUIET} onClick={restart}>
           {inDuel ? 'לצאת מהחדר' : 'למסך הפתיחה'}
