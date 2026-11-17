@@ -11,16 +11,17 @@ from pathlib import Path
 from PIL import Image, ImageChops
 
 ASSETS = Path("src/assets")
-PHOTOS = ["banner-cottonbro.jpg", "banner-yad.jpg"]
+# Each photo and the level its brightest white becomes: the small crop beside inner pages'
+# titles (120px wide, desktop only) less dim, or its letters and yad blur into brown.
+PHOTOS = {"banner-cottonbro.jpg": 0.58, "banner-yad.jpg": 0.75}
 
 GAMMA = 1.6  # the dark letters stay deep while the parchment dims
-LEVEL = 0.58  # the brightest white becomes this
 WARMTH = (1.0, 0.86, 0.68)  # red, green and blue kept: lamplight
 VIGNETTE = (0.55, 0.45, 0.9, 0.6)  # its centre (x, y, of the width and height), fall-off, floor
 
 
-def curve(k: float) -> list[int]:
-    return [round(255 * (v / 255) ** GAMMA * LEVEL * k) for v in range(256)]
+def curve(level: float, k: float) -> list[int]:
+    return [round(255 * (v / 255) ** GAMMA * level * k) for v in range(256)]
 
 
 def vignette(size: tuple[int, int]) -> Image.Image:
@@ -34,10 +35,10 @@ def vignette(size: tuple[int, int]) -> Image.Image:
     return Image.merge("RGB", (mask, mask, mask))
 
 
-for name in PHOTOS:
+for name, level in PHOTOS.items():
     source = ASSETS / name
     photo = Image.open(source).convert("RGB")
-    channels = [c.point(curve(k)) for c, k in zip(photo.split(), WARMTH)]
+    channels = [c.point(curve(level, k)) for c, k in zip(photo.split(), WARMTH)]
     dark = ImageChops.multiply(Image.merge("RGB", channels), vignette(photo.size))
     target = source.with_name(source.stem + "-dark.jpg")
     dark.save(target, quality=88, optimize=True, progressive=True)
