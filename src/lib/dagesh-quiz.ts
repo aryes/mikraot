@@ -1,5 +1,5 @@
 /**
- * The dagesh quiz ("דגש חזק או קל?", src/components/DageshQuiz.tsx; from the quiz ideas of
+ * The dagesh quiz ("דגש חזק או קל", src/components/DageshQuiz.tsx; from the quiz ideas of
  * 2026-11-11): a word from the Torah with a dagesh marked, חזק or קל? Only dageshes the rules of
  * the site's pages "דגש קל" and "דגש חזק" settle (scripts/quiz/dagesh-words.ts), each by its
  * rule, which the feedback names: "למה קל? אחרי שווא נח." Its list: public/quiz/dagesh-words.json.

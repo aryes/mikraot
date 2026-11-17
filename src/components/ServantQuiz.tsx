@@ -27,7 +27,7 @@ const CONFIG: QuizConfig = {
 
 /**
  * The servant quiz (src/lib/servant-quiz.ts): rounds of ten pairs of words from the Torah, the
- * first without its servant; four servant names to choose from. Shown on the page "איזה משרת?"
+ * first without its servant; four servant names to choose from. Shown on the page "זיהוי משרתים"
  * through the Markdoc tag `servant-quiz`.
  */
 export const ServantQuiz: React.FC = () => <Quiz config={CONFIG} />;

@@ -1,5 +1,5 @@
 /**
- * The servant quiz ("איזה משרת?", src/components/ServantQuiz.tsx; Arye, 2026-11-11: "which
+ * The servant quiz ("זיהוי משרתים", src/components/ServantQuiz.tsx; Arye, 2026-11-11: "which
  * mesharet is used for which trope"): two words from the Torah, the first without its servant
  * (משרת), the second with the disjunctive (מפסיק) it serves; which servant is missing? Its word
  * list, public/quiz/servant-words.json, is keyed by the disjunctive, each item naming its servant

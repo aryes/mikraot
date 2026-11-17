@@ -1,5 +1,5 @@
 /**
- * The shva quiz ("שווא נע או נח?", src/components/ShvaQuiz.tsx; Arye, 2026-11-14): a word from the
+ * The shva quiz ("שווא נע או נח", src/components/ShvaQuiz.tsx; Arye, 2026-11-14): a word from the
  * Torah with a shva marked, נע or נח? Only shvas the rules of the site's page "שווא נע" settle
  * (scripts/quiz/shva-words.ts), each by its rule. The feedback names a שווא נע's rule: "למה נע? בראש
  * מילה." A שווא נח is the default, as a קמץ גדול is in the qamats quiz, so it gets none (Arye,
@@ -43,7 +43,7 @@ export function shvaReason(group: string): string | undefined {
 export const SHVA_QUIZ: QuizKind = { ids: SHVA_KINDS, lookAlikes: [] };
 
 /**
- * The "why" quiz ("למה השווא נע?", src/components/ShvaWhyQuiz.tsx; Arye's idea of 2026-11-15): a
+ * The "why" quiz ("למה השווא נע", src/components/ShvaWhyQuiz.tsx; Arye's idea of 2026-11-15): a
  * שווא נע marked, which of the page's rules makes it נע? The shva quiz's list holds each word's
  * rule, and the other rules that apply to it too (`x`, never offered as wrong: the page itself
  * gives בְּכוֹר two). Each rule's name as an option: NA_REASONS without its full stop.

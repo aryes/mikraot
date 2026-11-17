@@ -38,7 +38,7 @@ const CONFIG: QuizConfig = {
 
 /**
  * The qamats quiz (src/lib/niqqud-quiz.ts): rounds of ten words from the Torah, a qamats marked
- * in each, the cantillation kept; a קמץ גדול or a קמץ קטן? Shown on the page "קמץ גדול או קטן?"
+ * in each, the cantillation kept; a קמץ גדול or a קמץ קטן? Shown on the page "קמץ גדול או קטן"
  * through the Markdoc tag `qamats-quiz`.
  */
 export const QamatsQuiz: React.FC = () => <Quiz config={CONFIG} />;

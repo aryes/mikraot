@@ -38,6 +38,6 @@ const CONFIG: QuizConfig = {
 /**
  * The "why" qamats quiz (QATAN_RULES in src/lib/niqqud-quiz.ts): rounds of ten words from the
  * Torah, a קמץ קטן marked in each, the cantillation kept; which of the four rules of the page "קמץ
- * קטן" makes it קטן? Shown on the page "למה הקמץ קטן?" through the Markdoc tag `qamats-why`.
+ * קטן" makes it קטן? Shown on the page "למה הקמץ קטן" through the Markdoc tag `qamats-why`.
  */
 export const QamatsWhyQuiz: React.FC = () => <Quiz config={CONFIG} />;

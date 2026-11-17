@@ -105,6 +105,6 @@ const CONFIG: QuizConfig = {
 
 /**
  * The trope quiz (src/lib/trope-quiz.ts): rounds of ten words from the Torah, four trope names to
- * choose from for each. Shown on the page "מה הטעם?" through the Markdoc tag `trope-quiz`.
+ * choose from for each. Shown on the page "זיהוי טעמים" through the Markdoc tag `trope-quiz`.
  */
 export const TropeQuiz: React.FC = () => <Quiz config={CONFIG} />;

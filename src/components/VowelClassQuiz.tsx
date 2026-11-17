@@ -34,7 +34,7 @@ const CONFIG: QuizConfig = {
 
 /**
  * The vowel-class quiz (src/lib/niqqud-quiz.ts): rounds of ten words from the Torah, one letter
- * of each marked; is its vowel long, short or hataf? Shown on the page "גדולה, קטנה או חטופה?"
+ * of each marked; is its vowel long, short or hataf? Shown on the page "סוג התנועה"
  * through the Markdoc tag `vowel-classes` (one hyphen: the Markdoc integration makes an identifier of it, replacing only the first).
  */
 export const VowelClassQuiz: React.FC = () => <Quiz config={CONFIG} />;

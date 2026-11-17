@@ -1,5 +1,5 @@
 /**
- * The niqqud quiz ("מה הניקוד?", src/components/NiqqudQuiz.tsx; Arye, 2026-11-10: "same as the
+ * The niqqud quiz ("זיהוי ניקוד", src/components/NiqqudQuiz.tsx; Arye, 2026-11-10: "same as the
  * trope quiz"): a word from the Torah with one letter marked, and four niqqud names to choose from
  * (the shared parts: quiz.ts). Its word list is public/quiz/niqqud-words.json; the words are shown
  * without their cantillation marks, so only the niqqud is asked about. The vowel-class quiz,
@@ -116,7 +116,7 @@ export const pointedName = (id: string) => POINTED[id] ?? vowelName(id);
 export const NIQQUD_GROUPS = [...QUIZ_VOWELS, 'קמץ-קטן'] as const;
 
 /**
- * The vowel-class quiz ("גדולה, קטנה או חטופה?", src/components/VowelClassQuiz.tsx; Arye,
+ * The vowel-class quiz ("סוג התנועה", src/components/VowelClassQuiz.tsx; Arye,
  * 2026-11-11): the same words, asking whether the marked vowel is long, short or hataf, as the
  * columns of the niqqud table divide them. Not the שווא, which is in the hataf column only when
  * it is a שווא נע: the quiz can't tell which.
@@ -143,7 +143,7 @@ export const VOWEL_CLASS_OF: Readonly<Record<string, (typeof VOWEL_CLASSES)[numb
 export const VOWEL_CLASS_QUIZ: QuizKind = { ids: VOWEL_CLASSES, lookAlikes: [] };
 
 /**
- * The qamats quiz ("קמץ גדול או קטן?", src/components/QamatsQuiz.tsx; from the list of quiz ideas
+ * The qamats quiz ("קמץ גדול או קטן", src/components/QamatsQuiz.tsx; from the list of quiz ideas
  * of 2026-11-11): a word with a qamats marked, its cantillation kept (the stress tells the kinds
  * apart); which kind? Its list, public/quiz/qamats-words.json, has the קמץ קטן by the rule that
  * makes it one (Arye, 2026-11-14: explain why, and ask every kind), and a round asks five of each
@@ -198,7 +198,7 @@ export function qamatsReason(group: string): string | undefined {
 export const QAMATS_QUIZ: QuizKind = { ids: QAMATS_KINDS, lookAlikes: [] };
 
 /**
- * The "why" quiz ("למה הקמץ קטן?", src/components/QamatsWhyQuiz.tsx; Arye's idea of 2026-11-15):
+ * The "why" quiz ("למה הקמץ קטן", src/components/QamatsWhyQuiz.tsx; Arye's idea of 2026-11-15):
  * a קמץ קטן marked, which of the page's rules makes it קטן? The qamats quiz's list holds each
  * word's rule, and any other that applies too (`x`, never offered as wrong). Each rule's name as
  * an option, shortened from QATAN_REASONS.

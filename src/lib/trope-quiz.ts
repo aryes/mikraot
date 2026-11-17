@@ -1,5 +1,5 @@
 /**
- * The trope quiz ("מה הטעם?", src/components/TropeQuiz.tsx): a word from the Torah and four trope
+ * The trope quiz ("זיהוי טעמים", src/components/TropeQuiz.tsx): a word from the Torah and four trope
  * names to choose from (the shared parts: quiz.ts). Its word list is public/quiz/trope-words.json;
  * its prepared questions (src/data/quiz/prepared.json) ask about the rare tropes and the tricky
  * pairs.

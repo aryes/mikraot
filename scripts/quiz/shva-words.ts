@@ -118,7 +118,7 @@ export function shvaGroup(letters: readonly Letter[], i: number): string | undef
 /**
  * Every rule of the page "שווא נע" that makes a letter's shva נע, where shvaGroup found one: a
  * word's first letter may have a dagesh too (בְּכוֹר), the second of two shvas too (וְעַבְדְּךָ),
- * as the page itself says. The "why" quiz (למה השווא נע?) offers none of the others as wrong.
+ * as the page itself says. The "why" quiz (למה השווא נע) offers none of the others as wrong.
  */
 export function naRules(letters: readonly Letter[], i: number): string[] {
   const letter = letters[i];

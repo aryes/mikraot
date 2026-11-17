@@ -83,54 +83,54 @@ export default defineMarkdocConfig({
       },
       selfClosing: true,
     },
-    // The trope quiz (src/components/TropeQuiz.tsx), on the page "מה הטעם?".
+    // The trope quiz (src/components/TropeQuiz.tsx), on the page "זיהוי טעמים".
     'trope-quiz': {
       render: component('./src/components/content/TropeQuiz.astro'),
       selfClosing: true,
     },
-    // The niqqud quiz (src/components/NiqqudQuiz.tsx), on the page "מה הניקוד?".
+    // The niqqud quiz (src/components/NiqqudQuiz.tsx), on the page "זיהוי ניקוד".
     'niqqud-quiz': {
       render: component('./src/components/content/NiqqudQuiz.astro'),
       selfClosing: true,
     },
-    // The vowel-class quiz (src/components/VowelClassQuiz.tsx), on the page "גדולה, קטנה או חטופה?".
+    // The vowel-class quiz (src/components/VowelClassQuiz.tsx), on the page "סוג התנועה".
     'vowel-classes': {
       render: component('./src/components/content/VowelClassQuiz.astro'),
       selfClosing: true,
     },
-    // The qamats quiz (src/components/QamatsQuiz.tsx), on the page "קמץ גדול או קטן?".
+    // The qamats quiz (src/components/QamatsQuiz.tsx), on the page "קמץ גדול או קטן".
     'qamats-quiz': {
       render: component('./src/components/content/QamatsQuiz.astro'),
       selfClosing: true,
     },
-    // The servant quiz (src/components/ServantQuiz.tsx), on the page "איזה משרת?".
+    // The servant quiz (src/components/ServantQuiz.tsx), on the page "זיהוי משרתים".
     'servant-quiz': {
       render: component('./src/components/content/ServantQuiz.astro'),
       selfClosing: true,
     },
-    // The dagesh quiz (src/components/DageshQuiz.tsx), on the page "דגש חזק או קל?".
+    // The dagesh quiz (src/components/DageshQuiz.tsx), on the page "דגש חזק או קל".
     'dagesh-quiz': {
       render: component('./src/components/content/DageshQuiz.astro'),
       selfClosing: true,
     },
-    // The "why" shva quiz (src/components/ShvaWhyQuiz.tsx), on the page "למה השווא נע?" (a tag
+    // The "why" shva quiz (src/components/ShvaWhyQuiz.tsx), on the page "למה השווא נע" (a tag
     // name has at most one hyphen).
     'shva-why': {
       render: component('./src/components/content/ShvaWhyQuiz.astro'),
       selfClosing: true,
     },
-    // The "why" qamats quiz (src/components/QamatsWhyQuiz.tsx), on the page "למה הקמץ קטן?" (a
+    // The "why" qamats quiz (src/components/QamatsWhyQuiz.tsx), on the page "למה הקמץ קטן" (a
     // tag name has at most one hyphen).
     'qamats-why': {
       render: component('./src/components/content/QamatsWhyQuiz.astro'),
       selfClosing: true,
     },
-    // The shva quiz (src/components/ShvaQuiz.tsx), on the page "שווא נע או נח?".
+    // The shva quiz (src/components/ShvaQuiz.tsx), on the page "שווא נע או נח".
     'shva-quiz': {
       render: component('./src/components/content/ShvaQuiz.astro'),
       selfClosing: true,
     },
-    // The sign quiz (src/components/SignQuiz.tsx), on the page "מה הסימן?".
+    // The sign quiz (src/components/SignQuiz.tsx), on the page "סימן הטעם".
     'sign-quiz': {
       render: component('./src/components/content/SignQuiz.astro'),
       selfClosing: true,
