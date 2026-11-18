@@ -31,7 +31,7 @@ const TEXT = 'text-slate-600 dark:text-slate-300';
 const ERROR = 'text-sm text-red-700 dark:text-red-300';
 const LINK = 'text-brand-strong underline hover:text-brand-deep dark:text-brand-light';
 /** An address on its own line: inside a Hebrew sentence its punctuation lands on the wrong side. */
-const ADDRESS = 'block text-start font-semibold text-slate-800 dark:text-slate-100';
+const ADDRESS = 'block text-right font-semibold text-slate-800 dark:text-slate-100';
 
 /** The token of a sign-in link (src/server/auth.ts `signInLink`), taken off the address. */
 function takeToken(): string | null {
