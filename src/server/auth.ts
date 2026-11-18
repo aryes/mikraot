@@ -82,9 +82,9 @@ export function authOptions(settings: AuthSettings) {
     // Cloudflare's address of the visitor, for Better Auth's own rate limits (not stored).
     advanced: {
       ipAddress: { ipAddressHeaders: ['cf-connecting-ip'] },
-      // Not checked against the database on each start (a few queries per request, since each
-      // request makes its own instance: src/server/auth-route.ts). migrations/0006_accounts.sql
-      // is Better Auth's own schema, and e2e/account.spec.ts signs in through it.
+      // Not checked against the database on each start (a few queries for each new instance:
+      // src/server/auth-route.ts). migrations/0006_accounts.sql is Better Auth's own schema, and
+      // e2e/account.spec.ts signs in through it.
       database: { validateSchema: false },
     },
     session: {

@@ -41,11 +41,15 @@ const json = (data: unknown, status = 200) =>
 const shownLinks = new Map<string, string>();
 
 /**
- * A new instance for each request. Workers lets no request wait on another's database work, and
- * an instance shared between requests would: Better Auth starts up in a promise kept inside it
- * (seen as page loads that never finished under parallel tests, 2026-11-18).
+ * Shared by a Worker instance's requests once its start has finished: building one costs about
+ * 10 ms of CPU (measured on a preview, 2026-11-18), the free plan's whole allowance for a request.
+ * Not before: Workers lets no request await another's work, and requests that waited on the first
+ * one's start hung (seen under parallel tests, 2026-11-18). Those build their own.
  */
+let ready: ReturnType<typeof createAuth> | undefined;
+
 function auth() {
+  if (ready) return ready;
   const secret = env.BETTER_AUTH_SECRET;
   if (!secret) throw new Error('BETTER_AUTH_SECRET is not set');
   const [apiKey, showLink] = [env.BREVO_API_KEY, env.AUTH_SHOW_LINK === '1'];
@@ -54,7 +58,7 @@ function auth() {
     env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
       ? { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET }
       : undefined;
-  return createAuth({
+  const made = createAuth({
     db: env.DB,
     secret,
     google,
@@ -69,6 +73,11 @@ function auth() {
       }
     },
   });
+  made.$context.then(
+    () => (ready ??= made),
+    () => undefined,
+  );
+  return made;
 }
 
 /** The signed-in learner's account id, from the request's session cookie; null if none. */
