@@ -203,8 +203,8 @@ export default defineConfig({
     // Not the author archive (noindex), nor the pages opened only from email links.
     sitemap({
       filter: (page) =>
-        !['/author/', '/unsubscribe/', '/newsletter/', '/comments/manage/'].some((path) =>
-          page.includes(path),
+        !['/author/', '/unsubscribe/', '/newsletter/', '/comments/manage/', '/account/'].some(
+          (path) => page.includes(path),
         ),
     }),
   ],

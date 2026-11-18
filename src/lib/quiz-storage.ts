@@ -1,7 +1,8 @@
 /**
  * What a quiz remembers in the browser (localStorage), read and written safely: by the quiz itself
  * (src/components/Quiz.tsx) and by the page of all the quizzes (src/components/QuizSummary.tsx).
- * No accounts: it stays in this browser.
+ * The results also go to the learner's account when signed in (src/lib/quiz-sync.ts); the rest
+ * stays in this browser.
  */
 import { MAX_LEVEL } from './quiz';
 

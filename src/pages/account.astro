@@ -1,0 +1,21 @@
+---
+/**
+ * The account page (src/server/auth.ts): signing in, which sign-in links lead to, and the
+ * account itself. Static: the island asks the server who is signed in. In the inner pages'
+ * layout (a title card with breadcrumbs above the content).
+ */
+import ContentLayout from '../layouts/ContentLayout.astro';
+import { AccountPanel } from '../components/AccountPanel';
+import { site } from '../lib/site';
+---
+
+<ContentLayout documentTitle={`החשבון שלי - ${site.title}`} title="החשבון שלי" crumbs={[]} noindex>
+  <div class="wp-content-rendered">
+    <p>
+      אפשר ללמוד באתר גם בלי חשבון. מי שמתחברים שומרים את התוצאות שלהם בחידונים, וממשיכים מכל מכשיר.
+    </p>
+  </div>
+  <div class="mt-6 max-w-xl">
+    <AccountPanel client:load />
+  </div>
+</ContentLayout>

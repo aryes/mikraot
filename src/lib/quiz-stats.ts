@@ -1,8 +1,8 @@
 /**
  * A learner's results over time in one quiz (Arye, 2026-11-10: "save quiz statistics for the
  * user"): rounds played, right answers, the best round, and for each answer how often it was asked
- * and missed. Kept in the browser like the level and the recent questions (no accounts; across
- * devices would need sign-in). Pure functions; src/components/Quiz.tsx stores and shows them.
+ * and missed. Kept in the browser like the level and the recent questions, and in the account
+ * when signed in (src/lib/quiz-sync.ts, since 2026-11-18). Pure functions; src/components/Quiz.tsx stores and shows them.
  * Also kept apart for each time limit (Arye, 2026-11-15: rounds with different limits are results
  * of their own), for the page of all the quizzes (src/components/QuizSummary.tsx).
  */
@@ -148,4 +148,29 @@ export function hardest(stats: QuizStats, limit = 3): string[] {
       .slice(0, limit)
       .map(({ id }) => id)
   );
+}
+
+/** Two tallies together: counts added, the better best. */
+const addTally = (a: Tally, b: Tally): Tally => ({
+  rounds: a.rounds + b.rounds,
+  asked: a.asked + b.asked,
+  right: a.right + b.right,
+  best: Math.max(a.best, b.best),
+});
+
+/**
+ * Results from two places together: this browser's and the account's other devices'
+ * (src/lib/quiz-sync.ts). Each device keeps only its own, so nothing is counted twice.
+ */
+export function addStats(a: QuizStats, b: QuizStats): QuizStats {
+  const answers = { ...a.answers };
+  for (const [id, entry] of Object.entries(b.answers)) {
+    const mine = answers[id] ?? { asked: 0, missed: 0 };
+    answers[id] = { asked: mine.asked + entry.asked, missed: mine.missed + entry.missed };
+  }
+  const byLimit = { ...a.byLimit };
+  for (const [key, tally] of Object.entries(b.byLimit)) {
+    byLimit[key] = addTally(byLimit[key] ?? emptyTally(), tally);
+  }
+  return { ...addTally(a, b), answers, byLimit };
 }

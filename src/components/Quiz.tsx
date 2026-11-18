@@ -19,12 +19,14 @@ import {
 } from '../lib/quiz';
 import type { DuelRound, DuelView } from '../lib/duel';
 import {
+  addStats,
   emptyStats,
   readStats,
   recordAnswer,
   recordRound,
   type QuizStats,
 } from '../lib/quiz-stats';
+import { clearResults, othersOf, SYNCED_EVENT, syncResults } from '../lib/quiz-sync';
 import { quizKeys, savedLevel, store, stored } from '../lib/quiz-storage';
 import { QUIZZES_PAGE } from '../lib/quizzes';
 import { track } from '../scripts/analytics';
@@ -438,6 +440,8 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
   const [now, setNow] = useState(() => Date.now());
   /** The learner's results so far (Arye, 2026-11-10), shown on the start screen. */
   const [stats, setStats] = useState<QuizStats>(emptyStats);
+  /** The account's other devices' results, when signed in (src/lib/quiz-sync.ts): shown added. */
+  const [others, setOthers] = useState<QuizStats>(emptyStats);
   const next = useRef<HTMLButtonElement>(null);
   const word = useRef<HTMLDivElement>(null);
   const result = useRef<HTMLDivElement>(null);
@@ -522,6 +526,8 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         setLetter(oneLetter);
         const ids: readonly string[] = config.kind.ids;
         setStats(readStats(stored(keysOf(config).stats), (id) => ids.includes(id)));
+        setOthers(othersOf(config.storage, (id) => ids.includes(id)));
+        void syncResults();
         setRound(newRound(config, data, level, oneLetter));
       })
       .catch(() => setFailed(true));
@@ -547,6 +553,19 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
     else if (round.index < round.questions.length) word.current?.focus();
     else result.current?.focus();
   }, [round, started]);
+
+  // The account's results arrived: the other devices', and this browser's own if a reset elsewhere
+  // cleared them.
+  useEffect(() => {
+    const ids: readonly string[] = config.kind.ids;
+    const known = (id: string) => ids.includes(id);
+    const update = () => {
+      setOthers(othersOf(config.storage, known));
+      setStats(readStats(stored(keysOf(config).stats), known));
+    };
+    document.addEventListener(SYNCED_EVENT, update);
+    return () => document.removeEventListener(SYNCED_EVENT, update);
+  }, [config]);
 
   /** The stats changed from their latest value (two answers in one moment both count once). */
   function saveStats(change: (stats: QuizStats) => QuizStats): void {
@@ -657,6 +676,8 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
       });
       if (round.score === round.questions.length) celebrate();
       saveStats((current) => recordRound(current, round.score, limit));
+      // After the state's update has stored them.
+      setTimeout(() => void syncResults(), 0);
     }
     setRound({
       ...round,
@@ -900,12 +921,16 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
           </button>
         )}
         <QuizStatsPanel
-          stats={stats}
+          stats={addStats(stats, others)}
           size={round.questions.length}
           // A name as in an option's button; a question of its own (it adds nothing to the name).
           name={(id) => config.name(id, { answer: '', key: '', group: '', item: { w: '' } }, true)}
           onReset={() => {
             saveStats(emptyStats);
+            clearResults(config.storage);
+            setOthers(emptyStats());
+            // On every device of the account too.
+            setTimeout(() => void syncResults([config.storage]), 0);
             // The panel goes away with the button pressed: focus to the start.
             begin.current?.focus();
           }}
