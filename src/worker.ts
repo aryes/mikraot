@@ -7,7 +7,7 @@
  * Cloudflare applies to static files only (src/server/security-headers.ts). Emails Brevo refused
  * are sent again from a queue (src/server/email.ts). Sentry records the errors with their details
  * (src/lib/sentry.ts). Quiz duels' rooms are Durable Objects (src/server/quiz-duel.ts), reached
- * here by WebSocket (src/server/duel-route.ts).
+ * here by WebSocket (src/server/duel-route.ts). Signing in has its own API (src/server/auth-route.ts).
  */
 import { handle } from '@astrojs/cloudflare/handler';
 import * as Sentry from '@sentry/cloudflare';
@@ -23,6 +23,8 @@ import { unsubscribeNewsletter } from './server/newsletter';
 import { oneClickUnsubscribe } from './server/one-click-unsubscribe';
 import { sentryOptions } from './lib/sentry';
 import { duelRoom } from './server/duel-route';
+import { authApi } from './server/auth-route';
+import { removeExpired } from './server/auth';
 
 export { QuizDuel } from './server/quiz-duel';
 
@@ -69,6 +71,9 @@ export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
       });
       // A 101 hands over the socket as it is; a refusal gets the headers like any answer.
       if (room) return room.status === 101 ? room : withSecurityHeaders(room);
+      // Signing in (src/server/auth-route.ts), before Astro.
+      const signIn = await authApi(request);
+      if (signIn) return withSecurityHeaders(signIn);
       const unsubscribe = await oneClickUnsubscribe(request);
       if (unsubscribe !== null) {
         const { stop, token } = unsubscribe;
@@ -113,7 +118,10 @@ export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
   },
   async scheduled(_controller: unknown, _env: unknown, context: Context) {
     try {
-      await backupDatabase(env.DB, env.BACKUPS, new Date());
+      const now = new Date();
+      await backupDatabase(env.DB, env.BACKUPS, now);
+      // After the backup, which leaves these tables out anyway.
+      await removeExpired(env.DB, now);
     } catch (error) {
       alert(context, 'backup', String(error));
       // Rethrown so the run is recorded as failed (with the error) in the Worker logs.

@@ -1,0 +1,21 @@
+---
+/**
+ * The account page (src/server/auth.ts): signing in, which sign-in links lead to, and the
+ * account itself. Static: the island asks the server who is signed in.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { AccountPanel } from '../components/AccountPanel';
+---
+
+<BaseLayout title="החשבון שלי – מקראות" noindex>
+  <div class="mx-auto max-w-2xl pb-3 sm:px-6 sm:py-8 lg:px-8">
+    <div class="border-b border-slate-200/80 sm:rounded-2xl sm:border dark:border-slate-700/80 bg-white dark:bg-slate-900 px-4 py-6 shadow-xs sm:p-10">
+      <h1 class="mb-2 text-3xl font-bold text-brand-deep dark:text-brand-light">החשבון שלי</h1>
+      <p class="mb-6 text-slate-600 dark:text-slate-300">
+        אפשר ללמוד באתר גם בלי חשבון. מי שמתחברים שומרים את התוצאות שלהם בחידונים, וממשיכים מכל
+        מכשיר.
+      </p>
+      <AccountPanel client:load />
+    </div>
+  </div>
+</BaseLayout>

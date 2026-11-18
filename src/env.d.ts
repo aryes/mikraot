@@ -21,8 +21,11 @@ declare module 'cloudflare:workers' {
   }
   // An ambient module can't use a relative `import` statement, so the type is imported inline.
   export const env: {
-    // oxlint-disable-next-line typescript/consistent-type-imports
-    DB: import('./server/comments').CommentsDb & import('./server/backup').BackupDb;
+    /* oxlint-disable typescript/consistent-type-imports */
+    DB: import('./server/comments').CommentsDb &
+      import('./server/backup').BackupDb &
+      import('better-auth').D1Database;
+    /* oxlint-enable typescript/consistent-type-imports */
     /** The static files (dist/client). */
     ASSETS: { fetch(input: string | URL | Request): Promise<Response> };
     /** Turnstile secret key (wrangler secret; locally in .dev.vars). */
@@ -62,6 +65,18 @@ declare module 'cloudflare:workers' {
     };
     /** Per-visitor limit on joining quiz duels (src/worker.ts). */
     DUEL_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
+    /** Signs the sign-in sessions (wrangler secret; a public value in previews; src/server/auth.ts). */
+    BETTER_AUTH_SECRET?: string;
+    /** '1' (local runs, tests, previews): a sign-in link is shown, not emailed. Never in production. */
+    AUTH_SHOW_LINK?: string;
+    /** Sign-in with Google (wrangler secrets), once its app exists. */
+    GOOGLE_CLIENT_ID?: string;
+    GOOGLE_CLIENT_SECRET?: string;
+    /** Per-visitor and per-address limits on sign-in links (src/server/auth-route.ts). */
+    AUTH_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
+    AUTH_EMAIL_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
+    /** Per-visitor limit on any sign-in request (the same file). */
+    AUTH_API_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
   };
 }
 

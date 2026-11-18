@@ -1,5 +1,6 @@
 /**
- * Cloudflare Turnstile ("are you human?") check for posted comments and newsletter sign-ups.
+ * Cloudflare Turnstile ("are you human?") check for posted comments, newsletter sign-ups and
+ * requests for a sign-in link.
  * https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
  */
 
@@ -8,7 +9,7 @@ const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverif
 const TIMEOUT_MS = 5000;
 
 /** The form a check was made for: a token from one is refused by the other. */
-export type TurnstileAction = 'comment' | 'newsletter';
+export type TurnstileAction = 'comment' | 'newsletter' | 'signin';
 
 /**
  * Cloudflare's public test secrets (local runs, tests and branch previews) answer with placeholder

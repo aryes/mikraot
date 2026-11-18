@@ -31,6 +31,13 @@ export interface Backup {
 /** Copies are kept a little over a year, then KV deletes them. */
 export const KEEP_SECONDS = 400 * 24 * 60 * 60;
 
+/**
+ * Not copied: signed-in sessions and sign-in links waiting to be used (src/server/auth.ts). They
+ * last weeks at most, and a copy of them would let whoever reads the backup sign in as a learner.
+ * After a restore, learners sign in again.
+ */
+export const NOT_BACKED_UP = new Set(['session', 'verification']);
+
 /** One key per day: a second run on the same day replaces that day's copy. */
 export const backupKey = (date: Date) => `d1/${date.toISOString().slice(0, 10)}.json`;
 
@@ -42,7 +49,8 @@ export const TABLES_QUERY = `SELECT name FROM sqlite_master WHERE type = 'table'
 const sqlName = (name: string) => `"${name.replaceAll('"', '""')}"`;
 
 export async function backupDatabase(db: BackupDb, store: BackupStore, now: Date): Promise<string> {
-  const { results: tables } = await db.prepare(TABLES_QUERY).all<{ name: string }>();
+  const { results: all } = await db.prepare(TABLES_QUERY).all<{ name: string }>();
+  const tables = all.filter(({ name }) => !NOT_BACKED_UP.has(name));
   // Table names come from sqlite_master, not from input; quoted all the same. In insertion order,
   // so a restore inserts a comment before its replies.
   const contents = await db.batch<Record<string, unknown>>(
@@ -70,10 +78,12 @@ const sqlValue = (value: unknown): string => {
  * `wrangler d1 execute --file`. Tables not in the backup are left alone.
  */
 export function backupToSql(backup: Backup): string {
-  // Foreign keys (a reply's parent) are checked at the end, once every row is back.
+  // Foreign keys (a reply's parent, an account's user) are checked at the end, once every row is
+  // back. Every table is emptied before any is filled: emptying `user` would otherwise delete
+  // (ON DELETE CASCADE) the accounts already put back.
   const lines = [`-- Backup of ${backup.createdAt}`, 'PRAGMA defer_foreign_keys = true;'];
+  for (const table of Object.keys(backup.tables)) lines.push(`DELETE FROM ${sqlName(table)};`);
   for (const [table, rows] of Object.entries(backup.tables)) {
-    lines.push(`DELETE FROM ${sqlName(table)};`);
     for (const row of rows) {
       const columns = Object.keys(row).map(sqlName).join(', ');
       const values = Object.values(row).map(sqlValue).join(', ');

@@ -48,6 +48,7 @@
     "@sentry/browser": "^11.7.0",
     "@sentry/cloudflare": "^11.7.0",
     "astro": "^7.3.5",
+    "better-auth": "^1.7.25",
     "canvas-confetti": "^1.9.4",
     "ipaddr.js": "^2.5.0",
     "lucide-react": "^1.49.0",
