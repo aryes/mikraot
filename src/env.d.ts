@@ -77,6 +77,8 @@ declare module 'cloudflare:workers' {
     AUTH_EMAIL_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
     /** Per-visitor limit on any sign-in request (the same file). */
     AUTH_API_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
+    /** Per-account limit on sending quiz results (src/pages/api/quiz-results.ts). */
+    QUIZ_SYNC_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
   };
 }
 

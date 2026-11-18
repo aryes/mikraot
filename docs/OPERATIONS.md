@@ -122,7 +122,9 @@ Deletions on request (date, comment id, what):
 ### Accounts (sign-in)
 
 Optional accounts (src/server/auth.ts, Better Auth, since 2026-11-18): tables `user`, `account`,
-`session` and `verification` in D1 (migrations/0006_accounts.sql).
+`session` and `verification` in D1 (migrations/0006_accounts.sql), and the quiz results kept in
+an account, `quiz_progress` and `quiz_resets` (migrations/0007_quiz_progress.sql: one row per
+quiz and browser, rewritten only when its results changed; deleted with the account).
 
 - **The secret** `BETTER_AUTH_SECRET` (Worker secret, random, kept nowhere else) signs the
   session cookies. Replacing it (`npx wrangler secret put BETTER_AUTH_SECRET --config

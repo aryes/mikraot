@@ -94,6 +94,13 @@
       "namespace_id": "1021",
       "simple": { "limit": 30, "period": 60 },
     },
+    // Quiz results sent by one account (src/pages/api/quiz-results.ts): each may rewrite a row per
+    // quiz, so 10 a minute, whatever addresses they come from.
+    {
+      "name": "QUIZ_SYNC_RATE_LIMIT",
+      "namespace_id": "1023",
+      "simple": { "limit": 10, "period": 60 },
+    },
   ],
   // Quiz duels (src/server/quiz-duel.ts): one Durable Object per room, kept in its own SQLite
   // storage (the only kind the free plan has); a room deletes itself after 3 hours.
@@ -196,6 +203,11 @@
         "name": "AUTH_API_RATE_LIMIT",
         "namespace_id": "1022",
         "simple": { "limit": 30, "period": 60 },
+      },
+      {
+        "name": "QUIZ_SYNC_RATE_LIMIT",
+        "namespace_id": "1024",
+        "simple": { "limit": 10, "period": 60 },
       },
     ],
   },

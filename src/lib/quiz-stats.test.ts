@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { emptyStats, hardest, readStats, recordAnswer, recordRound } from './quiz-stats';
+import { addStats, emptyStats, hardest, readStats, recordAnswer, recordRound } from './quiz-stats';
 
 /** The answers a quiz knows: all but one dropped since the stats were saved. */
 const known = (id: string) => id !== 'gone';
@@ -53,5 +53,28 @@ describe('quiz stats', () => {
       answers: { x: { asked: 2, missed: 0 }, y: { asked: 1, missed: 1 } },
       byLimit: { '5': { rounds: 1, asked: 3, right: 3, best: 2 } },
     });
+  });
+});
+
+describe('addStats', () => {
+  it("adds two devices' results: counts summed, the better best", () => {
+    const a = recordRound(recordAnswer(emptyStats(), 'x', true, null), 8, null);
+    const b = recordRound(
+      recordAnswer(recordAnswer(emptyStats(), 'x', false, 5), 'y', true, 5),
+      6,
+      5,
+    );
+    expect(addStats(a, b)).toEqual({
+      rounds: 2,
+      asked: 3,
+      right: 2,
+      best: 8,
+      answers: { x: { asked: 2, missed: 1 }, y: { asked: 1, missed: 0 } },
+      byLimit: {
+        none: { rounds: 1, asked: 1, right: 1, best: 8 },
+        '5': { rounds: 1, asked: 2, right: 1, best: 6 },
+      },
+    });
+    expect(addStats(a, emptyStats())).toEqual(a);
   });
 });

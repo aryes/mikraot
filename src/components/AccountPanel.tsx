@@ -9,6 +9,7 @@ import {
   signOut,
   type Account,
 } from '../lib/account';
+import { forgetAccountResults, syncResults } from '../lib/quiz-sync';
 import { PRIVACY_POLICY_URL } from '../lib/urls';
 import { Turnstile } from './Turnstile';
 
@@ -67,6 +68,8 @@ export const AccountPanel: React.FC = () => {
           // Signing in from a link: the result is announced like a change.
           if (token) setActed(true);
           remember(account);
+          // Signed in: this browser's quiz results join the account's, and theirs come here.
+          if (account) void syncResults();
           if (account) setView({ kind: 'signed-in', account });
           else if (token)
             setView({
@@ -307,6 +310,7 @@ const SignedIn: React.FC<{
     try {
       await signOut();
       remember(null);
+      forgetAccountResults();
       onSignedOut();
     } catch {
       setError('ההתנתקות לא הצליחה. נסו שוב.');
@@ -325,6 +329,7 @@ const SignedIn: React.FC<{
         return;
       }
       remember(null);
+      forgetAccountResults();
       onDeleted();
     } catch {
       setError('המחיקה לא הצליחה. נסו שוב.');

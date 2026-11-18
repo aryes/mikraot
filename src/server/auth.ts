@@ -18,11 +18,10 @@ import { magicLink } from 'better-auth/plugins/magic-link';
 
 import type { BrevoEmail } from './email';
 import { escapeHtml, OWNER_EMAIL } from './notify';
+import { ACCOUNT_URL } from '../lib/urls';
 
 /** Where the API is (src/server/auth-route.ts, answered by src/worker.ts): Better Auth's default. */
 export const AUTH_BASE_PATH = '/api/auth';
-/** The account page, where sign-in links lead (src/pages/account.astro). */
-export const ACCOUNT_PATH = '/account/';
 /** How long a sign-in link works. Mail can be slow: 10 minutes, not Better Auth's 5. */
 export const LINK_MINUTES = 10;
 
@@ -36,7 +35,7 @@ const LOCAL_HOSTS = ['localhost:*', '127.0.0.1:*'];
 
 /** The sign-in link: the account page, with the token where no server sees it. */
 export const signInLink = (origin: string, token: string) =>
-  `${origin}${ACCOUNT_PATH}#signin=${encodeURIComponent(token)}`;
+  `${origin}${ACCOUNT_URL}#signin=${encodeURIComponent(token)}`;
 
 export function signInEmail(to: string, link: string): BrevoEmail {
   const href = escapeHtml(link);

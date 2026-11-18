@@ -104,7 +104,7 @@
   - Login tool: **Better Auth** (open-source library, runs in our Worker, accounts in D1, our own Hebrew RTL screens, free at any size). Chosen over hosted Supabase Auth and Clerk (user data with a third party)
   - Sign-in methods at launch, all free: **email link** (no password; sent via Brevo) and **Google** (Arye, 2026-11-18: these two first); later **passkeys**, maybe **Microsoft** and **Facebook**. Not Apple for now (Apple Developer Program, $99/year; Apple users have the email link and, later, passkeys with Face ID); no SMS (paid per message). What syncs first: quiz results (Arye, 2026-11-18)
   - [ ] The email link, the account page (sign out, delete the account) and the header's link to it (2026-11-18, `src/server/auth.ts`)
-  - [ ] Quiz results kept in the account and merged with the browser's on sign-in
+  - [ ] Quiz results kept in the account and merged with the browser's on sign-in (2026-11-18: each browser's own row, `src/server/quiz-results.ts`)
   - [ ] Google sign-in, once Arye has created its app
   - [ ] Arye: create the provider apps/keys (Google Cloud OAuth client, Meta for Developers app, Microsoft Entra app registration), keys into `.env` / Worker secrets; Claude guides each
   - [ ] Privacy policy: what an account stores (email, name, progress), how to delete it; account deletion in the profile

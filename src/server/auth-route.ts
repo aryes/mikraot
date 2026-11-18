@@ -71,6 +71,24 @@ function auth() {
   });
 }
 
+/** The signed-in learner's account id, from the request's session cookie; null if none. */
+export async function signedInUser(request: Request): Promise<string | null> {
+  const session = await auth().api.getSession({ headers: request.headers });
+  return session?.user.id ?? null;
+}
+
+/**
+ * A visitor's limits (sign-in links, any sign-in request) hold where emails are sent: production.
+ * Local runs, tests and previews send none, and every test comes from one address.
+ */
+export async function withinVisitorLimit(
+  limiter: { limit(options: { key: string }): Promise<{ success: boolean }> },
+  clientAddress: string,
+): Promise<boolean> {
+  if (env.AUTH_SHOW_LINK === '1') return true;
+  return (await limiter.limit({ key: rateLimitKey(clientAddress) })).success;
+}
+
 /** Asking for a sign-in link: a human, a few a minute per visitor, one a minute per address. */
 async function checkLinkRequest(request: Request, url: URL, clientAddress: string) {
   if (Number(request.headers.get('content-length')) > MAX_BODY_BYTES) {
@@ -99,9 +117,9 @@ async function checkLinkRequest(request: Request, url: URL, clientAddress: strin
     action: 'signin',
   });
   if (!human) return { refused: json({ error: 'Human check failed' }, 403) };
-  const perVisitor = await env.AUTH_RATE_LIMIT.limit({ key: rateLimitKey(clientAddress) });
+  const perVisitor = await withinVisitorLimit(env.AUTH_RATE_LIMIT, clientAddress);
   const perAddress = await env.AUTH_EMAIL_RATE_LIMIT.limit({ key: email });
-  if (!perVisitor.success || !perAddress.success) {
+  if (!perVisitor || !perAddress.success) {
     return { refused: json({ error: 'Too many requests, try again in a minute' }, 429) };
   }
   return { email };
@@ -116,8 +134,7 @@ export async function authApi(request: Request): Promise<Response | null> {
   if (!ENDPOINTS.has(endpoint)) return json({ error: 'Not found' }, 404);
   // Every endpoint, a visitor's normal use far below it: Better Auth's own limits are counted in
   // memory, which a new instance per request starts afresh.
-  const visitor = rateLimitKey(clientAddress);
-  if (!(await env.AUTH_API_RATE_LIMIT.limit({ key: visitor })).success) {
+  if (!(await withinVisitorLimit(env.AUTH_API_RATE_LIMIT, clientAddress))) {
     return json({ error: 'Too many requests, try again in a minute' }, 429);
   }
   if (endpoint !== 'POST /sign-in/magic-link') return auth().handler(request);

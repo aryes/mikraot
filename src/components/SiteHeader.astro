@@ -1,6 +1,7 @@
 ---
 import { ChevronDown, Home, Menu, Search, UserRound } from 'lucide-react';
 import { menuTree, pointedTitle, site } from '../lib/site';
+import { ACCOUNT_URL } from '../lib/urls';
 import { NUSACH_LABELS, SWITCHABLE } from '../lib/tropes';
 import MenuTitle from './layout/MenuTitle.astro';
 import YadMark from './YadMark.astro';
@@ -61,7 +62,7 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
       <!-- The account page (signing in is optional); marked while signed in
            (src/scripts/account-link.ts). -->
       <a
-        href="/account/"
+        href={ACCOUNT_URL}
         data-account-link
         aria-label="התחברות"
         title="התחברות"
