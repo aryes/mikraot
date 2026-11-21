@@ -193,7 +193,10 @@ their own rate-limit counters, statistics and error reports off, no daily run. T
 shared by every preview and kept nowhere else (`npx wrangler preview base-config secret list
 --config wrangler.jsonc`): `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` (the site's),
 `BETTER_AUTH_SECRET`, `COMMENT_MANAGE_SECRET` and `NEWSLETTER_WEBHOOK_SECRET` (random, each
-unlike production's, set 2026-11-21). Replace one with `... base-config secret put <name>`.
+unlike production's, set 2026-11-21). A preview receives them when it is first created; one made before a change gets it with
+`npx wrangler preview secret put <name> --name <branch> --config wrangler.jsonc` (or `secret bulk
+<file> --name <branch>`), else its sign-in answers 500 ("BETTER_AUTH_SECRET is not set" in the
+logs). Change one for future previews with `... base-config secret put <name>`.
 
 ### Before they expire
 
