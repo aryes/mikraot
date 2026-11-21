@@ -26,7 +26,7 @@ import {
   recordRound,
   type QuizStats,
 } from '../lib/quiz-stats';
-import { clearResults, othersOf, SYNCED_EVENT, syncResults } from '../lib/quiz-sync';
+import { clearResults, othersOf, ownKey, SYNCED_EVENT, syncResults } from '../lib/quiz-sync';
 import { quizKeys, savedLevel, store, stored } from '../lib/quiz-storage';
 import { QUIZZES_PAGE } from '../lib/quizzes';
 import { track } from '../scripts/analytics';
@@ -525,7 +525,7 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
         );
         setLetter(oneLetter);
         const ids: readonly string[] = config.kind.ids;
-        setStats(readStats(stored(keysOf(config).stats), (id) => ids.includes(id)));
+        setStats(readStats(stored(ownKey(config.storage)), (id) => ids.includes(id)));
         setOthers(othersOf(config.storage, (id) => ids.includes(id)));
         void syncResults();
         setRound(newRound(config, data, level, oneLetter));
@@ -554,26 +554,36 @@ export const Quiz: React.FC<{ config: QuizConfig }> = ({ config }) => {
     else result.current?.focus();
   }, [round, started]);
 
-  // The account's results arrived: the other devices', and this browser's own if a reset elsewhere
-  // cleared them.
+  // The account's results arrived (the other devices', and this browser's row), signing out
+  // brought back the anonymous ones, or another tab changed them (or signed in or out).
   useEffect(() => {
     const ids: readonly string[] = config.kind.ids;
     const known = (id: string) => ids.includes(id);
     const update = () => {
       setOthers(othersOf(config.storage, known));
-      setStats(readStats(stored(keysOf(config).stats), known));
+      setStats(readStats(stored(ownKey(config.storage)), known));
     };
     document.addEventListener(SYNCED_EVENT, update);
-    return () => document.removeEventListener(SYNCED_EVENT, update);
+    addEventListener('storage', update);
+    return () => {
+      document.removeEventListener(SYNCED_EVENT, update);
+      removeEventListener('storage', update);
+    };
   }, [config]);
 
-  /** The stats changed from their latest value (two answers in one moment both count once). */
+  /**
+   * The stats changed from their latest saved value, where they belong now: another tab may have
+   * signed in or out since this one read them, and an account's results never go into the
+   * anonymous ones, or the other way round.
+   */
   function saveStats(change: (stats: QuizStats) => QuizStats): void {
-    setStats((current) => {
-      const updated = change(current);
-      store(keys.stats, updated);
-      return updated;
-    });
+    const ids: readonly string[] = config.kind.ids;
+    const known = (id: string) => ids.includes(id);
+    const key = ownKey(config.storage);
+    const updated = change(readStats(stored(key), known));
+    store(key, updated);
+    setStats(updated);
+    setOthers(othersOf(config.storage, known));
   }
 
   function chooseLimit(value: number | null): void {

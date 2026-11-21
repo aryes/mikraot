@@ -72,38 +72,61 @@ test('the sign-in API answers only the endpoints the site uses', async ({ reques
   expect((await request.get('/api/auth/get-session')).status()).toBe(200);
 });
 
-test('quiz results follow the account to another device', LOCAL_ONLY, async ({ page, browser }) => {
-  // This browser played two rounds of the trope quiz before signing in.
-  const tally = { rounds: 2, asked: 20, right: 15, best: 9 };
-  const stats = { ...tally, answers: {}, byLimit: { none: tally } };
-  await page.goto('/account/');
-  await page.evaluate(
-    (saved) => localStorage.setItem('trope-quiz-stats', saved),
-    JSON.stringify(stats),
-  );
-  const email = address('two-devices');
-  await page.goto(await askForLink(page, email));
-  await expect(page.getByText(`מחוברים בתור:${email}`)).toBeVisible(ANSWERED);
+test(
+  'quiz results played signed in follow the account; anonymous ones stay apart',
+  LOCAL_ONLY,
+  async ({ page, browser }) => {
+    const quizzes = encodeURI('/חידונים/');
 
-  // Another device: the same account (its session), nothing of its own.
-  const other = await browser.newContext({
-    storageState: { cookies: await page.context().cookies(), origins: [] },
-  });
-  const phone = await other.newPage();
-  await phone.goto('/account/');
-  await expect(phone.getByText(`מחוברים בתור:${email}`)).toBeVisible(ANSWERED);
-  await phone.goto(encodeURI('/חידונים/'));
-  await expect(phone.getByText('התוצאות נשמרות בחשבון שלכם')).toBeVisible(ANSWERED);
-  const results = phone
+    // Signed in, this browser played two rounds of the trope quiz (as the quiz saves them).
+    const email = address('two-devices');
+    await page.goto(await askForLink(page, email));
+    await expect(page.getByText(`מחוברים בתור:${email}`)).toBeVisible(ANSWERED);
+    await page.evaluate(
+      (saved) => localStorage.setItem('trope-quiz-stats-account', saved),
+      played(2),
+    );
+    await page.goto(quizzes);
+    await expect(page.getByText('התוצאות נשמרות בחשבון שלכם')).toBeVisible(ANSWERED);
+    await expect(roundsOn(page)).toHaveText('2', ANSWERED);
+
+    // As just after signing in again: the browser takes its row back from the account, not
+    // sending an empty one over it.
+    await page.evaluate(() => {
+      localStorage.removeItem('trope-quiz-stats-account');
+      localStorage.removeItem('quiz-resets-seen');
+    });
+    await page.reload();
+    await expect(roundsOn(page)).toHaveText('2', ANSWERED);
+
+    // Another device: the same account (its session), with five rounds played signed out, which
+    // stay out of the account.
+    const other = await browser.newContext({
+      storageState: { cookies: await page.context().cookies(), origins: [] },
+    });
+    const phone = await other.newPage();
+    await phone.goto('/account/');
+    await phone.evaluate((saved) => localStorage.setItem('trope-quiz-stats', saved), played(5));
+    await expect(phone.getByText(`מחוברים בתור:${email}`)).toBeVisible(ANSWERED);
+    await phone.goto(quizzes);
+    await expect(roundsOn(phone)).toHaveText('2', ANSWERED);
+
+    // Signing out there: the account's results go, the anonymous ones show again.
+    await phone.goto('/account/');
+    await phone.getByRole('button', { name: 'התנתקות' }).click();
+    await phone.goto(quizzes);
+    await expect(phone.getByText('התוצאות נשמרות רק בדפדפן הזה')).toBeVisible(ANSWERED);
+    await expect(roundsOn(phone)).toHaveText('5', ANSWERED);
+    await other.close();
+  },
+); /** A quiz's results as the quiz saves them: some rounds played without a time limit. */
+const played = (rounds: number) => {
+  const tally = { rounds, asked: rounds * 10, right: rounds * 7, best: 9 };
+  return JSON.stringify({ ...tally, answers: {}, byLimit: { none: tally } });
+};
+const roundsOn = (where: Page) =>
+  where
     .getByRole('region', { name: 'התוצאות בזיהוי טעמים' })
-    .or(phone.getByLabel('התוצאות בזיהוי טעמים'));
-  await expect(results.getByRole('cell').nth(1)).toHaveText('2', ANSWERED);
-
-  // Signing out there leaves only that device's own results (none).
-  await phone.goto('/account/');
-  await phone.getByRole('button', { name: 'התנתקות' }).click();
-  await phone.goto(encodeURI('/חידונים/'));
-  await expect(phone.getByText('התוצאות נשמרות רק בדפדפן הזה')).toBeVisible(ANSWERED);
-  await expect(phone.getByLabel('התוצאות בזיהוי טעמים')).toHaveCount(0);
-  await other.close();
-});
+    .or(where.getByLabel('התוצאות בזיהוי טעמים'))
+    .getByRole('cell')
+    .nth(1);

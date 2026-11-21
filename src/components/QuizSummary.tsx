@@ -42,7 +42,7 @@ function subscribe(changed: () => void): () => void {
  * The page of all the quizzes ("חידונים"; Arye, 2026-11-15): each one's name, what it asks, and the
  * learner's results so far, for each time limit played apart. Read from this browser once the page
  * loads; before that, and for a quiz not yet played, only its link and description. Below them,
- * that the results stay in this browser, and a way to clear every quiz's results at once (Arye,
+ * where the results are kept (this browser, or the account when signed in), and a way to clear every quiz's results at once (Arye,
  * 2026-11-16), asked once more first, as each quiz's own reset is: the same results (not the
  * levels or the choices made on the start screens).
  */
@@ -117,8 +117,8 @@ export const QuizSummary: React.FC<{ quizzes: readonly QuizLink[] }> = ({ quizze
           'התוצאות נשמרות בחשבון שלכם, בכל מכשיר שתתחברו ממנו.'
         ) : (
           <>
-            התוצאות נשמרות רק בדפדפן הזה. כדי לשמור אותן בכל מכשיר,{' '}
-            <a href={ACCOUNT_URL}>התחברו לחשבון</a>.
+            התוצאות נשמרות רק בדפדפן הזה. כדי לשמור את התוצאות שלכם בכל מכשיר,{' '}
+            <a href={ACCOUNT_URL}>התחברו לחשבון</a> לפני שאתם משחקים.
           </>
         )}
       </p>

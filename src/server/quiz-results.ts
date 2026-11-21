@@ -1,9 +1,10 @@
 /**
  * Quiz results kept in a learner's account (migrations/0007_quiz_progress.sql; Arye, 2026-11-18:
- * quiz results are what syncs first). A signed-in browser sends its own results (src/lib/quiz-sync.ts)
- * and gets back the sum of the account's other devices', which it shows added to its own: each
- * device's row is replaced, never added to, so sending again counts nothing twice, and results
- * played before signing in join the account with the first sync.
+ * quiz results are what syncs first). A signed-in browser sends the results played on it while
+ * signed in (src/lib/quiz-sync.ts) and gets back the sum of the account's other devices', which it
+ * shows added to its own: each device's row is replaced, never added to, so sending again counts
+ * nothing twice. Results played signed out stay in the browser, never in an account (Arye,
+ * 2026-11-21: on a shared computer they may be someone else's).
  */
 import { addStats, emptyStats, readStats, type QuizStats } from '../lib/quiz-stats';
 import { QUIZ_STORAGE } from '../lib/quizzes';
@@ -25,8 +26,9 @@ export interface Upload {
   /** The browser's own name for itself (src/lib/quiz-sync.ts). */
   device: string;
   /**
-   * Each quiz's results in this browser, and the latest reset of it this browser has seen: '' if
-   * none, null if this browser hasn't synced with this account before (its results join it).
+   * Each quiz's results played in this browser while signed in, and the latest reset of it this
+   * browser has seen: '' if none, null if it hasn't synced since signing in (then nothing is
+   * written: the browser takes its row back first, `mine`, and sends the two added together).
    */
   quizzes: Record<string, { stats: QuizStats; seen: string | null }>;
   /** Quizzes whose results the learner just cleared, on every device. */
@@ -34,8 +36,11 @@ export interface Upload {
 }
 
 export interface Answer {
-  /** For each quiz the account has: the other devices' results, and its latest reset. */
-  quizzes: Record<string, { others: QuizStats; reset: string | null }>;
+  /**
+   * For each quiz the account has: this device's results as kept, the other devices', and its
+   * latest reset.
+   */
+  quizzes: Record<string, { mine: QuizStats; others: QuizStats; reset: string | null }>;
 }
 
 const field = (value: unknown, key: string): unknown =>
@@ -120,9 +125,11 @@ export async function syncResults(
 
   const updates: Statement[] = [];
   for (const [quiz, { stats, seen }] of Object.entries(upload.quizzes)) {
+    // Just signed in: the browser takes its row back before sending anything.
+    if (seen === null) continue;
     const reset = resets.get(quiz);
     // Synced before, and cleared since: the browser clears its own and sends them again.
-    if (reset !== undefined && seen !== null && seen < reset) continue;
+    if (reset !== undefined && seen < reset) continue;
     const mine = rows.find((row) => row.quiz === quiz && row.device === upload.device);
     const json = JSON.stringify(stats);
     if (mine?.stats === json || (!mine && isEmpty(stats))) continue;
@@ -150,11 +157,12 @@ export async function syncResults(
 
   const quizzes: Answer['quizzes'] = {};
   for (const quiz of new Set([...rows.map((row) => row.quiz), ...resets.keys()])) {
-    const others = rows
-      .filter((row) => row.quiz === quiz && row.device !== upload.device)
-      .map((row) => readStats(parseJson(row.stats), knownShape))
-      .reduce(addStats, emptyStats());
-    quizzes[quiz] = { others, reset: resets.get(quiz) ?? null };
+    const sum = (mine: boolean) =>
+      rows
+        .filter((row) => row.quiz === quiz && (row.device === upload.device) === mine)
+        .map((row) => readStats(parseJson(row.stats), knownShape))
+        .reduce(addStats, emptyStats());
+    quizzes[quiz] = { mine: sum(true), others: sum(false), reset: resets.get(quiz) ?? null };
   }
   return { quizzes };
 }

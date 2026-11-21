@@ -39,7 +39,7 @@ const played = (rounds: number): QuizStats => {
   }
   return stats;
 };
-const upload = (device: string, stats: QuizStats, seen: string | null = null): Upload => ({
+const upload = (device: string, stats: QuizStats, seen: string | null = ''): Upload => ({
   device,
   quizzes: { 'trope-quiz': { stats, seen } },
   reset: [],
@@ -84,7 +84,11 @@ describe('syncResults', () => {
       { ...upload(DEVICE_A, emptyStats()), reset: ['trope-quiz'] },
       now,
     );
-    expect(reset.quizzes['trope-quiz']).toEqual({ others: emptyStats(), reset: now.toISOString() });
+    expect(reset.quizzes['trope-quiz']).toEqual({
+      mine: emptyStats(),
+      others: emptyStats(),
+      reset: now.toISOString(),
+    });
     // B, which synced before, still has its old results: refused until it has seen the reset.
     const stale = await syncResults(db, 'u', upload(DEVICE_B, played(3), ''), now);
     expect(stale.quizzes['trope-quiz']?.reset).toBe(now.toISOString());
@@ -96,18 +100,14 @@ describe('syncResults', () => {
     expect(again.quizzes['trope-quiz']?.others.rounds).toBe(1);
   });
 
-  it("takes a new device's results, played before its first sync, whatever was reset before", async () => {
+  it('writes nothing for a browser just signed in, and gives it back its row', async () => {
     const db = database();
-    await syncResults(db, 'u', { ...upload(DEVICE_A, emptyStats()), reset: ['trope-quiz'] }, now);
-    const later = new Date('2026-11-18T11:00:00Z');
-    await syncResults(db, 'u', upload(DEVICE_B, played(2)), later);
-    const fromA = await syncResults(
-      db,
-      'u',
-      upload(DEVICE_A, emptyStats(), now.toISOString()),
-      later,
-    );
-    expect(fromA.quizzes['trope-quiz']?.others.rounds).toBe(2);
+    await syncResults(db, 'u', upload(DEVICE_A, played(2)), now);
+    // Signed out and in again: nothing of its own yet, so it sends nothing over its row.
+    const back = await syncResults(db, 'u', upload(DEVICE_A, emptyStats(), null), now);
+    expect(back.quizzes['trope-quiz']?.mine.rounds).toBe(2);
+    const fromB = await syncResults(db, 'u', upload(DEVICE_B, emptyStats()), now);
+    expect(fromB.quizzes['trope-quiz']?.others.rounds).toBe(2);
   });
 
   it(`keeps at most ${MAX_DEVICES} devices per quiz, the latest heard from`, async () => {
