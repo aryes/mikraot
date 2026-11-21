@@ -49,7 +49,9 @@ const alert = (context: Context, kind: AlertKind, detail: string) => {
 export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
   async fetch(...args: Parameters<typeof handle>) {
     const [request, , context] = args;
-    const where = `${request.method} ${new URL(request.url).pathname}`;
+    // With the host: an alert from a preview reads like the site's otherwise.
+    const { host, pathname } = new URL(request.url);
+    const where = `${request.method} ${host}${pathname}`;
     try {
       if ((request.method === 'GET' || request.method === 'HEAD') && where.endsWith('.mp3')) {
         // The whole file from the assets; the browser's other headers (If-None-Match) still apply.
