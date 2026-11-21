@@ -10,6 +10,8 @@
   // branch previews stay.
   "routes": [{ "pattern": "mikraot.net/*", "zone_name": "mikraot.net" }],
   "workers_dev": false,
+  // The Brevo newsletter list sign-ups join (src/server/newsletter.ts); previews have their own.
+  "vars": { "NEWSLETTER_LIST_ID": "4" },
   "preview_urls": true,
   "assets": {
     "directory": "./dist",
@@ -133,11 +135,11 @@
   // 2026-11-21), with their own database and rate-limit counters, so test data never reaches
   // production. Their secrets are the Preview base config's (docs/OPERATIONS.md, Previews).
   "previews": {
+    // Brevo list "previews": a test sign-up never joins the newsletter.
+    "vars": { "NEWSLETTER_LIST_ID": "5" },
     // Each preview gets its own rooms (Cloudflare isolates a preview's Durable Objects); the
     // binding must be repeated here, or a preview has none.
     "durable_objects": { "bindings": [{ "name": "QUIZ_DUEL", "class_name": "QuizDuel" }] },
-    // The site's retry queue: production's `queue` handler sends a preview's refused emails again.
-    "queues": { "producers": [{ "binding": "EMAIL_RETRY", "queue": "mikraot-email-retry" }] },
     "d1_databases": [
       {
         "binding": "DB",

@@ -19,7 +19,7 @@ import { withSecurityHeaders } from './server/security-headers';
 import { backupDatabase } from './server/backup';
 import { retryEmails, type RetryMessage } from './server/email';
 import { unsubscribeReplies } from './server/comments';
-import { unsubscribeNewsletter } from './server/newsletter';
+import { newsletterList, unsubscribeNewsletter } from './server/newsletter';
 import { oneClickUnsubscribe } from './server/one-click-unsubscribe';
 import { sentryOptions } from './lib/sentry';
 import { duelRoom } from './server/duel-route';
@@ -83,7 +83,12 @@ export default Sentry.withSentry(() => sentryOptions(PUBLIC_SENTRY_DSN), {
         else {
           const [apiKey, secret] = [env.BREVO_API_KEY, env.NEWSLETTER_WEBHOOK_SECRET];
           // A Brevo failure throws: a 500 (and an alert to Arye) for that valid token only.
-          await unsubscribeNewsletter({ apiKey, secret, token });
+          await unsubscribeNewsletter({
+            apiKey,
+            secret,
+            token,
+            list: newsletterList(env.NEWSLETTER_LIST_ID),
+          });
         }
         // The same answer for any token: nothing to learn about which tokens exist.
         return withSecurityHeaders(

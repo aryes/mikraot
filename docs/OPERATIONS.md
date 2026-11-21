@@ -186,10 +186,14 @@ file; the template and the webhook (with its header) were made through Brevo's A
 Branch previews behave as the site does (Arye, 2026-11-21): the real Turnstile check (the widget
 "mikraot.net comments" lists mikraot-app.workers.dev beside mikraot.net) and real emails, so a
 comment, a newsletter sign-up or a sign-in link sent from a preview really reaches Brevo and
-counts in its 300 a day. A newsletter sign-up confirmed from a preview joins the real list
-(remove a test address in Brevo), and preview alerts and comment notices look like the site's:
-the address in the email shows which. Only their data is apart: the D1 `mikraot-db-preview`,
-their own rate-limit counters, statistics and error reports off, no daily run. Their secrets are the Preview base config's,
+counts in its 300 a day. Preview alerts and comment notices reach Arye like the site's; the address in the email
+shows which. Their data never mixes with the site's (Arye, 2026-11-21): the D1
+`mikraot-db-preview`, their own rate-limit counters, their own Brevo list for newsletter
+sign-ups (Brevo list "previews", id 5, `NEWSLETTER_LIST_ID` in the `previews` vars; the
+site's is set at the top level, and a Worker without it signs up nobody; the site's webhook
+ignores other lists, so
+no welcome email), no retry queue (a queue has one consumer: a refused email is not sent again),
+statistics and error reports off, no daily run. Their secrets are the Preview base config's,
 shared by every preview and kept nowhere else (`npx wrangler preview base-config secret list
 --config wrangler.jsonc`): `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` (the site's),
 `BETTER_AUTH_SECRET`, `COMMENT_MANAGE_SECRET` and `NEWSLETTER_WEBHOOK_SECRET` (random, each

@@ -20,7 +20,17 @@ const BREVO_CONTACTS_URL = 'https://api.brevo.com/v3/contacts';
 const BREVO_DOI_URL = `${BREVO_CONTACTS_URL}/doubleOptinConfirmation`;
 /** Brevo list "ניוזלטר מקראות". */
 export const NEWSLETTER_LIST_ID = 4;
-const BREVO_LIST_URL = `https://api.brevo.com/v3/contacts/lists/${NEWSLETTER_LIST_ID}`;
+const listUrl = (list: number) => `https://api.brevo.com/v3/contacts/lists/${String(list)}`;
+
+/**
+ * The Brevo list a Worker uses, `NEWSLETTER_LIST_ID` (wrangler.jsonc: the newsletter's on the
+ * site, previews' own list on previews, so a test sign-up never joins the real one). None when
+ * unset: then nothing is signed up or removed, rather than a preview reaching the real list.
+ */
+export function newsletterList(value: string | undefined): number | null {
+  const id = Number(value);
+  return value && Number.isInteger(id) && id > 0 ? id : null;
+}
 /** The welcome email's unsubscribe page (src/pages/newsletter/unsubscribe.astro). */
 export const UNSUBSCRIBE_PATH = '/newsletter/unsubscribe/';
 /** Brevo template "מקראות – אישור הרשמה (עברית)" (a double opt-in template: tag "optin"). */
@@ -66,6 +76,7 @@ export const isBlocked = (email: string) => {
 async function isSubscribed(
   apiKey: string,
   email: string,
+  list: number,
   fetchFn: typeof fetch = fetch,
 ): Promise<boolean> {
   try {
@@ -82,7 +93,7 @@ async function isSubscribed(
       contact && typeof contact === 'object' ? Reflect.get(contact, 'listIds') : [];
     const blocked =
       contact && typeof contact === 'object' && Reflect.get(contact, 'emailBlacklisted') === true;
-    return Array.isArray(lists) && lists.includes(NEWSLETTER_LIST_ID) && !blocked;
+    return Array.isArray(lists) && lists.includes(list) && !blocked;
   } catch {
     return false;
   }
@@ -101,15 +112,17 @@ export async function requestConfirmation(
   signup: Signup,
   origin: string,
   fetchFn: typeof fetch = fetch,
+  list = NEWSLETTER_LIST_ID,
 ): Promise<void> {
-  if (await isSubscribed(apiKey, signup.email, fetchFn)) return;
+  if (await isSubscribed(apiKey, signup.email, list, fetchFn)) return;
   const res = await fetchFn(BREVO_DOI_URL, {
     method: 'POST',
     headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
     body: JSON.stringify({
       email: signup.email,
-      ...(signup.name && { attributes: { FIRSTNAME: signup.name } }),
-      includeListIds: [NEWSLETTER_LIST_ID],
+      // Brevo keeps one contact per address for every list: only the site's sets its name.
+      ...(signup.name && list === NEWSLETTER_LIST_ID && { attributes: { FIRSTNAME: signup.name } }),
+      includeListIds: [list],
       templateId: CONFIRM_TEMPLATE_ID,
       redirectionUrl: new URL(CONFIRMED_PATH, origin).href,
     }),
@@ -204,8 +217,9 @@ export async function removeFromList(
   apiKey: string,
   email: string,
   fetchFn: typeof fetch = fetch,
+  list = NEWSLETTER_LIST_ID,
 ): Promise<void> {
-  const res = await fetchFn(`${BREVO_LIST_URL}/contacts/remove`, {
+  const res = await fetchFn(`${listUrl(list)}/contacts/remove`, {
     method: 'POST',
     headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
     body: JSON.stringify({ emails: [email] }),
@@ -230,16 +244,22 @@ export async function sameSecret(given: string, expected: string): Promise<boole
 
 /**
  * Unsubscribes the address a token was made for (the unsubscribe page, and one-click from a mail
- * app). False for a token that isn't ours. Without an API key (local runs, tests) nothing is
- * removed.
+ * app). False for a token that isn't ours. Without an API key (local runs, tests) or a list
+ * (`newsletterList`) nothing is removed.
  */
 export async function unsubscribeNewsletter(
-  options: { apiKey: string | undefined; secret: string | undefined; token: string },
+  options: {
+    apiKey: string | undefined;
+    secret: string | undefined;
+    token: string;
+    list: number | null;
+  },
   fetchFn: typeof fetch = fetch,
 ): Promise<boolean> {
   const email = await emailFromToken(options.secret ?? '', options.token);
   if (!email) return false;
-  if (options.apiKey) await removeFromList(options.apiKey, email, fetchFn);
-  else console.error('Newsletter unsubscribe: no BREVO_API_KEY, nothing removed');
+  if (options.apiKey && options.list) {
+    await removeFromList(options.apiKey, email, fetchFn, options.list);
+  } else console.error('Newsletter unsubscribe: no BREVO_API_KEY or list, nothing removed');
   return true;
 }

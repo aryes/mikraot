@@ -71,7 +71,7 @@ export const MAX_ATTEMPTS = 22;
 
 /**
  * Sends an email; if Brevo refuses it, queues it for a retry in an hour. Throws only if it could
- * be neither sent nor queued (or there is no queue: local runs, tests).
+ * be neither sent nor queued (or there is no queue: previews, local runs, tests).
  */
 export async function sendOrRetry(options: {
   apiKey: string;

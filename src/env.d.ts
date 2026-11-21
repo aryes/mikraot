@@ -32,6 +32,8 @@ declare module 'cloudflare:workers' {
     TURNSTILE_SECRET_KEY?: string;
     /** Brevo API key for comment notices (wrangler secret); without it nothing is sent. */
     BREVO_API_KEY?: string;
+    /** Previews' own Brevo list for newsletter sign-ups (src/server/newsletter.ts). */
+    NEWSLETTER_LIST_ID?: string;
     /** Shared with Brevo's newsletter webhook (wrangler secret; src/pages/api/newsletter-webhook.ts). */
     NEWSLETTER_WEBHOOK_SECRET?: string;
     /** Emails Brevo refused, sent again later (wrangler.jsonc `queues`; src/server/email.ts). */

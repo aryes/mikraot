@@ -4,6 +4,7 @@ import {
   isBlocked,
   MAX_BODY_BYTES,
   parseSignup,
+  newsletterList,
   requestConfirmation,
 } from '../../server/newsletter';
 import { rateLimitKey } from '../../server/rate-limit-key';
@@ -62,7 +63,10 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
   }
   // Blocked addresses get the usual answer: nothing to learn by trying.
   if (isBlocked(signup.email)) return json({ ok: true });
-  // Without a key (local runs, tests) nothing is sent.
-  if (env.BREVO_API_KEY) await requestConfirmation(env.BREVO_API_KEY, signup, url.origin);
+  // Without a key (local runs, tests) or a list nothing is sent.
+  const list = newsletterList(env.NEWSLETTER_LIST_ID);
+  if (env.BREVO_API_KEY && list) {
+    await requestConfirmation(env.BREVO_API_KEY, signup, url.origin, fetch, list);
+  } else if (env.BREVO_API_KEY) console.error('Newsletter: no NEWSLETTER_LIST_ID, nothing sent');
   return json({ ok: true });
 };
