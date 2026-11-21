@@ -10,8 +10,7 @@ const done = (status: number) =>
 
 /**
  * The links in the welcome email (home page, unsubscribe) use the real address, never workers.dev:
- * emails stay in inboxes for years, and the switch turns workers.dev off. Before the switch no one
- * can sign up anyway (the human check works only on mikraot.net).
+ * emails stay in inboxes for years, and a preview's address goes when its branch does.
  */
 const SITE = 'https://mikraot.net/';
 

@@ -230,7 +230,7 @@ export async function sameSecret(given: string, expected: string): Promise<boole
 
 /**
  * Unsubscribes the address a token was made for (the unsubscribe page, and one-click from a mail
- * app). False for a token that isn't ours. Without an API key (previews, local runs) nothing is
+ * app). False for a token that isn't ours. Without an API key (local runs, tests) nothing is
  * removed.
  */
 export async function unsubscribeNewsletter(

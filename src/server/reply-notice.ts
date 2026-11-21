@@ -51,7 +51,7 @@ export function replyEmail(notice: ReplyNotice): BrevoEmail {
 
 /**
  * Sends the reply notice. Never rejects: the reply is already saved, and the caller runs this in
- * the background. Without a key (branch previews, local runs) nothing is sent; nobody is told
+ * the background. Without a key (local runs, tests) nothing is sent; nobody is told
  * about their own reply. One Brevo refuses is tried again later (`retry`).
  */
 export async function notifyReplyAuthor(options: {

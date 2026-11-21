@@ -79,7 +79,7 @@ describe('notifyOwner', () => {
     expect(send.mock.calls[0]?.[0].email.subject).toBe('תגובה חדשה במקראות: דגש קל');
   });
 
-  it('sends nothing without a key (branch previews)', () => {
+  it('sends nothing without a key (local runs, tests)', () => {
     const fetchFn = ok();
     const waitUntil = vi.fn();
     notifyOwner({ apiKey: undefined, waitUntil, notice: () => notice, fetchFn });

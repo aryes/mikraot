@@ -65,9 +65,9 @@ declare module 'cloudflare:workers' {
     };
     /** Per-visitor limit on joining quiz duels (src/worker.ts). */
     DUEL_RATE_LIMIT: { limit(options: { key: string }): Promise<{ success: boolean }> };
-    /** Signs the sign-in sessions (wrangler secret; a public value in previews; src/server/auth.ts). */
+    /** Signs the sign-in sessions (wrangler secret; src/server/auth.ts). */
     BETTER_AUTH_SECRET?: string;
-    /** '1' (local runs, tests, previews): a sign-in link is shown, not emailed. Never in production. */
+    /** '1' (local runs and tests): a sign-in link is shown, not emailed. Never in production. */
     AUTH_SHOW_LINK?: string;
     /** Sign-in with Google (wrangler secrets), once its app exists. */
     GOOGLE_CLIENT_ID?: string;

@@ -57,7 +57,7 @@ const logFailure = (error: unknown) => {
 /**
  * Tells the owner about a saved comment, in the background (`waitUntil`: the Worker finishes the
  * send after responding). Never throws: the comment is already saved, so a failure here must not
- * turn the response into an error that invites a duplicate post. Without a key (branch previews)
+ * turn the response into an error that invites a duplicate post. Without a key (local runs, tests)
  * nothing is sent; one Brevo refuses is tried again later (`retry`). The notice is built lazily,
  * in the background (it may sign a link), so that errors building it are caught here too.
  */

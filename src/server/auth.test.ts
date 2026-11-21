@@ -26,7 +26,7 @@ describe('sign-in links', () => {
 });
 
 describe('authOptions', () => {
-  it('trusts local addresses only when asked (local runs, tests, previews)', () => {
+  it('trusts local addresses only when asked (local runs, tests)', () => {
     expect(authOptions(settings)).not.toHaveProperty('trustedOrigins');
     expect(authOptions({ ...settings, trustLocal: true }).trustedOrigins).toContain(
       'http://localhost:*',

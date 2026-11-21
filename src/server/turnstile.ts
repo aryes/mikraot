@@ -12,7 +12,7 @@ const TIMEOUT_MS = 5000;
 export type TurnstileAction = 'comment' | 'newsletter' | 'signin';
 
 /**
- * Cloudflare's public test secrets (local runs, tests and branch previews) answer with placeholder
+ * Cloudflare's public test secrets (local runs and tests) answer with placeholder
  * hostname and action values, so those two checks apply with the real secret only.
  */
 const isTestSecret = (secret: string) => /^[123]x0{31}AA$/.test(secret);

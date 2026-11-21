@@ -94,7 +94,7 @@ with the Worker secret `COMMENT_MANAGE_SECRET` (random, set 2026-10-19; kept now
 one comment, and doesn't expire. Replacing the secret
 (`npx wrangler secret put COMMENT_MANAGE_SECRET --config wrangler.jsonc`) makes every link
 already sent stop working ("הקישור אינו תקין"): do it if an email with these links reached
-someone who shouldn't have them. Without the secret (previews) emails go out without the link.
+someone who shouldn't have them. Without the secret emails go out without the link.
 The Worker logs record full request addresses, these links included (as with the unsubscribe
 links): don't paste log lines with them anywhere public.
 
@@ -131,9 +131,9 @@ quiz and browser, rewritten only when its results changed; deleted with the acco
 wrangler.jsonc`) signs everyone out; nothing else is lost. Without it the sign-in API answers
   500 and the account page says something went wrong; the rest of the site is unaffected.
 - **Sign-in links** go out through Brevo (the same 300 a day as everything else); a refused one
-  is not retried, since the learner is waiting: they ask again. Previews and local runs send no
-  email: they show the link on the page (`AUTH_SHOW_LINK`, a preview variable in
-  `wrangler.jsonc`; never set on production, where the API refuses to start without a Brevo key).
+  is not retried, since the learner is waiting: they ask again. Previews email it too. Local
+  runs and tests send no email: they show the link on the page (`AUTH_SHOW_LINK`, in `.dev.vars`
+  only; a published Worker without a Brevo key refuses to start the sign-in API).
   Someone passing Turnstile from many addresses could still use up the day's 300 emails, which
   would also hold back comment notices and alerts (those are retried for a day): if Brevo's log
   shows a burst of sign-in links, lower `AUTH_RATE_LIMIT` or turn the sign-in route off.
@@ -181,6 +181,20 @@ file; the template and the webhook (with its header) were made through Brevo's A
   same answer for every refusal, so the form can't reveal who subscribed) but gets none; the
   refusal is in the Worker logs ("Brevo double opt-in failed").
 
+### Previews
+
+Branch previews behave as the site does (Arye, 2026-11-21): the real Turnstile check (the widget
+"mikraot.net comments" lists mikraot-app.workers.dev beside mikraot.net) and real emails, so a
+comment, a newsletter sign-up or a sign-in link sent from a preview really reaches Brevo and
+counts in its 300 a day. A newsletter sign-up confirmed from a preview joins the real list
+(remove a test address in Brevo), and preview alerts and comment notices look like the site's:
+the address in the email shows which. Only their data is apart: the D1 `mikraot-db-preview`,
+their own rate-limit counters, statistics and error reports off, no daily run. Their secrets are the Preview base config's,
+shared by every preview and kept nowhere else (`npx wrangler preview base-config secret list
+--config wrangler.jsonc`): `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` (the site's),
+`BETTER_AUTH_SECRET`, `COMMENT_MANAGE_SECRET` and `NEWSLETTER_WEBHOOK_SECRET` (random, each
+unlike production's, set 2026-11-21). Replace one with `... base-config secret put <name>`.
+
 ### Before they expire
 
 - `CF_CONFIG_API_TOKEN` (the scoped Cloudflare token in `.env`): expires **2027-01-31**. Arye
@@ -188,7 +202,7 @@ file; the template and the webhook (with its header) were made through Brevo's A
 - `CF_PREVIEWS_API_TOKEN` (GitHub secret, since 2026-10-15; expiry: as set when created): edit rights on Workers scripts in
   this account, used only by `.github/workflows/previews.yml` to delete a pull request's Cloudflare
   Preview when it closes. If it expires or is revoked, that workflow fails on each merge or close and old
-  Previews stay public (no data, test settings) until a new token is saved under the same name.
+  Previews stay public (test data only) until a new token is saved under the same name.
 - **The domain** mikraot.net: registered at GoDaddy, paid until **2027-08-10** (registry record,
   checked 2026-10-19). Arye confirms automatic renewal in GoDaddy, or renews before then;
   `docs/CUTOVER.md` step 5 plans its move to Cloudflare Registrar.

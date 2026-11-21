@@ -62,7 +62,7 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
   }
   // Blocked addresses get the usual answer: nothing to learn by trying.
   if (isBlocked(signup.email)) return json({ ok: true });
-  // Without a key (branch previews, local runs) nothing is sent.
+  // Without a key (local runs, tests) nothing is sent.
   if (env.BREVO_API_KEY) await requestConfirmation(env.BREVO_API_KEY, signup, url.origin);
   return json({ ok: true });
 };

@@ -34,8 +34,8 @@ const json = (data: unknown, status = 200) =>
   });
 
 /**
- * Local runs, tests and branch previews (AUTH_SHOW_LINK, never in production) have no email key:
- * the sign-in link is answered to the page, which shows it, so sign-in can be tried there. Keyed
+ * Local runs and tests (AUTH_SHOW_LINK, in .dev.vars only; never on a published Worker) have no
+ * email key: the sign-in link is answered to the page, which shows it, so sign-in can be tried there. Keyed
  * by address, kept only until the request that made it answers.
  */
 const shownLinks = new Map<string, string>();
@@ -87,8 +87,8 @@ export async function signedInUser(request: Request): Promise<string | null> {
 }
 
 /**
- * A visitor's limits (sign-in links, any sign-in request) hold where emails are sent: production.
- * Local runs, tests and previews send none, and every test comes from one address.
+ * A visitor's limits (sign-in links, any sign-in request) hold wherever emails are sent. Local
+ * runs and tests send none, and every test comes from one address.
  */
 export async function withinVisitorLimit(
   limiter: { limit(options: { key: string }): Promise<{ success: boolean }> },

@@ -50,7 +50,7 @@ export async function currentAccount(): Promise<Account | null> {
 }
 
 export type LinkRequest =
-  | { ok: true; /** Only where no email is sent (local runs, tests, previews). */ link?: string }
+  | { ok: true; /** Only where no email is sent (local runs and tests). */ link?: string }
   | { ok: false; status: number };
 
 /** Asks for a sign-in link to be emailed. */

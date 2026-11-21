@@ -30,7 +30,7 @@ const LOGS = 'Cloudflare → Workers → mikraot → Observability → Logs';
 
 /**
  * Reports a failure. Never throws: it runs after the failure is already handled (in `waitUntil`),
- * and an alert that fails must not cause another. Without a key (branch previews, local runs)
+ * and an alert that fails must not cause another. Without a key (local runs, tests)
  * nothing is sent.
  */
 export async function alertOwner(options: {

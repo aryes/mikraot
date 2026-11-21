@@ -270,9 +270,9 @@ const Sent: React.FC<{ email: string; link?: string | undefined }> = ({ email, l
         הוא עובד פעם אחת, במשך 10 דקות. לא הגיע? בדקו בתיקיית הספאם, או רעננו את העמוד ובקשו שוב.
       </p>
       {link && (
-        // Local runs, tests and previews send no email (src/server/auth-route.ts).
+        // Local runs and tests send no email (src/server/auth-route.ts).
         <p className="rounded-xl border border-dashed border-slate-400 p-3 text-sm">
-          באתר הבדיקה לא נשלח אימייל:{' '}
+          לא נשלח אימייל:{' '}
           <a href={link} className={LINK}>
             הקישור
           </a>

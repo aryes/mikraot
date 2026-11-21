@@ -129,21 +129,15 @@
     { "binding": "ALERTS", "id": "1d520101c5964450b319f01663e8b890" },
   ],
   "observability": { "enabled": true },
-  // Worker Previews (one per git branch, `wrangler preview`): their own database and rate-limit
-  // counter, so test comments never reach production. Previews are built with Turnstile's test
-  // site key, so they use Cloudflare's public always-pass test secret (a documented test value,
-  // not a credential; production's real secret is a Worker secret). Previews send no email, so a
-  // sign-in link is shown on the page instead (AUTH_SHOW_LINK); their sessions are signed with a
-  // value that is public here: previews hold only test accounts (src/server/auth.ts).
+  // Worker Previews (one per git branch, `wrangler preview`): they behave as the site does (Arye,
+  // 2026-11-21), with their own database and rate-limit counters, so test data never reaches
+  // production. Their secrets are the Preview base config's (docs/OPERATIONS.md, Previews).
   "previews": {
-    "vars": {
-      "TURNSTILE_SECRET_KEY": "1x0000000000000000000000000000000AA",
-      "AUTH_SHOW_LINK": "1",
-      "BETTER_AUTH_SECRET": "previews-only-public-value-for-test-accounts-only-4b8e1d",
-    },
     // Each preview gets its own rooms (Cloudflare isolates a preview's Durable Objects); the
     // binding must be repeated here, or a preview has none.
     "durable_objects": { "bindings": [{ "name": "QUIZ_DUEL", "class_name": "QuizDuel" }] },
+    // The site's retry queue: production's `queue` handler sends a preview's refused emails again.
+    "queues": { "producers": [{ "binding": "EMAIL_RETRY", "queue": "mikraot-email-retry" }] },
     "d1_databases": [
       {
         "binding": "DB",
