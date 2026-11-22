@@ -178,13 +178,17 @@ export function clearResults(quiz: string): void {
   store(othersKey(quiz), emptyStats());
 }
 
-/** Signed out: the account's results leave this browser; its anonymous ones show again. */
+/**
+ * Signed out: the account's results leave this browser; its anonymous ones show again. Its name
+ * goes too, so accounts signed in here one after another aren't tied to one browser.
+ */
 export function forgetAccountResults(): void {
   for (const key of [
     ...QUIZZES.map(othersKey),
     ...QUIZZES.map(accountKey),
     SEEN_KEY,
     PENDING_KEY,
+    DEVICE_KEY,
   ]) {
     try {
       localStorage.removeItem(key);

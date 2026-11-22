@@ -62,16 +62,21 @@ export const AccountPanel: React.FC = () => {
 
   useEffect(() => {
     const show = (token: string | null) => {
-      const signedIn = token ? signInWithToken(token) : currentAccount();
+      // A link already used (opened again while signed in) leaves the session as it was.
+      const signedIn = token
+        ? signInWithToken(token).then(async (account) =>
+            account ? { account, fresh: true } : { account: await currentAccount(), fresh: false },
+          )
+        : currentAccount().then((account) => ({ account, fresh: false }));
       signedIn
-        .then((account) => {
+        .then(({ account, fresh }) => {
           // Signing in from a link: the result is announced like a change.
           if (token) setActed(true);
           remember(account);
           // Signed in from a link: anything left of an earlier account goes first (a sign-out
           // that never reached this browser); then the account's quiz results come here.
           // Signed out: none of an account's stay.
-          if (token || !account) forgetAccountResults();
+          if (fresh || !account) forgetAccountResults();
           if (account) void syncResults();
           if (account) setView({ kind: 'signed-in', account });
           else if (token)

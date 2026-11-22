@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { parse } from 'jsonc-parser';
 import { describe, expect, it, vi } from 'vitest';
 import {
   addedToList,
@@ -270,5 +272,15 @@ describe('sameSecret', () => {
     expect(await sameSecret('s3cret', 's3cret')).toBe(true);
     expect(await sameSecret('s3cre', 's3cret')).toBe(false);
     expect(await sameSecret('', '')).toBe(false);
+  });
+});
+
+describe('the newsletter list', () => {
+  it("is the one the site's Worker signs up to (the webhook and the name assume it)", () => {
+    const config: unknown = parse(readFileSync('wrangler.jsonc', 'utf8'));
+    const vars: unknown = config && typeof config === 'object' ? Reflect.get(config, 'vars') : null;
+    const list: unknown =
+      vars && typeof vars === 'object' ? Reflect.get(vars, 'NEWSLETTER_LIST_ID') : null;
+    expect(newsletterList(typeof list === 'string' ? list : undefined)).toBe(NEWSLETTER_LIST_ID);
   });
 });

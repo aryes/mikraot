@@ -77,12 +77,12 @@
       "namespace_id": "1015",
       "simple": { "limit": 10, "period": 60 },
     },
-    // Sign-in links (src/server/auth-route.ts): each sends an email, so at most 5 a minute from one
-    // visitor...
+    // Sign-in links (src/server/auth-route.ts): each sends an email, so at most 20 a minute from one
+    // address (a class may share one)...
     {
       "name": "AUTH_RATE_LIMIT",
       "namespace_id": "1017",
-      "simple": { "limit": 5, "period": 60 },
+      "simple": { "limit": 20, "period": 60 },
     },
     // ...and one a minute to any one address.
     {
@@ -90,11 +90,12 @@
       "namespace_id": "1019",
       "simple": { "limit": 1, "period": 60 },
     },
-    // Any sign-in request (checking who is signed in, signing out, Google): 30 a minute.
+    // Any sign-in request (checking who is signed in, signing out, Google) or quiz sync: 120 a
+    // minute from one address, enough for a class behind one school address.
     {
       "name": "AUTH_API_RATE_LIMIT",
       "namespace_id": "1021",
-      "simple": { "limit": 30, "period": 60 },
+      "simple": { "limit": 120, "period": 60 },
     },
     // Quiz results sent by one account (src/pages/api/quiz-results.ts): each may rewrite a row per
     // quiz, so 10 a minute, whatever addresses they come from.
@@ -188,7 +189,7 @@
       {
         "name": "AUTH_RATE_LIMIT",
         "namespace_id": "1018",
-        "simple": { "limit": 5, "period": 60 },
+        "simple": { "limit": 20, "period": 60 },
       },
       {
         "name": "AUTH_EMAIL_RATE_LIMIT",
@@ -198,7 +199,7 @@
       {
         "name": "AUTH_API_RATE_LIMIT",
         "namespace_id": "1022",
-        "simple": { "limit": 30, "period": 60 },
+        "simple": { "limit": 120, "period": 60 },
       },
       {
         "name": "QUIZ_SYNC_RATE_LIMIT",

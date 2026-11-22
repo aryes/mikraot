@@ -103,8 +103,8 @@
 - [x] **Learner accounts for the courses** (decided 2026-10-03): individual learning, no teacher groups. **Hybrid:** learning starts at once with no account, progress and quiz results kept in the browser; optional sign-in copies them to an account and syncs across devices (2026-11-21, Arye: for quiz results, not copied: results played signed in are the account's, those played signed out stay in the browser)
   - Login tool: **Better Auth** (open-source library, runs in our Worker, accounts in D1, our own Hebrew RTL screens, free at any size). Chosen over hosted Supabase Auth and Clerk (user data with a third party)
   - Sign-in methods at launch, all free: **email link** (no password; sent via Brevo) and **Google** (Arye, 2026-11-18: these two first); later **passkeys**, maybe **Microsoft** and **Facebook**. Not Apple for now (Apple Developer Program, $99/year; Apple users have the email link and, later, passkeys with Face ID); no SMS (paid per message). What syncs first: quiz results (Arye, 2026-11-18)
-  - [ ] The email link, the account page (sign out, delete the account) and the header's link to it (2026-11-18, `src/server/auth.ts`)
-  - [ ] Quiz results played signed in kept in the account, apart from the browser's anonymous ones (2026-11-18: each browser's own row, `src/server/quiz-results.ts`; 2026-11-21: no merge)
+  - [x] The email link, the account page (sign out, delete the account) and the header's link to it (2026-11-18, `src/server/auth.ts`)
+  - [x] Quiz results played signed in kept in the account, apart from the browser's anonymous ones (2026-11-18: each browser's own row, `src/server/quiz-results.ts`; 2026-11-21: no merge)
   - [ ] Google sign-in, once Arye has created its app
   - [ ] Arye: create the provider apps/keys (Google Cloud OAuth client, Meta for Developers app, Microsoft Entra app registration), keys into `.env` / Worker secrets; Claude guides each
   - [ ] Privacy policy: what an account stores (email, name, progress), how to delete it; account deletion in the profile
