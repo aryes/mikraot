@@ -122,8 +122,9 @@ for (const colorScheme of ['light', 'dark'] as const) {
   });
 }
 
-// Dark mode (the system setting): the same scan on every page, desktop only (the colours are the
-// same on a phone), plus loaded comments and the search dialog, whose colours come from scripts.
+// Dark mode (the device's setting, the switch's default): the same scan on every page, desktop only
+// (the colours are the same on a phone), plus loaded comments and the search dialog, whose colours
+// come from scripts.
 test.describe('dark mode', () => {
   test.use({ colorScheme: 'dark' });
   test.skip(({ isMobile }) => isMobile, 'same colours as desktop');

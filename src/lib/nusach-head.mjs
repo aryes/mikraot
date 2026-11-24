@@ -1,5 +1,5 @@
 // @ts-check
-import { createHash } from 'node:crypto';
+import { hashOf } from './csp-hash.mjs';
 
 /**
  * Applies the reader's saved tradition for trope names (the header switch, src/scripts/nusach.ts)
@@ -15,10 +15,4 @@ export const NUSACH_HEAD_SCRIPT = `try {
   }
 } catch {}`;
 
-/**
- * Its Content-Security-Policy hash.
- * @returns {`sha256-${string}`}
- */
-const hashOf = (/** @type {string} */ script) =>
-  `sha256-${createHash('sha256').update(script).digest('base64')}`;
 export const NUSACH_HEAD_HASH = hashOf(NUSACH_HEAD_SCRIPT);

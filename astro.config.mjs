@@ -6,6 +6,7 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import { NUSACH_HEAD_HASH } from './src/lib/nusach-head.mjs';
+import { THEME_HEAD_HASH, THEME_PICTURE_HASH } from './src/lib/theme-head.mjs';
 
 /**
  * Noto Sans Hebrew, only for the symbols Taamey David lacks (©, –, …): its Latin and Latin Extended
@@ -88,8 +89,9 @@ export default defineConfig({
           'https://challenges.cloudflare.com',
           'https://cloud.umami.is',
         ],
-        // The inline script applying the reader's tradition (src/lib/nusach-head.mjs).
-        hashes: [NUSACH_HEAD_HASH],
+        // The inline scripts applying the reader's tradition (src/lib/nusach-head.mjs) and light or
+        // dark (src/lib/theme-head.mjs: the page's, and each dark picture's).
+        hashes: [NUSACH_HEAD_HASH, THEME_HEAD_HASH, THEME_PICTURE_HASH],
       },
     },
   },

@@ -1,7 +1,15 @@
 @import 'tailwindcss';
 
-/* Dark mode follows the system setting, on screens only: printed pages stay black on white. */
-@custom-variant dark (@media screen and (prefers-color-scheme: dark));
+/* Dark mode: `data-theme="dark"` on <html>, set before the page draws from the reader's choice or
+   the device's setting (src/lib/theme-head.mjs, the header's switch src/scripts/theme.ts); on
+   screens only: printed pages stay black on white. */
+@custom-variant dark {
+  @media screen {
+    &:where([data-theme='dark'], [data-theme='dark'] *) {
+      @slot;
+    }
+  }
+}
 /* Theme fonts: `font-sans` (all text, headings included, with or without marks: one font) and
    `font-logo` (the site name in the logo), used as Tailwind utilities. The fonts themselves are
    set up in astro.config.mjs (`fonts`) and loaded by BaseLayout's <Font> tags. */
@@ -30,7 +38,7 @@
      דגש קל table has six; Arye, 2026-10-15). */
   --cell-padding: 10px 3px;
   --heading-size: calc(var(--content-size) * 0.8);
-  color-scheme: light dark;
+  color-scheme: light;
   --page: #f3f7f5;
   --content-text: #1e293b;
   --content-heading: #334155;
@@ -70,8 +78,9 @@
     --heading-size: calc(var(--content-size) * 0.9);
   }
 }
-@media screen and (prefers-color-scheme: dark) {
-  :root {
+:root {
+  @variant dark {
+    color-scheme: dark;
     --page: #020617;
     --content-text: #e2e8f0;
     --content-heading: #f1f5f9;
@@ -829,22 +838,24 @@ html {
     color: var(--color-brand-strong);
   }
 }
-@media screen and (prefers-color-scheme: dark) {
-  @supports (appearance: base-select) {
-    .nusach-select::picker(select) {
-      border-color: var(--color-slate-700);
-      background: var(--color-slate-900);
-    }
-    .nusach-select option {
-      background: transparent;
-      color: var(--color-slate-200);
-    }
-    .nusach-select option:hover,
-    .nusach-select option:focus-visible {
-      background: var(--color-slate-800);
-    }
-    .nusach-select option::checkmark {
-      color: var(--color-brand);
+@supports (appearance: base-select) {
+  .nusach-select {
+    @variant dark {
+      &::picker(select) {
+        border-color: var(--color-slate-700);
+        background: var(--color-slate-900);
+      }
+      & option {
+        background: transparent;
+        color: var(--color-slate-200);
+      }
+      & option:hover,
+      & option:focus-visible {
+        background: var(--color-slate-800);
+      }
+      & option::checkmark {
+        color: var(--color-brand);
+      }
     }
   }
 }
