@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "npm run db:dev:reset && astro dev",
-    "cms": "npm run patches && astro dev --config astro.config.cms.mjs --port 4400 --ignore-lock",
+    "cms": "astro dev --config astro.config.cms.mjs --port 4400 --ignore-lock",
     "check": "astro check && npm run lint && prettier --check . && vitest run",
     "build": "astro check && npm run build:site",
     "build:site": "astro build && html-validate dist/client && pagefind --site dist/client",
@@ -35,8 +35,7 @@
     "quiz:words": "tsx scripts/quiz/build-word-list.ts",
     "db:restore": "tsx scripts/db-restore.ts",
     "lighthouse": "lhci autorun",
-    "db:dev:reset": "wrangler d1 migrations apply mikraot-db --local --persist-to .wrangler/state-dev && wrangler d1 execute mikraot-db --local --persist-to .wrangler/state-dev --file e2e/fixtures/comments.sql",
-    "patches": "patch-package --error-on-fail --error-on-warn"
+    "db:dev:reset": "wrangler d1 migrations apply mikraot-db --local --persist-to .wrangler/state-dev && wrangler d1 execute mikraot-db --local --persist-to .wrangler/state-dev --file e2e/fixtures/comments.sql"
   },
   "dependencies": {
     "@astrojs/markdoc": "^2.0.9",
@@ -44,7 +43,7 @@
     "@astrojs/rss": "^4.0.19",
     "@fontsource-variable/noto-sans-hebrew": "^5.3.0",
     "@keystatic/astro": "^6.0.0",
-    "@keystatic/core": "^0.6.9",
+    "@keystatic/core": "^0.6.10",
     "@sentry/browser": "^11.7.0",
     "@sentry/cloudflare": "^11.7.0",
     "astro": "^7.3.5",
@@ -81,7 +80,6 @@
     "oxlint": "^1.86.0",
     "oxlint-tsgolint": "^7.0.2003",
     "pagefind": "^1.5.2",
-    "patch-package": "^8.0.1",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.0",
     "prettier-plugin-tailwindcss": "^0.8.1",
