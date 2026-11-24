@@ -1,14 +1,13 @@
 /**
- * The light/dark switch (src/components/SiteHeader.astro, [data-theme-switch]: in the header, and
- * in the phone menu instead on phones): each
- * click moves to the next of "by the device" (the default), light and dark. The choice is saved
+ * The light/dark switch (src/components/layout/ThemeSwitch.astro, in the header, and in the menu
+ * instead on phones): light, by the device (the default) or dark. The choice is saved
  * in the browser, applied before the next page draws (src/lib/theme-head.mjs), and shown at once
  * by `data-theme` on <html>, which every dark style reads (global.css). "By the device" also
  * follows a change of the device's setting while the page is open. The switch is hidden until this
  * runs: without JavaScript the site is light.
  */
 
-import { DEVICE_DARK, nextTheme, THEME_LABELS, type ThemeChoice as Choice } from '../lib/theme';
+import { DEVICE_DARK, THEME_LABELS, type ThemeChoice as Choice } from '../lib/theme';
 
 const KEY = 'theme';
 const root = document.documentElement;
@@ -48,30 +47,28 @@ function apply(choice: Choice): void {
   }
 }
 
-const switches = [...document.querySelectorAll<HTMLButtonElement>('[data-theme-switch]')];
+const inputs = [
+  ...document.querySelectorAll<HTMLInputElement>('[data-theme-switch] input[type="radio"]'),
+];
+const isChoice = (value: string): value is Choice => value in THEME_LABELS;
 
 function show(choice: Choice): void {
-  for (const button of switches) {
-    button.dataset['choice'] = choice;
-    const name = `תצוגה: ${THEME_LABELS[choice]}`;
-    // The menu's button shows its name; the header's, an icon, is named for screen readers.
-    const label = button.querySelector('[data-theme-label]');
-    if (label) label.textContent = name;
-    else button.setAttribute('aria-label', name);
-    button.title = `תצוגה: ${THEME_LABELS[choice]}. לחיצה: ${THEME_LABELS[nextTheme(choice)]}`;
-  }
+  for (const input of inputs) input.checked = input.value === choice;
 }
 
 let current = saved();
 show(current);
-for (const button of switches) {
-  button.addEventListener('click', () => {
-    current = nextTheme(current);
+for (const input of inputs) {
+  input.addEventListener('change', () => {
+    if (!input.checked || !isChoice(input.value)) return;
+    current = input.value;
     save(current);
     apply(current);
-    show(current);
+    show(current); // the other switch (header and menu) too
   });
-  button.hidden = false;
+}
+for (const control of document.querySelectorAll<HTMLElement>('[data-theme-switch]')) {
+  control.hidden = false;
 }
 
 // The device's setting changed (e.g. at sunset).

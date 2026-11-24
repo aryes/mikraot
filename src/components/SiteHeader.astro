@@ -1,8 +1,9 @@
 ---
-import { ChevronDown, Home, Menu, Moon, Search, Sun, SunMoon } from 'lucide-react';
+import { ChevronDown, Home, Menu, Search } from 'lucide-react';
 import { menuTree, pointedTitle, site } from '../lib/site';
 import { NUSACH_LABELS, SWITCHABLE } from '../lib/tropes';
 import MenuTitle from './layout/MenuTitle.astro';
+import ThemeSwitch from './layout/ThemeSwitch.astro';
 import YadMark from './YadMark.astro';
 
 const current = decodeURI(Astro.url.pathname);
@@ -58,21 +59,9 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
         </select>
         <ChevronDown size={14} className="pointer-events-none absolute end-2 text-slate-400" />
       </label>
-      <!-- Light or dark (src/scripts/theme.ts, which names the choice and shows the button): its
-           icon is the current choice, by the device, light or dark; a click moves to the next.
-           On phones it is in the menu instead, so the site's name keeps its one line. -->
-      <button
-        type="button"
-        hidden
-        data-theme-switch
-        data-choice="auto"
-        aria-label="תצוגה"
-        class="group/theme hidden cursor-pointer items-center rounded-xl bg-slate-100 dark:bg-slate-800 p-2 text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-200/80 dark:hover:bg-slate-700/80 md:flex"
-      >
-        <SunMoon size={16} className="hidden group-data-[choice=auto]/theme:block" />
-        <Sun size={16} className="hidden group-data-[choice=light]/theme:block" />
-        <Moon size={16} className="hidden group-data-[choice=dark]/theme:block" />
-      </button>
+      <!-- Light or dark (src/scripts/theme.ts). On phones it is in the menu instead, so the
+           site's name keeps its one line. -->
+      <ThemeSwitch name="theme" class="hidden md:flex" />
       <button
         type="button"
         data-open-search
@@ -161,19 +150,11 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
               </div>
             );
           })}
-          <div class="mt-2 border-t border-slate-200 dark:border-slate-700 pt-2">
-            <button
-              type="button"
-              hidden
-              data-theme-switch
-              data-choice="auto"
-              class="group/theme flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-lg px-3 text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
-            >
-              <SunMoon size={16} className="hidden group-data-[choice=auto]/theme:block" />
-              <Sun size={16} className="hidden group-data-[choice=light]/theme:block" />
-              <Moon size={16} className="hidden group-data-[choice=dark]/theme:block" />
-              <span data-theme-label>תצוגה</span>
-            </button>
+          <div class="mt-2 flex items-center justify-between gap-2 border-t border-slate-200 dark:border-slate-700 px-3 pt-3">
+            <span aria-hidden="true" class="text-base font-bold text-slate-800 dark:text-slate-100">
+              תצוגה
+            </span>
+            <ThemeSwitch name="theme-menu" labels class="flex" />
           </div>
         </nav>
       </details>

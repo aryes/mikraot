@@ -1,11 +1,11 @@
-/** The light/dark switch's choices (src/scripts/theme.ts), in the order a click moves through. */
-export const THEME_CHOICES = ['auto', 'light', 'dark'] as const;
+/** The light/dark switch's choices (src/components/layout/ThemeSwitch.astro), in its order. */
+export const THEME_CHOICES = ['light', 'auto', 'dark'] as const;
 export type ThemeChoice = (typeof THEME_CHOICES)[number];
 
-/** Each choice's name, after "תצוגה:" (feminine). */
+/** Each choice's name, as an adjective of "תצוגה" (feminine). */
 export const THEME_LABELS: Record<ThemeChoice, string> = {
-  auto: 'לפי המכשיר',
   light: 'בהירה',
+  auto: 'לפי המכשיר',
   dark: 'כהה',
 };
 
@@ -15,7 +15,3 @@ export const THEME_LABELS: Record<ThemeChoice, string> = {
  * (src/lib/theme-head.mjs).
  */
 export const DEVICE_DARK = 'screen and (prefers-color-scheme: dark)';
-
-/** The choice a click moves to. */
-export const nextTheme = (choice: ThemeChoice): ThemeChoice =>
-  THEME_CHOICES[(THEME_CHOICES.indexOf(choice) + 1) % THEME_CHOICES.length] ?? 'auto';

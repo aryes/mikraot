@@ -1,0 +1,45 @@
+---
+/**
+ * The light/dark switch: three choices side by side (light, by the device, dark), the chosen one
+ * raised. Native radio buttons, so arrow keys move between them and screen readers name the group.
+ * Hidden until its script runs (src/scripts/theme.ts): without JavaScript the site is light.
+ * In the header (icons only) and, on phones, in the menu (with their names).
+ */
+import { Moon, Sun, SunMoon } from 'lucide-react';
+import { THEME_CHOICES, THEME_LABELS } from '../../lib/theme';
+
+interface Props {
+  /** The radio group's name: one per switch on the page. */
+  name: string;
+  /** Each choice's name beside its icon (otherwise for screen readers only), and taller for fingers. */
+  labels?: boolean;
+  class?: string;
+}
+
+const { name, labels = false, class: className } = Astro.props;
+const ICONS = { light: Sun, auto: SunMoon, dark: Moon };
+---
+
+<fieldset
+  hidden
+  data-theme-switch
+  class:list={['items-center gap-0.5 rounded-xl bg-slate-100 dark:bg-slate-800 p-1', className]}
+>
+  <legend class="sr-only">תצוגה</legend>
+  {THEME_CHOICES.map((choice) => {
+    const Icon = ICONS[choice];
+    return (
+      <label
+        title={labels ? undefined : THEME_LABELS[choice]}
+        class:list={[
+          labels ? 'min-h-10 px-2.5' : 'px-1.5 py-1',
+          'flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 transition-colors hover:text-slate-800 dark:hover:text-slate-100 not-has-checked:hover:bg-slate-200/80 dark:not-has-checked:hover:bg-slate-700/80 has-checked:bg-white has-checked:text-brand-strong has-checked:shadow-sm has-checked:ring-1 has-checked:ring-slate-200 dark:has-checked:ring-slate-700 dark:has-checked:bg-slate-900 dark:has-checked:text-brand has-focus-visible:ring-2 has-focus-visible:ring-brand',
+        ]}
+      >
+        <input type="radio" name={name} value={choice} class="sr-only" />
+        <Icon size={16} aria-hidden="true" />
+        <span class:list={[!labels && 'sr-only']}>{THEME_LABELS[choice]}</span>
+      </label>
+    );
+  })}
+</fieldset>

@@ -6,6 +6,18 @@ async function showSwitch(page: Page): Promise<void> {
   if (await menu.isVisible()) await menu.click();
 }
 
+/** A choice of the visible switch (in the header or the menu: the other is hidden). */
+const choice = (page: Page, name: string) =>
+  page.getByRole('group', { name: 'תצוגה' }).getByRole('radio', { name, exact: true });
+
+/** Chooses it as a reader does, on its label (the radio itself is drawn by its label). */
+const choose = (page: Page, name: string) =>
+  page
+    .getByRole('group', { name: 'תצוגה' })
+    .locator('label')
+    .filter({ has: page.getByRole('radio', { name, exact: true }) })
+    .click();
+
 test('the light/dark switch: by the device, light or dark, remembered, with the dark photo', async ({
   page,
 }) => {
@@ -24,24 +36,21 @@ test('the light/dark switch: by the device, light or dark, remembered, with the 
   await showSwitch(page);
   const html = page.locator('html');
   const photo = page.locator('picture img').first();
-  const theme = page.getByRole('button', { name: /^תצוגה/ });
 
   // By the device (dark here), before any choice.
-  await expect(theme).toHaveAccessibleName('תצוגה: לפי המכשיר');
+  await expect(choice(page, 'לפי המכשיר')).toBeChecked();
   await expect(html).toHaveAttribute('data-theme', 'dark');
   await expect(photo).toHaveJSProperty('complete', true);
   expect(await photo.evaluate((img: HTMLImageElement) => img.currentSrc)).toContain('dark');
   expect(photos).toEqual(['dark']);
 
-  await theme.click();
-  await expect(theme).toHaveAccessibleName('תצוגה: בהירה');
+  await choose(page, 'בהירה');
   await expect(html).not.toHaveAttribute('data-theme');
   await expect
     .poll(() => photo.evaluate((img: HTMLImageElement) => img.currentSrc))
     .not.toContain('dark');
 
-  await theme.click();
-  await expect(theme).toHaveAccessibleName('תצוגה: כהה');
+  await choose(page, 'כהה');
   await expect(html).toHaveAttribute('data-theme', 'dark');
   // A choice holds whatever the device says.
   await page.emulateMedia({ colorScheme: 'light' });
@@ -53,14 +62,13 @@ test('the light/dark switch: by the device, light or dark, remembered, with the 
   await page.reload();
   await showSwitch(page);
   await expect(html).toHaveAttribute('data-theme', 'dark');
-  await expect(theme).toHaveAccessibleName('תצוגה: כהה');
+  await expect(choice(page, 'כהה')).toBeChecked();
   await expect(photo).toHaveJSProperty('complete', true);
   expect(await photo.evaluate((img: HTMLImageElement) => img.currentSrc)).toContain('dark');
   expect(photos).toEqual(['dark']);
 
   // Back to the device's setting, now light.
-  await theme.click();
-  await expect(theme).toHaveAccessibleName('תצוגה: לפי המכשיר');
+  await choose(page, 'לפי המכשיר');
   await expect(html).not.toHaveAttribute('data-theme');
   // The 404 page gets its CSP as a header that covers the whole page.
   await page.emulateMedia({ colorScheme: 'dark' });
