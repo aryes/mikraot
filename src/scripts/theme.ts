@@ -50,7 +50,7 @@ function apply(choice: Choice): void {
 const inputs = [
   ...document.querySelectorAll<HTMLInputElement>('[data-theme-switch] input[type="radio"]'),
 ];
-const isChoice = (value: string): value is Choice => value in THEME_LABELS;
+const isChoice = (value: string): value is Choice => Object.hasOwn(THEME_LABELS, value);
 
 function show(choice: Choice): void {
   for (const input of inputs) input.checked = input.value === choice;

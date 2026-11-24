@@ -51,6 +51,15 @@ test('the light/dark switch: by the device, light or dark, remembered, with the 
     .not.toContain('dark');
 
   await choose(page, 'כהה');
+  // The other switch (the menu's on desktop, the header's on phones) shows the same choice.
+  await Promise.all(
+    ['theme', 'theme-menu'].map((group) =>
+      expect(page.locator(`input[name="${group}"][value="dark"]`)).toHaveJSProperty(
+        'checked',
+        true,
+      ),
+    ),
+  );
   await expect(html).toHaveAttribute('data-theme', 'dark');
   // A choice holds whatever the device says.
   await page.emulateMedia({ colorScheme: 'light' });
@@ -66,6 +75,11 @@ test('the light/dark switch: by the device, light or dark, remembered, with the 
   await expect(photo).toHaveJSProperty('complete', true);
   expect(await photo.evaluate((img: HTMLImageElement) => img.currentSrc)).toContain('dark');
   expect(photos).toEqual(['dark']);
+
+  // Radio buttons: an arrow key moves the choice, away from dark here.
+  await choice(page, 'כהה').focus();
+  await page.keyboard.press('ArrowLeft');
+  await expect(html).not.toHaveAttribute('data-theme');
 
   // Back to the device's setting, now light.
   await choose(page, 'לפי המכשיר');

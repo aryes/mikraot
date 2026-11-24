@@ -33,7 +33,7 @@ const ICONS = { light: Sun, auto: SunMoon, dark: Moon };
         title={labels ? undefined : THEME_LABELS[choice]}
         class:list={[
           labels ? 'min-h-10 px-2.5' : 'px-1.5 py-1',
-          'flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 transition-colors hover:text-slate-800 dark:hover:text-slate-100 not-has-checked:hover:bg-slate-200/80 dark:not-has-checked:hover:bg-slate-700/80 has-checked:bg-white has-checked:text-brand-strong has-checked:shadow-sm has-checked:ring-1 has-checked:ring-slate-200 dark:has-checked:ring-slate-700 dark:has-checked:bg-slate-900 dark:has-checked:text-brand has-focus-visible:ring-2 has-focus-visible:ring-brand',
+          'flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 transition-colors hover:text-slate-800 dark:hover:text-slate-100 not-has-checked:hover:bg-slate-200/80 dark:not-has-checked:hover:bg-slate-700/80 has-checked:bg-white has-checked:text-brand-strong has-checked:shadow-sm has-checked:ring-1 has-checked:ring-slate-200 dark:has-checked:ring-slate-700 dark:has-checked:bg-slate-900 dark:has-checked:text-brand has-focus-visible:outline-2 has-focus-visible:outline-offset-1 has-focus-visible:outline-brand',
         ]}
       >
         <input type="radio" name={name} value={choice} class="sr-only" />
