@@ -107,7 +107,7 @@
   - [x] Quiz results played signed in kept in the account, apart from the browser's anonymous ones (2026-11-18: each browser's own row, `src/server/quiz-results.ts`; 2026-11-21: no merge)
   - [ ] Google sign-in, once Arye has created its app
   - [ ] Arye: create the provider apps/keys (Google Cloud OAuth client, Meta for Developers app, Microsoft Entra app registration), keys into `.env` / Worker secrets; Claude guides each
-  - [x] Privacy policy: what an account stores (email, name, progress), how to delete it; account deletion in the profile (2026-11-24, general wording; each service named only under "מי מטפל במידע", Arye)
+  - [x] Privacy policy: what an account stores (email, name, progress), how to delete it; account deletion in the profile (2026-11-24: the whole policy rewritten short, in general sentences; service names only where needed, the list under "מי מטפל במידע", Arye)
 - [x] Comments: Turnstile human check (decided 2026-10-02: Turnstile, comments still published immediately), plus rate limit and honeypot. Built with Cloudflare's test keys
 - [x] At deploy: `wrangler secret put TURNSTILE_SECRET_KEY` (set on the Worker since the first deploy, 2026-10-04) (value in `.env`; widget "mikraot.net comments" created 2026-10-02, site key in `astro.config.mjs`)
 - [x] Names reserved for the admin ("מנהל האתר", "admin", "מקראות"…) are refused, in the form and by the API, regardless of spacing, niqqud or case (`src/lib/reserved-names.ts`); the admin badge itself can't be faked

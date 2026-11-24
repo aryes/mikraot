@@ -100,8 +100,8 @@ links): don't paste log lines with them anywhere public.
 
 ### Delete a comment or an email on request
 
-The privacy policy promises deletion on request, and that a restore from an older backup won't
-bring the data back. So:
+The privacy policy promises deletion on request, and says deleted data stays only in the older
+backups until they expire; so a restore from one must not bring it back:
 
 1. Delete the row (with Arye's approval):
    `npx wrangler d1 execute mikraot-db --remote --config wrangler.jsonc --command "DELETE FROM comments WHERE id = <id>"`
