@@ -311,9 +311,10 @@ security.txt, required checks before any merge, dependency updates with tests.
 - **M/S Clean-up after the cutover:** the old `mikraot-api` Worker, `worker/`, `/staging/` on
   Bluehost, the Supabase project (after a final export). In `docs/CUTOVER.md` step 5. Needs: Arye's
   approval (deletions).
-- **M/S Better Hebrew in Keystatic upstream:** contribute the corrected strings
-  (`patches/@keystatic+core+0.6.9.patch`) and the hard-coded English labels to Keystatic, so the
-  patch can go and every Hebrew user benefits. Approved 2026-10-09.
+- **M/S Better Hebrew in Keystatic upstream:** the corrected strings were merged upstream
+  (Thinkmill/keystatic#1642) and released in 0.6.10, so our patch is gone (2026-11-24). Left: the
+  hard-coded English labels (the toolbar's tooltips, "Paragraph", "Empty list", the settings
+  page's Save, the menu item dialog), to contribute the same way. Approved 2026-10-09.
 
 ## 6. Learning what visitors need
 

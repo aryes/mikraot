@@ -47,7 +47,7 @@
       "groupName": "Wrangler"
     },
     {
-      "description": "Minor, patch and lockfile updates merge on their own (the lockfile refresh waits 3 days for indirect packages too, through .npmrc min-release-age) (Monday mornings) once every check passes (tests, build, Lighthouse, the Keystatic patch); majors, and any update of a 0.x package (where minor versions may break), wait for review.",
+      "description": "Minor, patch and lockfile updates merge on their own (the lockfile refresh waits 3 days for indirect packages too, through .npmrc min-release-age) (Monday mornings) once every check passes (tests, build, Lighthouse); majors, and any update of a 0.x package (where minor versions may break), wait for review.",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest", "lockFileMaintenance"],
       "automerge": true,
       "matchCurrentVersion": "!/^v?0\\./"

@@ -51,9 +51,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
-      # The editor's Hebrew labels (patches/): a Keystatic update that breaks the patch fails
-      # here, in its Renovate PR, rather than silently in the editor.
-      - run: npm run patches
 
   # The browser tests, split over three jobs (Playwright's --shard: each runs a third of the
   # tests, all of them together); they were the slowest part of a run.
