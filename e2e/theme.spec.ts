@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 /**
  * Shows the choices: on phones in the menu (which stays open), on wider screens the header's
- * button showing the current one, whose choices close again after each.
+ * toggle, opened by the pointer over it.
  */
 async function showSwitch(page: Page): Promise<void> {
   const menu = page.locator('summary[aria-label="תפריט"]');
@@ -14,8 +14,9 @@ async function showSwitch(page: Page): Promise<void> {
     if (open === null) await menu.click();
     return;
   }
-  const button = page.getByRole('button', { name: /^תצוגה/ });
-  if ((await button.getAttribute('aria-expanded')) !== 'true') await button.click();
+  // From elsewhere: after a choice, hover opens it again only once the pointer has left.
+  await page.mouse.move(640, 600);
+  await page.getByRole('group', { name: 'תצוגה' }).hover();
 }
 
 /** A choice of the visible switch (in the header or the menu: the other is hidden). */
@@ -50,12 +51,7 @@ test('the light/dark switch: by the device, light or dark, remembered, with the 
   const html = page.locator('html');
   const photo = page.locator('picture img').first();
 
-  // By the device (dark here), before any choice; on wider screens the header's button names it.
-  if (!test.info().project.name.includes('mobile')) {
-    await expect(page.getByRole('button', { name: /^תצוגה/ })).toHaveAccessibleName(
-      'תצוגה: לפי המכשיר',
-    );
-  }
+  // By the device (dark here), before any choice.
   await showSwitch(page);
   await expect(choice(page, 'לפי המכשיר')).toBeChecked();
   await expect(html).toHaveAttribute('data-theme', 'dark');
@@ -111,38 +107,50 @@ test('the light/dark switch: by the device, light or dark, remembered, with the 
   expect(blocked).toEqual([]);
 });
 
-test("the header's light/dark choices: open on a click, closed by Escape, a click elsewhere or a choice", async ({
-  page,
-}) => {
-  test.skip(test.info().project.name.includes('mobile'), 'on phones the choices are in the menu');
-  await page.goto('/');
-  const button = page.getByRole('button', { name: /^תצוגה/ });
-  const dark = page.getByRole('radio', { name: 'כהה', exact: true });
-  // Away from the button, so hover doesn't hold the choices open.
-  const away = async () => page.mouse.move(640, 600);
+test.describe("the header's light/dark toggle", () => {
+  test.skip(({ isMobile }) => isMobile, 'on phones the choices are in the menu');
 
-  await button.click();
-  await away();
-  await expect(button).toHaveAttribute('aria-expanded', 'true');
-  await expect(dark).toBeVisible();
-  // An arrow key chooses and leaves them open; Escape closes them and returns to the button.
-  await page.keyboard.press('Tab');
-  await page.keyboard.press('ArrowLeft');
-  await expect(button).toHaveAttribute('aria-expanded', 'true');
-  await page.keyboard.press('Escape');
-  await expect(dark).toBeHidden();
-  await expect(button).toBeFocused();
+  test('the choice alone; the others shown on hover, and folded after a choice', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const toggle = page.getByRole('group', { name: 'תצוגה' });
+    const label = (name: string) =>
+      toggle.locator('label').filter({ has: page.getByRole('radio', { name, exact: true }) });
+    await page.mouse.move(640, 600);
+    await expect(label('לפי המכשיר')).toBeVisible();
+    await expect(label('כהה')).toBeHidden();
+    await toggle.hover();
+    await expect(label('כהה')).toBeVisible();
+    // A choice folds it at once, though the pointer is still over it: the new choice alone.
+    await label('כהה').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(label('לפי המכשיר')).toBeHidden();
+    await expect(label('כהה')).toBeVisible();
+    // The keyboard's focus shows the others: Tab from the control before it.
+    await page.mouse.move(640, 600);
+    await page.getByRole('combobox', { name: 'נוסח' }).focus();
+    await page.keyboard.press('Tab');
+    await expect(label('בהירה')).toBeVisible();
+  });
 
-  // A click elsewhere closes them.
-  await button.click();
-  await away();
-  await page.mouse.click(640, 600);
-  await expect(dark).toBeHidden();
+  test.describe('on a touch screen', () => {
+    test.use({ hasTouch: true });
 
-  // A choice made by a click closes them.
-  await button.click();
-  await page.locator('label').filter({ has: dark }).click();
-  await away();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await expect(dark).toBeHidden();
+    test('a tap on the choice shows the others, a tap elsewhere hides them', async ({ page }) => {
+      await page.goto('/');
+      const toggle = page.getByRole('group', { name: 'תצוגה' });
+      const label = (name: string) =>
+        toggle.locator('label').filter({ has: page.getByRole('radio', { name, exact: true }) });
+      await label('לפי המכשיר').tap();
+      await expect(toggle).toHaveAttribute('data-open', '');
+      await expect(label('כהה')).toBeVisible();
+      await page.locator('main').tap({ position: { x: 20, y: 300 } });
+      await expect(toggle).not.toHaveAttribute('data-open');
+      await label('לפי המכשיר').tap();
+      await label('כהה').tap();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      await expect(toggle).not.toHaveAttribute('data-open');
+    });
+  });
 });

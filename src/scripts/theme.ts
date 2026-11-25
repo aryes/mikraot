@@ -1,7 +1,7 @@
 /**
- * The light/dark switch: light, by the device (the default) or dark; in the header a button
- * showing the choice that opens the three (src/components/layout/ThemePicker.astro), in the menu
- * on phones the three side by side (ThemeSwitch.astro). The choice is saved
+ * The light/dark switch (src/components/layout/ThemeSwitch.astro): light, by the device (the
+ * default) or dark; in the header a toggle showing the choice, the other two appearing beside it,
+ * in the menu on phones the three side by side. The choice is saved
  * in the browser, applied before the next page draws (src/lib/theme-head.mjs), and shown at once
  * by `data-theme` on <html>, which every dark style reads (global.css). "By the device" also
  * follows a change of the device's setting while the page is open. The switch is hidden until this
@@ -53,45 +53,38 @@ const inputs = [
 ];
 const isChoice = (value: string): value is Choice => Object.hasOwn(THEME_LABELS, value);
 
-const pickers = [...document.querySelectorAll<HTMLElement>('[data-theme-picker]')];
-
 function show(choice: Choice): void {
   for (const input of inputs) input.checked = input.value === choice;
-  for (const picker of pickers) {
-    picker.dataset['choice'] = choice;
-    picker.querySelector('button')?.setAttribute('aria-label', `תצוגה: ${THEME_LABELS[choice]}`);
-  }
 }
 
-/** The header's picker: its choices open on hover (CSS), or on a click, Enter or Space. */
-function setOpen(picker: HTMLElement, open: boolean): void {
-  picker.toggleAttribute('data-open', open);
-  picker.querySelector('button')?.setAttribute('aria-expanded', String(open));
-}
-for (const picker of pickers) {
-  const button = picker.querySelector('button');
-  button?.addEventListener('click', () => {
-    setOpen(picker, !picker.hasAttribute('data-open'));
+/**
+ * The header's toggle (ThemeSwitch.astro, `compact`) opens on hover and keyboard focus by CSS; on
+ * a touch screen, which has no hover, a tap on the chosen one opens it (`data-open`). A choice by
+ * the pointer closes it, and hover doesn't open it again until the pointer has left
+ * (`data-folded`); a press elsewhere closes it too.
+ */
+for (const toggle of document.querySelectorAll<HTMLElement>('[data-theme-switch][data-compact]')) {
+  const setOpen = (open: boolean) => toggle.toggleAttribute('data-open', open);
+  // How the last press came: a mouse hovers, so its click on the chosen one opens nothing.
+  let touch = false;
+  toggle.addEventListener('pointerdown', (event) => {
+    touch = event.pointerType !== 'mouse';
   });
-  picker.addEventListener('keydown', (event) => {
-    if (event.key !== 'Escape' || !picker.hasAttribute('data-open')) return;
-    setOpen(picker, false);
-    button?.focus();
+  toggle.addEventListener('click', (event) => {
+    // The press on a label (detail > 0), before it checks its radio: a tap on the chosen one
+    // opens or closes the toggle, another is a choice. Arrow keys make clicks of detail 0: ignored.
+    const label = event.target instanceof Element ? event.target.closest('label') : null;
+    if (!label || event.detail === 0 || event.target instanceof HTMLInputElement) return;
+    const chosen = label.querySelector('input')?.checked ?? false;
+    setOpen(chosen && touch && !toggle.hasAttribute('data-open'));
+    if (!chosen) toggle.toggleAttribute('data-folded', true);
   });
-  // A choice made by a click or a tap closes them; one made by the arrow keys (clicks of detail 0)
-  // leaves them open under the keyboard's focus.
-  picker.querySelector('fieldset')?.addEventListener('click', (event) => {
-    if (event.detail > 0) setOpen(picker, false);
+  toggle.addEventListener('pointerleave', () => {
+    toggle.removeAttribute('data-folded');
   });
-  // Closed by a click elsewhere.
-  document.addEventListener('click', (event) => {
-    if (event.target instanceof Node && !picker.contains(event.target)) setOpen(picker, false);
-  });
-  // The keyboard's focus leaving it (Tab): a press on a choice's label moves focus nowhere
-  // (relatedTarget null) and must not close it before its click lands.
-  picker.addEventListener('focusout', (event) => {
-    const to = event.relatedTarget;
-    if (to instanceof Node && !picker.contains(to)) setOpen(picker, false);
+  // A press anywhere else closes it (pointerdown: iOS sends no click for a tap on plain text).
+  document.addEventListener('pointerdown', (event) => {
+    if (event.target instanceof Node && !toggle.contains(event.target)) setOpen(false);
   });
 }
 
@@ -106,9 +99,7 @@ for (const input of inputs) {
     show(current); // the other switch (header and menu) too
   });
 }
-for (const control of document.querySelectorAll<HTMLElement>(
-  '[data-theme-switch], [data-theme-picker]',
-)) {
+for (const control of document.querySelectorAll<HTMLElement>('[data-theme-switch]')) {
   control.hidden = false;
 }
 

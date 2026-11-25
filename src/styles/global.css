@@ -10,6 +10,31 @@
     }
   }
 }
+/* The header's light/dark toggle open (ThemeSwitch.astro, `compact`): all three choices shown when
+   it is hovered (where there is hover; not again until the pointer leaves after a choice,
+   `data-folded`), holds the keyboard's focus, or was opened by a tap (`data-open`). `theme-open`
+   for its choices, `theme-track` for the toggle itself. `:is()` rather than `:where()`, so these win
+   over the closed state's `not-has-checked:` rules. */
+@custom-variant theme-open {
+  &:is([data-theme-switch][data-open] *, [data-theme-switch]:has(:focus-visible) *) {
+    @slot;
+  }
+  @media (hover: hover) {
+    &:is([data-theme-switch]:not([data-folded]):hover *) {
+      @slot;
+    }
+  }
+}
+@custom-variant theme-track {
+  &:is([data-open], :has(:focus-visible)) {
+    @slot;
+  }
+  @media (hover: hover) {
+    &:is(:not([data-folded]):hover) {
+      @slot;
+    }
+  }
+}
 /* Theme fonts: `font-sans` (all text, headings included, with or without marks: one font) and
    `font-logo` (the site name in the logo), used as Tailwind utilities. The fonts themselves are
    set up in astro.config.mjs (`fonts`) and loaded by BaseLayout's <Font> tags. */

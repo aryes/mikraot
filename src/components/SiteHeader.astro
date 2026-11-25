@@ -3,7 +3,6 @@ import { ChevronDown, Home, Menu, Search } from 'lucide-react';
 import { menuTree, pointedTitle, site } from '../lib/site';
 import { NUSACH_LABELS, SWITCHABLE } from '../lib/tropes';
 import MenuTitle from './layout/MenuTitle.astro';
-import ThemePicker from './layout/ThemePicker.astro';
 import ThemeSwitch from './layout/ThemeSwitch.astro';
 import YadMark from './YadMark.astro';
 
@@ -80,9 +79,9 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
         </select>
         <ChevronDown size={14} className="pointer-events-none absolute end-2 text-slate-400" />
       </label>
-      <!-- Light or dark (ThemePicker.astro). On phones it is in the menu instead, so the site's
+      <!-- Light or dark (ThemeSwitch.astro). On phones it is in the menu instead, so the site's
            name keeps its one line. -->
-      <ThemePicker class="hidden md:block" />
+      <ThemeSwitch name="theme" compact class="hidden md:flex" />
 
       <!-- Mobile menu: a native disclosure, so it works without JavaScript. -->
       <details class="md:hidden">
