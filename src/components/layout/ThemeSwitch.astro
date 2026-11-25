@@ -1,44 +1,54 @@
 ---
 /**
- * The light/dark switch: three choices side by side (light, by the device, dark), the chosen one
- * raised. Native radio buttons, so arrow keys move between them and screen readers name the group.
- * Hidden until its script runs (src/scripts/theme.ts): without JavaScript the site is light.
- * In the header (icons only) and, on phones, in the menu (with their names).
+ * The light/dark switch's choices (light, by the device, dark), the chosen one raised. Native
+ * radio buttons, so arrow keys move between them and screen readers name the group. Hidden until
+ * its script runs (src/scripts/theme.ts): without JavaScript the site is light. Side by side in
+ * the phone menu; one under another in the header's picker (ThemePicker.astro).
  */
-import { Moon, Sun, SunMoon } from 'lucide-react';
+import { Check, Moon, Sun, SunMoon } from 'lucide-react';
 import { THEME_CHOICES, THEME_LABELS } from '../../lib/theme';
 
 interface Props {
   /** The radio group's name: one per switch on the page. */
   name: string;
-  /** Each choice's name beside its icon (otherwise for screen readers only), and taller for fingers. */
-  labels?: boolean;
-  class?: string;
+  /** One under another, in a dropdown panel (the header's), rather than side by side. */
+  vertical?: boolean;
 }
 
-const { name, labels = false, class: className } = Astro.props;
+const { name, vertical = false } = Astro.props;
 const ICONS = { light: Sun, auto: SunMoon, dark: Moon };
 ---
 
 <fieldset
   hidden
   data-theme-switch
-  class:list={['items-center gap-0.5 rounded-xl bg-slate-100 dark:bg-slate-800 p-1', className]}
+  class:list={[
+    'flex',
+    vertical
+      ? 'min-w-40 flex-col rounded-xl border border-slate-200 bg-white py-2 shadow-lg dark:border-slate-700 dark:bg-slate-900'
+      : 'items-center gap-0.5 rounded-xl bg-slate-100 p-1 dark:bg-slate-800',
+  ]}
 >
   <legend class="sr-only">תצוגה</legend>
   {THEME_CHOICES.map((choice) => {
     const Icon = ICONS[choice];
     return (
       <label
-        title={labels ? undefined : THEME_LABELS[choice]}
         class:list={[
-          labels ? 'min-h-10 px-2.5' : 'px-1.5 py-1',
-          'flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 transition-colors hover:text-slate-800 dark:hover:text-slate-100 not-has-checked:hover:bg-slate-200/80 dark:not-has-checked:hover:bg-slate-700/80 has-checked:bg-white has-checked:text-brand-strong has-checked:shadow-sm has-checked:ring-1 has-checked:ring-slate-200 dark:has-checked:ring-slate-700 dark:has-checked:bg-slate-900 dark:has-checked:text-brand has-focus-visible:outline-2 has-focus-visible:outline-offset-1 has-focus-visible:outline-brand',
+          'flex cursor-pointer items-center gap-2 whitespace-nowrap text-sm font-medium transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-1 has-focus-visible:outline-brand has-checked:text-brand-strong dark:has-checked:text-brand',
+          vertical
+            ? // As the desktop menu's rows (SiteHeader.astro); the chosen one tinted and ticked.
+              'px-4 py-2 text-slate-700 hover:bg-slate-50 has-checked:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 dark:has-checked:bg-slate-800'
+            : // Raised on the track, as the phone menu shows it.
+              'min-h-10 gap-1.5 rounded-lg px-2.5 text-slate-600 hover:text-slate-800 not-has-checked:hover:bg-slate-200/80 has-checked:bg-white has-checked:shadow-sm has-checked:ring-1 has-checked:ring-slate-200 dark:text-slate-400 dark:hover:text-slate-100 dark:not-has-checked:hover:bg-slate-700/80 dark:has-checked:bg-slate-900 dark:has-checked:ring-slate-700',
         ]}
       >
-        <input type="radio" name={name} value={choice} class="sr-only" />
+        <input type="radio" name={name} value={choice} class="peer sr-only" />
         <Icon size={16} aria-hidden="true" />
-        <span class:list={[!labels && 'sr-only']}>{THEME_LABELS[choice]}</span>
+        <span>{THEME_LABELS[choice]}</span>
+        {vertical && (
+          <Check size={16} aria-hidden="true" className="ms-auto invisible peer-checked:visible" />
+        )}
       </label>
     );
   })}

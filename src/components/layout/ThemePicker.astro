@@ -1,0 +1,39 @@
+---
+/**
+ * The header's light/dark control (Arye, 2026-11-25: "only present the current mode and on hover
+ * open the selection options"): a button showing the current choice's icon, whose three choices
+ * (ThemeSwitch.astro) open below it on hover, and on a click, Enter or Space, for touch screens and
+ * the keyboard (src/scripts/theme.ts: Escape or a click elsewhere closes them). Hidden until that
+ * script runs.
+ */
+import { Moon, Sun, SunMoon } from 'lucide-react';
+import ThemeSwitch from './ThemeSwitch.astro';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div hidden data-theme-picker data-choice="auto" class:list={['group/theme relative', className]}>
+  <button
+    type="button"
+    aria-expanded="false"
+    aria-controls="theme-options"
+    aria-label="תצוגה"
+    class="flex cursor-pointer items-center rounded-xl bg-slate-100 dark:bg-slate-800 p-2 text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-200/80 dark:hover:bg-slate-700/80"
+  >
+    <Sun size={16} className="hidden group-data-[choice=light]/theme:block" />
+    <SunMoon size={16} className="hidden group-data-[choice=auto]/theme:block" />
+    <Moon size={16} className="hidden group-data-[choice=dark]/theme:block" />
+  </button>
+  <!-- Padding, not a margin, between the button and the choices: the pointer stays over the
+       control on its way down, so hover keeps them open. -->
+  <div
+    id="theme-options"
+    class="invisible absolute top-full left-0 z-50 pt-1.5 opacity-0 transition-[opacity,visibility] duration-150 group-hover/theme:visible group-hover/theme:opacity-100 group-data-open/theme:visible group-data-open/theme:opacity-100"
+  >
+    <ThemeSwitch name="theme" vertical />
+  </div>
+</div>

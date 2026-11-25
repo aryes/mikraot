@@ -1,6 +1,7 @@
 /**
- * The light/dark switch (src/components/layout/ThemeSwitch.astro, in the header, and in the menu
- * instead on phones): light, by the device (the default) or dark. The choice is saved
+ * The light/dark switch: light, by the device (the default) or dark; in the header a button
+ * showing the choice that opens the three (src/components/layout/ThemePicker.astro), in the menu
+ * on phones the three side by side (ThemeSwitch.astro). The choice is saved
  * in the browser, applied before the next page draws (src/lib/theme-head.mjs), and shown at once
  * by `data-theme` on <html>, which every dark style reads (global.css). "By the device" also
  * follows a change of the device's setting while the page is open. The switch is hidden until this
@@ -52,8 +53,46 @@ const inputs = [
 ];
 const isChoice = (value: string): value is Choice => Object.hasOwn(THEME_LABELS, value);
 
+const pickers = [...document.querySelectorAll<HTMLElement>('[data-theme-picker]')];
+
 function show(choice: Choice): void {
   for (const input of inputs) input.checked = input.value === choice;
+  for (const picker of pickers) {
+    picker.dataset['choice'] = choice;
+    picker.querySelector('button')?.setAttribute('aria-label', `תצוגה: ${THEME_LABELS[choice]}`);
+  }
+}
+
+/** The header's picker: its choices open on hover (CSS), or on a click, Enter or Space. */
+function setOpen(picker: HTMLElement, open: boolean): void {
+  picker.toggleAttribute('data-open', open);
+  picker.querySelector('button')?.setAttribute('aria-expanded', String(open));
+}
+for (const picker of pickers) {
+  const button = picker.querySelector('button');
+  button?.addEventListener('click', () => {
+    setOpen(picker, !picker.hasAttribute('data-open'));
+  });
+  picker.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !picker.hasAttribute('data-open')) return;
+    setOpen(picker, false);
+    button?.focus();
+  });
+  // A choice made by a click or a tap closes them; one made by the arrow keys (clicks of detail 0)
+  // leaves them open under the keyboard's focus.
+  picker.querySelector('fieldset')?.addEventListener('click', (event) => {
+    if (event.detail > 0) setOpen(picker, false);
+  });
+  // Closed by a click elsewhere.
+  document.addEventListener('click', (event) => {
+    if (event.target instanceof Node && !picker.contains(event.target)) setOpen(picker, false);
+  });
+  // The keyboard's focus leaving it (Tab): a press on a choice's label moves focus nowhere
+  // (relatedTarget null) and must not close it before its click lands.
+  picker.addEventListener('focusout', (event) => {
+    const to = event.relatedTarget;
+    if (to instanceof Node && !picker.contains(to)) setOpen(picker, false);
+  });
 }
 
 let current = saved();
@@ -67,7 +106,9 @@ for (const input of inputs) {
     show(current); // the other switch (header and menu) too
   });
 }
-for (const control of document.querySelectorAll<HTMLElement>('[data-theme-switch]')) {
+for (const control of document.querySelectorAll<HTMLElement>(
+  '[data-theme-switch], [data-theme-picker]',
+)) {
   control.hidden = false;
 }
 
