@@ -1,0 +1,68 @@
+---
+/**
+ * The light/dark switch's choices (light, by the device, dark), side by side, the chosen one
+ * raised. Native radio buttons, so arrow keys move between them and screen readers name the
+ * group. Hidden until its script runs (src/scripts/theme.ts): without JavaScript the site is
+ * light.
+ *
+ * In the phone menu, with their names. In the header (`compact`; Arye, 2026-11-25: "a toggle that
+ * will be wider itself and not a sub menu"), icons only: the chosen one alone, the other two
+ * appearing beside it on hover; on the keyboard's focus (not a click's, which would hold it open
+ * after a choice); or on a tap of the chosen one (`data-open`, set by the script for touch
+ * screens, which have no hover).
+ */
+import { Moon, Sun, SunMoon } from 'lucide-react';
+import { THEME_CHOICES, THEME_LABELS } from '../../lib/theme';
+
+interface Props {
+  /** The radio group's name: one per switch on the page. */
+  name: string;
+  /** The header's: icons only (named by tooltips and for screen readers), the chosen one alone. */
+  compact?: boolean;
+  class?: string;
+}
+
+const { name, compact = false, class: className } = Astro.props;
+const ICONS = { light: Sun, auto: SunMoon, dark: Moon };
+---
+
+<fieldset
+  hidden
+  data-theme-switch
+  data-compact={compact ? '' : undefined}
+  class:list={[
+    'items-center rounded-xl',
+    compact
+      ? // Its track shows only while open (theme-track, global.css).
+        'gap-0.5 p-0.5 transition-colors delay-300 theme-track:bg-slate-100 theme-track:delay-0 dark:theme-track:bg-slate-800'
+      : 'flex gap-0.5 bg-slate-100 p-1 dark:bg-slate-800',
+    className,
+  ]}
+>
+  <legend class="sr-only">תצוגה</legend>
+  {THEME_CHOICES.map((choice) => {
+    const Icon = ICONS[choice];
+    return (
+      <label
+        title={compact ? THEME_LABELS[choice] : undefined}
+        class:list={[
+          'flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg text-sm font-medium text-slate-600 hover:text-slate-800 not-has-checked:hover:bg-slate-200/80 has-checked:text-brand-strong has-focus-visible:outline-2 has-focus-visible:outline-offset-1 has-focus-visible:outline-brand dark:text-slate-400 dark:hover:text-slate-100 dark:not-has-checked:hover:bg-slate-700/80 dark:has-checked:text-brand',
+          compact
+            ? // Until the toggle opens, the chosen one alone, flat like the controls beside it,
+              // and first (nearest them); the others keep their places after it, unseen, so
+              // opening moves nothing: not the icon under the pointer, not the controls beside
+              // it. Closing waits a moment, so a pointer passing over on its way doesn't flash it;
+              // after a choice by the pointer it closes at once (`data-folded`), before the new
+              // choice moves first.
+              'px-2 py-1.5 has-checked:order-first transition-[opacity,visibility,color,background-color,box-shadow] delay-300 in-data-folded:delay-0! not-has-checked:invisible not-has-checked:opacity-0 has-checked:bg-slate-100 dark:has-checked:bg-slate-800 theme-open:visible theme-open:opacity-100 theme-open:delay-0 theme-open:has-checked:bg-white theme-open:has-checked:shadow-sm theme-open:has-checked:ring-1 theme-open:has-checked:ring-slate-200 dark:theme-open:has-checked:bg-slate-700 dark:theme-open:has-checked:ring-slate-600'
+            : // Raised on the track (lighter than it in dark mode too, so it reads as raised).
+              'min-h-10 px-2.5 transition-colors has-checked:bg-white has-checked:shadow-sm has-checked:ring-1 has-checked:ring-slate-200 dark:has-checked:bg-slate-700 dark:has-checked:ring-slate-600',
+        ]}
+      >
+        <input type="radio" name={name} value={choice} class="sr-only" />
+        <Icon size={16} aria-hidden="true" className="shrink-0" />
+        <span class:list={[compact && 'sr-only']}>{THEME_LABELS[choice]}</span>
+      </label>
+    );
+  })}
+</fieldset>

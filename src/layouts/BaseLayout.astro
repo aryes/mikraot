@@ -7,6 +7,7 @@ import SiteHeader from '../components/SiteHeader.astro';
 import { site } from '../lib/site';
 import { isGeneratedOgImage } from '../lib/og';
 import { NUSACH_HEAD_SCRIPT } from '../lib/nusach-head.mjs';
+import { THEME_HEAD_SCRIPT } from '../lib/theme-head.mjs';
 import type { Nusach } from '../lib/tropes';
 
 interface Props {
@@ -39,6 +40,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <title>{title}</title>
     <!-- The reader's tradition for trope names, before the page draws (src/lib/nusach-head.mjs). -->
     <script is:inline set:html={NUSACH_HEAD_SCRIPT} />
+    <!-- Light or dark (src/styles/global.css): the browser's own colours (form controls, the page
+         between loads) follow; set to the reader's choice by the script after it. -->
+    <meta name="color-scheme" content="light" />
+    <script is:inline set:html={THEME_HEAD_SCRIPT} />
     <!-- Fonts (astro.config.mjs). Preloaded so they're ready for the first paint (without them a
          line wrapped differently in the fallback font and the text below jumped): Taamey David
          CLM (all text) and Taamey D (the site name). -->
@@ -65,8 +70,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       href="/comments/feed/"
     />
     <!-- The yad logo (src/components/YadMark.astro) on the brand green; PNGs for browsers without SVG icons. -->
-    <!-- Dark mode (src/styles/global.css): native controls and the first paint follow the system. -->
-    <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/icon-32.png" sizes="32x32" />
     <link rel="icon" href="/icon-192.png" sizes="192x192" />
