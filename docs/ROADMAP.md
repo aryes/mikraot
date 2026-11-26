@@ -105,8 +105,8 @@
   - Sign-in methods at launch, all free: **email link** (no password; sent via Brevo) and **Google** (Arye, 2026-11-18: these two first); later **passkeys**, maybe **Microsoft** and **Facebook**. Not Apple for now (Apple Developer Program, $99/year; Apple users have the email link and, later, passkeys with Face ID); no SMS (paid per message). What syncs first: quiz results (Arye, 2026-11-18)
   - [x] The email link, the account page (sign out, delete the account) and the header's link to it (2026-11-18, `src/server/auth.ts`)
   - [x] Quiz results played signed in kept in the account, apart from the browser's anonymous ones (2026-11-18: each browser's own row, `src/server/quiz-results.ts`; 2026-11-21: no merge)
-  - [ ] Google sign-in, once Arye has created its app
-  - [ ] Arye: create the provider apps/keys (Google Cloud OAuth client, Meta for Developers app, Microsoft Entra app registration), keys into `.env` / Worker secrets; Claude guides each
+  - [x] Google sign-in (2026-11-26: the account page's button, Google's app made by Arye; `docs/OPERATIONS.md`, Accounts)
+  - [ ] Arye: create the provider apps/keys for the later methods (Meta for Developers app, Microsoft Entra app registration), keys into `.env` / Worker secrets; Claude guides each (Google's done 2026-11-26)
   - [x] Privacy policy: what an account stores (email, name, progress), how to delete it; account deletion in the profile (2026-11-24: the whole policy rewritten short, in general sentences; service names only where needed, the list under "מי מטפל במידע", Arye)
 - [x] Comments: Turnstile human check (decided 2026-10-02: Turnstile, comments still published immediately), plus rate limit and honeypot. Built with Cloudflare's test keys
 - [x] At deploy: `wrangler secret put TURNSTILE_SECRET_KEY` (set on the Worker since the first deploy, 2026-10-04) (value in `.env`; widget "mikraot.net comments" created 2026-10-02, site key in `astro.config.mjs`)

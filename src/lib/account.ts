@@ -4,6 +4,8 @@
  * React bindings the page would load for nothing.
  */
 
+import { ACCOUNT_URL } from './urls';
+
 const API = '/api/auth';
 
 /**
@@ -64,6 +66,30 @@ export async function requestLink(email: string, turnstileToken: string): Promis
   const data: unknown = await res.json();
   const link = data && typeof data === 'object' ? Reflect.get(data, 'link') : undefined;
   return typeof link === 'string' ? { ok: true, link } : { ok: true };
+}
+
+/**
+ * Where Google sends the learner back (src/server/auth.ts): the account page, marked so it knows
+ * the sign-in is new. A failure comes back to the page with Better Auth's `?error=`.
+ */
+export const GOOGLE_RETURN = `${ACCOUNT_URL}?signin=google`;
+
+/** Google's sign-in page, for this site's app: the browser goes there next. */
+export async function googleSignInUrl(): Promise<string> {
+  const res = await fetch(`${API}/sign-in/social`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      provider: 'google',
+      callbackURL: GOOGLE_RETURN,
+      errorCallbackURL: ACCOUNT_URL,
+    }),
+  });
+  if (!res.ok) throw new Error(`sign-in/social: ${res.status}`);
+  const data: unknown = await res.json();
+  const url = data && typeof data === 'object' ? Reflect.get(data, 'url') : undefined;
+  if (typeof url !== 'string') throw new Error('sign-in/social: no url');
+  return url;
 }
 
 /** Signs in with a link's token. Null if the link was already used or has expired. */

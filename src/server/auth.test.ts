@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { authOptions, removeExpired, signInEmail, signInLink, type AuthSettings } from './auth';
+import { ACCOUNT_URL } from '../lib/urls';
 
 const settings: AuthSettings = {
   // Never queried here.
@@ -33,13 +34,19 @@ describe('authOptions', () => {
     );
   });
 
-  it('offers Google only with its app', () => {
+  it("offers Google only with its app, asking which of Google's accounts", () => {
     expect(authOptions(settings)).not.toHaveProperty('socialProviders');
     const google = { clientId: 'id', clientSecret: 'secret' };
-    expect(authOptions({ ...settings, google }).socialProviders).toEqual({ google });
+    expect(authOptions({ ...settings, google }).socialProviders).toEqual({
+      google: { ...google, prompt: 'select_account' },
+    });
   });
 
-  it("keeps no IP address or browser in a session, and no provider's tokens", async () => {
+  it('brings a failed sign-in with Google back to the account page', () => {
+    expect(authOptions(settings).onAPIError.errorURL).toBe(ACCOUNT_URL);
+  });
+
+  it("keeps no IP address or browser in a session, no provider's tokens or picture", async () => {
     const hooks = authOptions(settings).databaseHooks;
     const [now, userId] = [new Date(), 'u'];
     const session = await hooks.session.create.before({
@@ -65,6 +72,18 @@ describe('authOptions', () => {
       idToken: 'it',
     });
     expect(account.data).toMatchObject({ accessToken: null, refreshToken: null, idToken: null });
+    const user = await hooks.user.create.before({
+      id: userId,
+      email: 'a@example.com',
+      emailVerified: true,
+      name: 'A',
+      createdAt: now,
+      updatedAt: now,
+      image: 'https://example.com/me.jpg',
+    });
+    expect(user.data).toMatchObject({ name: 'A', image: null });
+    const changed = await hooks.user.update.before({ image: 'https://example.com/me.jpg' });
+    expect(changed.data).toMatchObject({ image: null });
   });
 });
 

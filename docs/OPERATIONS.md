@@ -137,6 +137,19 @@ wrangler.jsonc`) signs everyone out; nothing else is lost. Without it the sign-i
   Someone passing Turnstile from many addresses could still use up the day's 300 emails, which
   would also hold back comment notices and alerts (those are retried for a day): if Brevo's log
   shows a burst of sign-in links, lower `AUTH_RATE_LIMIT` or turn the sign-in route off.
+- **Google sign-in** (since 2026-11-26): the OAuth client "mikraot.net site" in Arye's Google
+  Cloud project (the WordPress site's project; its older "Mikraot OAuth client" is WordPress's,
+  deleted with WordPress), consent screen "In production". Its keys are the Worker secrets
+  `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, and in `.env` (as `GOOGLE_APP_AUTH_CLIENT_*`).
+  Google returns only to the addresses listed in the client's "Authorized redirect URIs" (no
+  wildcards): `https://mikraot.net/api/auth/callback/google` and the sign-in branch's preview,
+  `https://claude-sign-in-mikraot.mikraot-app.workers.dev/api/auth/callback/google`. So previews
+  get the keys one by one, not from the base config: to try Google on one, add its address there
+  and `npx wrangler preview secret put GOOGLE_CLIENT_ID --name <branch> --config wrangler.jsonc`
+  (and the secret). Without the keys the Google button answers "לא הצלחנו להגיע ל־Google"; the
+  email link still works. A new client secret (Google shows it only when made): replace both
+  places, then delete the old one in the console. Local runs and tests use a stand-in app
+  (`local-test-only` in `.dev.vars`), whose sign-in fails at Google.
 - **Clean-up:** the daily run deletes expired sessions and sign-in links nobody used
   (`removeExpired`); a failure there emails a backup alert.
 - **Delete an account on request** (a learner who can't sign in to delete it themselves; with

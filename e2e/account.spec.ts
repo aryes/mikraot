@@ -55,6 +55,47 @@ test(
   },
 );
 
+test(
+  "Google's button leads to Google's sign-in, for the site's app",
+  LOCAL_ONLY,
+  async ({ page }) => {
+    // Stopped at Google: its page is not this site's to test.
+    let google: URL | undefined;
+    await page.route('https://accounts.google.com/**', async (route) => {
+      google = new URL(route.request().url());
+      await route.fulfill({ contentType: 'text/html', body: '<p>Google</p>' });
+    });
+    await page.goto('/account/');
+    await page.getByRole('button', { name: 'התחברות עם Google' }).click();
+    await expect(page.getByText('Google', { exact: true })).toBeVisible(ANSWERED);
+    expect(google?.searchParams.get('client_id')).toBe('local-test-only');
+    expect(google?.searchParams.get('prompt')).toBe('select_account');
+    expect(google?.searchParams.get('redirect_uri')).toMatch(/\/api\/auth\/callback\/google$/);
+    // Back from Google's page: the button works again.
+    await page.goBack();
+    await expect(page.getByRole('button', { name: 'התחברות עם Google' })).toBeEnabled(ANSWERED);
+  },
+);
+
+test('back from Google: a failure says so, a refusal and a bare link say nothing', async ({
+  page,
+}) => {
+  const failed = page.getByText('ההתחברות עם Google לא הצליחה');
+  const form = page.getByRole('button', { name: 'שלחו לי קישור' });
+  await page.goto('/account/?error=state_mismatch');
+  await expect(failed).toBeVisible(ANSWERED);
+  expect(new URL(page.url()).search).toBe('');
+  await page.goto('/account/?error=access_denied');
+  await expect(form).toBeVisible(ANSWERED);
+  await expect(failed).toBeHidden();
+  expect(new URL(page.url()).search).toBe('');
+  // A link to the return address, not a return from Google this tab went to.
+  await page.goto('/account/?signin=google');
+  await expect(form).toBeVisible(ANSWERED);
+  await expect(failed).toBeHidden();
+  expect(new URL(page.url()).search).toBe('');
+});
+
 test('a learner deletes their account', LOCAL_ONLY, async ({ page }) => {
   const email = address('leaving');
   await page.goto(await askForLink(page, email));

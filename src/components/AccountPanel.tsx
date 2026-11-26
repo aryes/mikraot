@@ -3,6 +3,7 @@ import { LogOut, Mail, Trash2 } from 'lucide-react';
 import {
   currentAccount,
   deleteAccount,
+  googleSignInUrl,
   remember,
   requestLink,
   signInWithToken,
@@ -42,8 +43,24 @@ function takeToken(): string | null {
 }
 
 /**
- * The account page (src/pages/account.astro): asking for a sign-in link, signing in with one,
- * and, once signed in, signing out or deleting the account.
+ * Back from Google (src/lib/account.ts `GOOGLE_RETURN`), taken off the address: 'google' if this
+ * tab went there (signed in if the session says so; a link to the address alone doesn't count),
+ * 'failed' if it failed, 'cancelled' if the learner turned it down there.
+ */
+function takeGoogleReturn(): 'google' | 'failed' | 'cancelled' | null {
+  const params = new URLSearchParams(location.search);
+  const error = params.get('error');
+  if (!error && !params.has('signin')) return null;
+  history.replaceState(null, '', location.pathname + location.hash);
+  const went = wentToGoogle(false);
+  if (error === 'access_denied') return 'cancelled';
+  if (error) return 'failed';
+  return went && params.get('signin') === 'google' ? 'google' : null;
+}
+
+/**
+ * The account page (src/pages/account.astro): signing in with Google, or asking for a sign-in link
+ * and signing in with one; once signed in, signing out or deleting the account.
  */
 export const AccountPanel: React.FC = () => {
   const [view, setView] = useState<View>({ kind: 'loading' });
@@ -61,17 +78,17 @@ export const AccountPanel: React.FC = () => {
   }, [view, acted]);
 
   useEffect(() => {
-    const show = (token: string | null) => {
+    const show = (token: string | null, google: ReturnType<typeof takeGoogleReturn> = null) => {
       // A link already used (opened again while signed in) leaves the session as it was.
       const signedIn = token
         ? signInWithToken(token).then(async (account) =>
             account ? { account, fresh: true } : { account: await currentAccount(), fresh: false },
           )
-        : currentAccount().then((account) => ({ account, fresh: false }));
+        : currentAccount().then((account) => ({ account, fresh: google === 'google' }));
       signedIn
         .then(({ account, fresh }) => {
-          // Signing in from a link: the result is announced like a change.
-          if (token) setActed(true);
+          // Signing in from a link or Google: the result is announced like a change.
+          if (token || google) setActed(true);
           remember(account);
           // Signed in from a link: anything left of an earlier account goes first (a sign-out
           // that never reached this browser); then the account's quiz results come here.
@@ -84,12 +101,17 @@ export const AccountPanel: React.FC = () => {
               kind: 'signed-out',
               notice: 'הקישור כבר שימש או שעבר זמנו. אפשר לבקש קישור חדש.',
             });
+          else if (google === 'failed' || google === 'google')
+            setView({
+              kind: 'signed-out',
+              notice: 'ההתחברות עם Google לא הצליחה. אפשר לנסות שוב, או להתחבר באימייל.',
+            });
           else setView({ kind: 'signed-out' });
         })
         .catch(() => setView({ kind: 'error' }));
     };
-    const first = takeToken();
-    show(first);
+    const google = takeGoogleReturn();
+    show(takeToken(), google);
     // A link opened in this same tab (where it is shown, on test sites) changes only the `#` part.
     const onHash = () => {
       const token = takeToken();
@@ -215,6 +237,10 @@ const SignInForm: React.FC<{
   return (
     <form ref={form} noValidate onSubmit={handleSubmit} className="space-y-4">
       {notice && <p className="font-semibold text-slate-800 dark:text-slate-100">{notice}</p>}
+      <GoogleButton />
+      <p className="flex items-center gap-3 text-sm text-slate-600 before:h-px before:w-6 before:flex-none before:bg-slate-300 after:h-px after:flex-1 after:bg-slate-300 dark:text-slate-400 dark:before:bg-slate-600 dark:after:bg-slate-600">
+        או
+      </p>
       <p className={TEXT}>אין צורך בסיסמה: נשלח אליכם אימייל עם קישור, ולחיצה עליו תחבר אתכם.</p>
       <div>
         <label
@@ -260,6 +286,92 @@ const SignInForm: React.FC<{
         </a>
       </p>
     </form>
+  );
+};
+
+/**
+ * Whether this tab went to Google to sign in: set before leaving, read (and forgotten) on the way
+ * back, so the return counts as a new sign-in (src/lib/quiz-sync.ts starts afresh) only then.
+ */
+function wentToGoogle(going: boolean): boolean {
+  const key = 'google-signin';
+  try {
+    if (going) sessionStorage.setItem(key, '1');
+    const went = sessionStorage.getItem(key) !== null;
+    if (!going) sessionStorage.removeItem(key);
+    return went;
+  } catch {
+    return false;
+  }
+}
+
+/** Google's "G", as its sign-in button guidelines draw it. */
+const GoogleMark: React.FC = () => (
+  <svg viewBox="0 0 48 48" className="h-5 w-5 shrink-0" aria-hidden="true">
+    <path
+      fill="#EA4335"
+      d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+    />
+    <path
+      fill="#4285F4"
+      d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+    />
+    <path
+      fill="#FBBC05"
+      d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+    />
+    <path
+      fill="#34A853"
+      d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+    />
+  </svg>
+);
+
+/**
+ * Signing in with Google: the server gives Google's address for this site's app, and Google sends
+ * the learner back to this page. Our own button with Google's mark, not Google's script, which
+ * would load Google's code (and cookies) on the page for everyone.
+ */
+const GoogleButton: React.FC = () => {
+  const [going, setGoing] = useState(false);
+  const [error, setError] = useState('');
+  // Back from Google's page, the browser may show this page as it was left: ready again.
+  useEffect(() => {
+    const ready = (event: PageTransitionEvent) => {
+      if (event.persisted) setGoing(false);
+    };
+    window.addEventListener('pageshow', ready);
+    return () => window.removeEventListener('pageshow', ready);
+  }, []);
+  const go = async () => {
+    setGoing(true);
+    setError('');
+    try {
+      const url = await googleSignInUrl();
+      wentToGoogle(true);
+      location.assign(url);
+    } catch {
+      setError('לא הצלחנו להגיע ל־Google. נסו שוב, או התחברו באימייל.');
+      setGoing(false);
+    }
+  };
+  return (
+    <div>
+      <button
+        type="button"
+        disabled={going}
+        onClick={() => void go()}
+        className={`${BUTTON} border border-slate-500 bg-white text-slate-900 hover:bg-slate-50 dark:border-slate-400 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800`}
+      >
+        <GoogleMark />
+        {going ? 'עוברים ל־Google…' : 'התחברות עם Google'}
+      </button>
+      {error && (
+        <p role="alert" className={`mt-1 ${ERROR}`}>
+          {error}
+        </p>
+      )}
+    </div>
   );
 };
 

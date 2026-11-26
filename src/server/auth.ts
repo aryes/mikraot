@@ -4,14 +4,14 @@
  * Worker and keeps the accounts in our D1 database (migrations/0006_accounts.sql), so no outside
  * service holds them (decided with Arye, 2026-10-03).
  *
- * Sign-in is by an emailed link (no passwords to keep or leak), and by Google once its app exists
- * (GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET). The link leads to the account page
- * (src/pages/account.astro) with its token after `#`, and the page's script signs in: a link
+ * Sign-in is by an emailed link (no passwords to keep or leak), or by Google (its app: the
+ * secrets GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET; Google returns to /api/auth/callback/google).
+ * The link leads to the account page (src/pages/account.astro) with its token after `#`, and the page's script signs in: a link
  * leading straight to the API would be used up by mail services that open links to scan them,
  * and the part after `#` never reaches a server's logs or the site's statistics.
  *
  * Kept as little as possible: no IP address or browser in a session, no Google tokens (the site
- * never calls Google for the learner), and sign-in links stored hashed for their 10 minutes.
+ * never calls Google for the learner) or profile picture, and sign-in links stored hashed for their 10 minutes.
  */
 import { betterAuth, type BetterAuthOptions, type D1Database } from 'better-auth';
 import { magicLink } from 'better-auth/plugins/magic-link';
@@ -96,8 +96,20 @@ export function authOptions(settings: AuthSettings) {
       // Asked for again within a day of signing in (Better Auth's `freshAge`), else signing in again.
       deleteUser: { enabled: true },
     },
-    ...(google && { socialProviders: { google } }),
+    // Google asks which of its accounts each time: a shared computer may be signed in to someone
+    // else's.
+    ...(google && {
+      socialProviders: { google: { ...google, prompt: 'select_account' as const } },
+    }),
+    // A sign-in with Google that fails comes back to the account page (with `?error=`), not to
+    // Better Auth's own error page.
+    onAPIError: { errorURL: ACCOUNT_URL },
     databaseHooks: {
+      // Of a provider's profile, the email and name only: not the picture's address.
+      user: {
+        create: { before: (user) => Promise.resolve({ data: { ...user, image: null } }) },
+        update: { before: (user) => Promise.resolve({ data: { ...user, image: null } }) },
+      },
       session: {
         create: {
           before: (session) =>

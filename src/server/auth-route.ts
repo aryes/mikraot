@@ -24,7 +24,6 @@ const ENDPOINTS = new Set([
   'POST /delete-user',
   'POST /sign-in/social',
   'GET /callback/google',
-  'POST /callback/google',
 ]);
 
 const json = (data: unknown, status = 200) =>
