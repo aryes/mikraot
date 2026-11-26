@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { parse } from 'jsonc-parser';
 import { describe, expect, it, vi } from 'vitest';
 import {
   addedToList,
@@ -5,6 +7,7 @@ import {
   emailFromToken,
   isBlocked,
   NEWSLETTER_LIST_ID,
+  newsletterList,
   parseSignup,
   removeFromList,
   requestConfirmation,
@@ -72,6 +75,21 @@ describe('requestConfirmation', () => {
       templateId: CONFIRM_TEMPLATE_ID,
       redirectionUrl: 'https://mikraot.net/newsletter/confirmed/',
     });
+  });
+
+  it("signs a preview up to its own list, without the shared contact's name", async () => {
+    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}', { status: 201 }));
+    const list = newsletterList('12') ?? NEWSLETTER_LIST_ID;
+    const signup = { email: 'a@b.co', name: 'דנה' };
+    await requestConfirmation('key', signup, 'https://x.example', fetchFn, list);
+    const sent = sentBody(fetchFn.mock.calls[1]?.[1]);
+    expect(sent).toMatchObject({ includeListIds: [12] });
+    expect(sent).not.toHaveProperty('attributes');
+  });
+
+  it('names no list when NEWSLETTER_LIST_ID is unset or wrong: nothing is signed up', () => {
+    expect([undefined, '', 'x', '0'].map(newsletterList)).toEqual([null, null, null, null]);
+    expect(newsletterList('4')).toBe(NEWSLETTER_LIST_ID);
   });
 
   it('sends no name attribute without a name', async () => {
@@ -214,9 +232,9 @@ describe('unsubscribeNewsletter', () => {
   it('removes the token’s address from the newsletter list', async () => {
     const fetchFn = removed();
     const token = await unsubscribeToken('s3cret', 'a@b.co');
-    expect(await unsubscribeNewsletter({ apiKey: 'key', secret: 's3cret', token }, fetchFn)).toBe(
-      true,
-    );
+    expect(
+      await unsubscribeNewsletter({ apiKey: 'key', secret: 's3cret', token, list: 4 }, fetchFn),
+    ).toBe(true);
     const [url, init] = fetchFn.mock.calls[0] ?? [];
     expect(url).toBe(
       `https://api.brevo.com/v3/contacts/lists/${NEWSLETTER_LIST_ID}/contacts/remove`,
@@ -227,11 +245,14 @@ describe('unsubscribeNewsletter', () => {
   it('does nothing for a bad token, and sends nothing without an API key', async () => {
     const fetchFn = removed();
     expect(
-      await unsubscribeNewsletter({ apiKey: 'key', secret: 's3cret', token: 'x.y' }, fetchFn),
+      await unsubscribeNewsletter(
+        { apiKey: 'key', secret: 's3cret', token: 'x.y', list: 4 },
+        fetchFn,
+      ),
     ).toBe(false);
     const token = await unsubscribeToken('s3cret', 'a@b.co');
     expect(
-      await unsubscribeNewsletter({ apiKey: undefined, secret: 's3cret', token }, fetchFn),
+      await unsubscribeNewsletter({ apiKey: undefined, secret: 's3cret', token, list: 4 }, fetchFn),
     ).toBe(true);
     expect(fetchFn).not.toHaveBeenCalled();
   });
@@ -251,5 +272,15 @@ describe('sameSecret', () => {
     expect(await sameSecret('s3cret', 's3cret')).toBe(true);
     expect(await sameSecret('s3cre', 's3cret')).toBe(false);
     expect(await sameSecret('', '')).toBe(false);
+  });
+});
+
+describe('the newsletter list', () => {
+  it("is the one the site's Worker signs up to (the webhook and the name assume it)", () => {
+    const config: unknown = parse(readFileSync('wrangler.jsonc', 'utf8'));
+    const vars: unknown = config && typeof config === 'object' ? Reflect.get(config, 'vars') : null;
+    const list: unknown =
+      vars && typeof vars === 'object' ? Reflect.get(vars, 'NEWSLETTER_LIST_ID') : null;
+    expect(newsletterList(typeof list === 'string' ? list : undefined)).toBe(NEWSLETTER_LIST_ID);
   });
 });

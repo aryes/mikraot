@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
 import type { TurnstileAction } from '../server/turnstile';
 
-/** Cloudflare's always-pass test key, for `astro dev` (the real widget only works on mikraot.net). */
+/** Cloudflare's always-pass test key, for `astro dev` (the real widget works only on mikraot.net and the previews). */
 const TEST_SITE_KEY = '1x00000000000000000000AA';
 const SITE_KEY = import.meta.env.DEV ? TEST_SITE_KEY : PUBLIC_TURNSTILE_SITE_KEY;
 

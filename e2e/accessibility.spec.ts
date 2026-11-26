@@ -2,7 +2,7 @@ import { AxeBuilder } from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 
-/** Every page of the build (from its sitemap), plus the 404 page. */
+/** Every page of the build (from its sitemap), plus the 404 page and the account page (not listed). */
 const paths = [
   ...[
     ...readFileSync('dist/client/sitemap-0.xml', 'utf8').matchAll(
@@ -10,6 +10,7 @@ const paths = [
     ),
   ].map((m) => decodeURI(m[1] ?? '/')),
   '/no-such-page/',
+  '/account/',
 ];
 
 for (const path of paths) {

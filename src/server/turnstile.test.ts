@@ -45,7 +45,7 @@ describe('verifyTurnstile', () => {
     expect(await check(reply({ success: true }))).toBe(false);
   });
 
-  it("accepts the test keys' placeholder hostname and action (local runs, previews)", async () => {
+  it("accepts the test keys' placeholder hostname and action (local runs, tests)", async () => {
     const placeholder = reply({ success: true, hostname: 'localhost', action: 'test' });
     expect(await check(placeholder, { key: TEST_SECRET })).toBe(true);
   });

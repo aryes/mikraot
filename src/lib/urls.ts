@@ -42,3 +42,5 @@ export function excerptOf(markdoc: string, words: number): string {
 
 /** The privacy policy (src/content/pages/privacy-policy.mdoc), linked from the forms. */
 export const PRIVACY_POLICY_URL = '/privacy-policy/';
+/** Signing in, and the account (src/pages/account.astro). */
+export const ACCOUNT_URL = '/account/';

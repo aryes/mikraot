@@ -14,3 +14,9 @@ regexes = ['''^<[A-Z_]+ in \.env>$''']
 [[rules.allowlists]]
 description = "The comment management links' local and CI test key (.dev.vars, ci.yml): not a secret"
 regexes = ['''^local-test-only$''']
+[[rules.allowlists]]
+description = "Sign-in's local and CI test value for BETTER_AUTH_SECRET (.dev.vars, ci.yml): not a secret"
+regexes = ['''^local-test-only-sign-in-not-a-secret-7f3a9c$''']
+[[rules.allowlists]]
+description = "Code reading a secret from the Worker's environment (env.NAME), not a value"
+regexes = ['''^env\.[A-Z_]+;?$''']

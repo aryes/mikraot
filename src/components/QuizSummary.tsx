@@ -1,6 +1,8 @@
-import React, { useRef, useState, useSyncExternalStore } from 'react';
-import { emptyStats, readStats, type QuizStats } from '../lib/quiz-stats';
-import { quizKeys, store, stored } from '../lib/quiz-storage';
+import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { signedInHere } from '../lib/account';
+import type { QuizStats } from '../lib/quiz-stats';
+import { clearResults, resultsOf, SYNCED_EVENT, syncResults } from '../lib/quiz-sync';
+import { ACCOUNT_URL } from '../lib/urls';
 import type { QuizEntry } from '../lib/quizzes';
 import { playedLimits, QuizResultsTable } from './QuizResultsTable';
 
@@ -17,25 +19,30 @@ const ACTION =
 const NONE: readonly QuizStats[] = [];
 
 /**
- * What this browser remembers of one quiz's results (src/lib/quiz-storage.ts). The answers aren't
- * shown here (they are, on the quiz's own start screen), nor the options' level (Arye, 2026-11-16:
- * not for the learner to see).
+ * What this browser remembers of one quiz's results (src/lib/quiz-storage.ts), with the account's
+ * other devices' when signed in (src/lib/quiz-sync.ts). The answers aren't shown here (they are,
+ * on the quiz's own start screen), nor the options' level (Arye, 2026-11-16: not for the learner
+ * to see).
  */
 function remembered(storage: string): QuizStats {
-  return readStats(stored(quizKeys(storage).stats), () => false);
+  return resultsOf(storage, () => false);
 }
 
-/** Storage changed in another tab. */
+/** Storage changed in another tab, or the account's results arrived. */
 function subscribe(changed: () => void): () => void {
   addEventListener('storage', changed);
-  return () => removeEventListener('storage', changed);
+  document.addEventListener(SYNCED_EVENT, changed);
+  return () => {
+    removeEventListener('storage', changed);
+    document.removeEventListener(SYNCED_EVENT, changed);
+  };
 }
 
 /**
  * The page of all the quizzes ("חידונים"; Arye, 2026-11-15): each one's name, what it asks, and the
  * learner's results so far, for each time limit played apart. Read from this browser once the page
  * loads; before that, and for a quiz not yet played, only its link and description. Below them,
- * that the results stay in this browser, and a way to clear every quiz's results at once (Arye,
+ * where the results are kept (this browser, or the account when signed in), and a way to clear every quiz's results at once (Arye,
  * 2026-11-16), asked once more first, as each quiz's own reset is: the same results (not the
  * levels or the choices made on the start screens).
  */
@@ -52,13 +59,22 @@ export const QuizSummary: React.FC<{ quizzes: readonly QuizLink[] }> = ({ quizze
     return latest.current.value;
   });
   const [confirming, setConfirming] = useState(false);
+  // Known only in the browser: until then (the built page), as for a visitor not signed in.
+  const account = useSyncExternalStore(subscribe, () =>
+    typeof window === 'undefined' ? false : signedInHere(),
+  );
+  useEffect(() => void syncResults(), []);
   const [cleared, setCleared] = useState(false);
   const done = useRef<HTMLParagraphElement>(null);
   // As the tables show them: results kept before they were by time limit (2026-11-15) don't count.
   const played = memory.map((stats) => playedLimits(stats).length > 0);
   const anything = played.some(Boolean);
   function clearAll(): void {
-    for (const { storage } of quizzes) store(quizKeys(storage).stats, emptyStats());
+    for (const { storage } of quizzes) {
+      clearResults(storage);
+    }
+    // On every device of the account too.
+    void syncResults(quizzes.map(({ storage }) => storage));
     setConfirming(false);
     setCleared(true);
     // The button pressed goes away: focus to the line that says it was done (always in the page).
@@ -97,7 +113,14 @@ export const QuizSummary: React.FC<{ quizzes: readonly QuizLink[] }> = ({ quizze
         })}
       </ul>
       <p className="m-0! mt-6! text-sm! text-slate-600 dark:text-slate-300">
-        התוצאות נשמרות רק בדפדפן הזה.
+        {account ? (
+          'התוצאות נשמרות בחשבון שלכם, בכל מכשיר שתתחברו ממנו.'
+        ) : (
+          <>
+            התוצאות נשמרות רק בדפדפן הזה. כדי לשמור את התוצאות שלכם בכל מכשיר,{' '}
+            <a href={ACCOUNT_URL}>התחברו לחשבון</a> לפני שאתם משחקים.
+          </>
+        )}
       </p>
       {/* Always in the page, its words changing, so a screen reader reads them out. Only until
           results come back (from another tab). */}

@@ -1,6 +1,7 @@
 ---
-import { ChevronDown, Home, Menu, Search } from 'lucide-react';
+import { ChevronDown, Home, Menu, Search, UserRound } from 'lucide-react';
 import { menuTree, pointedTitle, site } from '../lib/site';
+import { ACCOUNT_URL } from '../lib/urls';
 import { NUSACH_LABELS, SWITCHABLE } from '../lib/tropes';
 import MenuTitle from './layout/MenuTitle.astro';
 import YadMark from './YadMark.astro';
@@ -58,6 +59,21 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
         </select>
         <ChevronDown size={14} className="pointer-events-none absolute end-2 text-slate-400" />
       </label>
+      <!-- The account page (signing in is optional); marked while signed in
+           (src/scripts/account-link.ts). -->
+      <a
+        href={ACCOUNT_URL}
+        data-account-link
+        aria-label="התחברות"
+        title="התחברות"
+        class="group/account relative flex items-center rounded-xl bg-slate-100 dark:bg-slate-800 p-2 text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-200/80 dark:hover:bg-slate-700/80"
+      >
+        <UserRound size={16} />
+        <span
+          aria-hidden="true"
+          class="absolute end-1 top-1 hidden size-2 rounded-full bg-brand-strong ring-2 ring-slate-100 group-data-signed-in/account:block dark:bg-brand dark:ring-slate-800"
+        ></span>
+      </a>
       <button
         type="button"
         data-open-search
@@ -264,3 +280,4 @@ const linkOrText = (url: string | null) => (url ? 'a' : 'span');
 
 <script src="../scripts/menu.ts"></script>
 <script src="../scripts/nusach.ts"></script>
+<script src="../scripts/account-link.ts"></script>

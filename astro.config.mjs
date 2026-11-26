@@ -30,10 +30,7 @@ const notoSymbols =
     ),
   ]);
 
-/** Cloudflare's always-pass Turnstile test site key. */
-const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
 const ciBranch = process.env['WORKERS_CI_BRANCH'];
-const isPreviewBuild = ciBranch !== undefined && ciBranch !== 'main';
 /** Sentry project "javascript-astro" (EU; public: it only lets a client send error reports). */
 const SENTRY_DSN =
   'https://14039a75d2faec81966a64d944a17ef9@o4512244833386496.ingest.de.sentry.io/4512244858945616';
@@ -95,14 +92,13 @@ export default defineConfig({
   },
   env: {
     schema: {
-      // Turnstile site key (public; widget "mikraot.net comments", works only on mikraot.net).
-      // Builds of branches other than main (Cloudflare Workers Builds sets WORKERS_CI_BRANCH) are
-      // previews on workers.dev, so they get Cloudflare's test key, matching the previews' test
-      // secret (wrangler.jsonc). Tests override it too (playwright.config.ts).
+      // Turnstile site key (public; widget "mikraot.net comments", works on mikraot.net and the
+      // previews on mikraot-app.workers.dev, so previews check visitors as the site does). Local
+      // tests use Cloudflare's always-pass test key instead (playwright.config.ts).
       PUBLIC_TURNSTILE_SITE_KEY: envField.string({
         context: 'client',
         access: 'public',
-        default: isPreviewBuild ? TURNSTILE_TEST_SITE_KEY : '0x4AAAAAAFL0OyR8bp2yP3s0',
+        default: '0x4AAAAAAFL0OyR8bp2yP3s0',
       }),
       // Where errors are reported (src/lib/sentry.ts). Only Workers Builds of main (the
       // deployed site) get it: local runs, tests and previews report nothing, so their errors
@@ -203,8 +199,8 @@ export default defineConfig({
     // Not the author archive (noindex), nor the pages opened only from email links.
     sitemap({
       filter: (page) =>
-        !['/author/', '/unsubscribe/', '/newsletter/', '/comments/manage/'].some((path) =>
-          page.includes(path),
+        !['/author/', '/unsubscribe/', '/newsletter/', '/comments/manage/', '/account/'].some(
+          (path) => page.includes(path),
         ),
     }),
   ],

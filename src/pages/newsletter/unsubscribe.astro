@@ -6,7 +6,7 @@
  */
 import { env } from 'cloudflare:workers';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { emailFromToken, unsubscribeNewsletter } from '../../server/newsletter';
+import { emailFromToken, newsletterList, unsubscribeNewsletter } from '../../server/newsletter';
 
 // Runs in the Worker on each request.
 export const prerender = false;
@@ -16,7 +16,12 @@ const signingKey = env.NEWSLETTER_WEBHOOK_SECRET;
 let state: 'ask' | 'done' | 'unknown' =
   token && (await emailFromToken(signingKey ?? '', token)) ? 'ask' : 'unknown';
 if (Astro.request.method === 'POST' && state === 'ask') {
-  await unsubscribeNewsletter({ apiKey: env.BREVO_API_KEY, secret: signingKey, token });
+  await unsubscribeNewsletter({
+    apiKey: env.BREVO_API_KEY,
+    secret: signingKey,
+    token,
+    list: newsletterList(env.NEWSLETTER_LIST_ID),
+  });
   state = 'done';
 }
 ---

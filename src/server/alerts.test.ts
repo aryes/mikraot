@@ -55,7 +55,7 @@ describe('alertOwner', () => {
     expect(ttls).toEqual([]);
   });
 
-  it('sends nothing without a key (branch previews, local runs)', async () => {
+  it('sends nothing without a key (local runs, tests)', async () => {
     const fetchFn = okFetch();
     const { store } = memoryStore();
     await alertOwner({

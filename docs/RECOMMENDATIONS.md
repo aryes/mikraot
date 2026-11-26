@@ -70,7 +70,8 @@ Open from it, each waiting for Arye:
   it only after 60 days without activity).
 - **Decided (Arye, 2026-10-20): yes.** Branch previews stay public after the switch (test database,
   no emails, the human check's test keys; locking them needs Cloudflare Zero Trust with a card on
-  file). CLAUDE.md shortened to rules and a map after the switch (Claude's own working file).
+  file). Changed since 2026-11-21 (Arye: previews behave as the site does): they send real emails
+  behind the real human check, out of Brevo's 300 a day. CLAUDE.md shortened to rules and a map after the switch (Claude's own working file).
 - **Decided and done (Arye, 2026-10-20).** A content licence: CC BY-NC-SA 4.0, in the footer and on the about page (how to credit; not YouTube videos; the recordings, all Arye's, included).
 - **Decided (Arye, 2026-10-20).** A GitHub successor and a second Cloudflare member: not relevant.
   GitHub Actions pinned by full SHA: now required by the repository (all 18 already were). The

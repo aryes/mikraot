@@ -10,6 +10,8 @@
   // branch previews stay.
   "routes": [{ "pattern": "mikraot.net/*", "zone_name": "mikraot.net" }],
   "workers_dev": false,
+  // The Brevo newsletter list sign-ups join (src/server/newsletter.ts); previews have their own.
+  "vars": { "NEWSLETTER_LIST_ID": "4" },
   "preview_urls": true,
   "assets": {
     "directory": "./dist",
@@ -75,6 +77,33 @@
       "namespace_id": "1015",
       "simple": { "limit": 10, "period": 60 },
     },
+    // Sign-in links (src/server/auth-route.ts): each sends an email, so at most 20 a minute from one
+    // address (a class may share one)...
+    {
+      "name": "AUTH_RATE_LIMIT",
+      "namespace_id": "1017",
+      "simple": { "limit": 20, "period": 60 },
+    },
+    // ...and one a minute to any one address.
+    {
+      "name": "AUTH_EMAIL_RATE_LIMIT",
+      "namespace_id": "1019",
+      "simple": { "limit": 1, "period": 60 },
+    },
+    // Any sign-in request (checking who is signed in, signing out, Google) or quiz sync: 120 a
+    // minute from one address, enough for a class behind one school address.
+    {
+      "name": "AUTH_API_RATE_LIMIT",
+      "namespace_id": "1021",
+      "simple": { "limit": 120, "period": 60 },
+    },
+    // Quiz results sent by one account (src/pages/api/quiz-results.ts): each may rewrite a row per
+    // quiz, so 10 a minute, whatever addresses they come from.
+    {
+      "name": "QUIZ_SYNC_RATE_LIMIT",
+      "namespace_id": "1023",
+      "simple": { "limit": 10, "period": 60 },
+    },
   ],
   // Quiz duels (src/server/quiz-duel.ts): one Durable Object per room, kept in its own SQLite
   // storage (the only kind the free plan has); a room deletes itself after 3 hours.
@@ -103,12 +132,12 @@
     { "binding": "ALERTS", "id": "1d520101c5964450b319f01663e8b890" },
   ],
   "observability": { "enabled": true },
-  // Worker Previews (one per git branch, `wrangler preview`): their own database and rate-limit
-  // counter, so test comments never reach production. Previews are built with Turnstile's test
-  // site key, so they use Cloudflare's public always-pass test secret (a documented test value,
-  // not a credential; production's real secret is a Worker secret).
+  // Worker Previews (one per git branch, `wrangler preview`): they behave as the site does (Arye,
+  // 2026-11-21), with their own database and rate-limit counters, so test data never reaches
+  // production. Their secrets are the Preview base config's (docs/OPERATIONS.md, Previews).
   "previews": {
-    "vars": { "TURNSTILE_SECRET_KEY": "1x0000000000000000000000000000000AA" },
+    // Brevo list "previews": a test sign-up never joins the newsletter.
+    "vars": { "NEWSLETTER_LIST_ID": "5" },
     // Each preview gets its own rooms (Cloudflare isolates a preview's Durable Objects); the
     // binding must be repeated here, or a preview has none.
     "durable_objects": { "bindings": [{ "name": "QUIZ_DUEL", "class_name": "QuizDuel" }] },
@@ -155,6 +184,26 @@
       {
         "name": "DUEL_RATE_LIMIT",
         "namespace_id": "1016",
+        "simple": { "limit": 10, "period": 60 },
+      },
+      {
+        "name": "AUTH_RATE_LIMIT",
+        "namespace_id": "1018",
+        "simple": { "limit": 20, "period": 60 },
+      },
+      {
+        "name": "AUTH_EMAIL_RATE_LIMIT",
+        "namespace_id": "1020",
+        "simple": { "limit": 1, "period": 60 },
+      },
+      {
+        "name": "AUTH_API_RATE_LIMIT",
+        "namespace_id": "1022",
+        "simple": { "limit": 120, "period": 60 },
+      },
+      {
+        "name": "QUIZ_SYNC_RATE_LIMIT",
+        "namespace_id": "1024",
         "simple": { "limit": 10, "period": 60 },
       },
     ],
